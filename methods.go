@@ -250,6 +250,195 @@ func (bot *BotApi) sendPhoto(config PhotoConfig) (Message, error) {
 	return message, nil
 }
 
+func (bot *BotApi) sendDocument(config DocumentConfig) (Message, error) {
+	if config.UseExitingDocument {
+		v := url.Values{}
+		v.Add("chat_id", strconv.Itoa(config.ChatId))
+		v.Add("document", config.FileId)
+		if config.ReplyToMessageId != 0 {
+			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageId))
+		}
+		if config.ReplyMarkup != nil {
+			data, err := json.Marshal(config.ReplyMarkup)
+			if err != nil {
+				return Message{}, err
+			}
+
+			v.Add("reply_markup", string(data))
+		}
+
+		resp, err := bot.makeRequest("sendDocument", v)
+		if err != nil {
+			return Message{}, err
+		}
+
+		var message Message
+		json.Unmarshal(resp.Result, &message)
+
+		if bot.config.debug {
+			log.Printf("sendDocument req : %+v\n", v)
+			log.Printf("sendDocument resp: %+v\n", message)
+		}
+
+		return message, nil
+	}
+
+	params := make(map[string]string)
+
+	params["chat_id"] = strconv.Itoa(config.ChatId)
+	if config.ReplyToMessageId != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageId)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return Message{}, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	resp, err := bot.uploadFile("sendDocument", params, "document", config.FilePath)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+
+	if bot.config.debug {
+		log.Printf("sendDocument resp: %+v\n", message)
+	}
+
+	return message, nil
+}
+
+func (bot *BotApi) sendSticker(config StickerConfig) (Message, error) {
+	if config.UseExistingSticker {
+		v := url.Values{}
+		v.Add("chat_id", strconv.Itoa(config.ChatId))
+		v.Add("sticker", config.FileId)
+		if config.ReplyToMessageId != 0 {
+			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageId))
+		}
+		if config.ReplyMarkup != nil {
+			data, err := json.Marshal(config.ReplyMarkup)
+			if err != nil {
+				return Message{}, err
+			}
+
+			v.Add("reply_markup", string(data))
+		}
+
+		resp, err := bot.makeRequest("sendSticker", v)
+		if err != nil {
+			return Message{}, err
+		}
+
+		var message Message
+		json.Unmarshal(resp.Result, &message)
+
+		if bot.config.debug {
+			log.Printf("sendSticker req : %+v\n", v)
+			log.Printf("sendSticker resp: %+v\n", message)
+		}
+
+		return message, nil
+	}
+
+	params := make(map[string]string)
+
+	params["chat_id"] = strconv.Itoa(config.ChatId)
+	if config.ReplyToMessageId != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageId)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return Message{}, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	resp, err := bot.uploadFile("sendSticker", params, "sticker", config.FilePath)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+
+	if bot.config.debug {
+		log.Printf("sendSticker resp: %+v\n", message)
+	}
+
+	return message, nil
+}
+
+func (bot *BotApi) sendVideo(config VideoConfig) (Message, error) {
+	if config.UseExistingVideo {
+		v := url.Values{}
+		v.Add("chat_id", strconv.Itoa(config.ChatId))
+		v.Add("video", config.FileId)
+		if config.ReplyToMessageId != 0 {
+			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageId))
+		}
+		if config.ReplyMarkup != nil {
+			data, err := json.Marshal(config.ReplyMarkup)
+			if err != nil {
+				return Message{}, err
+			}
+
+			v.Add("reply_markup", string(data))
+		}
+
+		resp, err := bot.makeRequest("sendVideo", v)
+		if err != nil {
+			return Message{}, err
+		}
+
+		var message Message
+		json.Unmarshal(resp.Result, &message)
+
+		if bot.config.debug {
+			log.Printf("sendVideo req : %+v\n", v)
+			log.Printf("sendVideo resp: %+v\n", message)
+		}
+
+		return message, nil
+	}
+
+	params := make(map[string]string)
+
+	params["chat_id"] = strconv.Itoa(config.ChatId)
+	if config.ReplyToMessageId != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageId)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return Message{}, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	resp, err := bot.uploadFile("sendVideo", params, "video", config.FilePath)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+
+	if bot.config.debug {
+		log.Printf("sendVideo resp: %+v\n", message)
+	}
+
+	return message, nil
+}
+
 func (bot *BotApi) sendLocation(config LocationConfig) (Message, error) {
 	v := url.Values{}
 	v.Add("chat_id", strconv.Itoa(config.ChatId))
@@ -380,6 +569,33 @@ type PhotoConfig struct {
 	ReplyToMessageId int
 	ReplyMarkup      interface{}
 	UseExistingPhoto bool
+	FilePath         string
+	FileId           string
+}
+
+type DocumentConfig struct {
+	ChatId             int
+	ReplyToMessageId   int
+	ReplyMarkup        interface{}
+	UseExitingDocument bool
+	FilePath           string
+	FileId             string
+}
+
+type StickerConfig struct {
+	ChatId             int
+	ReplyToMessageId   int
+	ReplyMarkup        interface{}
+	UseExistingSticker bool
+	FilePath           string
+	FileId             string
+}
+
+type VideoConfig struct {
+	ChatId           int
+	ReplyToMessageId int
+	ReplyMarkup      interface{}
+	UseExistingVideo bool
 	FilePath         string
 	FileId           string
 }
