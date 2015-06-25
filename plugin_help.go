@@ -20,6 +20,9 @@ func (plugin *HelpPlugin) GetHelpText() []string {
 	return []string{"/help (/command) - returns help about a command"}
 }
 
+func (plugin *HelpPlugin) Setup() {
+}
+
 func (plugin *HelpPlugin) GotCommand(command string, message Message, args []string) {
 	msg := NewMessage(message.Chat.Id, "")
 	msg.ReplyToMessageId = message.MessageId
@@ -50,7 +53,12 @@ func (plugin *HelpPlugin) GotCommand(command string, message Message, args []str
 		buffer.WriteString("\n\n")
 
 		for _, plug := range plugins {
+			val, _ := config.EnabledPlugins[plugin.GetName()]
+
 			buffer.WriteString(plug.GetName())
+			if !val {
+				buffer.WriteString(" (disabled)")
+			}
 			buffer.WriteString("\n")
 
 			for _, cmd := range plug.GetHelpText() {

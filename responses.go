@@ -119,10 +119,10 @@ type UserProfilePhotos struct {
 }
 
 type ReplyKeyboardMarkup struct {
-	Keyboard        map[string]map[string]string `json:"keyboard"`
-	ResizeKeyboard  bool                         `json:"resize_keyboard"`
-	OneTimeKeyboard bool                         `json:"one_time_keyboard"`
-	Selective       bool                         `json:"selective"`
+	Keyboard        [][]string `json:"keyboard"`
+	ResizeKeyboard  bool       `json:"resize_keyboard"`
+	OneTimeKeyboard bool       `json:"one_time_keyboard"`
+	Selective       bool       `json:"selective"`
 }
 
 type ReplyKeyboardHide struct {

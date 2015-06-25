@@ -148,6 +148,14 @@ func (bot *BotApi) sendMessage(config MessageConfig) (Message, error) {
 	if config.ReplyToMessageId != 0 {
 		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageId))
 	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return Message{}, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
 
 	resp, err := bot.makeRequest("sendMessage", v)
 	if err != nil {
@@ -623,6 +631,7 @@ type MessageConfig struct {
 	Text                  string
 	DisableWebPagePreview bool
 	ReplyToMessageId      int
+	ReplyMarkup           interface{}
 }
 
 type ForwardConfig struct {

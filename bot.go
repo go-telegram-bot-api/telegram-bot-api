@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -10,8 +11,9 @@ import (
 )
 
 type Config struct {
-	Token   string            `json:"token"`
-	Plugins map[string]string `json:"plugins"`
+	Token          string            `json:"token"`
+	Plugins        map[string]string `json:"plugins"`
+	EnabledPlugins map[string]bool   `json:"enabled"`
 }
 
 type Plugin interface {
@@ -19,14 +21,16 @@ type Plugin interface {
 	GetCommands() []string
 	GetHelpText() []string
 	GotCommand(string, Message, []string)
+	Setup()
 }
 
 var bot *BotApi
 var plugins []Plugin
 var config Config
+var configPath *string
 
 func main() {
-	configPath := flag.String("config", "config.json", "path to config.json")
+	configPath = flag.String("config", "config.json", "path to config.json")
 
 	flag.Parse()
 
@@ -42,7 +46,34 @@ func main() {
 		debug: true,
 	})
 
-	plugins = []Plugin{&HelpPlugin{}, &FAPlugin{}}
+	plugins = []Plugin{&HelpPlugin{}, &FAPlugin{}, &ManagePlugin{}}
+
+	for _, plugin := range plugins {
+		val, ok := config.EnabledPlugins[plugin.GetName()]
+
+		if !ok {
+			fmt.Printf("Enable '%s'? [y/N] ", plugin.GetName())
+
+			var enabled string
+			fmt.Scanln(&enabled)
+
+			if strings.ToLower(enabled) == "y" {
+				plugin.Setup()
+				log.Printf("Plugin '%s' started!\n", plugin.GetName())
+
+				config.EnabledPlugins[plugin.GetName()] = true
+			} else {
+				config.EnabledPlugins[plugin.GetName()] = false
+			}
+		}
+
+		if val {
+			plugin.Setup()
+			log.Printf("Plugin '%s' started!\n", plugin.GetName())
+		}
+
+		saveConfig()
+	}
 
 	ticker := time.NewTicker(time.Second)
 
@@ -66,16 +97,32 @@ func main() {
 			}
 
 			for _, plugin := range plugins {
+				val, _ := config.EnabledPlugins[plugin.GetName()]
+				if !val {
+					continue
+				}
+
 				parts := strings.Split(update.Message.Text, " ")
+				command := parts[0]
 
 				for _, cmd := range plugin.GetCommands() {
-					if cmd == parts[0] {
+					if cmd == command {
+						if bot.config.debug {
+							log.Printf("'%s' matched plugin '%s'", update.Message.Text, plugin.GetName())
+						}
+
 						args := append(parts[:0], parts[1:]...)
 
-						plugin.GotCommand(parts[0], update.Message, args)
+						plugin.GotCommand(command, update.Message, args)
 					}
 				}
 			}
 		}
 	}
+}
+
+func saveConfig() {
+	data, _ := json.MarshalIndent(config, "", "  ")
+
+	ioutil.WriteFile(*configPath, data, 0600)
 }
