@@ -250,8 +250,71 @@ func (bot *BotApi) sendPhoto(config PhotoConfig) (Message, error) {
 	return message, nil
 }
 
+func (bot *BotApi) sendAudio(config AudioConfig) (Message, error) {
+	if config.UseExistingAudio {
+		v := url.Values{}
+		v.Add("chat_id", strconv.Itoa(config.ChatId))
+		v.Add("audio", config.FileId)
+		if config.ReplyToMessageId != 0 {
+			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageId))
+		}
+		if config.ReplyMarkup != nil {
+			data, err := json.Marshal(config.ReplyMarkup)
+			if err != nil {
+				return Message{}, err
+			}
+
+			v.Add("reply_markup", string(data))
+		}
+
+		resp, err := bot.makeRequest("sendAudio", v)
+		if err != nil {
+			return Message{}, err
+		}
+
+		var message Message
+		json.Unmarshal(resp.Result, &message)
+
+		if bot.config.debug {
+			log.Printf("sendAudio req : %+v\n", v)
+			log.Printf("sendAudio resp: %+v\n", message)
+		}
+
+		return message, nil
+	}
+
+	params := make(map[string]string)
+
+	params["chat_id"] = strconv.Itoa(config.ChatId)
+	if config.ReplyToMessageId != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageId)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return Message{}, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	resp, err := bot.uploadFile("sendAudio", params, "audio", config.FilePath)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+
+	if bot.config.debug {
+		log.Printf("sendAudio resp: %+v\n", message)
+	}
+
+	return message, nil
+}
+
 func (bot *BotApi) sendDocument(config DocumentConfig) (Message, error) {
-	if config.UseExitingDocument {
+	if config.UseExistingDocument {
 		v := url.Values{}
 		v.Add("chat_id", strconv.Itoa(config.ChatId))
 		v.Add("document", config.FileId)
@@ -573,13 +636,22 @@ type PhotoConfig struct {
 	FileId           string
 }
 
+type AudioConfig struct {
+	ChatId           int
+	ReplyToMessageId int
+	ReplyMarkup      interface{}
+	UseExistingAudio bool
+	FilePath         string
+	FileId           string
+}
+
 type DocumentConfig struct {
-	ChatId             int
-	ReplyToMessageId   int
-	ReplyMarkup        interface{}
-	UseExitingDocument bool
-	FilePath           string
-	FileId             string
+	ChatId              int
+	ReplyToMessageId    int
+	ReplyMarkup         interface{}
+	UseExistingDocument bool
+	FilePath            string
+	FileId              string
 }
 
 type StickerConfig struct {
@@ -648,6 +720,70 @@ func NewPhotoShare(chatId int, fileId string) PhotoConfig {
 	return PhotoConfig{
 		ChatId:           chatId,
 		UseExistingPhoto: true,
+		FileId:           fileId,
+	}
+}
+
+func NewAudioUpload(chatId int, filename string) AudioConfig {
+	return AudioConfig{
+		ChatId:           chatId,
+		UseExistingAudio: false,
+		FilePath:         filename,
+	}
+}
+
+func NewAudioShare(chatId int, fileId string) AudioConfig {
+	return AudioConfig{
+		ChatId:           chatId,
+		UseExistingAudio: true,
+		FileId:           fileId,
+	}
+}
+
+func NewDocumentUpload(chatId int, filename string) DocumentConfig {
+	return DocumentConfig{
+		ChatId:              chatId,
+		UseExistingDocument: false,
+		FilePath:            filename,
+	}
+}
+
+func NewDocumentShare(chatId int, fileId string) DocumentConfig {
+	return DocumentConfig{
+		ChatId:              chatId,
+		UseExistingDocument: true,
+		FileId:              fileId,
+	}
+}
+
+func NewStickerUpload(chatId int, filename string) StickerConfig {
+	return StickerConfig{
+		ChatId:             chatId,
+		UseExistingSticker: false,
+		FilePath:           filename,
+	}
+}
+
+func NewStickerShare(chatId int, fileId string) StickerConfig {
+	return StickerConfig{
+		ChatId:             chatId,
+		UseExistingSticker: true,
+		FileId:             fileId,
+	}
+}
+
+func NewVideoUpload(chatId int, filename string) VideoConfig {
+	return VideoConfig{
+		ChatId:           chatId,
+		UseExistingVideo: false,
+		FilePath:         filename,
+	}
+}
+
+func NewVideoShare(chatId int, fileId string) VideoConfig {
+	return VideoConfig{
+		ChatId:           chatId,
+		UseExistingVideo: true,
 		FileId:           fileId,
 	}
 }
