@@ -52,6 +52,8 @@ func (plugin *ColonThree) GotCommand(message Message, args []string) {
 		}
 	} else {
 		bot.sendMessage(NewMessage(message.Chat.Id, ":3"))
+
+		bot.sendPhoto(NewPhotoUpload(message.Chat.Id, "fox.png"))
 	}
 }
 
