@@ -5,59 +5,25 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
-	"strconv"
 	"strings"
 	"time"
 )
 
 type Config struct {
-	Token string `json:"token"`
+	Token   string            `json:"token"`
+	Plugins map[string]string `json:"plugins"`
 }
 
 type Plugin interface {
-	GetCommand() string
-	GotCommand(Message, []string)
-}
-
-type ColonThree struct {
-}
-
-func (plugin *ColonThree) GetCommand() string {
-	return "/three"
-}
-
-func (plugin *ColonThree) GotCommand(message Message, args []string) {
-	if len(args) > 0 {
-		n, err := strconv.Atoi(args[0])
-		if err != nil {
-			msg := NewMessage(message.Chat.Id, "Bad number!")
-			msg.ReplyToMessageId = message.MessageId
-
-			bot.sendMessage(msg)
-
-			return
-		}
-
-		if n > 5 {
-			msg := NewMessage(message.Chat.Id, "That's a bit much, no?")
-			msg.ReplyToMessageId = message.MessageId
-
-			bot.sendMessage(msg)
-
-			return
-		}
-
-		for i := 0; i < n; i++ {
-			bot.sendMessage(NewMessage(message.Chat.Id, ":3"))
-		}
-	} else {
-		bot.sendMessage(NewMessage(message.Chat.Id, ":3"))
-
-		bot.sendPhoto(NewPhotoUpload(message.Chat.Id, "fox.png"))
-	}
+	GetName() string
+	GetCommands() []string
+	GetHelpText() []string
+	GotCommand(string, Message, []string)
 }
 
 var bot *BotApi
+var plugins []Plugin
+var config Config
 
 func main() {
 	configPath := flag.String("config", "config.json", "path to config.json")
@@ -69,22 +35,24 @@ func main() {
 		log.Panic(err)
 	}
 
-	var cfg Config
-	json.Unmarshal(data, &cfg)
+	json.Unmarshal(data, &config)
 
 	bot = NewBotApi(BotConfig{
-		token: cfg.Token,
+		token: config.Token,
 		debug: true,
 	})
 
-	plugins := []Plugin{&ColonThree{}}
+	plugins = []Plugin{&HelpPlugin{}, &FAPlugin{}}
 
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(time.Second)
 
 	lastUpdate := 0
 
 	for range ticker.C {
-		updates, err := bot.getUpdates(NewUpdate(lastUpdate + 1))
+		update := NewUpdate(lastUpdate + 1)
+		update.Timeout = 30
+
+		updates, err := bot.getUpdates(update)
 
 		if err != nil {
 			log.Panic(err)
@@ -100,10 +68,12 @@ func main() {
 			for _, plugin := range plugins {
 				parts := strings.Split(update.Message.Text, " ")
 
-				if plugin.GetCommand() == parts[0] {
-					parts = append(parts[:0], parts[1:]...)
+				for _, cmd := range plugin.GetCommands() {
+					if cmd == parts[0] {
+						args := append(parts[:0], parts[1:]...)
 
-					plugin.GotCommand(update.Message, parts)
+						plugin.GotCommand(parts[0], update.Message, args)
+					}
 				}
 			}
 		}

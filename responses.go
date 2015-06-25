@@ -5,8 +5,10 @@ import (
 )
 
 type ApiResponse struct {
-	Ok     bool            `json:"ok"`
-	Result json.RawMessage `json:"result"`
+	Ok          bool            `json:"ok"`
+	Result      json.RawMessage `json:"result"`
+	ErrorCode   int             `json:"error_code"`
+	Description string          `json:"description"`
 }
 
 type Update struct {

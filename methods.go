@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"log"
@@ -52,11 +53,15 @@ func (bot *BotApi) makeRequest(endpoint string, params url.Values) (ApiResponse,
 	}
 
 	if bot.config.debug {
-		log.Println(string(bytes[:]))
+		log.Println(endpoint, string(bytes))
 	}
 
 	var apiResp ApiResponse
 	json.Unmarshal(bytes, &apiResp)
+
+	if !apiResp.Ok {
+		return ApiResponse{}, errors.New(apiResp.Description)
+	}
 
 	return apiResp, nil
 }
