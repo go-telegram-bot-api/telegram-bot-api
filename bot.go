@@ -1,3 +1,4 @@
+// Methods for interacting with the Telegram Bot API.
 package tgbotapi
 
 type BotApi struct {
@@ -7,6 +8,8 @@ type BotApi struct {
 	Updates chan Update `json:"-"`
 }
 
+// Creates a new BotApi instance.
+// Requires a token, provided by @BotFather on Telegram
 func NewBotApi(token string) (*BotApi, error) {
 	bot := &BotApi{
 		Token: token,

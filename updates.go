@@ -1,5 +1,6 @@
 package tgbotapi
 
+// Returns a chan that is called whenever a new message is gotten.
 func (bot *BotApi) UpdatesChan(config UpdateConfig) (chan Update, error) {
 	bot.Updates = make(chan Update, 100)
 
