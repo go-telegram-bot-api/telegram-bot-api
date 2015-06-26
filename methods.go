@@ -115,8 +115,8 @@ type WebhookConfig struct {
 	Url   *url.URL
 }
 
-// Makes a request to a specific endpoint with our token
-// All requests are POSTs because Telegram doesn't care, and it's easier
+// Makes a request to a specific endpoint with our token.
+// All requests are POSTs because Telegram doesn't care, and it's easier.
 func (bot *BotApi) MakeRequest(endpoint string, params url.Values) (ApiResponse, error) {
 	resp, err := http.PostForm("https://api.telegram.org/bot"+bot.Token+"/"+endpoint, params)
 	defer resp.Body.Close()
@@ -143,8 +143,9 @@ func (bot *BotApi) MakeRequest(endpoint string, params url.Values) (ApiResponse,
 	return apiResp, nil
 }
 
-// Makes a request to the API with a file
-// Requires the parameter to hold the file not be in the params
+// Makes a request to the API with a file.
+//
+// Requires the parameter to hold the file not be in the params.
 func (bot *BotApi) UploadFile(endpoint string, params map[string]string, fieldname string, filename string) (ApiResponse, error) {
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
@@ -203,8 +204,9 @@ func (bot *BotApi) UploadFile(endpoint string, params map[string]string, fieldna
 	return apiResp, nil
 }
 
-// Fetches the currently authenticated bot
-// There are no parameters for this method
+// Fetches the currently authenticated bot.
+//
+// There are no parameters for this method.
 func (bot *BotApi) GetMe() (User, error) {
 	resp, err := bot.MakeRequest("getMe", nil)
 	if err != nil {
@@ -221,9 +223,10 @@ func (bot *BotApi) GetMe() (User, error) {
 	return user, nil
 }
 
-// Sends a Message to a chat
-// Requires ChatId and Text
-// DisableWebPagePreview, ReplyToMessageId, and ReplyMarkup are optional
+// Sends a Message to a chat.
+//
+// Requires ChatId and Text.
+// DisableWebPagePreview, ReplyToMessageId, and ReplyMarkup are optional.
 func (bot *BotApi) SendMessage(config MessageConfig) (Message, error) {
 	v := url.Values{}
 	v.Add("chat_id", strconv.Itoa(config.ChatId))
@@ -257,8 +260,9 @@ func (bot *BotApi) SendMessage(config MessageConfig) (Message, error) {
 	return message, nil
 }
 
-// Forwards a message from one chat to another
-// Requires ChatId (destionation), FromChatId (source), and MessageId
+// Forwards a message from one chat to another.
+//
+// Requires ChatId (destionation), FromChatId (source), and MessageId.
 func (bot *BotApi) ForwardMessage(config ForwardConfig) (Message, error) {
 	v := url.Values{}
 	v.Add("chat_id", strconv.Itoa(config.ChatId))
@@ -281,9 +285,10 @@ func (bot *BotApi) ForwardMessage(config ForwardConfig) (Message, error) {
 	return message, nil
 }
 
-// Sends or uploads a photo to a chat
-// Requires ChatId and FileId OR FilePath
-// Caption, ReplyToMessageId, and ReplyMarkup are optional
+// Sends or uploads a photo to a chat.
+//
+// Requires ChatId and FileId OR FilePath.
+// Caption, ReplyToMessageId, and ReplyMarkup are optional.
 func (bot *BotApi) SendPhoto(config PhotoConfig) (Message, error) {
 	if config.UseExistingPhoto {
 		v := url.Values{}
@@ -352,9 +357,10 @@ func (bot *BotApi) SendPhoto(config PhotoConfig) (Message, error) {
 	return message, nil
 }
 
-// Sends or uploads an audio clip to a chat
-// Requires ChatId and FileId OR FilePath
-// ReplyToMessageId and ReplyMarkup are optional
+// Sends or uploads an audio clip to a chat.
+//
+// Requires ChatId and FileId OR FilePath.
+// ReplyToMessageId and ReplyMarkup are optional.
 func (bot *BotApi) SendAudio(config AudioConfig) (Message, error) {
 	if config.UseExistingAudio {
 		v := url.Values{}
@@ -418,9 +424,10 @@ func (bot *BotApi) SendAudio(config AudioConfig) (Message, error) {
 	return message, nil
 }
 
-// Sends or uploads a document to a chat
-// Requires ChatId and FileId OR FilePath
-// ReplyToMessageId and ReplyMarkup are optional
+// Sends or uploads a document to a chat.
+//
+// Requires ChatId and FileId OR FilePath.
+// ReplyToMessageId and ReplyMarkup are optional.
 func (bot *BotApi) SendDocument(config DocumentConfig) (Message, error) {
 	if config.UseExistingDocument {
 		v := url.Values{}
@@ -484,9 +491,10 @@ func (bot *BotApi) SendDocument(config DocumentConfig) (Message, error) {
 	return message, nil
 }
 
-// Sends or uploads a sticker to a chat
-// Requires ChatId and FileId OR FilePath
-// ReplyToMessageId and ReplyMarkup are optional
+// Sends or uploads a sticker to a chat.
+//
+// Requires ChatId and FileId OR FilePath.
+// ReplyToMessageId and ReplyMarkup are optional.
 func (bot *BotApi) SendSticker(config StickerConfig) (Message, error) {
 	if config.UseExistingSticker {
 		v := url.Values{}
@@ -550,9 +558,10 @@ func (bot *BotApi) SendSticker(config StickerConfig) (Message, error) {
 	return message, nil
 }
 
-// Sends or uploads a video to a chat
-// Requires ChatId and FileId OR FilePath
-// ReplyToMessageId and ReplyMarkup are optional
+// Sends or uploads a video to a chat.
+//
+// Requires ChatId and FileId OR FilePath.
+// ReplyToMessageId and ReplyMarkup are optional.
 func (bot *BotApi) SendVideo(config VideoConfig) (Message, error) {
 	if config.UseExistingVideo {
 		v := url.Values{}
@@ -616,9 +625,10 @@ func (bot *BotApi) SendVideo(config VideoConfig) (Message, error) {
 	return message, nil
 }
 
-// Sends a location to a chat
-// Requires ChatId, Latitude, and Longitude
-// ReplyToMessageId and ReplyMarkup are optional
+// Sends a location to a chat.
+//
+// Requires ChatId, Latitude, and Longitude.
+// ReplyToMessageId and ReplyMarkup are optional.
 func (bot *BotApi) SendLocation(config LocationConfig) (Message, error) {
 	v := url.Values{}
 	v.Add("chat_id", strconv.Itoa(config.ChatId))
@@ -652,8 +662,9 @@ func (bot *BotApi) SendLocation(config LocationConfig) (Message, error) {
 	return message, nil
 }
 
-// Sets a current action in a chat
-// Requires ChatId and a valid Action (see CHAT constants)
+// Sets a current action in a chat.
+//
+// Requires ChatId and a valid Action (see CHAT constants).
 func (bot *BotApi) SendChatAction(config ChatActionConfig) error {
 	v := url.Values{}
 	v.Add("chat_id", strconv.Itoa(config.ChatId))
@@ -667,9 +678,10 @@ func (bot *BotApi) SendChatAction(config ChatActionConfig) error {
 	return nil
 }
 
-// Gets a user's profile photos
-// Requires UserId
-// Offset and Limit are optional
+// Gets a user's profile photos.
+//
+// Requires UserId.
+// Offset and Limit are optional.
 func (bot *BotApi) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error) {
 	v := url.Values{}
 	v.Add("user_id", strconv.Itoa(config.UserId))
@@ -696,11 +708,12 @@ func (bot *BotApi) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	return profilePhotos, nil
 }
 
-// Fetches updates
+// Fetches updates.
 // If a WebHook is set, this will not return any data!
+//
 // Offset, Limit, and Timeout are optional.
-// To not get old items, set Offset to one higher than the previous item
-// Set Timeout to a large number to reduce requests and get responses instantly
+// To not get old items, set Offset to one higher than the previous item.
+// Set Timeout to a large number to reduce requests and get responses instantly.
 func (bot *BotApi) GetUpdates(config UpdateConfig) ([]Update, error) {
 	v := url.Values{}
 	if config.Offset > 0 {
@@ -728,9 +741,10 @@ func (bot *BotApi) GetUpdates(config UpdateConfig) ([]Update, error) {
 	return updates, nil
 }
 
-// Sets a webhook
+// Sets a webhook.
 // If this is set, GetUpdates will not get any data!
-// Requires Url OR to set Clear to true
+//
+// Requires Url OR to set Clear to true.
 func (bot *BotApi) SetWebhook(config WebhookConfig) error {
 	v := url.Values{}
 	if !config.Clear {
