@@ -14,10 +14,10 @@ func NewBotApi(token string) (*BotApi, error) {
 
 	self, err := bot.GetMe()
 	if err != nil {
-		return BotApi{}, err
+		return &BotApi{}, err
 	}
 
 	bot.Self = self
 
-	return bot
+	return bot, nil
 }
