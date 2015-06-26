@@ -5,17 +5,19 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 	bot.Updates = make(chan Update, 100)
 
 	go func() {
-		updates, err := bot.GetUpdates(config)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, update := range updates {
-			if update.UpdateID > config.Offset {
-				config.Offset = update.UpdateID + 1
+		for {
+			updates, err := bot.GetUpdates(config)
+			if err != nil {
+				panic(err)
 			}
 
-			bot.Updates <- update
+			for _, update := range updates {
+				if update.UpdateID > config.Offset {
+					config.Offset = update.UpdateID + 1
+				}
+
+				bot.Updates <- update
+			}
 		}
 	}()
 
