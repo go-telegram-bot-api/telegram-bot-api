@@ -4,40 +4,46 @@ import (
 	"encoding/json"
 )
 
-type ApiResponse struct {
+// APIResponse is a response from the Telegram API with the result stored raw.
+type APIResponse struct {
 	Ok          bool            `json:"ok"`
 	Result      json.RawMessage `json:"result"`
 	ErrorCode   int             `json:"error_code"`
 	Description string          `json:"description"`
 }
 
+// Update is an update response, from GetUpdates.
 type Update struct {
-	UpdateId int     `json:"update_id"`
+	UpdateID int     `json:"update_id"`
 	Message  Message `json:"message"`
 }
 
+// User is a user, contained in Message and returned by GetSelf.
 type User struct {
-	Id        int    `json:"id"`
+	ID        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	UserName  string `json:"username"`
 }
 
+// GroupChat is a group chat, and not currently in use.
 type GroupChat struct {
-	Id    int    `json:"id"`
+	ID    int    `json:"id"`
 	Title string `json:"title"`
 }
 
+// UserOrGroupChat is returned in Message, because it's not clear which it is.
 type UserOrGroupChat struct {
-	Id        int    `json:"id"`
+	ID        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	UserName  string `json:"username"`
 	Title     string `json:"title"`
 }
 
+// Message is returned by almost every request, and contains data about almost anything.
 type Message struct {
-	MessageId           int             `json:"message_id"`
+	MessageID           int             `json:"message_id"`
 	From                User            `json:"from"`
 	Date                int             `json:"date"`
 	Chat                UserOrGroupChat `json:"chat"`
@@ -60,64 +66,73 @@ type Message struct {
 	GroupChatCreated    bool            `json:"group_chat_created"`
 }
 
+// PhotoSize contains information about photos, including ID and Width and Height.
 type PhotoSize struct {
-	FileId   string `json:"file_id"`
+	FileID   string `json:"file_id"`
 	Width    int    `json:"width"`
 	Height   int    `json:"height"`
 	FileSize int    `json:"file_size"`
 }
 
+// Audio contains information about audio, including ID and Duration.
 type Audio struct {
-	FileId   string `json:"file_id"`
+	FileID   string `json:"file_id"`
 	Duration int    `json:"duration"`
 	MimeType string `json:"mime_type"`
 	FileSize int    `json:"file_size"`
 }
 
+// Document contains information about a document, including ID and a Thumbnail.
 type Document struct {
-	FileId   string    `json:"file_id"`
-	Thumb    PhotoSize `json:"thumb"`
-	FileName string    `json:"file_name"`
-	MimeType string    `json:"mime_type"`
-	FileSize int       `json:"file_size"`
+	FileID    string    `json:"file_id"`
+	Thumbnail PhotoSize `json:"thumb"`
+	FileName  string    `json:"file_name"`
+	MimeType  string    `json:"mime_type"`
+	FileSize  int       `json:"file_size"`
 }
 
+// Sticker contains information about a sticker, including ID and Thumbnail.
 type Sticker struct {
-	FileId   string    `json:"file_id"`
-	Width    int       `json:"width"`
-	Height   int       `json:"height"`
-	Thumb    PhotoSize `json:"thumb"`
-	FileSize int       `json:"file_size"`
+	FileID    string    `json:"file_id"`
+	Width     int       `json:"width"`
+	Height    int       `json:"height"`
+	Thumbnail PhotoSize `json:"thumb"`
+	FileSize  int       `json:"file_size"`
 }
 
+// Video contains information about a video, including ID and duration and Thumbnail.
 type Video struct {
-	FileId   string    `json:"file_id"`
-	Width    int       `json:"width"`
-	Height   int       `json:"height"`
-	Duration int       `json:"duration"`
-	Thumb    PhotoSize `json:"thumb"`
-	MimeType string    `json:"mime_type"`
-	FileSize int       `json:"file_size"`
-	Caption  string    `json:"caption"`
+	FileID    string    `json:"file_id"`
+	Width     int       `json:"width"`
+	Height    int       `json:"height"`
+	Duration  int       `json:"duration"`
+	Thumbnail PhotoSize `json:"thumb"`
+	MimeType  string    `json:"mime_type"`
+	FileSize  int       `json:"file_size"`
+	Caption   string    `json:"caption"`
 }
 
+// Contact contains information about a contact, such as PhoneNumber and UserId.
 type Contact struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
-	UserId      string `json:"user_id"`
+	UserID      string `json:"user_id"`
 }
 
+// Location contains information about a place, such as Longitude and Latitude.
 type Location struct {
 	Longitude float32 `json:"longitude"`
 	Latitude  float32 `json:"latitude"`
 }
 
+// UserProfilePhotos contains information a set of user profile photos.
 type UserProfilePhotos struct {
 	TotalCount int         `json:"total_count"`
 	Photos     []PhotoSize `json:"photos"`
 }
 
+// ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
 type ReplyKeyboardMarkup struct {
 	Keyboard        [][]string `json:"keyboard"`
 	ResizeKeyboard  bool       `json:"resize_keyboard"`
@@ -125,11 +140,13 @@ type ReplyKeyboardMarkup struct {
 	Selective       bool       `json:"selective"`
 }
 
+// ReplyKeyboardHide allows the Bot to hide a custom keyboard.
 type ReplyKeyboardHide struct {
 	HideKeyboard bool `json:"hide_keyboard"`
 	Selective    bool `json:"selective"`
 }
 
+// ForceReply allows the Bot to have users directly reply to it without additional interaction.
 type ForceReply struct {
 	ForceReply bool `json:"force_reply"`
 	Selective  bool `json:"force_reply"`

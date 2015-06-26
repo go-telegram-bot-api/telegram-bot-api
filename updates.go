@@ -1,7 +1,7 @@
 package tgbotapi
 
-// Returns a chan that is called whenever a new message is gotten.
-func (bot *BotApi) UpdatesChan(config UpdateConfig) (chan Update, error) {
+// UpdatesChan returns a chan that is called whenever a new message is gotten.
+func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 	bot.Updates = make(chan Update, 100)
 
 	go func() {
@@ -11,8 +11,8 @@ func (bot *BotApi) UpdatesChan(config UpdateConfig) (chan Update, error) {
 		}
 
 		for _, update := range updates {
-			if update.UpdateId > config.Offset {
-				config.Offset = update.UpdateId + 1
+			if update.UpdateID > config.Offset {
+				config.Offset = update.UpdateID + 1
 			}
 
 			bot.Updates <- update
