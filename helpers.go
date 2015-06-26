@@ -4,6 +4,10 @@ import (
 	"net/url"
 )
 
+// Creates a new Message.
+// Perhaps set a ChatAction of CHAT_TYPING while processing.
+//
+// chatId is where to send it, text is the message text.
 func NewMessage(chatId int, text string) MessageConfig {
 	return MessageConfig{
 		ChatId: chatId,
@@ -13,6 +17,10 @@ func NewMessage(chatId int, text string) MessageConfig {
 	}
 }
 
+// Creates a new forward.
+//
+// chatId is where to send it, fromChatId is the source chat,
+// and messageId is the Id of the original message.
 func NewForward(chatId int, fromChatId int, messageId int) ForwardConfig {
 	return ForwardConfig{
 		ChatId:     chatId,
@@ -21,6 +29,11 @@ func NewForward(chatId int, fromChatId int, messageId int) ForwardConfig {
 	}
 }
 
+// Creates a new photo uploader.
+// This requires a file on the local filesystem to upload to Telegram.
+// Perhaps set a ChatAction of CHAT_UPLOAD_PHOTO while processing.
+//
+// chatId is where to send it, filename is the path to the file.
 func NewPhotoUpload(chatId int, filename string) PhotoConfig {
 	return PhotoConfig{
 		ChatId:           chatId,
@@ -29,6 +42,10 @@ func NewPhotoUpload(chatId int, filename string) PhotoConfig {
 	}
 }
 
+// Shares an existing photo.
+// You may use this to reshare an existing photo without reuploading it.
+//
+// chatId is where to send it, fileId is the Id of the file already uploaded.
 func NewPhotoShare(chatId int, fileId string) PhotoConfig {
 	return PhotoConfig{
 		ChatId:           chatId,
@@ -37,6 +54,11 @@ func NewPhotoShare(chatId int, fileId string) PhotoConfig {
 	}
 }
 
+// Creates a new audio uploader.
+// This requires a file on the local filesystem to upload to Telegram.
+// Perhaps set a ChatAction of CHAT_RECORD_AUDIO or CHAT_UPLOAD_AUDIO while processing.
+//
+// chatId is where to send it, filename is the path to the file.
 func NewAudioUpload(chatId int, filename string) AudioConfig {
 	return AudioConfig{
 		ChatId:           chatId,
@@ -45,6 +67,10 @@ func NewAudioUpload(chatId int, filename string) AudioConfig {
 	}
 }
 
+// Shares an existing audio file.
+// You may use this to reshare an existing audio file without reuploading it.
+//
+// chatId is where to send it, fileId is the Id of the audio already uploaded.
 func NewAudioShare(chatId int, fileId string) AudioConfig {
 	return AudioConfig{
 		ChatId:           chatId,
@@ -53,6 +79,11 @@ func NewAudioShare(chatId int, fileId string) AudioConfig {
 	}
 }
 
+// Creates a new document uploader.
+// This requires a file on the local filesystem to upload to Telegram.
+// Perhaps set a ChatAction of CHAT_UPLOAD_DOCUMENT while processing.
+//
+// chatId is where to send it, filename is the path to the file.
 func NewDocumentUpload(chatId int, filename string) DocumentConfig {
 	return DocumentConfig{
 		ChatId:              chatId,
@@ -61,6 +92,10 @@ func NewDocumentUpload(chatId int, filename string) DocumentConfig {
 	}
 }
 
+// Shares an existing document.
+// You may use this to reshare an existing document without reuploading it.
+//
+// chatId is where to send it, fileId is the Id of the document already uploaded.
 func NewDocumentShare(chatId int, fileId string) DocumentConfig {
 	return DocumentConfig{
 		ChatId:              chatId,
@@ -69,6 +104,10 @@ func NewDocumentShare(chatId int, fileId string) DocumentConfig {
 	}
 }
 
+// Creates a new sticker uploader.
+// This requires a file on the local filesystem to upload to Telegram.
+//
+// chatId is where to send it, filename is the path to the file.
 func NewStickerUpload(chatId int, filename string) StickerConfig {
 	return StickerConfig{
 		ChatId:             chatId,
@@ -77,6 +116,10 @@ func NewStickerUpload(chatId int, filename string) StickerConfig {
 	}
 }
 
+// Shares an existing sticker.
+// You may use this to reshare an existing sticker without reuploading it.
+//
+// chatId is where to send it, fileId is the Id of the sticker already uploaded.
 func NewStickerShare(chatId int, fileId string) StickerConfig {
 	return StickerConfig{
 		ChatId:             chatId,
@@ -85,6 +128,11 @@ func NewStickerShare(chatId int, fileId string) StickerConfig {
 	}
 }
 
+// Creates a new video uploader.
+// This requires a file on the local filesystem to upload to Telegram.
+// Perhaps set a ChatAction of CHAT_RECORD_VIDEO or CHAT_UPLOAD_VIDEO while processing.
+//
+// chatId is where to send it, filename is the path to the file.
 func NewVideoUpload(chatId int, filename string) VideoConfig {
 	return VideoConfig{
 		ChatId:           chatId,
@@ -93,6 +141,10 @@ func NewVideoUpload(chatId int, filename string) VideoConfig {
 	}
 }
 
+// Shares an existing video.
+// You may use this to reshare an existing video without reuploading it.
+//
+// chatId is where to send it, fileId is the Id of the video already uploaded.
 func NewVideoShare(chatId int, fileId string) VideoConfig {
 	return VideoConfig{
 		ChatId:           chatId,
@@ -101,6 +153,10 @@ func NewVideoShare(chatId int, fileId string) VideoConfig {
 	}
 }
 
+// Shares your location.
+// Perhaps set a ChatAction of CHAT_FIND_LOCATION while processing.
+//
+// chatId is where to send it, latitude and longitude are coordinates.
 func NewLocation(chatId int, latitude float64, longitude float64) LocationConfig {
 	return LocationConfig{
 		ChatId:           chatId,
@@ -111,6 +167,10 @@ func NewLocation(chatId int, latitude float64, longitude float64) LocationConfig
 	}
 }
 
+// Sets a chat action.
+// Actions last for 5 seconds, or until your next action.
+//
+// chatId is where to send it, action should be set via CHAT constants.
 func NewChatAction(chatId int, action string) ChatActionConfig {
 	return ChatActionConfig{
 		ChatId: chatId,
@@ -118,6 +178,9 @@ func NewChatAction(chatId int, action string) ChatActionConfig {
 	}
 }
 
+// Gets user profile photos.
+//
+// userId is the Id of the user you wish to get profile photos from.
 func NewUserProfilePhotos(userId int) UserProfilePhotosConfig {
 	return UserProfilePhotosConfig{
 		UserId: userId,
@@ -126,6 +189,10 @@ func NewUserProfilePhotos(userId int) UserProfilePhotosConfig {
 	}
 }
 
+// Gets updates since the last Offset.
+//
+// offset is the last Update Id to include.
+// You likely want to set this to the last Update Id plus 1.
 func NewUpdate(offset int) UpdateConfig {
 	return UpdateConfig{
 		Offset:  offset,
@@ -134,6 +201,9 @@ func NewUpdate(offset int) UpdateConfig {
 	}
 }
 
+// Creates a new webhook.
+//
+// link is the url parsable link you wish to get the updates.
 func NewWebhook(link string) WebhookConfig {
 	u, _ := url.Parse(link)
 
