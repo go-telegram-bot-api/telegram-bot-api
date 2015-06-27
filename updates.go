@@ -16,7 +16,6 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 					config.Offset = update.UpdateID + 1
 					bot.Updates <- update
 				}
-
 			}
 		}
 	}()
