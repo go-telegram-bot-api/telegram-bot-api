@@ -12,11 +12,10 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 			}
 
 			for _, update := range updates {
-				if update.UpdateID > config.Offset {
+				if update.UpdateID >= config.Offset {
 					config.Offset = update.UpdateID + 1
+					bot.Updates <- update
 				}
-
-				bot.Updates <- update
 			}
 		}
 	}()
