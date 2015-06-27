@@ -14,7 +14,7 @@ package main
 
 import (
 	"log"
-	"src.foxpaw.in/Syfaro/telegram-bot-api"
+	"github.com/Syfaro/telegram-bot-api"
 )
 
 func main() {
