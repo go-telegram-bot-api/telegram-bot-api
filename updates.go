@@ -28,7 +28,6 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 					}
 				}
 			}
-
 		}
 	}()
 
