@@ -17,7 +17,7 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 					panic(err)
 				} else {
 					log.Println(err)
-					log.Println("Retry in 3 Seconds")
+					log.Println("Fail to GetUpdates,Retry in 3 Seconds...")
 					time.Sleep(time.Second * 3)
 				}
 			} else {
