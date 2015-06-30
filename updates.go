@@ -13,19 +13,21 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 		for {
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
-				if bot.Debug == true {
+				if bot.Debug {
 					panic(err)
 				} else {
 					log.Println(err)
-					log.Println("Fail to GetUpdates,Retry in 3 Seconds...")
+					log.Println("Failed to get updates, retrying in 3 seconds...")
 					time.Sleep(time.Second * 3)
 				}
-			} else {
-				for _, update := range updates {
-					if update.UpdateID >= config.Offset {
-						config.Offset = update.UpdateID + 1
-						bot.Updates <- update
-					}
+
+				continue
+			}
+
+			for _, update := range updates {
+				if update.UpdateID >= config.Offset {
+					config.Offset = update.UpdateID + 1
+					bot.Updates <- update
 				}
 			}
 		}
