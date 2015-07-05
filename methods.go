@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // MakeRequest makes a request to a specific endpoint with our token.
@@ -192,11 +193,13 @@ func (bot *BotAPI) SendFile(config FileConfig) (Message, error) {
 	if !config.FileType.ValidFileType() {
 		return Message{}, errors.New("Invalid file type.")
 	}
+	action := "Send" + strings.Title(config.FileType.String())
 	if config.UseExistingPhoto {
 		v := url.Values{}
 		v.Add("chat_id", strconv.Itoa(config.ChatID))
 		v.Add(config.FileType.String(), config.FileID)
-		if config.FileType == "photo" && config.Caption != "" {
+		log.Printf(config.Caption)
+		if config.FileType.String() == "photo" && config.Caption != "" {
 			v.Add("caption", config.Caption)
 		}
 		if config.ReplyToMessageID != 0 {
@@ -211,7 +214,7 @@ func (bot *BotAPI) SendFile(config FileConfig) (Message, error) {
 			v.Add("reply_markup", string(data))
 		}
 
-		resp, err := bot.MakeRequest("SendPhoto", v)
+		resp, err := bot.MakeRequest(action, v)
 		if err != nil {
 			return Message{}, err
 		}
@@ -220,8 +223,8 @@ func (bot *BotAPI) SendFile(config FileConfig) (Message, error) {
 		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
-			log.Printf("SendPhoto req : %+v\n", v)
-			log.Printf("SendPhoto resp: %+v\n", message)
+			log.Printf(action + " req : %+v\n", v)
+			log.Printf(action + " resp: %+v\n", message)
 		}
 
 		return message, nil
@@ -244,7 +247,7 @@ func (bot *BotAPI) SendFile(config FileConfig) (Message, error) {
 		params["reply_markup"] = string(data)
 	}
 
-	resp, err := bot.UploadFile("SendPhoto", params, "photo", config.FilePath)
+	resp, err := bot.UploadFile(action, params, config.FileType.String(), config.FilePath)
 	if err != nil {
 		return Message{}, err
 	}
@@ -253,7 +256,7 @@ func (bot *BotAPI) SendFile(config FileConfig) (Message, error) {
 	json.Unmarshal(resp.Result, &message)
 
 	if bot.Debug {
-		log.Printf("SendPhoto resp: %+v\n", message)
+		log.Printf(action + " resp: %+v\n", message)
 	}
 
 	return message, nil
