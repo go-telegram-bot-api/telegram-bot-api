@@ -47,7 +47,7 @@ func NewFileUpload(chatID int, filename string, fileType FileType) FileConfig {
 // You may use this to reshare an existing photo without reuploading it.
 //
 // chatID is where to send it, fileID is the ID of the file already uploaded.
-func NewPhotoShare(chatID int, fileID string, fileType FileType) FileConfig {
+func NewFileShare(chatID int, fileID string, fileType FileType) FileConfig {
 	return FileConfig{
 		ChatID:           chatID,
 		UseExistingPhoto: true,
