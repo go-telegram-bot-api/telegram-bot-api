@@ -29,127 +29,30 @@ func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 	}
 }
 
-// NewPhotoUpload creates a new photo uploader.
+// NewFileUpload creates a new photo uploader.
 // This requires a file on the local filesystem to upload to Telegram.
 // Perhaps set a ChatAction of ChatUploadPhoto while processing.
 //
 // chatID is where to send it, filename is the path to the file.
-func NewPhotoUpload(chatID int, filename string) PhotoConfig {
-	return PhotoConfig{
+func NewFileUpload(chatID int, filename string, fileType FileType) FileConfig {
+	return FileConfig{
 		ChatID:           chatID,
 		UseExistingPhoto: false,
 		FilePath:         filename,
+		FileType:         fileType,
 	}
 }
 
-// NewPhotoShare shares an existing photo.
+// NewFileShare shares an existing photo.
 // You may use this to reshare an existing photo without reuploading it.
 //
 // chatID is where to send it, fileID is the ID of the file already uploaded.
-func NewPhotoShare(chatID int, fileID string) PhotoConfig {
-	return PhotoConfig{
+func NewPhotoShare(chatID int, fileID string, fileType FileType) FileConfig {
+	return FileConfig{
 		ChatID:           chatID,
 		UseExistingPhoto: true,
 		FileID:           fileID,
-	}
-}
-
-// NewAudioUpload creates a new audio uploader.
-// This requires a file on the local filesystem to upload to Telegram.
-// Perhaps set a ChatAction of ChatRecordAudio or ChatUploadAudio while processing.
-//
-// chatID is where to send it, filename is the path to the file.
-func NewAudioUpload(chatID int, filename string) AudioConfig {
-	return AudioConfig{
-		ChatID:           chatID,
-		UseExistingAudio: false,
-		FilePath:         filename,
-	}
-}
-
-// NewAudioShare shares an existing audio file.
-// You may use this to reshare an existing audio file without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the audio already uploaded.
-func NewAudioShare(chatID int, fileID string) AudioConfig {
-	return AudioConfig{
-		ChatID:           chatID,
-		UseExistingAudio: true,
-		FileID:           fileID,
-	}
-}
-
-// NewDocumentUpload creates a new document uploader.
-// This requires a file on the local filesystem to upload to Telegram.
-// Perhaps set a ChatAction of ChatUploadDocument while processing.
-//
-// chatID is where to send it, filename is the path to the file.
-func NewDocumentUpload(chatID int, filename string) DocumentConfig {
-	return DocumentConfig{
-		ChatID:              chatID,
-		UseExistingDocument: false,
-		FilePath:            filename,
-	}
-}
-
-// NewDocumentShare shares an existing document.
-// You may use this to reshare an existing document without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the document already uploaded.
-func NewDocumentShare(chatID int, fileID string) DocumentConfig {
-	return DocumentConfig{
-		ChatID:              chatID,
-		UseExistingDocument: true,
-		FileID:              fileID,
-	}
-}
-
-// NewStickerUpload creates a new sticker uploader.
-// This requires a file on the local filesystem to upload to Telegram.
-//
-// chatID is where to send it, filename is the path to the file.
-func NewStickerUpload(chatID int, filename string) StickerConfig {
-	return StickerConfig{
-		ChatID:             chatID,
-		UseExistingSticker: false,
-		FilePath:           filename,
-	}
-}
-
-// NewStickerShare shares an existing sticker.
-// You may use this to reshare an existing sticker without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the sticker already uploaded.
-func NewStickerShare(chatID int, fileID string) StickerConfig {
-	return StickerConfig{
-		ChatID:             chatID,
-		UseExistingSticker: true,
-		FileID:             fileID,
-	}
-}
-
-// NewVideoUpload creates a new video uploader.
-// This requires a file on the local filesystem to upload to Telegram.
-// Perhaps set a ChatAction of ChatRecordVideo or ChatUploadVideo while processing.
-//
-// chatID is where to send it, filename is the path to the file.
-func NewVideoUpload(chatID int, filename string) VideoConfig {
-	return VideoConfig{
-		ChatID:           chatID,
-		UseExistingVideo: false,
-		FilePath:         filename,
-	}
-}
-
-// NewVideoShare shares an existing video.
-// You may use this to reshare an existing video without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video already uploaded.
-func NewVideoShare(chatID int, fileID string) VideoConfig {
-	return VideoConfig{
-		ChatID:           chatID,
-		UseExistingVideo: true,
-		FileID:           fileID,
+		FileType:         fileType,
 	}
 }
 

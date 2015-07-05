@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"net/url"
 )
 
 // Constant values for ChatActions
@@ -19,13 +20,17 @@ const (
 // FileType type which allows us to validate file types.
 type FileType string
 
-func (f *FileType) ValidFileType() bool {
-	switch *f {
+func (f FileType) ValidFileType() bool {
+	switch f {
 	case "photo", "document", "video", "sticker", "audio":
 		return true
 	default:
 		return false
 	}
+}
+
+func (f FileType) String() string {
+	return string(f)
 }
 
 // APIResponse is a response from the Telegram API with the result stored raw.
