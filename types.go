@@ -16,6 +16,18 @@ const (
 	ChatFindLocation   = "find_location"
 )
 
+// FileType type which allows us to validate file types.
+type FileType string
+
+func (f *FileType) ValidFileType() bool {
+	switch *f {
+	case "photo", "document", "video", "sticker", "audio":
+		return true
+	default:
+		return false
+	}
+}
+
 // APIResponse is a response from the Telegram API with the result stored raw.
 type APIResponse struct {
 	Ok          bool            `json:"ok"`
@@ -180,8 +192,8 @@ type ForwardConfig struct {
 	MessageID  int
 }
 
-// PhotoConfig contains information about a SendPhoto request.
-type PhotoConfig struct {
+// FileConfig contains information about any Send<file> request.
+type FileConfig struct {
 	ChatID           int
 	Caption          string
 	ReplyToMessageID int
@@ -189,46 +201,7 @@ type PhotoConfig struct {
 	UseExistingPhoto bool
 	FilePath         string
 	FileID           string
-}
-
-// AudioConfig contains information about a SendAudio request.
-type AudioConfig struct {
-	ChatID           int
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
-	UseExistingAudio bool
-	FilePath         string
-	FileID           string
-}
-
-// DocumentConfig contains information about a SendDocument request.
-type DocumentConfig struct {
-	ChatID              int
-	ReplyToMessageID    int
-	ReplyMarkup         interface{}
-	UseExistingDocument bool
-	FilePath            string
-	FileID              string
-}
-
-// StickerConfig contains information about a SendSticker request.
-type StickerConfig struct {
-	ChatID             int
-	ReplyToMessageID   int
-	ReplyMarkup        interface{}
-	UseExistingSticker bool
-	FilePath           string
-	FileID             string
-}
-
-// VideoConfig contains information about a SendVideo request.
-type VideoConfig struct {
-	ChatID           int
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
-	UseExistingVideo bool
-	FilePath         string
-	FileID           string
+	FileType         FileType
 }
 
 // LocationConfig contains information about a SendLocation request.
