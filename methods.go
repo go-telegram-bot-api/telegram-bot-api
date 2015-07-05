@@ -198,7 +198,6 @@ func (bot *BotAPI) SendFile(config FileConfig) (Message, error) {
 		v := url.Values{}
 		v.Add("chat_id", strconv.Itoa(config.ChatID))
 		v.Add(config.FileType.String(), config.FileID)
-		log.Printf(config.Caption)
 		if config.FileType.String() == "photo" && config.Caption != "" {
 			v.Add("caption", config.Caption)
 		}
