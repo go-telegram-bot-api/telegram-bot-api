@@ -55,6 +55,19 @@ type User struct {
 	UserName  string `json:"username"`
 }
 
+func (u User) String() string {
+	str string
+	if u.FirstName != "" {
+		str += u.FirstName
+		if u.LastName != "" {
+			str += u.LastName
+		}
+	} else {
+		str += u.UserName
+	}
+	return str
+}
+
 // GroupChat is a group chat, and not currently in use.
 type GroupChat struct {
 	ID    int    `json:"id"`
