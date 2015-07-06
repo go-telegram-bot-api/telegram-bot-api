@@ -56,7 +56,7 @@ type User struct {
 }
 
 func (u User) String() string {
-	str string
+	var str string
 	if u.FirstName != "" {
 		str += u.FirstName
 		if u.LastName != "" {
