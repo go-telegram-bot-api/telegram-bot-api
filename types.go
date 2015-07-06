@@ -60,7 +60,7 @@ func (u User) String() string {
 	if u.FirstName != "" {
 		str += u.FirstName
 		if u.LastName != "" {
-			str += u.LastName
+			str += " " + u.LastName
 		}
 	} else {
 		str += u.UserName
