@@ -132,9 +132,10 @@ type WebhookConfig struct {
 // All requests are POSTs because Telegram doesn't care, and it's easier.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
 	resp, err := http.PostForm("https://api.telegram.org/bot"+bot.Token+"/"+endpoint, params)
-	defer resp.Body.Close()
 	if err != nil {
 		return APIResponse{}, err
+	} else {
+		defer resp.Body.Close()
 	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
