@@ -6,7 +6,7 @@ import (
 )
 
 // UpdatesChan returns a chan that is called whenever a new message is gotten.
-func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
+func (bot *BotAPI) UpdatesChan(config UpdateConfig) error {
 	bot.Updates = make(chan Update, 100)
 
 	go func() {
@@ -33,5 +33,5 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) (chan Update, error) {
 		}
 	}()
 
-	return bot.Updates, nil
+	return nil
 }
