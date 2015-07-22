@@ -149,5 +149,5 @@ type ReplyKeyboardHide struct {
 // ForceReply allows the Bot to have users directly reply to it without additional interaction.
 type ForceReply struct {
 	ForceReply bool `json:"force_reply"`
-	Selective  bool `json:"force_reply"`
+	Selective  bool `json:"selective"`
 }
