@@ -14,14 +14,14 @@ type BotAPI struct {
 
 // NewBotAPI creates a new BotAPI instance.
 // Requires a token, provided by @BotFather on Telegram
-func NewBotAPI(token string, client http.Client) (*BotAPI, error) {
+func NewBotAPI(token string, client *http.Client) (*BotAPI, error) {
 	if client == nil {
 		client = &http.Client{}
 	}
 
 	bot := &BotAPI{
 		Token:  token,
-		Client: client,
+		Client: *client,
 	}
 
 	self, err := bot.GetMe()

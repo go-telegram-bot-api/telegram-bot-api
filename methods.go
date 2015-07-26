@@ -190,7 +190,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 	w.Close()
 
-	req, err := bot.Client.NewRequest("POST", "https://api.telegram.org/bot"+bot.Token+"/"+endpoint, &b)
+	req, err := http.NewRequest("POST", "https://api.telegram.org/bot"+bot.Token+"/"+endpoint, &b)
 	if err != nil {
 		return APIResponse{}, err
 	}
