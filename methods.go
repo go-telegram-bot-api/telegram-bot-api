@@ -131,7 +131,7 @@ type WebhookConfig struct {
 // MakeRequest makes a request to a specific endpoint with our token.
 // All requests are POSTs because Telegram doesn't care, and it's easier.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	resp, err := http.PostForm("https://api.telegram.org/bot"+bot.Token+"/"+endpoint, params)
+	resp, err := bot.Client.PostForm("https://api.telegram.org/bot"+bot.Token+"/"+endpoint, params)
 	if err != nil {
 		return APIResponse{}, err
 	} else {
@@ -190,15 +190,14 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 	w.Close()
 
-	req, err := http.NewRequest("POST", "https://api.telegram.org/bot"+bot.Token+"/"+endpoint, &b)
+	req, err := bot.Client.NewRequest("POST", "https://api.telegram.org/bot"+bot.Token+"/"+endpoint, &b)
 	if err != nil {
 		return APIResponse{}, err
 	}
 
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := bot.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
