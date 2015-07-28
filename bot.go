@@ -5,11 +5,11 @@ import "net/http"
 
 // BotAPI has methods for interacting with all of Telegram's Bot API endpoints.
 type BotAPI struct {
-	Token   string      `json:"token"`
-	Debug   bool        `json:"debug"`
-	Self    User        `json:"-"`
-	Updates chan Update `json:"-"`
-	Client  http.Client `json:"-"`
+	Token   string       `json:"token"`
+	Debug   bool         `json:"debug"`
+	Self    User         `json:"-"`
+	Updates chan Update  `json:"-"`
+	Client  *http.Client `json:"-"`
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -21,7 +21,7 @@ func NewBotAPI(token string, client *http.Client) (*BotAPI, error) {
 
 	bot := &BotAPI{
 		Token:  token,
-		Client: *client,
+		Client: client,
 	}
 
 	self, err := bot.GetMe()
