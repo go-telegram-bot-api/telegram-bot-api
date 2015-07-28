@@ -134,9 +134,8 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	resp, err := bot.Client.PostForm("https://api.telegram.org/bot"+bot.Token+"/"+endpoint, params)
 	if err != nil {
 		return APIResponse{}, err
-	} else {
-		defer resp.Body.Close()
 	}
+	defer resp.Body.Close()
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
