@@ -1,4 +1,4 @@
-# Golang Telegram bindings for the Bot API
+# Golang bindings for the Telegram Bot API
 
 [![GoDoc](https://godoc.org/github.com/Syfaro/telegram-bot-api?status.svg)](http://godoc.org/github.com/Syfaro/telegram-bot-api)
 
@@ -7,7 +7,7 @@ If you want a feature that hasn't been added yet or something is broken, open an
 
 All methods are fairly self explanatory, and reading the godoc page should explain everything. If something isn't clear, open an issue or submit a pull request.
 
-The scope of this project is just to provide a wrapper around the API without any additional features. There are other projects (including one I am developing myself) for creating something with plugins and command handlers without having to design all that yourself.
+The scope of this project is just to provide a wrapper around the API without any additional features. There are other projects for creating something with plugins and command handlers without having to design all that yourself.
 
 ## Example
 

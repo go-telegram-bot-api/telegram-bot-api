@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -12,6 +13,12 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+)
+
+// Telegram constants
+const (
+	// APIEndpoint is the endpoint for all API methods, with formatting for Sprintf
+	APIEndpoint = "https://api.telegram.org/bot%s/%s"
 )
 
 // Constant values for ChatActions
@@ -26,6 +33,12 @@ const (
 	ChatFindLocation   = "find_location"
 )
 
+// API errors
+const (
+	// APIForbidden happens when a token is bad
+	APIForbidden = "forbidden"
+)
+
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
 	ChatID                int
@@ -35,7 +48,7 @@ type MessageConfig struct {
 	ReplyMarkup           interface{}
 }
 
-// ForwardConfig contains infomation about a ForwardMessage request.
+// ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
 	ChatID     int
 	FromChatID int
@@ -131,11 +144,15 @@ type WebhookConfig struct {
 // MakeRequest makes a request to a specific endpoint with our token.
 // All requests are POSTs because Telegram doesn't care, and it's easier.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	resp, err := bot.Client.PostForm("https://api.telegram.org/bot"+bot.Token+"/"+endpoint, params)
+	resp, err := bot.Client.PostForm(fmt.Sprintf(APIEndpoint, bot.Token, endpoint), params)
 	if err != nil {
 		return APIResponse{}, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusForbidden {
+		return APIResponse{}, errors.New(APIForbidden)
+	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -189,7 +206,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 	w.Close()
 
-	req, err := http.NewRequest("POST", "https://api.telegram.org/bot"+bot.Token+"/"+endpoint, &b)
+	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), &b)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -274,7 +291,7 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 
 // ForwardMessage forwards a message from one chat to another.
 //
-// Requires ChatID (destionation), FromChatID (source), and MessageID.
+// Requires ChatID (destination), FromChatID (source), and MessageID.
 func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 	v := url.Values{}
 	v.Add("chat_id", strconv.Itoa(config.ChatID))
