@@ -41,7 +41,6 @@ func TestGetUpdates(t *testing.T) {
 	}
 
 	u := tgbotapi.NewUpdate(0)
-	u.Limit = 10000
 
 	_, err = bot.GetUpdates(u)
 
