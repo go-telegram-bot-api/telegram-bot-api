@@ -34,9 +34,12 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.UpdatesChan(u)
+	err = bot.UpdatesChan(u)
+	if err != nil {
+		log.Panic(err)
+	}
 
-	for update := range updates {
+	for update := range bot.Updates {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
