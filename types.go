@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // APIResponse is a response from the Telegram API with the result stored raw.
@@ -80,6 +81,16 @@ type Message struct {
 	NewChatPhoto        string          `json:"new_chat_photo"`
 	DeleteChatPhoto     bool            `json:"delete_chat_photo"`
 	GroupChatCreated    bool            `json:"group_chat_created"`
+}
+
+// Time converts the message timestamp into a Time.
+func (m *Message) Time() time.Time {
+	return time.Unix(int64(m.Date), 0)
+}
+
+// IsGroup returns if the message was sent to a group.
+func (m *Message) IsGroup() bool {
+	return m.From.ID != m.Chat.ID
 }
 
 // PhotoSize contains information about photos, including ID and Width and Height.
