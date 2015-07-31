@@ -26,6 +26,22 @@ type User struct {
 	UserName  string `json:"username"`
 }
 
+// String displays a simple text version of a user.
+// It is normally a user's username,
+// but falls back to a first/last name as available.
+func (u *User) String() string {
+	if u.UserName != "" {
+		return u.UserName
+	}
+
+	name := u.FirstName
+	if u.LastName != "" {
+		name += " " + u.LastName
+	}
+
+	return name
+}
+
 // GroupChat is a group chat, and not currently in use.
 type GroupChat struct {
 	ID    int    `json:"id"`
