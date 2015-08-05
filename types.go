@@ -73,6 +73,7 @@ type Message struct {
 	Photo               []PhotoSize     `json:"photo"`
 	Sticker             Sticker         `json:"sticker"`
 	Video               Video           `json:"video"`
+	Caption             string          `json:"caption"`
 	Contact             Contact         `json:"contact"`
 	Location            Location        `json:"location"`
 	NewChatParticipant  User            `json:"new_chat_participant"`
@@ -136,7 +137,6 @@ type Video struct {
 	Thumbnail PhotoSize `json:"thumb"`
 	MimeType  string    `json:"mime_type"`
 	FileSize  int       `json:"file_size"`
-	Caption   string    `json:"caption"`
 }
 
 // Contact contains information about a contact, such as PhoneNumber and UserId.
@@ -144,7 +144,7 @@ type Contact struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
-	UserID      string `json:"user_id"`
+	UserID      int    `json:"user_id"`
 }
 
 // Location contains information about a place, such as Longitude and Latitude.

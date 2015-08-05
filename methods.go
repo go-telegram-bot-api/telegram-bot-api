@@ -99,6 +99,8 @@ type StickerConfig struct {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	ChatID           int
+	Duration         int
+	Caption          string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingVideo bool
@@ -599,6 +601,12 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 		v.Add("video", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+		}
+		if config.Duration != 0 {
+			v.Add("duration", strconv.Itoa(config.Duration))
+		}
+		if config.Caption != "" {
+			v.Add("caption", config.Caption)
 		}
 		if config.ReplyMarkup != nil {
 			data, err := json.Marshal(config.ReplyMarkup)
