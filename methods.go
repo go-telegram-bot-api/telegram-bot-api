@@ -69,6 +69,7 @@ type PhotoConfig struct {
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	ChatID           int
+	Duration         int
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingAudio bool
@@ -400,6 +401,9 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 		v.Add("audio", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+		}
+		if config.Duration != 0 {
+			v.Add("duration", strconv.Itoa(config.Duration))
 		}
 		if config.ReplyMarkup != nil {
 			data, err := json.Marshal(config.ReplyMarkup)
