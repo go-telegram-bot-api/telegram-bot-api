@@ -79,7 +79,7 @@ type Message struct {
 	NewChatParticipant  User            `json:"new_chat_participant"`
 	LeftChatParticipant User            `json:"left_chat_participant"`
 	NewChatTitle        string          `json:"new_chat_title"`
-	NewChatPhoto        string          `json:"new_chat_photo"`
+	NewChatPhoto        []PhotoSize     `json:"new_chat_photo"`
 	DeleteChatPhoto     bool            `json:"delete_chat_photo"`
 	GroupChatCreated    bool            `json:"group_chat_created"`
 }
