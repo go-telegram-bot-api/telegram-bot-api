@@ -3,7 +3,6 @@ package tgutils
 
 import (
 	"github.com/syfaro/telegram-bot-api"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,7 +54,7 @@ func tempFileWithSuffix(dir, suffix string) (f *os.File, err error) {
 }
 
 // EncodeAudio takes a file and attempts to convert it to a .ogg for Telegram.
-// It then returns an AudioConfig.
+// It then updates the path to the audio file in the AudioConfig.
 //
 // This function requires ffmpeg and opusenc to be installed on the system!
 func EncodeAudio(audio *tgbotapi.AudioConfig) error {
@@ -64,8 +63,6 @@ func EncodeAudio(audio *tgbotapi.AudioConfig) error {
 		return err
 	}
 	defer f.Close()
-
-	log.Println(f.Name())
 
 	ffmpegArgs := []string{
 		"-i",
