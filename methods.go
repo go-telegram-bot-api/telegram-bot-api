@@ -375,6 +375,7 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 
 // SendAudio sends or uploads an audio clip to a chat.
 // If using a file, the file must be encoded as an .ogg with OPUS.
+// You may use the tgutils.EncodeAudio func to assist you with this, if needed.
 //
 // Requires ChatID and FileID OR FilePath.
 // ReplyToMessageID and ReplyMarkup are optional.
