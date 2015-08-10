@@ -1,14 +1,12 @@
 package tgbotapi
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"github.com/technoweenie/multipartstreamer"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -180,46 +178,32 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 //
 // Requires the parameter to hold the file not be in the params.
 func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, filename string) (APIResponse, error) {
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-
 	f, err := os.Open(filename)
 	if err != nil {
 		return APIResponse{}, err
 	}
+	defer f.Close()
 
-	fw, err := w.CreateFormFile(fieldname, filename)
+	fi, err := os.Stat(filename)
 	if err != nil {
 		return APIResponse{}, err
 	}
 
-	if _, err = io.Copy(fw, f); err != nil {
-		return APIResponse{}, err
-	}
+	ms := multipartstreamer.New()
+	ms.WriteFields(params)
+	ms.WriteReader(fieldname, f.Name(), fi.Size(), f)
 
-	for key, val := range params {
-		if fw, err = w.CreateFormField(key); err != nil {
-			return APIResponse{}, err
-		}
-
-		if _, err = fw.Write([]byte(val)); err != nil {
-			return APIResponse{}, err
-		}
-	}
-
-	w.Close()
-
-	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), &b)
+	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), nil)
+	ms.SetupRequest(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
-
-	req.Header.Set("Content-Type", w.FormDataContentType())
 
 	res, err := bot.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
+	defer res.Body.Close()
 
 	bytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
