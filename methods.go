@@ -1,18 +1,17 @@
 package tgbotapi
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
+
+	"github.com/technoweenie/multipartstreamer"
 )
 
 // Telegram constants
@@ -193,46 +192,32 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 //
 // Requires the parameter to hold the file not be in the params.
 func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, filename string) (APIResponse, error) {
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-
 	f, err := os.Open(filename)
 	if err != nil {
 		return APIResponse{}, err
 	}
+	defer f.Close()
 
-	fw, err := w.CreateFormFile(fieldname, filename)
+	fi, err := os.Stat(filename)
 	if err != nil {
 		return APIResponse{}, err
 	}
 
-	if _, err = io.Copy(fw, f); err != nil {
-		return APIResponse{}, err
-	}
+	ms := multipartstreamer.New()
+	ms.WriteFields(params)
+	ms.WriteReader(fieldname, f.Name(), fi.Size(), f)
 
-	for key, val := range params {
-		if fw, err = w.CreateFormField(key); err != nil {
-			return APIResponse{}, err
-		}
-
-		if _, err = fw.Write([]byte(val)); err != nil {
-			return APIResponse{}, err
-		}
-	}
-
-	w.Close()
-
-	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), &b)
+	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), nil)
+	ms.SetupRequest(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
-
-	req.Header.Set("Content-Type", w.FormDataContentType())
 
 	res, err := bot.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
+	defer res.Body.Close()
 
 	bytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -408,6 +393,7 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 // when the fields title and performer are both empty
 // and the mime-type of the file to be sent is not audio/mpeg,
 // the file must be in an .ogg file encoded with OPUS.
+// You may use the tgutils.EncodeAudio func to assist you with this, if needed.
 //
 // Requires ChatID and FileID OR FilePath.
 // ReplyToMessageID and ReplyMarkup are optional.
@@ -561,6 +547,7 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 
 // SendVoice sends or uploads a playable voice to a chat.
 // If using a file, the file must be encoded as an .ogg with OPUS.
+// You may use the tgutils.EncodeAudio func to assist you with this, if needed.
 //
 // Requires ChatID and FileID OR FilePath.
 // ReplyToMessageID and ReplyMarkup are optional.

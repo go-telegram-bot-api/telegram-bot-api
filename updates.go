@@ -13,13 +13,9 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) error {
 		for {
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
-				if bot.Debug {
-					panic(err)
-				} else {
-					log.Println(err)
-					log.Println("Failed to get updates, retrying in 3 seconds...")
-					time.Sleep(time.Second * 3)
-				}
+				log.Println(err)
+				log.Println("Failed to get updates, retrying in 3 seconds...")
+				time.Sleep(time.Second * 3)
 
 				continue
 			}
