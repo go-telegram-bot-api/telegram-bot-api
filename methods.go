@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/technoweenie/multipartstreamer"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
+
+	"github.com/technoweenie/multipartstreamer"
 )
 
 // Telegram constants
@@ -68,6 +69,8 @@ type PhotoConfig struct {
 type AudioConfig struct {
 	ChatID           int
 	Duration         int
+	Performer        string
+	Title            string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingAudio bool
@@ -103,6 +106,17 @@ type VideoConfig struct {
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingVideo bool
+	FilePath         string
+	FileID           string
+}
+
+// VoiceConfig contains information about a SendVoice request.
+type VoiceConfig struct {
+	ChatID           int
+	Duration         int
+	ReplyToMessageID int
+	ReplyMarkup      interface{}
+	UseExistingVoice bool
 	FilePath         string
 	FileID           string
 }
@@ -374,7 +388,11 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 }
 
 // SendAudio sends or uploads an audio clip to a chat.
-// If using a file, the file must be encoded as an .ogg with OPUS.
+// If using a file, the file must be in the .mp3 format.
+//
+// when the fields title and performer are both empty
+// and the mime-type of the file to be sent is not audio/mpeg,
+// the file must be in an .ogg file encoded with OPUS.
 // You may use the tgutils.EncodeAudio func to assist you with this, if needed.
 //
 // Requires ChatID and FileID OR FilePath.
@@ -397,6 +415,12 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 			}
 
 			v.Add("reply_markup", string(data))
+		}
+		if config.Performer != "" {
+			v.Add("performer", config.Performer)
+		}
+		if config.Title != "" {
+			v.Add("title", config.Title)
 		}
 
 		resp, err := bot.MakeRequest("sendAudio", v)
@@ -421,6 +445,9 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 	if config.ReplyToMessageID != 0 {
 		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
 	}
+	if config.Duration != 0 {
+		params["duration"] = strconv.Itoa(config.Duration)
+	}
 	if config.ReplyMarkup != nil {
 		data, err := json.Marshal(config.ReplyMarkup)
 		if err != nil {
@@ -428,6 +455,12 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 		}
 
 		params["reply_markup"] = string(data)
+	}
+	if config.Performer != "" {
+		params["performer"] = config.Performer
+	}
+	if config.Title != "" {
+		params["title"] = config.Title
 	}
 
 	resp, err := bot.UploadFile("sendAudio", params, "audio", config.FilePath)
@@ -507,6 +540,81 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 
 	if bot.Debug {
 		log.Printf("sendDocument resp: %+v\n", message)
+	}
+
+	return message, nil
+}
+
+// SendVoice sends or uploads a playable voice to a chat.
+// If using a file, the file must be encoded as an .ogg with OPUS.
+// You may use the tgutils.EncodeAudio func to assist you with this, if needed.
+//
+// Requires ChatID and FileID OR FilePath.
+// ReplyToMessageID and ReplyMarkup are optional.
+func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
+	if config.UseExistingVoice {
+		v := url.Values{}
+		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		v.Add("voice", config.FileID)
+		if config.ReplyToMessageID != 0 {
+			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+		}
+		if config.Duration != 0 {
+			v.Add("duration", strconv.Itoa(config.Duration))
+		}
+		if config.ReplyMarkup != nil {
+			data, err := json.Marshal(config.ReplyMarkup)
+			if err != nil {
+				return Message{}, err
+			}
+
+			v.Add("reply_markup", string(data))
+		}
+
+		resp, err := bot.MakeRequest("sendVoice", v)
+		if err != nil {
+			return Message{}, err
+		}
+
+		var message Message
+		json.Unmarshal(resp.Result, &message)
+
+		if bot.Debug {
+			log.Printf("SendVoice req : %+v\n", v)
+			log.Printf("SendVoice resp: %+v\n", message)
+		}
+
+		return message, nil
+	}
+
+	params := make(map[string]string)
+
+	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.Duration != 0 {
+		params["duration"] = strconv.Itoa(config.Duration)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return Message{}, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	resp, err := bot.UploadFile("SendVoice", params, "voice", config.FilePath)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+
+	if bot.Debug {
+		log.Printf("SendVoice resp: %+v\n", message)
 	}
 
 	return message, nil

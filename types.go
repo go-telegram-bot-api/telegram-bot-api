@@ -73,6 +73,7 @@ type Message struct {
 	Photo               []PhotoSize     `json:"photo"`
 	Sticker             Sticker         `json:"sticker"`
 	Video               Video           `json:"video"`
+	Voice               Voice           `json:"voice"`
 	Caption             string          `json:"caption"`
 	Contact             Contact         `json:"contact"`
 	Location            Location        `json:"location"`
@@ -102,12 +103,15 @@ type PhotoSize struct {
 	FileSize int    `json:"file_size"`
 }
 
-// Audio contains information about audio, including ID and Duration.
+// Audio contains information about audio,
+// including ID, Duration, Performer and Title.
 type Audio struct {
-	FileID   string `json:"file_id"`
-	Duration int    `json:"duration"`
-	MimeType string `json:"mime_type"`
-	FileSize int    `json:"file_size"`
+	FileID    string `json:"file_id"`
+	Duration  int    `json:"duration"`
+	Performer string `json:"performer"`
+	Title     string `json:"title"`
+	MimeType  string `json:"mime_type"`
+	FileSize  int    `json:"file_size"`
 }
 
 // Document contains information about a document, including ID and a Thumbnail.
@@ -137,6 +141,14 @@ type Video struct {
 	Thumbnail PhotoSize `json:"thumb"`
 	MimeType  string    `json:"mime_type"`
 	FileSize  int       `json:"file_size"`
+}
+
+// Voice contains information about a voice, including ID and duration.
+type Voice struct {
+	FileID   string `json:"file_id"`
+	Duration int    `json:"duration"`
+	MimeType string `json:"mime_type"`
+	FileSize int    `json:"file_size"`
 }
 
 // Contact contains information about a contact, such as PhoneNumber and UserId.

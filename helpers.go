@@ -153,6 +153,31 @@ func NewVideoShare(chatID int, fileID string) VideoConfig {
 	}
 }
 
+// NewVoiceUpload creates a new voice uploader.
+// This requires a file on the local filesystem to upload to Telegram.
+// Perhaps set a ChatAction of ChatRecordVideo or ChatUploadVideo while processing.
+//
+// chatID is where to send it, filename is the path to the file.
+func NewVoiceUpload(chatID int, filename string) VoiceConfig {
+	return VoiceConfig{
+		ChatID:           chatID,
+		UseExistingVoice: false,
+		FilePath:         filename,
+	}
+}
+
+// NewVoiceShare shares an existing voice.
+// You may use this to reshare an existing voice without reuploading it.
+//
+// chatID is where to send it, fileID is the ID of the video already uploaded.
+func NewVoiceShare(chatID int, fileID string) VoiceConfig {
+	return VoiceConfig{
+		ChatID:           chatID,
+		UseExistingVoice: true,
+		FileID:           fileID,
+	}
+}
+
 // NewLocation shares your location.
 // Perhaps set a ChatAction of ChatFindLocation while processing.
 //
