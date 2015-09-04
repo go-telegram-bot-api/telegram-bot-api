@@ -880,13 +880,11 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 // If this is set, GetUpdates will not get any data!
 //
 // Requires Url OR to set Clear to true.
-func (bot *BotAPI) SetWebhook(config WebhookConfig) error {
+func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error){
 	v := url.Values{}
 	if !config.Clear {
 		v.Add("url", config.URL.String())
 	}
 
-	_, err := bot.MakeRequest("setWebhook", v)
-
-	return err
+	return bot.MakeRequest("setWebhook", v)
 }
