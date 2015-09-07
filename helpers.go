@@ -238,7 +238,7 @@ func NewWebhook(link string) WebhookConfig {
 	}
 }
 
-// NewWebhookWithCert creates a new webhook with a selfsigned certificate.
+// NewWebhookWithCert creates a new webhook with a certificate.
 //
 // link is the url you wish to get webhooks,
 // file contains a string to a file, or a FileReader or FileBytes.

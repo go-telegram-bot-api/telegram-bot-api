@@ -985,6 +985,7 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	}
 
 	params := make(map[string]string)
+	params["url"] = config.URL.String()
 
 	resp, err := bot.UploadFile("setWebhook", params, "certificate", config.Certificate)
 	if err != nil {
