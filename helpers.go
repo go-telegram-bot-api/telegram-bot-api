@@ -33,12 +33,12 @@ func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 // This requires a file on the local filesystem to upload to Telegram.
 // Perhaps set a ChatAction of ChatUploadPhoto while processing.
 //
-// chatID is where to send it, filename is the path to the file.
-func NewPhotoUpload(chatID int, filename string) PhotoConfig {
+// chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
+func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 	return PhotoConfig{
 		ChatID:           chatID,
 		UseExistingPhoto: false,
-		FilePath:         filename,
+		File:             file,
 	}
 }
 
@@ -58,12 +58,12 @@ func NewPhotoShare(chatID int, fileID string) PhotoConfig {
 // This requires a file on the local filesystem to upload to Telegram.
 // Perhaps set a ChatAction of ChatRecordAudio or ChatUploadAudio while processing.
 //
-// chatID is where to send it, filename is the path to the file.
-func NewAudioUpload(chatID int, filename string) AudioConfig {
+// chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
+func NewAudioUpload(chatID int, file interface{}) AudioConfig {
 	return AudioConfig{
 		ChatID:           chatID,
 		UseExistingAudio: false,
-		FilePath:         filename,
+		File:             file,
 	}
 }
 
@@ -83,12 +83,12 @@ func NewAudioShare(chatID int, fileID string) AudioConfig {
 // This requires a file on the local filesystem to upload to Telegram.
 // Perhaps set a ChatAction of ChatUploadDocument while processing.
 //
-// chatID is where to send it, filename is the path to the file.
-func NewDocumentUpload(chatID int, filename string) DocumentConfig {
+// chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
+func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
 	return DocumentConfig{
 		ChatID:              chatID,
 		UseExistingDocument: false,
-		FilePath:            filename,
+		File:                file,
 	}
 }
 
@@ -107,12 +107,12 @@ func NewDocumentShare(chatID int, fileID string) DocumentConfig {
 // NewStickerUpload creates a new sticker uploader.
 // This requires a file on the local filesystem to upload to Telegram.
 //
-// chatID is where to send it, filename is the path to the file.
-func NewStickerUpload(chatID int, filename string) StickerConfig {
+// chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
+func NewStickerUpload(chatID int, file interface{}) StickerConfig {
 	return StickerConfig{
 		ChatID:             chatID,
 		UseExistingSticker: false,
-		FilePath:           filename,
+		File:               file,
 	}
 }
 
@@ -132,12 +132,12 @@ func NewStickerShare(chatID int, fileID string) StickerConfig {
 // This requires a file on the local filesystem to upload to Telegram.
 // Perhaps set a ChatAction of ChatRecordVideo or ChatUploadVideo while processing.
 //
-// chatID is where to send it, filename is the path to the file.
-func NewVideoUpload(chatID int, filename string) VideoConfig {
+// chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
+func NewVideoUpload(chatID int, file interface{}) VideoConfig {
 	return VideoConfig{
 		ChatID:           chatID,
 		UseExistingVideo: false,
-		FilePath:         filename,
+		File:             file,
 	}
 }
 
@@ -157,12 +157,12 @@ func NewVideoShare(chatID int, fileID string) VideoConfig {
 // This requires a file on the local filesystem to upload to Telegram.
 // Perhaps set a ChatAction of ChatRecordVideo or ChatUploadVideo while processing.
 //
-// chatID is where to send it, filename is the path to the file.
-func NewVoiceUpload(chatID int, filename string) VoiceConfig {
+// chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
+func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
 	return VoiceConfig{
 		ChatID:           chatID,
 		UseExistingVoice: false,
-		FilePath:         filename,
+		File:             file,
 	}
 }
 

@@ -1,7 +1,9 @@
 // Package tgbotapi has bindings for interacting with the Telegram Bot API.
 package tgbotapi
 
-import "net/http"
+import (
+	"net/http"
+)
 
 // BotAPI has methods for interacting with all of Telegram's Bot API endpoints.
 type BotAPI struct {

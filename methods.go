@@ -1,17 +1,18 @@
 package tgbotapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/technoweenie/multipartstreamer"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
-
-	"github.com/technoweenie/multipartstreamer"
 )
 
 // Telegram constants
@@ -62,6 +63,7 @@ type PhotoConfig struct {
 	ReplyMarkup      interface{}
 	UseExistingPhoto bool
 	FilePath         string
+	File             interface{}
 	FileID           string
 }
 
@@ -75,6 +77,7 @@ type AudioConfig struct {
 	ReplyMarkup      interface{}
 	UseExistingAudio bool
 	FilePath         string
+	File             interface{}
 	FileID           string
 }
 
@@ -85,6 +88,7 @@ type DocumentConfig struct {
 	ReplyMarkup         interface{}
 	UseExistingDocument bool
 	FilePath            string
+	File                interface{}
 	FileID              string
 }
 
@@ -95,6 +99,7 @@ type StickerConfig struct {
 	ReplyMarkup        interface{}
 	UseExistingSticker bool
 	FilePath           string
+	File               interface{}
 	FileID             string
 }
 
@@ -107,6 +112,7 @@ type VideoConfig struct {
 	ReplyMarkup      interface{}
 	UseExistingVideo bool
 	FilePath         string
+	File             interface{}
 	FileID           string
 }
 
@@ -118,6 +124,7 @@ type VoiceConfig struct {
 	ReplyMarkup      interface{}
 	UseExistingVoice bool
 	FilePath         string
+	File             interface{}
 	FileID           string
 }
 
@@ -156,6 +163,20 @@ type WebhookConfig struct {
 	URL   *url.URL
 }
 
+// FileBytes contains information about a set of bytes to upload as a File.
+type FileBytes struct {
+	Name  string
+	Bytes []byte
+}
+
+// FileReader contains information about a reader to upload as a File.
+// If Size is -1, it will read the entire Reader into memory to calculate a Size.
+type FileReader struct {
+	Name   string
+	Reader io.Reader
+	Size   int64
+}
+
 // MakeRequest makes a request to a specific endpoint with our token.
 // All requests are POSTs because Telegram doesn't care, and it's easier.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
@@ -191,21 +212,45 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 // UploadFile makes a request to the API with a file.
 //
 // Requires the parameter to hold the file not be in the params.
-func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, filename string) (APIResponse, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return APIResponse{}, err
-	}
-	defer f.Close()
-
-	fi, err := os.Stat(filename)
-	if err != nil {
-		return APIResponse{}, err
-	}
-
+// File should be a string to a file path, a FileBytes struct, or a FileReader struct.
+func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
 	ms := multipartstreamer.New()
 	ms.WriteFields(params)
-	ms.WriteReader(fieldname, f.Name(), fi.Size(), f)
+
+	switch f := file.(type) {
+	case string:
+		fileHandle, err := os.Open(f)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		defer fileHandle.Close()
+
+		fi, err := os.Stat(f)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		ms.WriteReader(fieldname, fileHandle.Name(), fi.Size(), fileHandle)
+	case FileBytes:
+		buf := bytes.NewBuffer(f.Bytes)
+		ms.WriteReader(fieldname, f.Name, int64(len(f.Bytes)), buf)
+	case FileReader:
+		if f.Size == -1 {
+			data, err := ioutil.ReadAll(f.Reader)
+			if err != nil {
+				return APIResponse{}, err
+			}
+			buf := bytes.NewBuffer(data)
+
+			ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
+
+			break
+		}
+
+		ms.WriteReader(fieldname, f.Name, f.Size, f.Reader)
+	default:
+		return APIResponse{}, errors.New("bad file type")
+	}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), nil)
 	ms.SetupRequest(req)
@@ -317,8 +362,9 @@ func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 
 // SendPhoto sends or uploads a photo to a chat.
 //
-// Requires ChatID and FileID OR FilePath.
+// Requires ChatID and FileID OR File.
 // Caption, ReplyToMessageID, and ReplyMarkup are optional.
+// File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 	if config.UseExistingPhoto {
 		v := url.Values{}
@@ -372,7 +418,14 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 		params["reply_markup"] = string(data)
 	}
 
-	resp, err := bot.UploadFile("SendPhoto", params, "photo", config.FilePath)
+	var file interface{}
+	if config.FilePath == "" {
+		file = config.File
+	} else {
+		file = config.FilePath
+	}
+
+	resp, err := bot.UploadFile("SendPhoto", params, "photo", file)
 	if err != nil {
 		return Message{}, err
 	}
@@ -390,13 +443,14 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 // SendAudio sends or uploads an audio clip to a chat.
 // If using a file, the file must be in the .mp3 format.
 //
-// when the fields title and performer are both empty
-// and the mime-type of the file to be sent is not audio/mpeg,
-// the file must be in an .ogg file encoded with OPUS.
+// When the fields title and performer are both empty and
+// the mime-type of the file to be sent is not audio/mpeg,
+// the file must be an .ogg file encoded with OPUS.
 // You may use the tgutils.EncodeAudio func to assist you with this, if needed.
 //
-// Requires ChatID and FileID OR FilePath.
+// Requires ChatID and FileID OR File.
 // ReplyToMessageID and ReplyMarkup are optional.
+// File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 	if config.UseExistingAudio {
 		v := url.Values{}
@@ -463,7 +517,14 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 		params["title"] = config.Title
 	}
 
-	resp, err := bot.UploadFile("sendAudio", params, "audio", config.FilePath)
+	var file interface{}
+	if config.FilePath == "" {
+		file = config.File
+	} else {
+		file = config.FilePath
+	}
+
+	resp, err := bot.UploadFile("sendAudio", params, "audio", file)
 	if err != nil {
 		return Message{}, err
 	}
@@ -480,8 +541,9 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 
 // SendDocument sends or uploads a document to a chat.
 //
-// Requires ChatID and FileID OR FilePath.
+// Requires ChatID and FileID OR File.
 // ReplyToMessageID and ReplyMarkup are optional.
+// File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 	if config.UseExistingDocument {
 		v := url.Values{}
@@ -530,7 +592,14 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 		params["reply_markup"] = string(data)
 	}
 
-	resp, err := bot.UploadFile("sendDocument", params, "document", config.FilePath)
+	var file interface{}
+	if config.FilePath == "" {
+		file = config.File
+	} else {
+		file = config.FilePath
+	}
+
+	resp, err := bot.UploadFile("sendDocument", params, "document", file)
 	if err != nil {
 		return Message{}, err
 	}
@@ -549,8 +618,9 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 // If using a file, the file must be encoded as an .ogg with OPUS.
 // You may use the tgutils.EncodeAudio func to assist you with this, if needed.
 //
-// Requires ChatID and FileID OR FilePath.
+// Requires ChatID and FileID OR File.
 // ReplyToMessageID and ReplyMarkup are optional.
+// File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 	if config.UseExistingVoice {
 		v := url.Values{}
@@ -605,7 +675,14 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 		params["reply_markup"] = string(data)
 	}
 
-	resp, err := bot.UploadFile("SendVoice", params, "voice", config.FilePath)
+	var file interface{}
+	if config.FilePath == "" {
+		file = config.File
+	} else {
+		file = config.FilePath
+	}
+
+	resp, err := bot.UploadFile("SendVoice", params, "voice", file)
 	if err != nil {
 		return Message{}, err
 	}
@@ -622,8 +699,9 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 
 // SendSticker sends or uploads a sticker to a chat.
 //
-// Requires ChatID and FileID OR FilePath.
+// Requires ChatID and FileID OR File.
 // ReplyToMessageID and ReplyMarkup are optional.
+// File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 	if config.UseExistingSticker {
 		v := url.Values{}
@@ -672,7 +750,14 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 		params["reply_markup"] = string(data)
 	}
 
-	resp, err := bot.UploadFile("sendSticker", params, "sticker", config.FilePath)
+	var file interface{}
+	if config.FilePath == "" {
+		file = config.File
+	} else {
+		file = config.FilePath
+	}
+
+	resp, err := bot.UploadFile("sendSticker", params, "sticker", file)
 	if err != nil {
 		return Message{}, err
 	}
@@ -689,8 +774,9 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 
 // SendVideo sends or uploads a video to a chat.
 //
-// Requires ChatID and FileID OR FilePath.
+// Requires ChatID and FileID OR File.
 // ReplyToMessageID and ReplyMarkup are optional.
+// File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 	if config.UseExistingVideo {
 		v := url.Values{}
@@ -745,7 +831,14 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 		params["reply_markup"] = string(data)
 	}
 
-	resp, err := bot.UploadFile("sendVideo", params, "video", config.FilePath)
+	var file interface{}
+	if config.FilePath == "" {
+		file = config.File
+	} else {
+		file = config.FilePath
+	}
+
+	resp, err := bot.UploadFile("sendVideo", params, "video", file)
 	if err != nil {
 		return Message{}, err
 	}
