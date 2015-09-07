@@ -159,8 +159,9 @@ type UpdateConfig struct {
 
 // WebhookConfig contains information about a SetWebhook request.
 type WebhookConfig struct {
-	Clear bool
-	URL   *url.URL
+	Clear       bool
+	URL         *url.URL
+	Certificate interface{}
 }
 
 // FileBytes contains information about a set of bytes to upload as a File.
@@ -973,11 +974,29 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 // If this is set, GetUpdates will not get any data!
 //
 // Requires Url OR to set Clear to true.
-func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error){
-	v := url.Values{}
-	if !config.Clear {
-		v.Add("url", config.URL.String())
+func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
+	if config.Certificate == nil {
+		v := url.Values{}
+		if !config.Clear {
+			v.Add("url", config.URL.String())
+		}
+
+		return bot.MakeRequest("setWebhook", v)
 	}
 
-	return bot.MakeRequest("setWebhook", v)
+	params := make(map[string]string)
+
+	resp, err := bot.UploadFile("setWebhook", params, "certificate", config.Certificate)
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	var apiResp APIResponse
+	json.Unmarshal(resp.Result, &apiResp)
+
+	if bot.Debug {
+		log.Printf("sendVideo resp: %+v\n", apiResp)
+	}
+
+	return apiResp, nil
 }

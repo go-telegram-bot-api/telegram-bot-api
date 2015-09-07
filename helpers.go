@@ -237,3 +237,17 @@ func NewWebhook(link string) WebhookConfig {
 		Clear: false,
 	}
 }
+
+// NewWebhookWithCert creates a new webhook with a selfsigned certificate.
+//
+// link is the url you wish to get webhooks,
+// file contains a string to a file, or a FileReader or FileBytes.
+func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
+	u, _ := url.Parse(link)
+
+	return WebhookConfig{
+		URL:         u,
+		Clear:       false,
+		Certificate: file,
+	}
+}
