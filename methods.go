@@ -995,7 +995,7 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	json.Unmarshal(resp.Result, &apiResp)
 
 	if bot.Debug {
-		log.Printf("sendVideo resp: %+v\n", apiResp)
+		log.Printf("setWebhook resp: %+v\n", apiResp)
 	}
 
 	return apiResp, nil
