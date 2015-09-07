@@ -49,3 +49,42 @@ func main() {
 	}
 }
 ```
+
+If you need to use webhooks for some reason (such as running on Google App Engine), you may use a slightly different method.
+
+```go
+package main
+
+import (
+	"github.com/Syfaro/telegram-bot-api"
+	"log"
+	"net/http"
+)
+
+func main() {
+	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	_, err := bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bot.ListenForWebhook()
+	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+
+	for update := range bot.Updates {
+		log.Printf("%+v\n", update)
+	}
+}
+```
+
+If you need, you may generate a self signed certficate, as this requires HTTPS / TLS. The above example tells Telegram that this is your certificate and that it should be trusted, even though it is not properly signed.
+
+    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj -nodes
