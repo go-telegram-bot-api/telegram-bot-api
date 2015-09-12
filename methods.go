@@ -39,10 +39,16 @@ const (
 	APIForbidden = "forbidden"
 )
 
+// Constant values for ParseMode in MessageConfig
+const (
+	ModeMarkdown = "Markdown"
+)
+
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
 	ChatID                int
 	Text                  string
+	ParseMode             string
 	DisableWebPagePreview bool
 	ReplyToMessageID      int
 	ReplyMarkup           interface{}
@@ -308,6 +314,9 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 	v.Add("chat_id", strconv.Itoa(config.ChatID))
 	v.Add("text", config.Text)
 	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
+	if config.ParseMode != "" {
+		v.Add("parse_mode", config.ParseMode)
+	}
 	if config.ReplyToMessageID != 0 {
 		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
 	}
