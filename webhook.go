@@ -7,12 +7,10 @@ import (
 )
 
 // ListenForWebhook registers a http handler for a webhook.
-// Useful for Google App Engine or other places where you cannot
-// use a normal update chan.
-func (bot *BotAPI) ListenForWebhook(config WebhookConfig) {
+func (bot *BotAPI) ListenForWebhook(pattern string) {
 	bot.Updates = make(chan Update, 100)
 
-	http.HandleFunc("/"+config.Url.Path, func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
 
 		var update Update
