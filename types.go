@@ -183,7 +183,7 @@ type File struct {
 //
 // It requires the Bot Token to create the link.
 func (f *File) Link(token string) string {
-	return fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", token, f.FilePath)
+	return fmt.Sprintf(FileEndpoint, token, f.FilePath)
 }
 
 // ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
