@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -176,6 +177,13 @@ type File struct {
 	FileID   string `json:"file_id"`
 	FileSize int    `json:"file_size"`
 	FilePath string `json:"file_path"`
+}
+
+// Link returns a full path to the download URL for a File.
+//
+// It requires the Bot Token to create the link.
+func (f *File) Link(token string) string {
+	return fmt.Sprintf(FileEndpoint, token, f.FilePath)
 }
 
 // ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
