@@ -171,6 +171,13 @@ type UserProfilePhotos struct {
 	Photos     []PhotoSize `json:"photos"`
 }
 
+// File contains information about a file to download from Telegram
+type File struct {
+	FileID   string `json:"file_id"`
+	FileSize int    `json:"file_size"`
+	FilePath string `json:"file_path"`
+}
+
 // ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
 type ReplyKeyboardMarkup struct {
 	Keyboard        [][]string `json:"keyboard"`

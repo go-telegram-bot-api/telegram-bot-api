@@ -156,6 +156,11 @@ type UserProfilePhotosConfig struct {
 	Limit  int
 }
 
+// FileConfig has information about a file hosted on Telegram
+type FileConfig struct {
+	FileID string
+}
+
 // UpdateConfig contains information about a GetUpdates request.
 type UpdateConfig struct {
 	Offset  int
@@ -944,6 +949,29 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	}
 
 	return profilePhotos, nil
+}
+
+// GetFile returns a file_id required to download a file.
+//
+// Requires FileID.
+func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
+	v := url.Values{}
+	v.Add("file_id", config.FileID)
+
+	resp, err := bot.MakeRequest("getFile", v)
+	if err != nil {
+		return File{}, err
+	}
+
+	var file File
+	json.Unmarshal(resp.Result, &file)
+
+	if bot.Debug {
+		log.Printf("getFile req : %+v\n", v)
+		log.Printf("getFile resp: %+v\n", file)
+	}
+
+	return file, nil
 }
 
 // GetUpdates fetches updates.
