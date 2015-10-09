@@ -60,6 +60,21 @@ type Chat struct {
 	LastName  string `json:"last_name"`
 }
 
+// IsPrivate returns true if the Chat is a private conversation
+func (c *Chat) IsPrivate() bool {
+	return c.Type == "private"
+}
+
+// IsGroup returns true if the Chat is a group conversation
+func (c *Chat) IsGroup() bool {
+	return c.Type == "group"
+}
+
+// IsChannel returns true if the Chat is a channel
+func (c *Chat) IsChannel() bool {
+	return c.Type == "channel"
+}
+
 // Message is returned by almost every request, and contains data about almost anything.
 type Message struct {
 	MessageID           int         `json:"message_id"`
