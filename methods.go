@@ -290,6 +290,10 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	var apiResp APIResponse
 	json.Unmarshal(bytes, &apiResp)
 
+	if !apiResp.Ok {
+		return APIResponse{}, errors.New(apiResp.Description)
+	}
+
 	return apiResp, nil
 }
 
