@@ -49,6 +49,7 @@ const (
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
 	ChatID                int
+	ChannelUsername       string
 	Text                  string
 	ParseMode             string
 	DisableWebPagePreview bool
@@ -58,14 +59,17 @@ type MessageConfig struct {
 
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
-	ChatID     int
-	FromChatID int
-	MessageID  int
+	ChatID              int
+	ChannelUsername     string
+	FromChatID          int
+	FromChannelUsername string
+	MessageID           int
 }
 
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	ChatID           int
+	ChannelUsername  string
 	Caption          string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
@@ -78,6 +82,7 @@ type PhotoConfig struct {
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	ChatID           int
+	ChannelUsername  string
 	Duration         int
 	Performer        string
 	Title            string
@@ -92,6 +97,7 @@ type AudioConfig struct {
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	ChatID              int
+	ChannelUsername     string
 	ReplyToMessageID    int
 	ReplyMarkup         interface{}
 	UseExistingDocument bool
@@ -103,6 +109,7 @@ type DocumentConfig struct {
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	ChatID             int
+	ChannelUsername    string
 	ReplyToMessageID   int
 	ReplyMarkup        interface{}
 	UseExistingSticker bool
@@ -114,6 +121,7 @@ type StickerConfig struct {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	ChatID           int
+	ChannelUsername  string
 	Duration         int
 	Caption          string
 	ReplyToMessageID int
@@ -127,6 +135,7 @@ type VideoConfig struct {
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	ChatID           int
+	ChannelUsername  string
 	Duration         int
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
@@ -139,6 +148,7 @@ type VoiceConfig struct {
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	ChatID           int
+	ChannelUsername  string
 	Latitude         float64
 	Longitude        float64
 	ReplyToMessageID int
@@ -147,8 +157,9 @@ type LocationConfig struct {
 
 // ChatActionConfig contains information about a SendChatAction request.
 type ChatActionConfig struct {
-	ChatID int
-	Action string
+	ChatID          int
+	ChannelUsername string
+	Action          string
 }
 
 // UserProfilePhotosConfig contains information about a GetUserProfilePhotos request.
@@ -322,7 +333,11 @@ func (bot *BotAPI) GetMe() (User, error) {
 // DisableWebPagePreview, ReplyToMessageID, and ReplyMarkup are optional.
 func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 	v := url.Values{}
-	v.Add("chat_id", strconv.Itoa(config.ChatID))
+	if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(config.ChatID))
+	}
 	v.Add("text", config.Text)
 	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
 	if config.ParseMode != "" {
@@ -361,8 +376,16 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 // Requires ChatID (destination), FromChatID (source), and MessageID.
 func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 	v := url.Values{}
-	v.Add("chat_id", strconv.Itoa(config.ChatID))
-	v.Add("from_chat_id", strconv.Itoa(config.FromChatID))
+	if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(config.ChatID))
+	}
+	if config.FromChannelUsername != "" {
+		v.Add("chat_id", config.FromChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(config.FromChatID))
+	}
 	v.Add("message_id", strconv.Itoa(config.MessageID))
 
 	resp, err := bot.MakeRequest("forwardMessage", v)
@@ -389,13 +412,17 @@ func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 	if config.UseExistingPhoto {
 		v := url.Values{}
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		if config.ChannelUsername != "" {
+			v.Add("chat_id", config.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.Itoa(config.ChatID))
+		}
 		v.Add("photo", config.FileID)
 		if config.Caption != "" {
 			v.Add("caption", config.Caption)
 		}
 		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ChatID))
+			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
 		}
 		if config.ReplyMarkup != nil {
 			data, err := json.Marshal(config.ReplyMarkup)
@@ -423,7 +450,11 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 	}
 
 	params := make(map[string]string)
-	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ChannelUsername != "" {
+		params["chat_id"] = config.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(config.ChatID)
+	}
 	if config.Caption != "" {
 		params["caption"] = config.Caption
 	}
@@ -475,7 +506,11 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 	if config.UseExistingAudio {
 		v := url.Values{}
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		if config.ChannelUsername != "" {
+			v.Add("chat_id", config.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.Itoa(config.ChatID))
+		}
 		v.Add("audio", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
@@ -516,7 +551,11 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 
 	params := make(map[string]string)
 
-	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ChannelUsername != "" {
+		params["chat_id"] = config.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(config.ChatID)
+	}
 	if config.ReplyToMessageID != 0 {
 		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
 	}
@@ -568,7 +607,11 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 	if config.UseExistingDocument {
 		v := url.Values{}
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		if config.ChannelUsername != "" {
+			v.Add("chat_id", config.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.Itoa(config.ChatID))
+		}
 		v.Add("document", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
@@ -600,7 +643,11 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 
 	params := make(map[string]string)
 
-	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ChannelUsername != "" {
+		params["chat_id"] = config.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(config.ChatID)
+	}
 	if config.ReplyToMessageID != 0 {
 		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
 	}
@@ -645,7 +692,11 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 	if config.UseExistingVoice {
 		v := url.Values{}
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		if config.ChannelUsername != "" {
+			v.Add("chat_id", config.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.Itoa(config.ChatID))
+		}
 		v.Add("voice", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
@@ -680,7 +731,11 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 
 	params := make(map[string]string)
 
-	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ChannelUsername != "" {
+		params["chat_id"] = config.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(config.ChatID)
+	}
 	if config.ReplyToMessageID != 0 {
 		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
 	}
@@ -726,7 +781,11 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 	if config.UseExistingSticker {
 		v := url.Values{}
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		if config.ChannelUsername != "" {
+			v.Add("chat_id", config.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.Itoa(config.ChatID))
+		}
 		v.Add("sticker", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
@@ -758,7 +817,11 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 
 	params := make(map[string]string)
 
-	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ChannelUsername != "" {
+		params["chat_id"] = config.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(config.ChatID)
+	}
 	if config.ReplyToMessageID != 0 {
 		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
 	}
@@ -801,7 +864,11 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 	if config.UseExistingVideo {
 		v := url.Values{}
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
+		if config.ChannelUsername != "" {
+			v.Add("chat_id", config.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.Itoa(config.ChatID))
+		}
 		v.Add("video", config.FileID)
 		if config.ReplyToMessageID != 0 {
 			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
@@ -839,7 +906,11 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 
 	params := make(map[string]string)
 
-	params["chat_id"] = strconv.Itoa(config.ChatID)
+	if config.ChannelUsername != "" {
+		params["chat_id"] = config.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(config.ChatID)
+	}
 	if config.ReplyToMessageID != 0 {
 		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
 	}
@@ -880,7 +951,11 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 	v := url.Values{}
-	v.Add("chat_id", strconv.Itoa(config.ChatID))
+	if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(config.ChatID))
+	}
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
 	if config.ReplyToMessageID != 0 {
@@ -916,7 +991,11 @@ func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 // Requires ChatID and a valid Action (see Chat constants).
 func (bot *BotAPI) SendChatAction(config ChatActionConfig) error {
 	v := url.Values{}
-	v.Add("chat_id", strconv.Itoa(config.ChatID))
+	if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(config.ChatID))
+	}
 	v.Add("action", config.Action)
 
 	_, err := bot.MakeRequest("sendChatAction", v)
@@ -1016,7 +1095,7 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 // SetWebhook sets a webhook.
 // If this is set, GetUpdates will not get any data!
 //
-// Requires Url OR to set Clear to true.
+// Requires URL OR to set Clear to true.
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	if config.Certificate == nil {
 		v := url.Values{}
