@@ -188,7 +188,7 @@ func (bot *BotAPI) GetMe() (User, error) {
 	return user, nil
 }
 
-func (bot *BotAPI) Send(c Chattable) error {
+func (bot *BotAPI) Send(c BaseChat) error {
 	return nil
 }
 
@@ -199,13 +199,27 @@ func (bot *BotAPI) DebugLog(context string, v url.Values, message interface{}) {
 	}
 }
 
+func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error) {
+	v, err := config.Values()
+
+	if err != nil {
+		return Message{}, err
+	}
+
+	message, err := bot.MakeMessageRequest(method, v)
+	if err != nil {
+		return Message{}, err
+	}
+
+	return message, nil
+}
+
 // SendMessage sends a Message to a chat.
 //
 // Requires ChatID and Text.
 // DisableWebPagePreview, ReplyToMessageID, and ReplyMarkup are optional.
 func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 	v, err := config.Values()
-
 	if err != nil {
 		return Message{}, err
 	}
@@ -223,9 +237,30 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 //
 // Requires ChatID (destination), FromChatID (source), and MessageID.
 func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
-	v, _ := config.Values()
+	v, err := config.Values()
+	if err != nil {
+		return Message{}, err
+	}
 
 	message, err := bot.MakeMessageRequest("forwardMessage", v)
+	if err != nil {
+		return Message{}, err
+	}
+
+	return message, nil
+}
+
+// SendLocation sends a location to a chat.
+//
+// Requires ChatID, Latitude, and Longitude.
+// ReplyToMessageID and ReplyMarkup are optional.
+func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
+	v, err := config.Values()
+	if err != nil {
+		return Message{}, err
+	}
+
+	message, err := bot.MakeMessageRequest("sendLocation", v)
 	if err != nil {
 		return Message{}, err
 	}
@@ -239,48 +274,16 @@ func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 // Caption, ReplyToMessageID, and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
-	if config.UseExistingPhoto {
-		v, err := config.Values()
-
-		if err != nil {
-			return Message{}, err
-		}
-
-		message, err := bot.MakeMessageRequest("SendPhoto", v)
-		if err != nil {
-			return Message{}, err
-		}
-
-		return message, nil
+	if config.UseExisting {
+		return bot.sendExisting("SendPhoto", config)
 	}
 
-	params := make(map[string]string)
-	if config.ChannelUsername != "" {
-		params["chat_id"] = config.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.Itoa(config.ChatID)
-	}
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		params["reply_markup"] = string(data)
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
 	}
 
-	var file interface{}
-	if config.FilePath == "" {
-		file = config.File
-	} else {
-		file = config.FilePath
-	}
+	file := config.GetFile()
 
 	resp, err := bot.UploadFile("SendPhoto", params, "photo", file)
 	if err != nil {
@@ -309,54 +312,16 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
-	if config.UseExistingAudio {
-		v, err := config.Values()
-		if err != nil {
-			return Message{}, err
-		}
-
-		message, err := bot.MakeMessageRequest("sendAudio", v)
-		if err != nil {
-			return Message{}, err
-		}
-
-		return message, nil
+	if config.UseExisting {
+		return bot.sendExisting("sendAudio", config)
 	}
 
-	params := make(map[string]string)
-
-	if config.ChannelUsername != "" {
-		params["chat_id"] = config.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.Itoa(config.ChatID)
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.Duration != 0 {
-		params["duration"] = strconv.Itoa(config.Duration)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		params["reply_markup"] = string(data)
-	}
-	if config.Performer != "" {
-		params["performer"] = config.Performer
-	}
-	if config.Title != "" {
-		params["title"] = config.Title
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
 	}
 
-	var file interface{}
-	if config.FilePath == "" {
-		file = config.File
-	} else {
-		file = config.FilePath
-	}
+	file := config.GetFile()
 
 	resp, err := bot.UploadFile("sendAudio", params, "audio", file)
 	if err != nil {
@@ -379,45 +344,16 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
-	if config.UseExistingDocument {
-		v, err := config.Values()
-		if err != nil {
-			return Message{}, err
-		}
-
-		message, err := bot.MakeMessageRequest("sendDocument", v)
-		if err != nil {
-			return Message{}, err
-		}
-
-		return message, nil
+	if config.UseExisting {
+		return bot.sendExisting("sendDocument", config)
 	}
 
-	params := make(map[string]string)
-
-	if config.ChannelUsername != "" {
-		params["chat_id"] = config.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.Itoa(config.ChatID)
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		params["reply_markup"] = string(data)
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
 	}
 
-	var file interface{}
-	if config.FilePath == "" {
-		file = config.File
-	} else {
-		file = config.FilePath
-	}
+	file := config.GetFile()
 
 	resp, err := bot.UploadFile("sendDocument", params, "document", file)
 	if err != nil {
@@ -442,48 +378,16 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
-	if config.UseExistingVoice {
-		v, err := config.Values()
-		if err != nil {
-			return Message{}, err
-		}
-
-		message, err := bot.MakeMessageRequest("sendVoice", v)
-		if err != nil {
-			return Message{}, err
-		}
-
-		return message, nil
+	if config.UseExisting {
+		return bot.sendExisting("sendVoice", config)
 	}
 
-	params := make(map[string]string)
-
-	if config.ChannelUsername != "" {
-		params["chat_id"] = config.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.Itoa(config.ChatID)
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.Duration != 0 {
-		params["duration"] = strconv.Itoa(config.Duration)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		params["reply_markup"] = string(data)
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
 	}
 
-	var file interface{}
-	if config.FilePath == "" {
-		file = config.File
-	} else {
-		file = config.FilePath
-	}
+	file := config.GetFile()
 
 	resp, err := bot.UploadFile("SendVoice", params, "voice", file)
 	if err != nil {
@@ -506,45 +410,16 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
-	if config.UseExistingSticker {
-		v, err := config.Values()
-		if err != nil {
-			return Message{}, err
-		}
-
-		message, err := bot.MakeMessageRequest("sendSticker", v)
-		if err != nil {
-			return Message{}, err
-		}
-
-		return message, nil
+	if config.UseExisting {
+		return bot.sendExisting("sendSticker", config)
 	}
 
-	params := make(map[string]string)
-
-	if config.ChannelUsername != "" {
-		params["chat_id"] = config.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.Itoa(config.ChatID)
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		params["reply_markup"] = string(data)
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
 	}
 
-	var file interface{}
-	if config.FilePath == "" {
-		file = config.File
-	} else {
-		file = config.FilePath
-	}
+	file := config.GetFile()
 
 	resp, err := bot.UploadFile("sendSticker", params, "sticker", file)
 	if err != nil {
@@ -567,45 +442,16 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
-	if config.UseExistingVideo {
-		v, err := config.Values()
-		if err != nil {
-			return Message{}, err
-		}
-
-		message, err := bot.MakeMessageRequest("sendVideo", v)
-		if err != nil {
-			return Message{}, err
-		}
-
-		return message, nil
+	if config.UseExisting {
+		return bot.sendExisting("sendVideo", config)
 	}
 
-	params := make(map[string]string)
-
-	if config.ChannelUsername != "" {
-		params["chat_id"] = config.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.Itoa(config.ChatID)
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		params["reply_markup"] = string(data)
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
 	}
 
-	var file interface{}
-	if config.FilePath == "" {
-		file = config.File
-	} else {
-		file = config.FilePath
-	}
+	file := config.GetFile()
 
 	resp, err := bot.UploadFile("sendVideo", params, "video", file)
 	if err != nil {
@@ -622,31 +468,16 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 	return message, nil
 }
 
-// SendLocation sends a location to a chat.
-//
-// Requires ChatID, Latitude, and Longitude.
-// ReplyToMessageID and ReplyMarkup are optional.
-func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
-	v, err := config.Values()
-	if err != nil {
-		return Message{}, err
-	}
-
-	message, err := bot.MakeMessageRequest("sendLocation", v)
-	if err != nil {
-		return Message{}, err
-	}
-
-	return message, nil
-}
-
 // SendChatAction sets a current action in a chat.
 //
 // Requires ChatID and a valid Action (see Chat constants).
 func (bot *BotAPI) SendChatAction(config ChatActionConfig) error {
-	v, _ := config.Values()
+	v, err := config.Values()
+	if err != nil {
+		return err
+	}
 
-	_, err := bot.MakeRequest("sendChatAction", v)
+	_, err = bot.MakeRequest("sendChatAction", v)
 	if err != nil {
 		return err
 	}

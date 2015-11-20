@@ -38,31 +38,66 @@ const (
 	ModeMarkdown = "Markdown"
 )
 
+type Chattable interface {
+	Values() (url.Values, error)
+}
+
+type Fileable interface {
+	Chattable
+	Params() (map[string]string, error)
+	GetFile() interface{}
+}
+
 // Base struct for all chat event(Message, Photo and so on)
-type Chattable struct {
+type BaseChat struct {
 	ChatID          int
 	ChannelUsername string
 }
 
-type Fileable struct {
-	FilePath string
-	File     interface{}
-	FileID   string
-}
-
-func (chattable *Chattable) Values() (url.Values, error) {
+func (chat *BaseChat) Values() (url.Values, error) {
 	v := url.Values{}
-	if chattable.ChannelUsername != "" {
-		v.Add("chat_id", chattable.ChannelUsername)
+	if chat.ChannelUsername != "" {
+		v.Add("chat_id", chat.ChannelUsername)
 	} else {
-		v.Add("chat_id", strconv.Itoa(chattable.ChatID))
+		v.Add("chat_id", strconv.Itoa(chat.ChatID))
 	}
 	return v, nil
 }
 
+type BaseFile struct {
+	BaseChat
+	FilePath    string
+	File        interface{}
+	FileID      string
+	UseExisting bool
+}
+
+func (file BaseFile) Params() (map[string]string, error) {
+	params := make(map[string]string)
+
+	if file.ChannelUsername != "" {
+		params["chat_id"] = file.ChannelUsername
+	} else {
+		params["chat_id"] = strconv.Itoa(file.ChatID)
+	}
+
+	return params, nil
+}
+
+func (file BaseFile) GetFile() interface{} {
+	var result interface{}
+	if file.FilePath == "" {
+		result = file.File
+	} else {
+		result = file.FilePath
+	}
+
+	return result
+}
+
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
-	Chattable
+	BaseChat
 	Text                  string
 	ParseMode             string
 	DisableWebPagePreview bool
@@ -70,8 +105,8 @@ type MessageConfig struct {
 	ReplyMarkup           interface{}
 }
 
-func (config *MessageConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config MessageConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 	v.Add("text", config.Text)
 	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
 	if config.ParseMode != "" {
@@ -94,14 +129,14 @@ func (config *MessageConfig) Values() (url.Values, error) {
 
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
-	Chattable
+	BaseChat
 	FromChatID          int
 	FromChannelUsername string
 	MessageID           int
 }
 
-func (config *ForwardConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config ForwardConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	if config.FromChannelUsername != "" {
 		v.Add("chat_id", config.FromChannelUsername)
@@ -115,16 +150,35 @@ func (config *ForwardConfig) Values() (url.Values, error) {
 
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
-	Chattable
-	Fileable
+	BaseFile
 	Caption          string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
-	UseExistingPhoto bool
 }
 
-func (config *PhotoConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config PhotoConfig) Params() (map[string]string, error) {
+	params, _ := config.BaseFile.Params()
+
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+	}
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	return params, nil
+}
+
+func (config PhotoConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("photo", config.FileID)
 	if config.Caption != "" {
@@ -147,18 +201,16 @@ func (config *PhotoConfig) Values() (url.Values, error) {
 
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
-	Chattable
-	Fileable
+	BaseFile
 	Duration         int
 	Performer        string
 	Title            string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
-	UseExistingAudio bool
 }
 
-func (config *AudioConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config AudioConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("audio", config.FileID)
 	if config.ReplyToMessageID != 0 {
@@ -185,17 +237,42 @@ func (config *AudioConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
-// DocumentConfig contains information about a SendDocument request.
-type DocumentConfig struct {
-	Chattable
-	Fileable
-	ReplyToMessageID    int
-	ReplyMarkup         interface{}
-	UseExistingDocument bool
+func (config AudioConfig) Params() (map[string]string, error) {
+	params, _ := config.BaseFile.Params()
+
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.Duration != 0 {
+		params["duration"] = strconv.Itoa(config.Duration)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+	if config.Performer != "" {
+		params["performer"] = config.Performer
+	}
+	if config.Title != "" {
+		params["title"] = config.Title
+	}
+
+	return params, nil
 }
 
-func (config *DocumentConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+// DocumentConfig contains information about a SendDocument request.
+type DocumentConfig struct {
+	BaseFile
+	ReplyToMessageID int
+	ReplyMarkup      interface{}
+}
+
+func (config DocumentConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("document", config.FileID)
 	if config.ReplyToMessageID != 0 {
@@ -213,17 +290,33 @@ func (config *DocumentConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
-// StickerConfig contains information about a SendSticker request.
-type StickerConfig struct {
-	Chattable
-	Fileable
-	ReplyToMessageID   int
-	ReplyMarkup        interface{}
-	UseExistingSticker bool
+func (config DocumentConfig) Params() (map[string]string, error) {
+	params, _ := config.BaseFile.Params()
+
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	return params, nil
 }
 
-func (config *StickerConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+// StickerConfig contains information about a SendSticker request.
+type StickerConfig struct {
+	BaseFile
+	ReplyToMessageID int
+	ReplyMarkup      interface{}
+}
+
+func (config StickerConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("sticker", config.FileID)
 	if config.ReplyToMessageID != 0 {
@@ -241,19 +334,35 @@ func (config *StickerConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+func (config StickerConfig) Params() (map[string]string, error) {
+	params, _ := config.BaseFile.Params()
+
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	return params, nil
+}
+
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
-	Chattable
-	Fileable
+	BaseFile
 	Duration         int
 	Caption          string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
-	UseExistingVideo bool
 }
 
-func (config *VideoConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config VideoConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("video", config.FileID)
 	if config.ReplyToMessageID != 0 {
@@ -277,18 +386,34 @@ func (config *VideoConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+func (config VideoConfig) Params() (map[string]string, error) {
+	params, _ := config.BaseFile.Params()
+
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	return params, nil
+}
+
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
-	Chattable
-	Fileable
+	BaseFile
 	Duration         int
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
-	UseExistingVoice bool
 }
 
-func (config *VoiceConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config VoiceConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("voice", config.FileID)
 	if config.ReplyToMessageID != 0 {
@@ -309,17 +434,38 @@ func (config *VoiceConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+func (config VoiceConfig) Params() (map[string]string, error) {
+	params, _ := config.BaseFile.Params()
+
+	if config.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
+	}
+	if config.Duration != 0 {
+		params["duration"] = strconv.Itoa(config.Duration)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
+	}
+
+	return params, nil
+}
+
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
-	Chattable
+	BaseChat
 	Latitude         float64
 	Longitude        float64
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 }
 
-func (config *LocationConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config LocationConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
@@ -341,12 +487,12 @@ func (config *LocationConfig) Values() (url.Values, error) {
 
 // ChatActionConfig contains information about a SendChatAction request.
 type ChatActionConfig struct {
-	Chattable
+	BaseChat
 	Action string
 }
 
-func (config *ChatActionConfig) Values() (url.Values, error) {
-	v, _ := config.Chattable.Values()
+func (config ChatActionConfig) Values() (url.Values, error) {
+	v, _ := config.BaseChat.Values()
 	v.Add("action", config.Action)
 	return v, nil
 }
