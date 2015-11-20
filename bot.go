@@ -89,6 +89,9 @@ func (bot *BotAPI) MakeMessageRequest(endpoint string, params url.Values) (Messa
 
 	var message Message
 	json.Unmarshal(resp.Result, &message)
+
+	bot.DebugLog(endpoint, params, message)
+
 	return message, nil
 }
 
@@ -189,7 +192,6 @@ func (bot *BotAPI) Send(c Chattable) error {
 	return nil
 }
 
-
 func (bot *BotAPI) DebugLog(context string, v url.Values, message interface{}) {
 	if bot.Debug {
 		log.Printf("%s req : %+v\n", context, v)
@@ -214,8 +216,6 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 		return Message{}, err
 	}
 
-	bot.DebugLog("SendMessage", v, message)
-
 	return message, nil
 }
 
@@ -229,8 +229,6 @@ func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 	if err != nil {
 		return Message{}, err
 	}
-
-	bot.DebugLog("ForwardMessage", v, message)
 
 	return message, nil
 }
@@ -252,8 +250,6 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 		if err != nil {
 			return Message{}, err
 		}
-
-		bot.DebugLog("SendPhoto", v, message)
 
 		return message, nil
 	}
@@ -323,9 +319,6 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 		if err != nil {
 			return Message{}, err
 		}
-
-
-		bot.DebugLog("SendAudio", v, message)
 
 		return message, nil
 	}
@@ -397,8 +390,6 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		bot.DebugLog("SendDocument", v, message)
-
 		return message, nil
 	}
 
@@ -461,8 +452,6 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 		if err != nil {
 			return Message{}, err
 		}
-
-		bot.DebugLog("SendVoice", v, message)
 
 		return message, nil
 	}
@@ -528,8 +517,6 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		bot.DebugLog("SendSticker", v, message)
-
 		return message, nil
 	}
 
@@ -591,8 +578,6 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		bot.DebugLog("SendVideo", v, message)
-
 		return message, nil
 	}
 
@@ -651,8 +636,6 @@ func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 	if err != nil {
 		return Message{}, err
 	}
-
-	bot.DebugLog("SendLocation", v, message)
 
 	return message, nil
 }
