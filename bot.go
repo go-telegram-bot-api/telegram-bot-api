@@ -81,6 +81,17 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	return apiResp, nil
 }
 
+func (bot *BotAPI) MakeMessageRequest(endpoint string, params url.Values) (Message, error) {
+	resp, err := bot.MakeRequest(endpoint, params)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+	return message, nil
+}
+
 // UploadFile makes a request to the API with a file.
 //
 // Requires the parameter to hold the file not be in the params.
@@ -189,13 +200,11 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 		return Message{}, err
 	}
 
-	resp, err := bot.MakeRequest("SendMessage", v)
+	message, err := bot.MakeMessageRequest("SendMessage", v)
+
 	if err != nil {
 		return Message{}, err
 	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
 
 	if bot.Debug {
 		log.Printf("SendMessage req : %+v\n", v)
@@ -209,15 +218,12 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 //
 // Requires ChatID (destination), FromChatID (source), and MessageID.
 func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
-	v, _:= config.Values()
+	v, _ := config.Values()
 
-	resp, err := bot.MakeRequest("forwardMessage", v)
+	message, err := bot.MakeMessageRequest("forwardMessage", v)
 	if err != nil {
 		return Message{}, err
 	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
 
 	if bot.Debug {
 		log.Printf("forwardMessage req : %+v\n", v)
@@ -240,13 +246,10 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		resp, err := bot.MakeRequest("SendPhoto", v)
+		message, err := bot.MakeMessageRequest("SendPhoto", v)
 		if err != nil {
 			return Message{}, err
 		}
-
-		var message Message
-		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
 			log.Printf("SendPhoto req : %+v\n", v)
@@ -317,13 +320,10 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		resp, err := bot.MakeRequest("sendAudio", v)
+		message, err := bot.MakeMessageRequest("sendAudio", v)
 		if err != nil {
 			return Message{}, err
 		}
-
-		var message Message
-		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
 			log.Printf("sendAudio req : %+v\n", v)
@@ -395,13 +395,10 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		resp, err := bot.MakeRequest("sendDocument", v)
+		message, err := bot.MakeMessageRequest("sendDocument", v)
 		if err != nil {
 			return Message{}, err
 		}
-
-		var message Message
-		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
 			log.Printf("sendDocument req : %+v\n", v)
@@ -466,13 +463,10 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		resp, err := bot.MakeRequest("sendVoice", v)
+		message, err := bot.MakeMessageRequest("sendVoice", v)
 		if err != nil {
 			return Message{}, err
 		}
-
-		var message Message
-		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
 			log.Printf("SendVoice req : %+v\n", v)
@@ -538,13 +532,10 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		resp, err := bot.MakeRequest("sendSticker", v)
+		message, err := bot.MakeMessageRequest("sendSticker", v)
 		if err != nil {
 			return Message{}, err
 		}
-
-		var message Message
-		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
 			log.Printf("sendSticker req : %+v\n", v)
@@ -607,13 +598,10 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		resp, err := bot.MakeRequest("sendVideo", v)
+		message, err := bot.MakeMessageRequest("sendVideo", v)
 		if err != nil {
 			return Message{}, err
 		}
-
-		var message Message
-		json.Unmarshal(resp.Result, &message)
 
 		if bot.Debug {
 			log.Printf("sendVideo req : %+v\n", v)
@@ -674,13 +662,10 @@ func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 		return Message{}, err
 	}
 
-	resp, err := bot.MakeRequest("sendLocation", v)
+	message, err := bot.MakeMessageRequest("sendLocation", v)
 	if err != nil {
 		return Message{}, err
 	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
 
 	if bot.Debug {
 		log.Printf("sendLocation req : %+v\n", v)

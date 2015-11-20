@@ -1,10 +1,10 @@
 package tgbotapi
 
 import (
+	"encoding/json"
 	"io"
 	"net/url"
 	"strconv"
-	"encoding/json"
 )
 
 // Telegram constants
@@ -44,7 +44,7 @@ type Chattable struct {
 	ChannelUsername string
 }
 
-func (chattable *Chattable) Values() (url.Values, error){
+func (chattable *Chattable) Values() (url.Values, error) {
 	v := url.Values{}
 	if chattable.ChannelUsername != "" {
 		v.Add("chat_id", chattable.ChannelUsername)
@@ -82,7 +82,6 @@ func (config *MessageConfig) Values() (url.Values, error) {
 
 		v.Add("reply_markup", string(data))
 	}
-
 
 	return v, nil
 }
@@ -330,6 +329,7 @@ func (config *LocationConfig) Values() (url.Values, error) {
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
+
 	if config.ReplyToMessageID != 0 {
 		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
 	}
