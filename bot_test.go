@@ -1,7 +1,7 @@
 package tgbotapi_test
 
 import (
-	"github.com/syfaro/telegram-bot-api"
+	"github.com/zhulik/telegram-bot-api"
 	"log"
 	"os"
 	"testing"
@@ -20,7 +20,8 @@ func TestMain(m *testing.M) {
 func TestNewBotAPI_notoken(t *testing.T) {
 	_, err := tgbotapi.NewBotAPI("")
 
-	if err.Error() != tgbotapi.APIForbidden {
+	if err == nil {
+		log.Println(err.Error())
 		t.Fail()
 	}
 }
