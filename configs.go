@@ -3,6 +3,8 @@ package tgbotapi
 import (
 	"io"
 	"net/url"
+	"strconv"
+	"encoding/json"
 )
 
 // Telegram constants
@@ -42,6 +44,16 @@ type Chattable struct {
 	ChannelUsername string
 }
 
+func (chattable *Chattable) Values() (url.Values, error){
+	v := url.Values{}
+	if chattable.ChannelUsername != "" {
+		v.Add("chat_id", chattable.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(chattable.ChatID))
+	}
+	return v, nil
+}
+
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
 	Chattable
@@ -52,12 +64,48 @@ type MessageConfig struct {
 	ReplyMarkup           interface{}
 }
 
+func (config *MessageConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+	v.Add("text", config.Text)
+	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
+	if config.ParseMode != "" {
+		v.Add("parse_mode", config.ParseMode)
+	}
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+
+	return v, nil
+}
+
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
 	Chattable
 	FromChatID          int
 	FromChannelUsername string
 	MessageID           int
+}
+
+func (config *ForwardConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	if config.FromChannelUsername != "" {
+		v.Add("chat_id", config.FromChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.Itoa(config.FromChatID))
+	}
+	v.Add("message_id", strconv.Itoa(config.MessageID))
+
+	return v, nil
 }
 
 // PhotoConfig contains information about a SendPhoto request.
@@ -70,6 +118,28 @@ type PhotoConfig struct {
 	FilePath         string
 	File             interface{}
 	FileID           string
+}
+
+func (config *PhotoConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("photo", config.FileID)
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+	}
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
 }
 
 // AudioConfig contains information about a SendAudio request.
@@ -86,6 +156,34 @@ type AudioConfig struct {
 	FileID           string
 }
 
+func (config *AudioConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("audio", config.FileID)
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.Duration != 0 {
+		v.Add("duration", strconv.Itoa(config.Duration))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+	if config.Performer != "" {
+		v.Add("performer", config.Performer)
+	}
+	if config.Title != "" {
+		v.Add("title", config.Title)
+	}
+
+	return v, nil
+}
+
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	Chattable
@@ -97,6 +195,25 @@ type DocumentConfig struct {
 	FileID              string
 }
 
+func (config *DocumentConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("document", config.FileID)
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
+
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	Chattable
@@ -106,6 +223,25 @@ type StickerConfig struct {
 	FilePath           string
 	File               interface{}
 	FileID             string
+}
+
+func (config *StickerConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("sticker", config.FileID)
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
 }
 
 // VideoConfig contains information about a SendVideo request.
@@ -121,6 +257,31 @@ type VideoConfig struct {
 	FileID           string
 }
 
+func (config *VideoConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("video", config.FileID)
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.Duration != 0 {
+		v.Add("duration", strconv.Itoa(config.Duration))
+	}
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
+
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	Chattable
@@ -133,6 +294,28 @@ type VoiceConfig struct {
 	FileID           string
 }
 
+func (config *VoiceConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("voice", config.FileID)
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.Duration != 0 {
+		v.Add("duration", strconv.Itoa(config.Duration))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
+
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	Chattable
@@ -142,10 +325,36 @@ type LocationConfig struct {
 	ReplyMarkup      interface{}
 }
 
+func (config *LocationConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+
+	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
+	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
+
 // ChatActionConfig contains information about a SendChatAction request.
 type ChatActionConfig struct {
 	Chattable
 	Action string
+}
+
+func (config *ChatActionConfig) Values() (url.Values, error) {
+	v, _ := config.Chattable.Values()
+	v.Add("action", config.Action)
+	return v, nil
 }
 
 // UserProfilePhotosConfig contains information about a GetUserProfilePhotos request.

@@ -183,27 +183,10 @@ func (bot *BotAPI) Send(c Chattable) error {
 // Requires ChatID and Text.
 // DisableWebPagePreview, ReplyToMessageID, and ReplyMarkup are optional.
 func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
-	v := url.Values{}
-	if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
-	}
-	v.Add("text", config.Text)
-	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
-	if config.ParseMode != "" {
-		v.Add("parse_mode", config.ParseMode)
-	}
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
+	v, err := config.Values()
 
-		v.Add("reply_markup", string(data))
+	if err != nil {
+		return Message{}, err
 	}
 
 	resp, err := bot.MakeRequest("SendMessage", v)
@@ -226,18 +209,7 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 //
 // Requires ChatID (destination), FromChatID (source), and MessageID.
 func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
-	v := url.Values{}
-	if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
-	}
-	if config.FromChannelUsername != "" {
-		v.Add("chat_id", config.FromChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.Itoa(config.FromChatID))
-	}
-	v.Add("message_id", strconv.Itoa(config.MessageID))
+	v, _:= config.Values()
 
 	resp, err := bot.MakeRequest("forwardMessage", v)
 	if err != nil {
@@ -262,26 +234,10 @@ func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 	if config.UseExistingPhoto {
-		v := url.Values{}
-		if config.ChannelUsername != "" {
-			v.Add("chat_id", config.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		}
-		v.Add("photo", config.FileID)
-		if config.Caption != "" {
-			v.Add("caption", config.Caption)
-		}
-		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-		}
-		if config.ReplyMarkup != nil {
-			data, err := json.Marshal(config.ReplyMarkup)
-			if err != nil {
-				return Message{}, err
-			}
+		v, err := config.Values()
 
-			v.Add("reply_markup", string(data))
+		if err != nil {
+			return Message{}, err
 		}
 
 		resp, err := bot.MakeRequest("SendPhoto", v)
@@ -356,32 +312,9 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 	if config.UseExistingAudio {
-		v := url.Values{}
-		if config.ChannelUsername != "" {
-			v.Add("chat_id", config.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		}
-		v.Add("audio", config.FileID)
-		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-		}
-		if config.Duration != 0 {
-			v.Add("duration", strconv.Itoa(config.Duration))
-		}
-		if config.ReplyMarkup != nil {
-			data, err := json.Marshal(config.ReplyMarkup)
-			if err != nil {
-				return Message{}, err
-			}
-
-			v.Add("reply_markup", string(data))
-		}
-		if config.Performer != "" {
-			v.Add("performer", config.Performer)
-		}
-		if config.Title != "" {
-			v.Add("title", config.Title)
+		v, err := config.Values()
+		if err != nil {
+			return Message{}, err
 		}
 
 		resp, err := bot.MakeRequest("sendAudio", v)
@@ -457,23 +390,9 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 	if config.UseExistingDocument {
-		v := url.Values{}
-		if config.ChannelUsername != "" {
-			v.Add("chat_id", config.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		}
-		v.Add("document", config.FileID)
-		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-		}
-		if config.ReplyMarkup != nil {
-			data, err := json.Marshal(config.ReplyMarkup)
-			if err != nil {
-				return Message{}, err
-			}
-
-			v.Add("reply_markup", string(data))
+		v, err := config.Values()
+		if err != nil {
+			return Message{}, err
 		}
 
 		resp, err := bot.MakeRequest("sendDocument", v)
@@ -542,26 +461,9 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 	if config.UseExistingVoice {
-		v := url.Values{}
-		if config.ChannelUsername != "" {
-			v.Add("chat_id", config.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		}
-		v.Add("voice", config.FileID)
-		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-		}
-		if config.Duration != 0 {
-			v.Add("duration", strconv.Itoa(config.Duration))
-		}
-		if config.ReplyMarkup != nil {
-			data, err := json.Marshal(config.ReplyMarkup)
-			if err != nil {
-				return Message{}, err
-			}
-
-			v.Add("reply_markup", string(data))
+		v, err := config.Values()
+		if err != nil {
+			return Message{}, err
 		}
 
 		resp, err := bot.MakeRequest("sendVoice", v)
@@ -631,23 +533,9 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 	if config.UseExistingSticker {
-		v := url.Values{}
-		if config.ChannelUsername != "" {
-			v.Add("chat_id", config.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		}
-		v.Add("sticker", config.FileID)
-		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-		}
-		if config.ReplyMarkup != nil {
-			data, err := json.Marshal(config.ReplyMarkup)
-			if err != nil {
-				return Message{}, err
-			}
-
-			v.Add("reply_markup", string(data))
+		v, err := config.Values()
+		if err != nil {
+			return Message{}, err
 		}
 
 		resp, err := bot.MakeRequest("sendSticker", v)
@@ -714,29 +602,9 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 	if config.UseExistingVideo {
-		v := url.Values{}
-		if config.ChannelUsername != "" {
-			v.Add("chat_id", config.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		}
-		v.Add("video", config.FileID)
-		if config.ReplyToMessageID != 0 {
-			v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-		}
-		if config.Duration != 0 {
-			v.Add("duration", strconv.Itoa(config.Duration))
-		}
-		if config.Caption != "" {
-			v.Add("caption", config.Caption)
-		}
-		if config.ReplyMarkup != nil {
-			data, err := json.Marshal(config.ReplyMarkup)
-			if err != nil {
-				return Message{}, err
-			}
-
-			v.Add("reply_markup", string(data))
+		v, err := config.Values()
+		if err != nil {
+			return Message{}, err
 		}
 
 		resp, err := bot.MakeRequest("sendVideo", v)
@@ -801,24 +669,9 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 // Requires ChatID, Latitude, and Longitude.
 // ReplyToMessageID and ReplyMarkup are optional.
 func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
-	v := url.Values{}
-	if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
-	}
-	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
-	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return Message{}, err
-		}
-
-		v.Add("reply_markup", string(data))
+	v, err := config.Values()
+	if err != nil {
+		return Message{}, err
 	}
 
 	resp, err := bot.MakeRequest("sendLocation", v)
@@ -841,13 +694,7 @@ func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 //
 // Requires ChatID and a valid Action (see Chat constants).
 func (bot *BotAPI) SendChatAction(config ChatActionConfig) error {
-	v := url.Values{}
-	if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.Itoa(config.ChatID))
-	}
-	v.Add("action", config.Action)
+	v, _ := config.Values()
 
 	_, err := bot.MakeRequest("sendChatAction", v)
 	if err != nil {
