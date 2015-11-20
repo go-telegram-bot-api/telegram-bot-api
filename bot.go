@@ -189,6 +189,14 @@ func (bot *BotAPI) Send(c Chattable) error {
 	return nil
 }
 
+
+func (bot *BotAPI) DebugLog(context string, v url.Values, message interface{}) {
+	if bot.Debug {
+		log.Printf("%s req : %+v\n", context, v)
+		log.Printf("%s resp: %+v\n", context, message)
+	}
+}
+
 // SendMessage sends a Message to a chat.
 //
 // Requires ChatID and Text.
@@ -206,10 +214,7 @@ func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
 		return Message{}, err
 	}
 
-	if bot.Debug {
-		log.Printf("SendMessage req : %+v\n", v)
-		log.Printf("SendMessage resp: %+v\n", message)
-	}
+	bot.DebugLog("SendMessage", v, message)
 
 	return message, nil
 }
@@ -225,10 +230,7 @@ func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
 		return Message{}, err
 	}
 
-	if bot.Debug {
-		log.Printf("forwardMessage req : %+v\n", v)
-		log.Printf("forwardMessage resp: %+v\n", message)
-	}
+	bot.DebugLog("ForwardMessage", v, message)
 
 	return message, nil
 }
@@ -251,10 +253,7 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		if bot.Debug {
-			log.Printf("SendPhoto req : %+v\n", v)
-			log.Printf("SendPhoto resp: %+v\n", message)
-		}
+		bot.DebugLog("SendPhoto", v, message)
 
 		return message, nil
 	}
@@ -325,10 +324,8 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		if bot.Debug {
-			log.Printf("sendAudio req : %+v\n", v)
-			log.Printf("sendAudio resp: %+v\n", message)
-		}
+
+		bot.DebugLog("SendAudio", v, message)
 
 		return message, nil
 	}
@@ -400,10 +397,7 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		if bot.Debug {
-			log.Printf("sendDocument req : %+v\n", v)
-			log.Printf("sendDocument resp: %+v\n", message)
-		}
+		bot.DebugLog("SendDocument", v, message)
 
 		return message, nil
 	}
@@ -468,10 +462,7 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		if bot.Debug {
-			log.Printf("SendVoice req : %+v\n", v)
-			log.Printf("SendVoice resp: %+v\n", message)
-		}
+		bot.DebugLog("SendVoice", v, message)
 
 		return message, nil
 	}
@@ -537,10 +528,7 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		if bot.Debug {
-			log.Printf("sendSticker req : %+v\n", v)
-			log.Printf("sendSticker resp: %+v\n", message)
-		}
+		bot.DebugLog("SendSticker", v, message)
 
 		return message, nil
 	}
@@ -603,10 +591,7 @@ func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
 			return Message{}, err
 		}
 
-		if bot.Debug {
-			log.Printf("sendVideo req : %+v\n", v)
-			log.Printf("sendVideo resp: %+v\n", message)
-		}
+		bot.DebugLog("SendVideo", v, message)
 
 		return message, nil
 	}
@@ -667,10 +652,7 @@ func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 		return Message{}, err
 	}
 
-	if bot.Debug {
-		log.Printf("sendLocation req : %+v\n", v)
-		log.Printf("sendLocation resp: %+v\n", message)
-	}
+	bot.DebugLog("SendLocation", v, message)
 
 	return message, nil
 }
@@ -711,10 +693,7 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	var profilePhotos UserProfilePhotos
 	json.Unmarshal(resp.Result, &profilePhotos)
 
-	if bot.Debug {
-		log.Printf("getUserProfilePhotos req : %+v\n", v)
-		log.Printf("getUserProfilePhotos resp: %+v\n", profilePhotos)
-	}
+	bot.DebugLog("GetUserProfilePhoto", v, profilePhotos)
 
 	return profilePhotos, nil
 }
@@ -734,10 +713,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 	var file File
 	json.Unmarshal(resp.Result, &file)
 
-	if bot.Debug {
-		log.Printf("getFile req : %+v\n", v)
-		log.Printf("getFile resp: %+v\n", file)
-	}
+	bot.DebugLog("GetFile", v, file)
 
 	return file, nil
 }
