@@ -21,7 +21,6 @@ func TestNewBotAPI_notoken(t *testing.T) {
 	_, err := tgbotapi.NewBotAPI("")
 
 	if err == nil {
-		log.Println(err.Error())
 		t.Fail()
 	}
 }
@@ -50,15 +49,34 @@ func TestGetUpdates(t *testing.T) {
 	}
 }
 
-func TestSendMessage(t *testing.T) {
+func TestSendWithMessage(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
 
 	if err != nil {
 		t.Fail()
 	}
 
-	msg := tgbotapi.NewMessage(36529758, "A test message from the test library in telegram-bot-api")
-	bot.SendMessage(msg)
+	msg := tgbotapi.NewMessage(76918703, "A test message from the test library in telegram-bot-api")
+	_, err = bot.Send(msg)
+
+	if err != nil {
+		t.Fail()
+	}
+}
+
+func TestSendWithPhoto(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewPhotoUpload(76918703, "tests/image.jpg")
+	_, err = bot.Send(msg)
+
+	if err != nil {
+		t.Fail()
+	}
 }
 
 func ExampleNewBotAPI() {
@@ -82,6 +100,6 @@ func ExampleNewBotAPI() {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 		msg.ReplyToMessageID = update.Message.MessageID
 
-		bot.SendMessage(msg)
+		bot.Send(msg)
 	}
 }

@@ -53,8 +53,10 @@ type Fileable interface {
 
 // Base struct for all chat event(Message, Photo and so on)
 type BaseChat struct {
-	ChatID          int
-	ChannelUsername string
+	ChatID           int
+	ChannelUsername  string
+	ReplyToMessageID int
+	ReplyMarkup      interface{}
 }
 
 func (chat *BaseChat) Values() (url.Values, error) {
@@ -64,6 +66,20 @@ func (chat *BaseChat) Values() (url.Values, error) {
 	} else {
 		v.Add("chat_id", strconv.Itoa(chat.ChatID))
 	}
+
+	if chat.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(chat.ReplyToMessageID))
+	}
+
+	if chat.ReplyMarkup != nil {
+		data, err := json.Marshal(chat.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
 	return v, nil
 }
 
@@ -82,6 +98,19 @@ func (file BaseFile) Params() (map[string]string, error) {
 		params["chat_id"] = file.ChannelUsername
 	} else {
 		params["chat_id"] = strconv.Itoa(file.ChatID)
+	}
+
+	if file.ReplyToMessageID != 0 {
+		params["reply_to_message_id"] = strconv.Itoa(file.ReplyToMessageID)
+	}
+
+	if file.ReplyMarkup != nil {
+		data, err := json.Marshal(file.ReplyMarkup)
+		if err != nil {
+			return params, err
+		}
+
+		params["reply_markup"] = string(data)
 	}
 
 	return params, nil
@@ -108,7 +137,6 @@ type MessageConfig struct {
 	Text                  string
 	ParseMode             string
 	DisableWebPagePreview bool
-	ReplyToMessageID      int
 	ReplyMarkup           interface{}
 }
 
@@ -118,17 +146,6 @@ func (config MessageConfig) Values() (url.Values, error) {
 	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
 	if config.ParseMode != "" {
 		v.Add("parse_mode", config.ParseMode)
-	}
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
 	}
 
 	return v, nil
@@ -159,9 +176,7 @@ func (config ForwardConfig) Method() string {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
-	Caption          string
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	Caption string
 }
 
 func (config PhotoConfig) Params() (map[string]string, error) {
@@ -169,17 +184,6 @@ func (config PhotoConfig) Params() (map[string]string, error) {
 
 	if config.Caption != "" {
 		params["caption"] = config.Caption
-	}
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
-
-		params["reply_markup"] = string(data)
 	}
 
 	return params, nil
@@ -192,18 +196,6 @@ func (config PhotoConfig) Values() (url.Values, error) {
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
 	}
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
-	}
-
 	return v, nil
 }
 
@@ -218,31 +210,19 @@ func (config PhotoConfig) Method() string {
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	BaseFile
-	Duration         int
-	Performer        string
-	Title            string
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	Duration  int
+	Performer string
+	Title     string
 }
 
 func (config AudioConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
 	v.Add("audio", config.FileID)
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
 
-		v.Add("reply_markup", string(data))
-	}
 	if config.Performer != "" {
 		v.Add("performer", config.Performer)
 	}
@@ -256,20 +236,10 @@ func (config AudioConfig) Values() (url.Values, error) {
 func (config AudioConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
 	if config.Duration != 0 {
 		params["duration"] = strconv.Itoa(config.Duration)
 	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
 
-		params["reply_markup"] = string(data)
-	}
 	if config.Performer != "" {
 		params["performer"] = config.Performer
 	}
@@ -291,43 +261,18 @@ func (config AudioConfig) Method() string {
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
 }
 
 func (config DocumentConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
 	v.Add("document", config.FileID)
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
-	}
 
 	return v, nil
 }
 
 func (config DocumentConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
-
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
-
-		params["reply_markup"] = string(data)
-	}
 
 	return params, nil
 }
@@ -343,43 +288,18 @@ func (config DocumentConfig) Method() string {
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	BaseFile
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
 }
 
 func (config StickerConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
 	v.Add("sticker", config.FileID)
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
-	}
 
 	return v, nil
 }
 
 func (config StickerConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
-
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
-
-		params["reply_markup"] = string(data)
-	}
 
 	return params, nil
 }
@@ -395,32 +315,19 @@ func (config StickerConfig) Method() string {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
-	Duration         int
-	Caption          string
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	Duration int
+	Caption  string
 }
 
 func (config VideoConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
 	v.Add("video", config.FileID)
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
 	}
 
 	return v, nil
@@ -429,23 +336,11 @@ func (config VideoConfig) Values() (url.Values, error) {
 func (config VideoConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
-
-		params["reply_markup"] = string(data)
-	}
-
 	return params, nil
 }
 
 func (config VideoConfig) Name() string {
-	return "viceo"
+	return "video"
 }
 
 func (config VideoConfig) Method() string {
@@ -455,28 +350,15 @@ func (config VideoConfig) Method() string {
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
-	Duration         int
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	Duration int
 }
 
 func (config VoiceConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
 	v.Add("voice", config.FileID)
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
 	}
 
 	return v, nil
@@ -485,19 +367,8 @@ func (config VoiceConfig) Values() (url.Values, error) {
 func (config VoiceConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
-	if config.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(config.ReplyToMessageID)
-	}
 	if config.Duration != 0 {
 		params["duration"] = strconv.Itoa(config.Duration)
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
-
-		params["reply_markup"] = string(data)
 	}
 
 	return params, nil
@@ -514,10 +385,8 @@ func (config VoiceConfig) Method() string {
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	BaseChat
-	Latitude         float64
-	Longitude        float64
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	Latitude  float64
+	Longitude float64
 }
 
 func (config LocationConfig) Values() (url.Values, error) {
@@ -525,18 +394,6 @@ func (config LocationConfig) Values() (url.Values, error) {
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
-
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-	if config.ReplyMarkup != nil {
-		data, err := json.Marshal(config.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-
-		v.Add("reply_markup", string(data))
-	}
 
 	return v, nil
 }

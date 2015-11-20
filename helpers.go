@@ -10,10 +10,9 @@ import (
 // chatID is where to send it, text is the message text.
 func NewMessage(chatID int, text string) MessageConfig {
 	return MessageConfig{
-		BaseChat: BaseChat{ChatID: chatID},
+		BaseChat: BaseChat{ChatID: chatID, ReplyToMessageID: 0},
 		Text:     text,
 		DisableWebPagePreview: false,
-		ReplyToMessageID:      0,
 	}
 }
 
@@ -160,11 +159,9 @@ func NewVoiceShare(chatID int, fileID string) VoiceConfig {
 // chatID is where to send it, latitude and longitude are coordinates.
 func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig {
 	return LocationConfig{
-		BaseChat:         BaseChat{ChatID: chatID},
-		Latitude:         latitude,
-		Longitude:        longitude,
-		ReplyToMessageID: 0,
-		ReplyMarkup:      nil,
+		BaseChat:  BaseChat{ChatID: chatID, ReplyToMessageID: 0, ReplyMarkup: nil},
+		Latitude:  latitude,
+		Longitude: longitude,
 	}
 }
 
