@@ -45,7 +45,9 @@ type Chattable interface {
 type Fileable interface {
 	Chattable
 	Params() (map[string]string, error)
+	Name() string
 	GetFile() interface{}
+	UseExistingFile() bool
 }
 
 // Base struct for all chat event(Message, Photo and so on)
@@ -93,6 +95,10 @@ func (file BaseFile) GetFile() interface{} {
 	}
 
 	return result
+}
+
+func (file BaseFile) UseExistingFile() bool {
+	return file.UseExisting
 }
 
 // MessageConfig contains information about a SendMessage request.
@@ -199,6 +205,10 @@ func (config PhotoConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+func (config PhotoConfig) Name() string {
+	return "photo"
+}
+
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	BaseFile
@@ -264,6 +274,10 @@ func (config AudioConfig) Params() (map[string]string, error) {
 	return params, nil
 }
 
+func (config AudioConfig) Name() string {
+	return "audio"
+}
+
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
@@ -308,6 +322,10 @@ func (config DocumentConfig) Params() (map[string]string, error) {
 	return params, nil
 }
 
+func (config DocumentConfig) Name() string {
+	return "document"
+}
+
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	BaseFile
@@ -350,6 +368,10 @@ func (config StickerConfig) Params() (map[string]string, error) {
 	}
 
 	return params, nil
+}
+
+func (config StickerConfig) Name() string {
+	return "sticker"
 }
 
 // VideoConfig contains information about a SendVideo request.
@@ -404,6 +426,10 @@ func (config VideoConfig) Params() (map[string]string, error) {
 	return params, nil
 }
 
+func (config VideoConfig) Name() string {
+	return "viceo"
+}
+
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
@@ -453,6 +479,10 @@ func (config VoiceConfig) Params() (map[string]string, error) {
 	}
 
 	return params, nil
+}
+
+func (config VoiceConfig) Name() string {
+	return "voice"
 }
 
 // LocationConfig contains information about a SendLocation request.

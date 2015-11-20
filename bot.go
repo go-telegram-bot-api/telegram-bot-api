@@ -214,6 +214,37 @@ func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error)
 	return message, nil
 }
 
+func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error) {
+	params, err := config.Params()
+	if err != nil {
+		return Message{}, err
+	}
+
+	file := config.GetFile()
+
+	resp, err := bot.UploadFile(method, params, config.Name(), file)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	json.Unmarshal(resp.Result, &message)
+
+	if bot.Debug {
+		log.Printf("%s resp: %+v\n", method, message)
+	}
+
+	return message, nil
+}
+
+func (bot *BotAPI) sendFile(method string, config Fileable) (Message, error) {
+	if config.UseExistingFile() {
+		return bot.sendExisting(method, config)
+	}
+
+	return bot.uploadAndSend(method, config)
+}
+
 // SendMessage sends a Message to a chat.
 //
 // Requires ChatID and Text.
@@ -274,30 +305,7 @@ func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
 // Caption, ReplyToMessageID, and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
-	if config.UseExisting {
-		return bot.sendExisting("SendPhoto", config)
-	}
-
-	params, err := config.Params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.GetFile()
-
-	resp, err := bot.UploadFile("SendPhoto", params, "photo", file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	if bot.Debug {
-		log.Printf("SendPhoto resp: %+v\n", message)
-	}
-
-	return message, nil
+	return bot.sendFile("SendPhoto", config)
 }
 
 // SendAudio sends or uploads an audio clip to a chat.
@@ -312,30 +320,7 @@ func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
-	if config.UseExisting {
-		return bot.sendExisting("sendAudio", config)
-	}
-
-	params, err := config.Params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.GetFile()
-
-	resp, err := bot.UploadFile("sendAudio", params, "audio", file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	if bot.Debug {
-		log.Printf("sendAudio resp: %+v\n", message)
-	}
-
-	return message, nil
+	return bot.sendFile("sendAudio", config)
 }
 
 // SendDocument sends or uploads a document to a chat.
@@ -344,30 +329,7 @@ func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
-	if config.UseExisting {
-		return bot.sendExisting("sendDocument", config)
-	}
-
-	params, err := config.Params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.GetFile()
-
-	resp, err := bot.UploadFile("sendDocument", params, "document", file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	if bot.Debug {
-		log.Printf("sendDocument resp: %+v\n", message)
-	}
-
-	return message, nil
+	return bot.sendFile("sendDocument", config)
 }
 
 // SendVoice sends or uploads a playable voice to a chat.
@@ -378,30 +340,7 @@ func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
-	if config.UseExisting {
-		return bot.sendExisting("sendVoice", config)
-	}
-
-	params, err := config.Params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.GetFile()
-
-	resp, err := bot.UploadFile("SendVoice", params, "voice", file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	if bot.Debug {
-		log.Printf("SendVoice resp: %+v\n", message)
-	}
-
-	return message, nil
+	return bot.sendFile("sendVoice", config)
 }
 
 // SendSticker sends or uploads a sticker to a chat.
@@ -410,30 +349,7 @@ func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
-	if config.UseExisting {
-		return bot.sendExisting("sendSticker", config)
-	}
-
-	params, err := config.Params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.GetFile()
-
-	resp, err := bot.UploadFile("sendSticker", params, "sticker", file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	if bot.Debug {
-		log.Printf("sendSticker resp: %+v\n", message)
-	}
-
-	return message, nil
+	return bot.sendFile("sendSticker", config)
 }
 
 // SendVideo sends or uploads a video to a chat.
@@ -442,30 +358,7 @@ func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
 // ReplyToMessageID and ReplyMarkup are optional.
 // File should be either a string, FileBytes, or FileReader.
 func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
-	if config.UseExisting {
-		return bot.sendExisting("sendVideo", config)
-	}
-
-	params, err := config.Params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.GetFile()
-
-	resp, err := bot.UploadFile("sendVideo", params, "video", file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	if bot.Debug {
-		log.Printf("sendVideo resp: %+v\n", message)
-	}
-
-	return message, nil
+	return bot.sendFile("sendVideo", config)
 }
 
 // SendChatAction sets a current action in a chat.

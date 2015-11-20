@@ -11,7 +11,7 @@ import (
 func NewMessage(chatID int, text string) MessageConfig {
 	return MessageConfig{
 		BaseChat: BaseChat{ChatID: chatID},
-		Text:      text,
+		Text:     text,
 		DisableWebPagePreview: false,
 		ReplyToMessageID:      0,
 	}
@@ -23,7 +23,7 @@ func NewMessage(chatID int, text string) MessageConfig {
 // and messageID is the ID of the original message.
 func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 	return ForwardConfig{
-		BaseChat:  BaseChat{ChatID: chatID},
+		BaseChat:   BaseChat{ChatID: chatID},
 		FromChatID: fromChatID,
 		MessageID:  messageID,
 	}
@@ -160,7 +160,7 @@ func NewVoiceShare(chatID int, fileID string) VoiceConfig {
 // chatID is where to send it, latitude and longitude are coordinates.
 func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig {
 	return LocationConfig{
-		BaseChat:        BaseChat{ChatID: chatID},
+		BaseChat:         BaseChat{ChatID: chatID},
 		Latitude:         latitude,
 		Longitude:        longitude,
 		ReplyToMessageID: 0,
@@ -175,7 +175,7 @@ func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig
 func NewChatAction(chatID int, action string) ChatActionConfig {
 	return ChatActionConfig{
 		BaseChat: BaseChat{ChatID: chatID},
-		Action:    action,
+		Action:   action,
 	}
 }
 
