@@ -165,6 +165,7 @@ type ForwardConfig struct {
 
 func (config ForwardConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
+	v.Add("from_chat_id", strconv.Itoa(config.FromChatID))
 	v.Add("message_id", strconv.Itoa(config.MessageID))
 	return v, nil
 }
