@@ -37,8 +37,8 @@ func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 	return PhotoConfig{
 		Chattable:        Chattable{ChatID: chatID},
+		Fileable:         Fileable{File: file},
 		UseExistingPhoto: false,
-		File:             file,
 	}
 }
 
@@ -49,8 +49,8 @@ func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 func NewPhotoShare(chatID int, fileID string) PhotoConfig {
 	return PhotoConfig{
 		Chattable:        Chattable{ChatID: chatID},
+		Fileable:         Fileable{FileID: fileID},
 		UseExistingPhoto: true,
-		FileID:           fileID,
 	}
 }
 
@@ -62,8 +62,8 @@ func NewPhotoShare(chatID int, fileID string) PhotoConfig {
 func NewAudioUpload(chatID int, file interface{}) AudioConfig {
 	return AudioConfig{
 		Chattable:        Chattable{ChatID: chatID},
+		Fileable:         Fileable{File: file},
 		UseExistingAudio: false,
-		File:             file,
 	}
 }
 
@@ -73,9 +73,9 @@ func NewAudioUpload(chatID int, file interface{}) AudioConfig {
 // chatID is where to send it, fileID is the ID of the audio already uploaded.
 func NewAudioShare(chatID int, fileID string) AudioConfig {
 	return AudioConfig{
-		Chattable:        Chattable{ChatID: chatID},
+		Chattable: Chattable{ChatID: chatID},
+		Fileable:  Fileable{FileID: fileID},
 		UseExistingAudio: true,
-		FileID:           fileID,
 	}
 }
 
@@ -87,8 +87,8 @@ func NewAudioShare(chatID int, fileID string) AudioConfig {
 func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
 	return DocumentConfig{
 		Chattable:           Chattable{ChatID: chatID},
+		Fileable:            Fileable{File: file},
 		UseExistingDocument: false,
-		File:                file,
 	}
 }
 
@@ -99,8 +99,8 @@ func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
 func NewDocumentShare(chatID int, fileID string) DocumentConfig {
 	return DocumentConfig{
 		Chattable:           Chattable{ChatID: chatID},
+		Fileable:            Fileable{FileID: fileID},
 		UseExistingDocument: true,
-		FileID:              fileID,
 	}
 }
 
@@ -111,8 +111,8 @@ func NewDocumentShare(chatID int, fileID string) DocumentConfig {
 func NewStickerUpload(chatID int, file interface{}) StickerConfig {
 	return StickerConfig{
 		Chattable:          Chattable{ChatID: chatID},
+		Fileable:           Fileable{File: file},
 		UseExistingSticker: false,
-		File:               file,
 	}
 }
 
@@ -122,9 +122,9 @@ func NewStickerUpload(chatID int, file interface{}) StickerConfig {
 // chatID is where to send it, fileID is the ID of the sticker already uploaded.
 func NewStickerShare(chatID int, fileID string) StickerConfig {
 	return StickerConfig{
-		Chattable:          Chattable{ChatID: chatID},
+		Chattable: Chattable{ChatID: chatID},
+		Fileable:  Fileable{FileID: fileID},
 		UseExistingSticker: true,
-		FileID:             fileID,
 	}
 }
 
@@ -136,8 +136,8 @@ func NewStickerShare(chatID int, fileID string) StickerConfig {
 func NewVideoUpload(chatID int, file interface{}) VideoConfig {
 	return VideoConfig{
 		Chattable:        Chattable{ChatID: chatID},
+		Fileable:            Fileable{File: file},
 		UseExistingVideo: false,
-		File:             file,
 	}
 }
 
@@ -149,7 +149,7 @@ func NewVideoShare(chatID int, fileID string) VideoConfig {
 	return VideoConfig{
 		Chattable:        Chattable{ChatID: chatID},
 		UseExistingVideo: true,
-		FileID:           fileID,
+		Fileable:  Fileable{FileID: fileID},
 	}
 }
 
@@ -161,8 +161,8 @@ func NewVideoShare(chatID int, fileID string) VideoConfig {
 func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
 	return VoiceConfig{
 		Chattable:        Chattable{ChatID: chatID},
+		Fileable:            Fileable{File: file},
 		UseExistingVoice: false,
-		File:             file,
 	}
 }
 
@@ -173,8 +173,8 @@ func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
 func NewVoiceShare(chatID int, fileID string) VoiceConfig {
 	return VoiceConfig{
 		Chattable:        Chattable{ChatID: chatID},
+		Fileable:  Fileable{FileID: fileID},
 		UseExistingVoice: true,
-		FileID:           fileID,
 	}
 }
 

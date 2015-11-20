@@ -44,6 +44,12 @@ type Chattable struct {
 	ChannelUsername string
 }
 
+type Fileable struct {
+	FilePath string
+	File     interface{}
+	FileID   string
+}
+
 func (chattable *Chattable) Values() (url.Values, error) {
 	v := url.Values{}
 	if chattable.ChannelUsername != "" {
@@ -110,13 +116,11 @@ func (config *ForwardConfig) Values() (url.Values, error) {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	Chattable
+	Fileable
 	Caption          string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingPhoto bool
-	FilePath         string
-	File             interface{}
-	FileID           string
 }
 
 func (config *PhotoConfig) Values() (url.Values, error) {
@@ -144,15 +148,13 @@ func (config *PhotoConfig) Values() (url.Values, error) {
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	Chattable
+	Fileable
 	Duration         int
 	Performer        string
 	Title            string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingAudio bool
-	FilePath         string
-	File             interface{}
-	FileID           string
 }
 
 func (config *AudioConfig) Values() (url.Values, error) {
@@ -186,12 +188,10 @@ func (config *AudioConfig) Values() (url.Values, error) {
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	Chattable
+	Fileable
 	ReplyToMessageID    int
 	ReplyMarkup         interface{}
 	UseExistingDocument bool
-	FilePath            string
-	File                interface{}
-	FileID              string
 }
 
 func (config *DocumentConfig) Values() (url.Values, error) {
@@ -216,12 +216,10 @@ func (config *DocumentConfig) Values() (url.Values, error) {
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	Chattable
+	Fileable
 	ReplyToMessageID   int
 	ReplyMarkup        interface{}
 	UseExistingSticker bool
-	FilePath           string
-	File               interface{}
-	FileID             string
 }
 
 func (config *StickerConfig) Values() (url.Values, error) {
@@ -246,14 +244,12 @@ func (config *StickerConfig) Values() (url.Values, error) {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	Chattable
+	Fileable
 	Duration         int
 	Caption          string
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingVideo bool
-	FilePath         string
-	File             interface{}
-	FileID           string
 }
 
 func (config *VideoConfig) Values() (url.Values, error) {
@@ -284,13 +280,11 @@ func (config *VideoConfig) Values() (url.Values, error) {
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	Chattable
+	Fileable
 	Duration         int
 	ReplyToMessageID int
 	ReplyMarkup      interface{}
 	UseExistingVoice bool
-	FilePath         string
-	File             interface{}
-	FileID           string
 }
 
 func (config *VoiceConfig) Values() (url.Values, error) {
