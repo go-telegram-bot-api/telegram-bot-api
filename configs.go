@@ -40,6 +40,7 @@ const (
 
 type Chattable interface {
 	Values() (url.Values, error)
+	Method() string
 }
 
 type Fileable interface {
@@ -133,6 +134,10 @@ func (config MessageConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+func (config MessageConfig) Method() string {
+	return "SendMessage"
+}
+
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
 	BaseChat
@@ -143,15 +148,12 @@ type ForwardConfig struct {
 
 func (config ForwardConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
-
-	if config.FromChannelUsername != "" {
-		v.Add("chat_id", config.FromChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.Itoa(config.FromChatID))
-	}
 	v.Add("message_id", strconv.Itoa(config.MessageID))
-
 	return v, nil
+}
+
+func (config ForwardConfig) Method() string {
+	return "forwardMessage"
 }
 
 // PhotoConfig contains information about a SendPhoto request.
@@ -207,6 +209,10 @@ func (config PhotoConfig) Values() (url.Values, error) {
 
 func (config PhotoConfig) Name() string {
 	return "photo"
+}
+
+func (config PhotoConfig) Method() string {
+	return "SendPhoto"
 }
 
 // AudioConfig contains information about a SendAudio request.
@@ -278,6 +284,10 @@ func (config AudioConfig) Name() string {
 	return "audio"
 }
 
+func (config AudioConfig) Method() string {
+	return "SendAudio"
+}
+
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
@@ -326,6 +336,10 @@ func (config DocumentConfig) Name() string {
 	return "document"
 }
 
+func (config DocumentConfig) Method() string {
+	return "sendDocument"
+}
+
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	BaseFile
@@ -372,6 +386,10 @@ func (config StickerConfig) Params() (map[string]string, error) {
 
 func (config StickerConfig) Name() string {
 	return "sticker"
+}
+
+func (config StickerConfig) Method() string {
+	return "sendSticker"
 }
 
 // VideoConfig contains information about a SendVideo request.
@@ -430,6 +448,10 @@ func (config VideoConfig) Name() string {
 	return "viceo"
 }
 
+func (config VideoConfig) Method() string {
+	return "sendVideo"
+}
+
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
@@ -485,6 +507,10 @@ func (config VoiceConfig) Name() string {
 	return "voice"
 }
 
+func (config VoiceConfig) Method() string {
+	return "sendVoice"
+}
+
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	BaseChat
@@ -513,6 +539,10 @@ func (config LocationConfig) Values() (url.Values, error) {
 	}
 
 	return v, nil
+}
+
+func (config LocationConfig) Method() string {
+	return "sendLocation"
 }
 
 // ChatActionConfig contains information about a SendChatAction request.

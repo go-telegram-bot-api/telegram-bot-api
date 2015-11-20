@@ -90,7 +90,7 @@ func (bot *BotAPI) MakeMessageRequest(endpoint string, params url.Values) (Messa
 	var message Message
 	json.Unmarshal(resp.Result, &message)
 
-	bot.DebugLog(endpoint, params, message)
+	bot.debugLog(endpoint, params, message)
 
 	return message, nil
 }
@@ -188,11 +188,16 @@ func (bot *BotAPI) GetMe() (User, error) {
 	return user, nil
 }
 
-func (bot *BotAPI) Send(c BaseChat) error {
-	return nil
+func (bot *BotAPI) Send(c Chattable) (Message, error) {
+	switch c.(type) {
+	case Fileable:
+		return bot.sendFile(c.(Fileable))
+	default:
+		return bot.sendChattable(c)
+	}
 }
 
-func (bot *BotAPI) DebugLog(context string, v url.Values, message interface{}) {
+func (bot *BotAPI) debugLog(context string, v url.Values, message interface{}) {
 	if bot.Debug {
 		log.Printf("%s req : %+v\n", context, v)
 		log.Printf("%s resp: %+v\n", context, message)
@@ -237,145 +242,27 @@ func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error
 	return message, nil
 }
 
-func (bot *BotAPI) sendFile(method string, config Fileable) (Message, error) {
+func (bot *BotAPI) sendFile(config Fileable) (Message, error) {
 	if config.UseExistingFile() {
-		return bot.sendExisting(method, config)
+		return bot.sendExisting(config.Method(), config)
 	}
 
-	return bot.uploadAndSend(method, config)
+	return bot.uploadAndSend(config.Method(), config)
 }
 
-// SendMessage sends a Message to a chat.
-//
-// Requires ChatID and Text.
-// DisableWebPagePreview, ReplyToMessageID, and ReplyMarkup are optional.
-func (bot *BotAPI) SendMessage(config MessageConfig) (Message, error) {
+func (bot *BotAPI) sendChattable(config Chattable) (Message, error) {
 	v, err := config.Values()
 	if err != nil {
 		return Message{}, err
 	}
 
-	message, err := bot.MakeMessageRequest("SendMessage", v)
+	message, err := bot.MakeMessageRequest(config.Method(), v)
 
 	if err != nil {
 		return Message{}, err
 	}
 
 	return message, nil
-}
-
-// ForwardMessage forwards a message from one chat to another.
-//
-// Requires ChatID (destination), FromChatID (source), and MessageID.
-func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
-	v, err := config.Values()
-	if err != nil {
-		return Message{}, err
-	}
-
-	message, err := bot.MakeMessageRequest("forwardMessage", v)
-	if err != nil {
-		return Message{}, err
-	}
-
-	return message, nil
-}
-
-// SendLocation sends a location to a chat.
-//
-// Requires ChatID, Latitude, and Longitude.
-// ReplyToMessageID and ReplyMarkup are optional.
-func (bot *BotAPI) SendLocation(config LocationConfig) (Message, error) {
-	v, err := config.Values()
-	if err != nil {
-		return Message{}, err
-	}
-
-	message, err := bot.MakeMessageRequest("sendLocation", v)
-	if err != nil {
-		return Message{}, err
-	}
-
-	return message, nil
-}
-
-// SendPhoto sends or uploads a photo to a chat.
-//
-// Requires ChatID and FileID OR File.
-// Caption, ReplyToMessageID, and ReplyMarkup are optional.
-// File should be either a string, FileBytes, or FileReader.
-func (bot *BotAPI) SendPhoto(config PhotoConfig) (Message, error) {
-	return bot.sendFile("SendPhoto", config)
-}
-
-// SendAudio sends or uploads an audio clip to a chat.
-// If using a file, the file must be in the .mp3 format.
-//
-// When the fields title and performer are both empty and
-// the mime-type of the file to be sent is not audio/mpeg,
-// the file must be an .ogg file encoded with OPUS.
-// You may use the tgutils.EncodeAudio func to assist you with this, if needed.
-//
-// Requires ChatID and FileID OR File.
-// ReplyToMessageID and ReplyMarkup are optional.
-// File should be either a string, FileBytes, or FileReader.
-func (bot *BotAPI) SendAudio(config AudioConfig) (Message, error) {
-	return bot.sendFile("sendAudio", config)
-}
-
-// SendDocument sends or uploads a document to a chat.
-//
-// Requires ChatID and FileID OR File.
-// ReplyToMessageID and ReplyMarkup are optional.
-// File should be either a string, FileBytes, or FileReader.
-func (bot *BotAPI) SendDocument(config DocumentConfig) (Message, error) {
-	return bot.sendFile("sendDocument", config)
-}
-
-// SendVoice sends or uploads a playable voice to a chat.
-// If using a file, the file must be encoded as an .ogg with OPUS.
-// You may use the tgutils.EncodeAudio func to assist you with this, if needed.
-//
-// Requires ChatID and FileID OR File.
-// ReplyToMessageID and ReplyMarkup are optional.
-// File should be either a string, FileBytes, or FileReader.
-func (bot *BotAPI) SendVoice(config VoiceConfig) (Message, error) {
-	return bot.sendFile("sendVoice", config)
-}
-
-// SendSticker sends or uploads a sticker to a chat.
-//
-// Requires ChatID and FileID OR File.
-// ReplyToMessageID and ReplyMarkup are optional.
-// File should be either a string, FileBytes, or FileReader.
-func (bot *BotAPI) SendSticker(config StickerConfig) (Message, error) {
-	return bot.sendFile("sendSticker", config)
-}
-
-// SendVideo sends or uploads a video to a chat.
-//
-// Requires ChatID and FileID OR File.
-// ReplyToMessageID and ReplyMarkup are optional.
-// File should be either a string, FileBytes, or FileReader.
-func (bot *BotAPI) SendVideo(config VideoConfig) (Message, error) {
-	return bot.sendFile("sendVideo", config)
-}
-
-// SendChatAction sets a current action in a chat.
-//
-// Requires ChatID and a valid Action (see Chat constants).
-func (bot *BotAPI) SendChatAction(config ChatActionConfig) error {
-	v, err := config.Values()
-	if err != nil {
-		return err
-	}
-
-	_, err = bot.MakeRequest("sendChatAction", v)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // GetUserProfilePhotos gets a user's profile photos.
@@ -400,7 +287,7 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	var profilePhotos UserProfilePhotos
 	json.Unmarshal(resp.Result, &profilePhotos)
 
-	bot.DebugLog("GetUserProfilePhoto", v, profilePhotos)
+	bot.debugLog("GetUserProfilePhoto", v, profilePhotos)
 
 	return profilePhotos, nil
 }
@@ -420,7 +307,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 	var file File
 	json.Unmarshal(resp.Result, &file)
 
-	bot.DebugLog("GetFile", v, file)
+	bot.debugLog("GetFile", v, file)
 
 	return file, nil
 }
@@ -529,4 +416,21 @@ func (bot *BotAPI) ListenForWebhook(pattern string) {
 
 		bot.Updates <- update
 	})
+}
+
+// SendChatAction sets a current action in a chat.
+//
+// Requires ChatID and a valid Action (see Chat constants).
+func (bot *BotAPI) SendChatAction(config ChatActionConfig) error {
+	v, err := config.Values()
+	if err != nil {
+		return err
+	}
+
+	_, err = bot.MakeRequest("sendChatAction", v)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
