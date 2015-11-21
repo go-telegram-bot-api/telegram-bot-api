@@ -545,3 +545,26 @@ func ExampleNewBotAPI() {
 		bot.Send(msg)
 	}
 }
+
+func ExampleNewWebhook() {
+	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bot.ListenForWebhook("/" + bot.Token)
+	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+
+	for update := range bot.Updates {
+		log.Printf("%+v\n", update)
+	}
+}
