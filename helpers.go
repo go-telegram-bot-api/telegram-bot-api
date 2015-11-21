@@ -206,8 +206,7 @@ func NewWebhook(link string) WebhookConfig {
 	u, _ := url.Parse(link)
 
 	return WebhookConfig{
-		URL:   u,
-		Clear: false,
+		URL: u,
 	}
 }
 
@@ -220,7 +219,6 @@ func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
 
 	return WebhookConfig{
 		URL:         u,
-		Clear:       false,
 		Certificate: file,
 	}
 }

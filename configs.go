@@ -436,7 +436,6 @@ type UpdateConfig struct {
 
 // WebhookConfig contains information about a SetWebhook request.
 type WebhookConfig struct {
-	Clear       bool
 	URL         *url.URL
 	Certificate interface{}
 }

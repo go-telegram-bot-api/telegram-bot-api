@@ -437,17 +437,15 @@ func TestSetWebhook(t *testing.T) {
 		t.Fail()
 	}
 
-	wh := tgbotapi.WebhookConfig{Clear: true}
-	_, err = bot.SetWebhook(wh)
+	bot.RemoveWebhook()
 
-	wh = tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/" + bot.Token, "tests/cert.pem")
+	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
 	_, err = bot.SetWebhook(wh)
 	if err != nil {
 		t.Fail()
 	}
 
-	wh = tgbotapi.WebhookConfig{Clear: true}
-	_, err = bot.SetWebhook(wh)
+	bot.RemoveWebhook()
 }
 
 func TestUpdatesChan(t *testing.T) {

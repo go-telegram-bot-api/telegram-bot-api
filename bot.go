@@ -345,6 +345,10 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	return updates, nil
 }
 
+func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
+	return bot.MakeRequest("setWebhook", url.Values{})
+}
+
 // SetWebhook sets a webhook.
 // If this is set, GetUpdates will not get any data!
 //
@@ -352,9 +356,7 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	if config.Certificate == nil {
 		v := url.Values{}
-		if !config.Clear {
-			v.Add("url", config.URL.String())
-		}
+		v.Add("url", config.URL.String())
 
 		return bot.MakeRequest("setWebhook", v)
 	}
