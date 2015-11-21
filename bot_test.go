@@ -1,7 +1,7 @@
 package tgbotapi_test
 
 import (
-	"github.com/zhulik/telegram-bot-api"
+	"github.com/Syfaro/telegram-bot-api"
 	"io/ioutil"
 	"log"
 	"net/http"

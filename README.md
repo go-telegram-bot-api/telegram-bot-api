@@ -1,7 +1,7 @@
 # Golang bindings for the Telegram Bot API
 
-[![GoDoc](https://godoc.org/github.com/zhulik/telegram-bot-api?status.svg)](http://godoc.org/github.com/zhulik/telegram-bot-api)
-[![Travis](https://travis-ci.org/zhulik/telegram-bot-api.svg)](https://travis-ci.org/zhulik/telegram-bot-api)
+[![GoDoc](https://godoc.org/github.com/Syfaro/telegram-bot-api?status.svg)](http://godoc.org/github.com/Syfaro/telegram-bot-api)
+[![Travis](https://travis-ci.org/Syfaro/telegram-bot-api.svg)](https://travis-ci.org/Syfaro/telegram-bot-api)
 
 All methods have been added, and all features should be available.
 If you want a feature that hasn't been added yet or something is broken, open an issue and I'll see what I can do.
@@ -19,7 +19,7 @@ package main
 
 import (
 	"log"
-	"github.com/zhulik/telegram-bot-api"
+	"github.com/Syfaro/telegram-bot-api"
 )
 
 func main() {
@@ -54,7 +54,7 @@ If you need to use webhooks for some reason (such as running on Google App Engin
 package main
 
 import (
-	"github.com/zhulik/telegram-bot-api"
+	"github.com/Syfaro/telegram-bot-api"
 	"log"
 	"net/http"
 )
