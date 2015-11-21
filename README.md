@@ -24,27 +24,27 @@ import (
 
 func main() {
 	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
-    if err != nil {
-        log.Panic(err)
-    }
+	if err != nil {
+		log.Panic(err)
+	}
 
-    bot.Debug = true
+	bot.Debug = true
 
-    log.Printf("Authorized on account %s", bot.Self.UserName)
+	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-    u := tgbotapi.NewUpdate(0)
-    u.Timeout = 60
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
 
-    err = bot.UpdatesChan(u)
+	updates, err := bot.GetUpdatesChan(u)
 
-    for update := range bot.Updates {
-        log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+	for update := range updates {
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-        msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-        msg.ReplyToMessageID = update.Message.MessageID
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		msg.ReplyToMessageID = update.Message.MessageID
 
-        bot.Send(msg)
-    }
+		bot.Send(msg)
+	}
 }
 ```
 
@@ -74,10 +74,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	bot.ListenForWebhook("/"+bot.Token)
+	updates, _ := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
-	for update := range bot.Updates {
+	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
 }

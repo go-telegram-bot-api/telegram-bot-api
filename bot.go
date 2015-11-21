@@ -394,7 +394,7 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 }
 
 // UpdatesChan starts a channel for getting updates.
-func (bot *BotAPI) UpdatesChan(config UpdateConfig) (<-chan Update, error) {
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 	updatesChan := make(chan Update, 100)
 
 	go func() {

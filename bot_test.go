@@ -396,7 +396,7 @@ func TestUpdatesChan(t *testing.T) {
 
 	var ucfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
 	ucfg.Timeout = 60
-	_, err := bot.UpdatesChan(ucfg)
+	_, err := bot.GetUpdatesChan(ucfg)
 
 	if err != nil {
 		t.Fail()
@@ -416,7 +416,7 @@ func ExampleNewBotAPI() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.UpdatesChan(u)
+	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
