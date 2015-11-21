@@ -112,6 +112,11 @@ func (m *Message) IsGroup() bool {
 	return m.From.ID != m.Chat.ID
 }
 
+// IsGroup returns if the message was sent to a group.
+func (m *Message) IsCommand() bool {
+	return m.Text != "" && m.Text[0] == '/'
+}
+
 // PhotoSize contains information about photos, including ID and Width and Height.
 type PhotoSize struct {
 	FileID   string `json:"file_id"`
