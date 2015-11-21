@@ -81,7 +81,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	return apiResp, nil
 }
 
-func (bot *BotAPI) MakeMessageRequest(endpoint string, params url.Values) (Message, error) {
+func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Message, error) {
 	resp, err := bot.MakeRequest(endpoint, params)
 	if err != nil {
 		return Message{}, err
@@ -169,14 +169,17 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	return apiResp, nil
 }
 
-func (this *BotAPI) GetFileDirectUrl(fileID string) (string, error) {
-	file, err := this.GetFile(FileConfig{fileID})
+// GetFileDirectURL returns direct URL to file
+//
+// Requires fileID
+func (bot *BotAPI) GetFileDirectURL(fileID string) (string, error) {
+	file, err := bot.GetFile(FileConfig{fileID})
 
 	if err != nil {
 		return "", err
 	}
 
-	return file.Link(this.Token), nil
+	return file.Link(bot.Token), nil
 }
 
 // GetMe fetches the currently authenticated bot.
@@ -198,10 +201,16 @@ func (bot *BotAPI) GetMe() (User, error) {
 	return user, nil
 }
 
+// IsMessageToMe returns true if message directed to this bot
+//
+// Requires message
 func (bot *BotAPI) IsMessageToMe(message Message) bool {
 	return strings.Contains(message.Text, "@"+bot.Self.UserName)
 }
 
+// Send will send event(Message, Photo, Audio, ChatAction, anything) to Telegram
+//
+// Requires Chattable
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	switch c.(type) {
 	case Fileable:
@@ -225,7 +234,7 @@ func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error)
 		return Message{}, err
 	}
 
-	message, err := bot.MakeMessageRequest(method, v)
+	message, err := bot.makeMessageRequest(method, v)
 	if err != nil {
 		return Message{}, err
 	}
@@ -270,7 +279,7 @@ func (bot *BotAPI) sendChattable(config Chattable) (Message, error) {
 		return Message{}, err
 	}
 
-	message, err := bot.MakeMessageRequest(config.Method(), v)
+	message, err := bot.makeMessageRequest(config.Method(), v)
 
 	if err != nil {
 		return Message{}, err
@@ -359,6 +368,9 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	return updates, nil
 }
 
+// RemoveWebhook removes webhook
+//
+// There are no parameters for this method.
 func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 	return bot.MakeRequest("setWebhook", url.Values{})
 }
@@ -393,7 +405,9 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	return apiResp, nil
 }
 
-// UpdatesChan starts a channel for getting updates.
+// GetUpdatesChan starts and returns a channel for getting updates.
+//
+// Requires UpdateConfig
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 	updatesChan := make(chan Update, 100)
 

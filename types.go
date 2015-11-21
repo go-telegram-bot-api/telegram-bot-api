@@ -113,10 +113,12 @@ func (m *Message) IsGroup() bool {
 	return m.From.ID != m.Chat.ID
 }
 
+// IsCommand returns true if message starts from /
 func (m *Message) IsCommand() bool {
 	return m.Text != "" && m.Text[0] == '/'
 }
 
+// Command returns first word from message
 func (m *Message) Command() string {
 	return strings.Split(m.Text, " ")[0]
 }

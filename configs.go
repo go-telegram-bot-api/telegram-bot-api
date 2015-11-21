@@ -38,11 +38,13 @@ const (
 	ModeMarkdown = "Markdown"
 )
 
+//Chattable represents any event in chat(MessageConfig, PhotoConfig, ChatActionConfig and others)
 type Chattable interface {
 	Values() (url.Values, error)
 	Method() string
 }
 
+//Fileable represents any file event(PhotoConfig, DocumentConfig, AudioConfig, VoiceConfig, VideoConfig, StickerConfig)
 type Fileable interface {
 	Chattable
 	Params() (map[string]string, error)
@@ -51,7 +53,7 @@ type Fileable interface {
 	UseExistingFile() bool
 }
 
-// Base struct for all chat event(Message, Photo and so on)
+// BaseChat is base struct for all chat event(Message, Photo and so on)
 type BaseChat struct {
 	ChatID           int
 	ChannelUsername  string
@@ -59,6 +61,7 @@ type BaseChat struct {
 	ReplyMarkup      interface{}
 }
 
+// Values returns url.Values representation of BaseChat
 func (chat *BaseChat) Values() (url.Values, error) {
 	v := url.Values{}
 	if chat.ChannelUsername != "" {
@@ -83,6 +86,7 @@ func (chat *BaseChat) Values() (url.Values, error) {
 	return v, nil
 }
 
+// BaseFile is base struct for all file events(PhotoConfig, DocumentConfig, AudioConfig, VoiceConfig, VideoConfig, StickerConfig)
 type BaseFile struct {
 	BaseChat
 	FilePath    string
@@ -91,6 +95,7 @@ type BaseFile struct {
 	UseExisting bool
 }
 
+// Params returns map[string]string representation of BaseFile
 func (file BaseFile) Params() (map[string]string, error) {
 	params := make(map[string]string)
 
@@ -116,6 +121,7 @@ func (file BaseFile) Params() (map[string]string, error) {
 	return params, nil
 }
 
+// GetFile returns abstract representation of File inside BaseFile
 func (file BaseFile) GetFile() interface{} {
 	var result interface{}
 	if file.FilePath == "" {
@@ -127,6 +133,7 @@ func (file BaseFile) GetFile() interface{} {
 	return result
 }
 
+// UseExistingFile returns true if BaseFile contains already uploaded file by FileID
 func (file BaseFile) UseExistingFile() bool {
 	return file.UseExisting
 }
@@ -140,6 +147,7 @@ type MessageConfig struct {
 	ReplyMarkup           interface{}
 }
 
+// Values returns url.Values representation of MessageConfig
 func (config MessageConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 	v.Add("text", config.Text)
@@ -151,6 +159,7 @@ func (config MessageConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Method returns Telegram API method name for sending Message
 func (config MessageConfig) Method() string {
 	return "SendMessage"
 }
@@ -163,6 +172,7 @@ type ForwardConfig struct {
 	MessageID           int
 }
 
+// Values returns url.Values representation of ForwardConfig
 func (config ForwardConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 	v.Add("from_chat_id", strconv.Itoa(config.FromChatID))
@@ -170,6 +180,7 @@ func (config ForwardConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Method returns Telegram API method name for sending Forward
 func (config ForwardConfig) Method() string {
 	return "forwardMessage"
 }
@@ -180,6 +191,7 @@ type PhotoConfig struct {
 	Caption string
 }
 
+// Params returns map[string]string representation of PhotoConfig
 func (config PhotoConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
@@ -190,6 +202,7 @@ func (config PhotoConfig) Params() (map[string]string, error) {
 	return params, nil
 }
 
+// Values returns url.Values representation of PhotoConfig
 func (config PhotoConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -200,10 +213,12 @@ func (config PhotoConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Name return field name for uploading file
 func (config PhotoConfig) Name() string {
 	return "photo"
 }
 
+// Method returns Telegram API method name for sending Photo
 func (config PhotoConfig) Method() string {
 	return "SendPhoto"
 }
@@ -216,6 +231,7 @@ type AudioConfig struct {
 	Title     string
 }
 
+// Values returns url.Values representation of AudioConfig
 func (config AudioConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -234,6 +250,7 @@ func (config AudioConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Params returns map[string]string representation of AudioConfig
 func (config AudioConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
@@ -251,10 +268,12 @@ func (config AudioConfig) Params() (map[string]string, error) {
 	return params, nil
 }
 
+// Name return field name for uploading file
 func (config AudioConfig) Name() string {
 	return "audio"
 }
 
+// Method returns Telegram API method name for sending Audio
 func (config AudioConfig) Method() string {
 	return "SendAudio"
 }
@@ -264,6 +283,7 @@ type DocumentConfig struct {
 	BaseFile
 }
 
+// Values returns url.Values representation of DocumentConfig
 func (config DocumentConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -272,16 +292,19 @@ func (config DocumentConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Params returns map[string]string representation of DocumentConfig
 func (config DocumentConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
 	return params, nil
 }
 
+// Name return field name for uploading file
 func (config DocumentConfig) Name() string {
 	return "document"
 }
 
+// Method returns Telegram API method name for sending Document
 func (config DocumentConfig) Method() string {
 	return "sendDocument"
 }
@@ -291,6 +314,7 @@ type StickerConfig struct {
 	BaseFile
 }
 
+// Values returns url.Values representation of StickerConfig
 func (config StickerConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -299,16 +323,19 @@ func (config StickerConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Params returns map[string]string representation of StickerConfig
 func (config StickerConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
 	return params, nil
 }
 
+// Name return field name for uploading file
 func (config StickerConfig) Name() string {
 	return "sticker"
 }
 
+// Method returns Telegram API method name for sending Sticker
 func (config StickerConfig) Method() string {
 	return "sendSticker"
 }
@@ -320,6 +347,7 @@ type VideoConfig struct {
 	Caption  string
 }
 
+// Values returns url.Values representation of VideoConfig
 func (config VideoConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -334,16 +362,19 @@ func (config VideoConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Params returns map[string]string representation of VideoConfig
 func (config VideoConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
 	return params, nil
 }
 
+// Name return field name for uploading file
 func (config VideoConfig) Name() string {
 	return "video"
 }
 
+// Method returns Telegram API method name for sending Video
 func (config VideoConfig) Method() string {
 	return "sendVideo"
 }
@@ -354,6 +385,7 @@ type VoiceConfig struct {
 	Duration int
 }
 
+// Values returns url.Values representation of VoiceConfig
 func (config VoiceConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -365,6 +397,7 @@ func (config VoiceConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Params returns map[string]string representation of VoiceConfig
 func (config VoiceConfig) Params() (map[string]string, error) {
 	params, _ := config.BaseFile.Params()
 
@@ -375,10 +408,12 @@ func (config VoiceConfig) Params() (map[string]string, error) {
 	return params, nil
 }
 
+// Name return field name for uploading file
 func (config VoiceConfig) Name() string {
 	return "voice"
 }
 
+// Method returns Telegram API method name for sending Voice
 func (config VoiceConfig) Method() string {
 	return "sendVoice"
 }
@@ -390,6 +425,7 @@ type LocationConfig struct {
 	Longitude float64
 }
 
+// Values returns url.Values representation of LocationConfig
 func (config LocationConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
@@ -399,6 +435,7 @@ func (config LocationConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+// Method returns Telegram API method name for sending Location
 func (config LocationConfig) Method() string {
 	return "sendLocation"
 }
@@ -409,12 +446,14 @@ type ChatActionConfig struct {
 	Action string
 }
 
+// Values returns url.Values representation of ChatActionConfig
 func (config ChatActionConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 	v.Add("action", config.Action)
 	return v, nil
 }
 
+// Method returns Telegram API method name for sending ChatAction
 func (config ChatActionConfig) Method() string {
 	return "sendChatAction"
 }
