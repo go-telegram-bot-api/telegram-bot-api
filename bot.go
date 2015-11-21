@@ -14,6 +14,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"strings"
 )
 
 // BotAPI has methods for interacting with all of Telegram's Bot API endpoints.
@@ -196,6 +197,10 @@ func (bot *BotAPI) GetMe() (User, error) {
 	}
 
 	return user, nil
+}
+
+func (bot *BotAPI) IsMessageToMe(message Message) (bool) {
+	return strings.Contains(message.Text, "@"+bot.Self.UserName)
 }
 
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
