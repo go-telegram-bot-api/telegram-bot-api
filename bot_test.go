@@ -3,7 +3,10 @@ package tgbotapi_test
 import (
 	"github.com/zhulik/telegram-bot-api"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -45,6 +48,7 @@ func TestGetUpdates(t *testing.T) {
 	_, err = bot.GetUpdates(u)
 
 	if err != nil {
+		t.Log(err.Error())
 		t.Fail()
 	}
 }
@@ -406,6 +410,44 @@ func TestGetUserProfilePhotos(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
+}
+
+func TestListenForWebhook(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	handler := bot.ListenForWebhook("/")
+
+	req, _ := http.NewRequest("GET", "", strings.NewReader("{}"))
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Errorf("Home page didn't return %v", http.StatusOK)
+	}
+}
+
+func TestSetWebhook(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	wh := tgbotapi.WebhookConfig{Clear: true}
+	_, err = bot.SetWebhook(wh)
+
+	wh = tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/" + bot.Token, "tests/cert.pem")
+	_, err = bot.SetWebhook(wh)
+	if err != nil {
+		t.Fail()
+	}
+
+	wh = tgbotapi.WebhookConfig{Clear: true}
+	_, err = bot.SetWebhook(wh)
 }
 
 func TestUpdatesChan(t *testing.T) {

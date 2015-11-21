@@ -193,7 +193,7 @@ func (config PhotoConfig) Params() (map[string]string, error) {
 func (config PhotoConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
-	v.Add("photo", config.FileID)
+	v.Add(config.Name(), config.FileID)
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
 	}
@@ -219,7 +219,7 @@ type AudioConfig struct {
 func (config AudioConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
-	v.Add("audio", config.FileID)
+	v.Add(config.Name(), config.FileID)
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}
@@ -267,7 +267,7 @@ type DocumentConfig struct {
 func (config DocumentConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
-	v.Add("document", config.FileID)
+	v.Add(config.Name(), config.FileID)
 
 	return v, nil
 }
@@ -294,7 +294,7 @@ type StickerConfig struct {
 func (config StickerConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
-	v.Add("sticker", config.FileID)
+	v.Add(config.Name(), config.FileID)
 
 	return v, nil
 }
@@ -323,7 +323,7 @@ type VideoConfig struct {
 func (config VideoConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
-	v.Add("video", config.FileID)
+	v.Add(config.Name(), config.FileID)
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}
@@ -357,7 +357,7 @@ type VoiceConfig struct {
 func (config VoiceConfig) Values() (url.Values, error) {
 	v, _ := config.BaseChat.Values()
 
-	v.Add("voice", config.FileID)
+	v.Add(config.Name(), config.FileID)
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}

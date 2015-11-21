@@ -405,10 +405,10 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) error {
 }
 
 // ListenForWebhook registers a http handler for a webhook.
-func (bot *BotAPI) ListenForWebhook(pattern string) {
+func (bot *BotAPI) ListenForWebhook(pattern string) http.Handler {
 	bot.Updates = make(chan Update, 100)
 
-	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
 
 		var update Update
@@ -416,6 +416,10 @@ func (bot *BotAPI) ListenForWebhook(pattern string) {
 
 		bot.Updates <- update
 	})
+
+	http.HandleFunc(pattern, handler)
+
+	return handler
 }
 
 // SendChatAction sets a current action in a chat.
