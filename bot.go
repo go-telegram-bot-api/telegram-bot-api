@@ -169,7 +169,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	return apiResp, nil
 }
 
-func (this *BotAPI) getFileDirectUrl(fileID string) (string, error) {
+func (this *BotAPI) GetFileDirectUrl(fileID string) (string, error) {
 	file, err := this.GetFile(FileConfig{fileID})
 
 	if err != nil {
