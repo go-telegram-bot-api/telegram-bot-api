@@ -49,7 +49,6 @@ func TestGetUpdates(t *testing.T) {
 	_, err := bot.GetUpdates(u)
 
 	if err != nil {
-		t.Log(err.Error())
 		t.Fail()
 	}
 }
@@ -274,9 +273,7 @@ func TestSendWithNewSticker(t *testing.T) {
 
 	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
 
-	resp, err := bot.Send(msg)
-
-	t.Log(resp)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
