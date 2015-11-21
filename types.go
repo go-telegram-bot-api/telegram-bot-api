@@ -3,8 +3,8 @@ package tgbotapi
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 	"strings"
+	"time"
 )
 
 // APIResponse is a response from the Telegram API with the result stored raw.

@@ -13,16 +13,16 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 // BotAPI has methods for interacting with all of Telegram's Bot API endpoints.
 type BotAPI struct {
-	Token   string       `json:"token"`
-	Debug   bool         `json:"debug"`
-	Self    User         `json:"-"`
-	Client  *http.Client `json:"-"`
+	Token  string       `json:"token"`
+	Debug  bool         `json:"debug"`
+	Self   User         `json:"-"`
+	Client *http.Client `json:"-"`
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -198,7 +198,7 @@ func (bot *BotAPI) GetMe() (User, error) {
 	return user, nil
 }
 
-func (bot *BotAPI) IsMessageToMe(message Message) (bool) {
+func (bot *BotAPI) IsMessageToMe(message Message) bool {
 	return strings.Contains(message.Text, "@"+bot.Self.UserName)
 }
 
