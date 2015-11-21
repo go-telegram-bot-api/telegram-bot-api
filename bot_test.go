@@ -258,6 +258,113 @@ func TestSendWithLocation(t *testing.T) {
 	}
 }
 
+func TestSendWithNewVideo(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewVideoUpload(76918703, "tests/video.mp4")
+	msg.Duration = 10
+	msg.Caption = "TEST"
+
+	_, err = bot.Send(msg)
+
+	if err != nil {
+
+		t.Fail()
+	}
+}
+
+func TestSendWithExistingVideo(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewVideoShare(76918703, "BAADAgADRgADhwGzCopBeKJ7rv9SAg")
+	msg.Duration = 10
+	msg.Caption = "TEST"
+
+	_, err = bot.Send(msg)
+
+	if err != nil {
+
+		t.Fail()
+	}
+}
+
+func TestSendWithNewSticker(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewStickerUpload(76918703, "tests/image.jpg")
+
+	_, err = bot.Send(msg)
+
+	if err != nil {
+
+		t.Fail()
+	}
+}
+
+func TestSendWithExistingSticker(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewStickerShare(76918703, "BQADAgADUwADhwGzCmwtOypNFlrRAg")
+
+	_, err = bot.Send(msg)
+
+	if err != nil {
+
+		t.Fail()
+	}
+}
+
+func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewStickerUpload(76918703, "tests/image.jpg")
+	msg.ReplyMarkup = tgbotapi.ReplyKeyboardHide{true, false}
+	_, err = bot.Send(msg)
+
+	if err != nil {
+
+		t.Fail()
+	}
+}
+
+func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	msg := tgbotapi.NewStickerShare(76918703, "BQADAgADUwADhwGzCmwtOypNFlrRAg")
+	msg.ReplyMarkup = tgbotapi.ReplyKeyboardHide{true, false}
+
+	_, err = bot.Send(msg)
+
+	if err != nil {
+
+		t.Fail()
+	}
+}
+
 func TestGetFile(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
 
