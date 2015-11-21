@@ -22,7 +22,6 @@ type BotAPI struct {
 	Token   string       `json:"token"`
 	Debug   bool         `json:"debug"`
 	Self    User         `json:"-"`
-	Updates chan Update  `json:"-"`
 	Client  *http.Client `json:"-"`
 }
 
@@ -395,8 +394,8 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 }
 
 // UpdatesChan starts a channel for getting updates.
-func (bot *BotAPI) UpdatesChan(config UpdateConfig) error {
-	bot.Updates = make(chan Update, 100)
+func (bot *BotAPI) UpdatesChan(config UpdateConfig) (<-chan Update, error) {
+	updatesChan := make(chan Update, 100)
 
 	go func() {
 		for {
@@ -412,18 +411,18 @@ func (bot *BotAPI) UpdatesChan(config UpdateConfig) error {
 			for _, update := range updates {
 				if update.UpdateID >= config.Offset {
 					config.Offset = update.UpdateID + 1
-					bot.Updates <- update
+					updatesChan <- update
 				}
 			}
 		}
 	}()
 
-	return nil
+	return updatesChan, nil
 }
 
 // ListenForWebhook registers a http handler for a webhook.
-func (bot *BotAPI) ListenForWebhook(pattern string) http.Handler {
-	bot.Updates = make(chan Update, 100)
+func (bot *BotAPI) ListenForWebhook(pattern string) (<-chan Update, http.Handler) {
+	updatesChan := make(chan Update, 100)
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
@@ -431,10 +430,10 @@ func (bot *BotAPI) ListenForWebhook(pattern string) http.Handler {
 		var update Update
 		json.Unmarshal(bytes, &update)
 
-		bot.Updates <- update
+		updatesChan <- update
 	})
 
 	http.HandleFunc(pattern, handler)
 
-	return handler
+	return updatesChan, handler
 }

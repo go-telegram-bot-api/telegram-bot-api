@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+	"strings"
 )
 
 // APIResponse is a response from the Telegram API with the result stored raw.
@@ -112,9 +113,12 @@ func (m *Message) IsGroup() bool {
 	return m.From.ID != m.Chat.ID
 }
 
-// IsGroup returns if the message was sent to a group.
 func (m *Message) IsCommand() bool {
 	return m.Text != "" && m.Text[0] == '/'
+}
+
+func (m *Message) Command() string {
+	return strings.Split(m.Text, " ")[0]
 }
 
 // PhotoSize contains information about photos, including ID and Width and Height.

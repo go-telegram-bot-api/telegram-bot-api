@@ -352,7 +352,7 @@ func TestGetUserProfilePhotos(t *testing.T) {
 func TestListenForWebhook(t *testing.T) {
 	bot, _ := getBot(t)
 
-	handler := bot.ListenForWebhook("/")
+	_, handler := bot.ListenForWebhook("/")
 
 	req, _ := http.NewRequest("GET", "", strings.NewReader("{}"))
 	w := httptest.NewRecorder()
@@ -396,7 +396,7 @@ func TestUpdatesChan(t *testing.T) {
 
 	var ucfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
 	ucfg.Timeout = 60
-	err := bot.UpdatesChan(ucfg)
+	_, err := bot.UpdatesChan(ucfg)
 
 	if err != nil {
 		t.Fail()
@@ -416,9 +416,9 @@ func ExampleNewBotAPI() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	err = bot.UpdatesChan(u)
+	updates, err := bot.UpdatesChan(u)
 
-	for update := range bot.Updates {
+	for update := range updates {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
@@ -443,10 +443,10 @@ func ExampleNewWebhook() {
 		log.Fatal(err)
 	}
 
-	bot.ListenForWebhook("/" + bot.Token)
+	updates, _ := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
-	for update := range bot.Updates {
+	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
 }
