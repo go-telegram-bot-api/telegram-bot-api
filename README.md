@@ -45,7 +45,7 @@ func main() {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 		msg.ReplyToMessageID = update.Message.MessageID
 
-		bot.SendMessage(msg)
+		bot.Send(msg)
 	}
 }
 ```
@@ -87,4 +87,4 @@ func main() {
 
 If you need, you may generate a self signed certficate, as this requires HTTPS / TLS. The above example tells Telegram that this is your certificate and that it should be trusted, even though it is not properly signed.
 
-    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj -nodes
+    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
