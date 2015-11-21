@@ -11,14 +11,26 @@ import (
 	"testing"
 )
 
-func TestMain(m *testing.M) {
-	botToken := os.Getenv("TELEGRAM_API_TOKEN")
+const (
+	TestToken              = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
+	ChatID                 = 76918703
+	ReplyToMessageID       = 35
+	ExistingPhotoFileID    = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
+	ExistingDocumentFileID = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
+	ExistingAudioFileID    = "BQADAgADRgADjMcoCdXg3lSIN49lAg"
+	ExistingVoiceFileID    = "AwADAgADWQADjMcoCeul6r_q52IyAg"
+	ExistingVideoFileID    = "BAADAgADZgADjMcoCav432kYe0FRAg"
+	ExistingStickerFileID  = "BQADAgADcwADjMcoCbdl-6eB--YPAg"
+)
 
-	if botToken == "" {
-		log.Panic("You must provide a TELEGRAM_API_TOKEN env variable to test!")
+func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
+	bot, err := tgbotapi.NewBotAPI(TestToken)
+
+	if err != nil {
+		t.Fail()
 	}
 
-	os.Exit(m.Run())
+	return bot, err
 }
 
 func TestNewBotAPI_notoken(t *testing.T) {
@@ -29,24 +41,12 @@ func TestNewBotAPI_notoken(t *testing.T) {
 	}
 }
 
-func TestNewBotAPI_token(t *testing.T) {
-	_, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
-}
-
 func TestGetUpdates(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	u := tgbotapi.NewUpdate(0)
 
-	_, err = bot.GetUpdates(u)
+	_, err := bot.GetUpdates(u)
 
 	if err != nil {
 		t.Log(err.Error())
@@ -55,15 +55,11 @@ func TestGetUpdates(t *testing.T) {
 }
 
 func TestSendWithMessage(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewMessage(76918703, "A test message from the test library in telegram-bot-api")
+	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -71,15 +67,11 @@ func TestSendWithMessage(t *testing.T) {
 }
 
 func TestSendWithMessageReply(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewMessage(76918703, "A test message from the test library in telegram-bot-api")
-	msg.ReplyToMessageID = 480
-	_, err = bot.Send(msg)
+	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg.ReplyToMessageID = ReplyToMessageID
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -87,14 +79,10 @@ func TestSendWithMessageReply(t *testing.T) {
 }
 
 func TestSendWithMessageForward(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewForward(76918703, 76918703, 480)
-	_, err = bot.Send(msg)
+	msg := tgbotapi.NewForward(ChatID, ChatID, ReplyToMessageID)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -102,15 +90,11 @@ func TestSendWithMessageForward(t *testing.T) {
 }
 
 func TestSendWithNewPhoto(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewPhotoUpload(76918703, "tests/image.jpg")
+	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg")
 	msg.Caption = "Test"
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -118,18 +102,14 @@ func TestSendWithNewPhoto(t *testing.T) {
 }
 
 func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	data, _ := ioutil.ReadFile("tests/image.jpg")
 	b := tgbotapi.FileBytes{Name: "image.jpg", Bytes: data}
 
-	msg := tgbotapi.NewPhotoUpload(76918703, b)
+	msg := tgbotapi.NewPhotoUpload(ChatID, b)
 	msg.Caption = "Test"
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -137,18 +117,14 @@ func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 }
 
 func TestSendWithNewPhotoWithFileReader(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	f, _ := os.Open("tests/image.jpg")
 	reader := tgbotapi.FileReader{Name: "image.jpg", Reader: f, Size: -1}
 
-	msg := tgbotapi.NewPhotoUpload(76918703, reader)
+	msg := tgbotapi.NewPhotoUpload(ChatID, reader)
 	msg.Caption = "Test"
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -156,16 +132,12 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 }
 
 func TestSendWithNewPhotoReply(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
+	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg")
+	msg.ReplyToMessageID = ReplyToMessageID
 
-	msg := tgbotapi.NewPhotoUpload(76918703, "tests/image.jpg")
-	msg.ReplyToMessageID = 480
-
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -173,15 +145,11 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 }
 
 func TestSendWithExistingPhoto(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewPhotoShare(76918703, "AgADAgADxKcxG4cBswqt13DnHOgbmBxDhCoABC0h01_AL4SKe20BAAEC")
+	msg := tgbotapi.NewPhotoShare(ChatID, ExistingPhotoFileID)
 	msg.Caption = "Test"
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -189,14 +157,10 @@ func TestSendWithExistingPhoto(t *testing.T) {
 }
 
 func TestSendWithNewDocument(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewDocumentUpload(76918703, "tests/image.jpg")
-	_, err = bot.Send(msg)
+	msg := tgbotapi.NewDocumentUpload(ChatID, "tests/image.jpg")
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -204,14 +168,10 @@ func TestSendWithNewDocument(t *testing.T) {
 }
 
 func TestSendWithExistingDocument(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewDocumentShare(76918703, "BQADAgADBwADhwGzCjWgiUU4T8VNAg")
-	_, err = bot.Send(msg)
+	msg := tgbotapi.NewDocumentShare(ChatID, ExistingDocumentFileID)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -219,17 +179,13 @@ func TestSendWithExistingDocument(t *testing.T) {
 }
 
 func TestSendWithNewAudio(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewAudioUpload(76918703, "tests/audio.mp3")
+	msg := tgbotapi.NewAudioUpload(ChatID, "tests/audio.mp3")
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -237,18 +193,14 @@ func TestSendWithNewAudio(t *testing.T) {
 }
 
 func TestSendWithExistingAudio(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewAudioShare(76918703, "BQADAgADMwADhwGzCkYFlCTpxiP6Ag")
+	msg := tgbotapi.NewAudioShare(ChatID, ExistingAudioFileID)
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
 
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -256,15 +208,11 @@ func TestSendWithExistingAudio(t *testing.T) {
 }
 
 func TestSendWithNewVoice(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewVoiceUpload(76918703, "tests/voice.ogg")
+	msg := tgbotapi.NewVoiceUpload(ChatID, "tests/voice.ogg")
 	msg.Duration = 10
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -272,15 +220,11 @@ func TestSendWithNewVoice(t *testing.T) {
 }
 
 func TestSendWithExistingVoice(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewVoiceShare(76918703, "AwADAgADIgADhwGzCigyMW_GUtWIAg")
+	msg := tgbotapi.NewVoiceShare(ChatID, ExistingVoiceFileID)
 	msg.Duration = 10
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 		t.Fail()
@@ -288,13 +232,9 @@ func TestSendWithExistingVoice(t *testing.T) {
 }
 
 func TestSendWithLocation(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = bot.Send(tgbotapi.NewLocation(76918703, 40, 40))
+	_, err := bot.Send(tgbotapi.NewLocation(ChatID, 40, 40))
 
 	if err != nil {
 		t.Fail()
@@ -302,105 +242,78 @@ func TestSendWithLocation(t *testing.T) {
 }
 
 func TestSendWithNewVideo(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewVideoUpload(76918703, "tests/video.mp4")
+	msg := tgbotapi.NewVideoUpload(ChatID, "tests/video.mp4")
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
-
 		t.Fail()
 	}
 }
 
 func TestSendWithExistingVideo(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewVideoShare(76918703, "BAADAgADRgADhwGzCopBeKJ7rv9SAg")
+	msg := tgbotapi.NewVideoShare(ChatID, ExistingVideoFileID)
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
-
 		t.Fail()
 	}
 }
 
 func TestSendWithNewSticker(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
+
+	resp, err := bot.Send(msg)
+
+	t.Log(resp)
 
 	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewStickerUpload(76918703, "tests/image.jpg")
-
-	_, err = bot.Send(msg)
-
-	if err != nil {
-
 		t.Fail()
 	}
 }
 
 func TestSendWithExistingSticker(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewStickerShare(ChatID, ExistingStickerFileID)
+
+	_, err := bot.Send(msg)
 
 	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewStickerShare(76918703, "BQADAgADUwADhwGzCmwtOypNFlrRAg")
-
-	_, err = bot.Send(msg)
-
-	if err != nil {
-
 		t.Fail()
 	}
 }
 
 func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewStickerUpload(76918703, "tests/image.jpg")
+	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
 	msg.ReplyMarkup = tgbotapi.ReplyKeyboardHide{true, false}
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
-
 		t.Fail()
 	}
 }
 
 func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	msg := tgbotapi.NewStickerShare(76918703, "BQADAgADUwADhwGzCmwtOypNFlrRAg")
+	msg := tgbotapi.NewStickerShare(ChatID, ExistingStickerFileID)
 	msg.ReplyMarkup = tgbotapi.ReplyKeyboardHide{true, false}
 
-	_, err = bot.Send(msg)
+	_, err := bot.Send(msg)
 
 	if err != nil {
 
@@ -409,15 +322,11 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 }
 
 func TestGetFile(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
+	file := tgbotapi.FileConfig{ExistingPhotoFileID}
 
-	file := tgbotapi.FileConfig{"BQADAgADBwADhwGzCjWgiUU4T8VNAg"}
-
-	_, err = bot.GetFile(file)
+	_, err := bot.GetFile(file)
 
 	if err != nil {
 		t.Fail()
@@ -425,13 +334,9 @@ func TestGetFile(t *testing.T) {
 }
 
 func TestSendChatConfig(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = bot.Send(tgbotapi.NewChatAction(76918703, tgbotapi.ChatTyping))
+	_, err := bot.Send(tgbotapi.NewChatAction(ChatID, tgbotapi.ChatTyping))
 
 	if err != nil {
 		t.Fail()
@@ -439,24 +344,16 @@ func TestSendChatConfig(t *testing.T) {
 }
 
 func TestGetUserProfilePhotos(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+	bot, _ := getBot(t)
 
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = bot.GetUserProfilePhotos(tgbotapi.NewUserProfilePhotos(76918703))
+	_, err := bot.GetUserProfilePhotos(tgbotapi.NewUserProfilePhotos(ChatID))
 	if err != nil {
 		t.Fail()
 	}
 }
 
 func TestListenForWebhook(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	handler := bot.ListenForWebhook("/")
 
@@ -470,16 +367,12 @@ func TestListenForWebhook(t *testing.T) {
 }
 
 func TestSetWebhookWithCert(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	bot.RemoveWebhook()
 
 	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
-	_, err = bot.SetWebhook(wh)
+	_, err := bot.SetWebhook(wh)
 	if err != nil {
 		t.Fail()
 	}
@@ -488,16 +381,12 @@ func TestSetWebhookWithCert(t *testing.T) {
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	bot.RemoveWebhook()
 
 	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
-	_, err = bot.SetWebhook(wh)
+	_, err := bot.SetWebhook(wh)
 	if err != nil {
 		t.Fail()
 	}
@@ -506,15 +395,11 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 }
 
 func TestUpdatesChan(t *testing.T) {
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
-
-	if err != nil {
-		t.Fail()
-	}
+	bot, _ := getBot(t)
 
 	var ucfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
 	ucfg.Timeout = 60
-	err = bot.UpdatesChan(ucfg)
+	err := bot.UpdatesChan(ucfg)
 
 	if err != nil {
 		t.Fail()
