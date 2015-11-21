@@ -18,35 +18,32 @@ package main
 
 import (
 	"log"
-	"github.com/Syfaro/telegram-bot-api"
+	"github.com/zhulik/telegram-bot-api"
 )
 
 func main() {
 	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
-	if err != nil {
-		log.Panic(err)
-	}
+    if err != nil {
+        log.Panic(err)
+    }
 
-	bot.Debug = true
+    bot.Debug = true
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+    log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+    u := tgbotapi.NewUpdate(0)
+    u.Timeout = 60
 
-	err = bot.UpdatesChan(u)
-	if err != nil {
-		log.Panic(err)
-	}
+    err = bot.UpdatesChan(u)
 
-	for update := range bot.Updates {
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+    for update := range bot.Updates {
+        log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
+        msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+        msg.ReplyToMessageID = update.Message.MessageID
 
-		bot.Send(msg)
-	}
+        bot.Send(msg)
+    }
 }
 ```
 
@@ -56,7 +53,7 @@ If you need to use webhooks for some reason (such as running on Google App Engin
 package main
 
 import (
-	"github.com/Syfaro/telegram-bot-api"
+	"github.com/zhulik/telegram-bot-api"
 	"log"
 	"net/http"
 )
