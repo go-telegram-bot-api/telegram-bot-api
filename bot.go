@@ -169,6 +169,16 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	return apiResp, nil
 }
 
+func (this *BotAPI) getFileDirectUrl(fileID string) (string, error) {
+	file, err := this.GetFile(FileConfig{fileID})
+
+	if err != nil {
+		return "", err
+	}
+
+	return file.Link(this.Token), nil
+}
+
 // GetMe fetches the currently authenticated bot.
 //
 // There are no parameters for this method.
