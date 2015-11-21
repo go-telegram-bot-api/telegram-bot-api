@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"io/ioutil"
 )
 
 func TestMain(m *testing.M) {
@@ -115,6 +116,48 @@ func TestSendWithNewPhoto(t *testing.T) {
 		t.Fail()
 	}
 }
+
+
+
+func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	data, _ := ioutil.ReadFile("tests/image.jpg")
+	b := tgbotapi.FileBytes{Name: "image.jpg", Bytes: data}
+
+	msg := tgbotapi.NewPhotoUpload(76918703, b)
+	msg.Caption = "Test"
+	_, err = bot.Send(msg)
+
+	if err != nil {
+		t.Fail()
+	}
+}
+
+
+func TestSendWithNewPhotoWithFileReader(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	f, _ := os.Open("tests/image.jpg")
+	reader := tgbotapi.FileReader{Name: "image.jpg", Reader: f, Size: -1}
+
+	msg := tgbotapi.NewPhotoUpload(76918703, reader)
+	msg.Caption = "Test"
+	_, err = bot.Send(msg)
+
+	if err != nil {
+		t.Fail()
+	}
+}
+
 
 func TestSendWithNewPhotoReply(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
@@ -430,7 +473,7 @@ func TestListenForWebhook(t *testing.T) {
 	}
 }
 
-func TestSetWebhook(t *testing.T) {
+func TestSetWebhookWithCert(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
 
 	if err != nil {
@@ -440,6 +483,24 @@ func TestSetWebhook(t *testing.T) {
 	bot.RemoveWebhook()
 
 	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
+	_, err = bot.SetWebhook(wh)
+	if err != nil {
+		t.Fail()
+	}
+
+	bot.RemoveWebhook()
+}
+
+func TestSetWebhookWithoutCert(t *testing.T) {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
+
+	if err != nil {
+		t.Fail()
+	}
+
+	bot.RemoveWebhook()
+
+	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 	_, err = bot.SetWebhook(wh)
 	if err != nil {
 		t.Fail()
