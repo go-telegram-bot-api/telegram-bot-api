@@ -2,13 +2,13 @@ package tgbotapi_test
 
 import (
 	"github.com/zhulik/telegram-bot-api"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
-	"io/ioutil"
 )
 
 func TestMain(m *testing.M) {
@@ -117,8 +117,6 @@ func TestSendWithNewPhoto(t *testing.T) {
 	}
 }
 
-
-
 func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
 
@@ -138,7 +136,6 @@ func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 	}
 }
 
-
 func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
 
@@ -157,7 +154,6 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 		t.Fail()
 	}
 }
-
 
 func TestSendWithNewPhotoReply(t *testing.T) {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_TOKEN"))
@@ -435,7 +431,7 @@ func TestSendChatConfig(t *testing.T) {
 		t.Fail()
 	}
 
-	err = bot.SendChatAction(tgbotapi.NewChatAction(76918703, tgbotapi.ChatTyping))
+	_, err = bot.Send(tgbotapi.NewChatAction(76918703, tgbotapi.ChatTyping))
 
 	if err != nil {
 		t.Fail()

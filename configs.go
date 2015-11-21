@@ -415,6 +415,10 @@ func (config ChatActionConfig) Values() (url.Values, error) {
 	return v, nil
 }
 
+func (config ChatActionConfig) Method() string {
+	return "sendChatAction"
+}
+
 // UserProfilePhotosConfig contains information about a GetUserProfilePhotos request.
 type UserProfilePhotosConfig struct {
 	UserID int

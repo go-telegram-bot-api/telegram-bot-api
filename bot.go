@@ -423,20 +423,3 @@ func (bot *BotAPI) ListenForWebhook(pattern string) http.Handler {
 
 	return handler
 }
-
-// SendChatAction sets a current action in a chat.
-//
-// Requires ChatID and a valid Action (see Chat constants).
-func (bot *BotAPI) SendChatAction(config ChatActionConfig) error {
-	v, err := config.Values()
-	if err != nil {
-		return err
-	}
-
-	_, err = bot.MakeRequest("sendChatAction", v)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
