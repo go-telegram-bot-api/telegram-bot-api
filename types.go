@@ -3,6 +3,7 @@ package tgbotapi
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -110,6 +111,16 @@ func (m *Message) Time() time.Time {
 // IsGroup returns if the message was sent to a group.
 func (m *Message) IsGroup() bool {
 	return m.From.ID != m.Chat.ID
+}
+
+// IsCommand returns true if message starts from /
+func (m *Message) IsCommand() bool {
+	return m.Text != "" && m.Text[0] == '/'
+}
+
+// Command returns first word from message
+func (m *Message) Command() string {
+	return strings.Split(m.Text, " ")[0]
 }
 
 // PhotoSize contains information about photos, including ID and Width and Height.

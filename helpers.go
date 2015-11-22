@@ -10,10 +10,9 @@ import (
 // chatID is where to send it, text is the message text.
 func NewMessage(chatID int, text string) MessageConfig {
 	return MessageConfig{
-		ChatID: chatID,
-		Text:   text,
+		BaseChat: BaseChat{ChatID: chatID, ReplyToMessageID: 0},
+		Text:     text,
 		DisableWebPagePreview: false,
-		ReplyToMessageID:      0,
 	}
 }
 
@@ -23,7 +22,7 @@ func NewMessage(chatID int, text string) MessageConfig {
 // and messageID is the ID of the original message.
 func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 	return ForwardConfig{
-		ChatID:     chatID,
+		BaseChat:   BaseChat{ChatID: chatID},
 		FromChatID: fromChatID,
 		MessageID:  messageID,
 	}
@@ -36,9 +35,7 @@ func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 // chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
 func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 	return PhotoConfig{
-		ChatID:           chatID,
-		UseExistingPhoto: false,
-		File:             file,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, File: file, UseExisting: false},
 	}
 }
 
@@ -48,9 +45,7 @@ func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 // chatID is where to send it, fileID is the ID of the file already uploaded.
 func NewPhotoShare(chatID int, fileID string) PhotoConfig {
 	return PhotoConfig{
-		ChatID:           chatID,
-		UseExistingPhoto: true,
-		FileID:           fileID,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, FileID: fileID, UseExisting: true},
 	}
 }
 
@@ -61,9 +56,7 @@ func NewPhotoShare(chatID int, fileID string) PhotoConfig {
 // chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
 func NewAudioUpload(chatID int, file interface{}) AudioConfig {
 	return AudioConfig{
-		ChatID:           chatID,
-		UseExistingAudio: false,
-		File:             file,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, File: file, UseExisting: false},
 	}
 }
 
@@ -73,9 +66,7 @@ func NewAudioUpload(chatID int, file interface{}) AudioConfig {
 // chatID is where to send it, fileID is the ID of the audio already uploaded.
 func NewAudioShare(chatID int, fileID string) AudioConfig {
 	return AudioConfig{
-		ChatID:           chatID,
-		UseExistingAudio: true,
-		FileID:           fileID,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, FileID: fileID, UseExisting: true},
 	}
 }
 
@@ -86,9 +77,7 @@ func NewAudioShare(chatID int, fileID string) AudioConfig {
 // chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
 func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
 	return DocumentConfig{
-		ChatID:              chatID,
-		UseExistingDocument: false,
-		File:                file,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, File: file, UseExisting: false},
 	}
 }
 
@@ -98,9 +87,7 @@ func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
 // chatID is where to send it, fileID is the ID of the document already uploaded.
 func NewDocumentShare(chatID int, fileID string) DocumentConfig {
 	return DocumentConfig{
-		ChatID:              chatID,
-		UseExistingDocument: true,
-		FileID:              fileID,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, FileID: fileID, UseExisting: true},
 	}
 }
 
@@ -110,9 +97,7 @@ func NewDocumentShare(chatID int, fileID string) DocumentConfig {
 // chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
 func NewStickerUpload(chatID int, file interface{}) StickerConfig {
 	return StickerConfig{
-		ChatID:             chatID,
-		UseExistingSticker: false,
-		File:               file,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, File: file, UseExisting: false},
 	}
 }
 
@@ -122,9 +107,7 @@ func NewStickerUpload(chatID int, file interface{}) StickerConfig {
 // chatID is where to send it, fileID is the ID of the sticker already uploaded.
 func NewStickerShare(chatID int, fileID string) StickerConfig {
 	return StickerConfig{
-		ChatID:             chatID,
-		UseExistingSticker: true,
-		FileID:             fileID,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, FileID: fileID, UseExisting: true},
 	}
 }
 
@@ -135,9 +118,7 @@ func NewStickerShare(chatID int, fileID string) StickerConfig {
 // chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
 func NewVideoUpload(chatID int, file interface{}) VideoConfig {
 	return VideoConfig{
-		ChatID:           chatID,
-		UseExistingVideo: false,
-		File:             file,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, File: file, UseExisting: false},
 	}
 }
 
@@ -147,9 +128,7 @@ func NewVideoUpload(chatID int, file interface{}) VideoConfig {
 // chatID is where to send it, fileID is the ID of the video already uploaded.
 func NewVideoShare(chatID int, fileID string) VideoConfig {
 	return VideoConfig{
-		ChatID:           chatID,
-		UseExistingVideo: true,
-		FileID:           fileID,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, FileID: fileID, UseExisting: true},
 	}
 }
 
@@ -160,9 +139,7 @@ func NewVideoShare(chatID int, fileID string) VideoConfig {
 // chatID is where to send it, file is a string path to the file, or FileReader or FileBytes.
 func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
 	return VoiceConfig{
-		ChatID:           chatID,
-		UseExistingVoice: false,
-		File:             file,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, File: file, UseExisting: false},
 	}
 }
 
@@ -172,9 +149,7 @@ func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
 // chatID is where to send it, fileID is the ID of the video already uploaded.
 func NewVoiceShare(chatID int, fileID string) VoiceConfig {
 	return VoiceConfig{
-		ChatID:           chatID,
-		UseExistingVoice: true,
-		FileID:           fileID,
+		BaseFile: BaseFile{BaseChat: BaseChat{ChatID: chatID}, FileID: fileID, UseExisting: true},
 	}
 }
 
@@ -184,11 +159,9 @@ func NewVoiceShare(chatID int, fileID string) VoiceConfig {
 // chatID is where to send it, latitude and longitude are coordinates.
 func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig {
 	return LocationConfig{
-		ChatID:           chatID,
-		Latitude:         latitude,
-		Longitude:        longitude,
-		ReplyToMessageID: 0,
-		ReplyMarkup:      nil,
+		BaseChat:  BaseChat{ChatID: chatID, ReplyToMessageID: 0, ReplyMarkup: nil},
+		Latitude:  latitude,
+		Longitude: longitude,
 	}
 }
 
@@ -198,8 +171,8 @@ func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig
 // chatID is where to send it, action should be set via CHAT constants.
 func NewChatAction(chatID int, action string) ChatActionConfig {
 	return ChatActionConfig{
-		ChatID: chatID,
-		Action: action,
+		BaseChat: BaseChat{ChatID: chatID},
+		Action:   action,
 	}
 }
 
@@ -233,8 +206,7 @@ func NewWebhook(link string) WebhookConfig {
 	u, _ := url.Parse(link)
 
 	return WebhookConfig{
-		URL:   u,
-		Clear: false,
+		URL: u,
 	}
 }
 
@@ -247,7 +219,6 @@ func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
 
 	return WebhookConfig{
 		URL:         u,
-		Clear:       false,
 		Certificate: file,
 	}
 }

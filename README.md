@@ -1,6 +1,7 @@
 # Golang bindings for the Telegram Bot API
 
 [![GoDoc](https://godoc.org/github.com/Syfaro/telegram-bot-api?status.svg)](http://godoc.org/github.com/Syfaro/telegram-bot-api)
+[![Travis](https://travis-ci.org/Syfaro/telegram-bot-api.svg)](https://travis-ci.org/Syfaro/telegram-bot-api)
 
 All methods have been added, and all features should be available.
 If you want a feature that hasn't been added yet or something is broken, open an issue and I'll see what I can do.
@@ -34,18 +35,15 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	err = bot.UpdatesChan(u)
-	if err != nil {
-		log.Panic(err)
-	}
+	updates, err := bot.GetUpdatesChan(u)
 
-	for update := range bot.Updates {
+	for update := range updates {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 		msg.ReplyToMessageID = update.Message.MessageID
 
-		bot.SendMessage(msg)
+		bot.Send(msg)
 	}
 }
 ```
@@ -76,10 +74,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	bot.ListenForWebhook("/"+bot.Token)
+	updates, _ := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
-	for update := range bot.Updates {
+	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
 }
@@ -87,4 +85,4 @@ func main() {
 
 If you need, you may generate a self signed certficate, as this requires HTTPS / TLS. The above example tells Telegram that this is your certificate and that it should be trusted, even though it is not properly signed.
 
-    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj -nodes
+    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
