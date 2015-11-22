@@ -10,6 +10,8 @@ All methods are fairly self explanatory, and reading the godoc page should expla
 
 The scope of this project is just to provide a wrapper around the API without any additional features. There are other projects for creating something with plugins and command handlers without having to design all that yourself.
 
+Note to previous users, there was just a large change that broke some methods. The main changes are that all the `Send*` functions have been replaced with a single `Send`, and `UpdatesChan` was renamed `GetUpdatesChan` and returns `(chan, err)` instead of storing the chan in `Updates`.
+
 ## Example
 
 This is a very simple bot that just displays any gotten updates, then replies it to that chat.
