@@ -144,7 +144,6 @@ type MessageConfig struct {
 	Text                  string
 	ParseMode             string
 	DisableWebPagePreview bool
-	ReplyMarkup           interface{}
 }
 
 // Values returns url.Values representation of MessageConfig
