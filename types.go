@@ -71,6 +71,11 @@ func (c *Chat) IsGroup() bool {
 	return c.Type == "group"
 }
 
+// IsSuperGroup returns true if the Chat is a supergroup conversation
+func (c *Chat) IsSuperGroup() bool {
+	return c.Type == "supergroup"
+}
+
 // IsChannel returns true if the Chat is a channel
 func (c *Chat) IsChannel() bool {
 	return c.Type == "channel"
@@ -78,29 +83,33 @@ func (c *Chat) IsChannel() bool {
 
 // Message is returned by almost every request, and contains data about almost anything.
 type Message struct {
-	MessageID           int         `json:"message_id"`
-	From                User        `json:"from"`
-	Date                int         `json:"date"`
-	Chat                Chat        `json:"chat"`
-	ForwardFrom         User        `json:"forward_from"`
-	ForwardDate         int         `json:"forward_date"`
-	ReplyToMessage      *Message    `json:"reply_to_message"`
-	Text                string      `json:"text"`
-	Audio               Audio       `json:"audio"`
-	Document            Document    `json:"document"`
-	Photo               []PhotoSize `json:"photo"`
-	Sticker             Sticker     `json:"sticker"`
-	Video               Video       `json:"video"`
-	Voice               Voice       `json:"voice"`
-	Caption             string      `json:"caption"`
-	Contact             Contact     `json:"contact"`
-	Location            Location    `json:"location"`
-	NewChatParticipant  User        `json:"new_chat_participant"`
-	LeftChatParticipant User        `json:"left_chat_participant"`
-	NewChatTitle        string      `json:"new_chat_title"`
-	NewChatPhoto        []PhotoSize `json:"new_chat_photo"`
-	DeleteChatPhoto     bool        `json:"delete_chat_photo"`
-	GroupChatCreated    bool        `json:"group_chat_created"`
+	MessageID             int         `json:"message_id"`
+	From                  User        `json:"from"`
+	Date                  int         `json:"date"`
+	Chat                  Chat        `json:"chat"`
+	ForwardFrom           User        `json:"forward_from"`
+	ForwardDate           int         `json:"forward_date"`
+	ReplyToMessage        *Message    `json:"reply_to_message"`
+	Text                  string      `json:"text"`
+	Audio                 Audio       `json:"audio"`
+	Document              Document    `json:"document"`
+	Photo                 []PhotoSize `json:"photo"`
+	Sticker               Sticker     `json:"sticker"`
+	Video                 Video       `json:"video"`
+	Voice                 Voice       `json:"voice"`
+	Caption               string      `json:"caption"`
+	Contact               Contact     `json:"contact"`
+	Location              Location    `json:"location"`
+	NewChatParticipant    User        `json:"new_chat_participant"`
+	LeftChatParticipant   User        `json:"left_chat_participant"`
+	NewChatTitle          string      `json:"new_chat_title"`
+	NewChatPhoto          []PhotoSize `json:"new_chat_photo"`
+	DeleteChatPhoto       bool        `json:"delete_chat_photo"`
+	GroupChatCreated      bool        `json:"group_chat_created"`
+	SuperGroupChatCreated bool        `json:"supergroup_chat_created"`
+	ChannelChatCreated    bool        `json:"channel_chat_created"`
+	MigrateToChatID       int         `json:"migrate_to_chat_id"`
+	MigrateFromChatID     int         `json:"migrate_from_chat_id"`
 }
 
 // Time converts the message timestamp into a Time.
@@ -110,7 +119,7 @@ func (m *Message) Time() time.Time {
 
 // IsGroup returns if the message was sent to a group.
 func (m *Message) IsGroup() bool {
-	return m.From.ID != m.Chat.ID
+	return m.Chat.IsGroup()
 }
 
 // IsCommand returns true if message starts from /
