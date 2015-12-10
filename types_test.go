@@ -22,16 +22,6 @@ func TestUserStringWithUserName(t *testing.T) {
 	}
 }
 
-func TestMessageIsGroup(t *testing.T) {
-	from := tgbotapi.User{ID: 0}
-	chat := tgbotapi.Chat{ID: 10}
-	message := tgbotapi.Message{From: from, Chat: chat}
-
-	if message.IsGroup() != true {
-		t.Fail()
-	}
-}
-
 func TestMessageTime(t *testing.T) {
 	message := tgbotapi.Message{Date: 0}
 
@@ -61,6 +51,14 @@ func TestChatIsChannel(t *testing.T) {
 	chat := tgbotapi.Chat{ID: 10, Type: "channel"}
 
 	if chat.IsChannel() != true {
+		t.Fail()
+	}
+}
+
+func TestChatIsSuperGroup(t *testing.T) {
+	chat := tgbotapi.Chat{ID: 10, Type: "supergroup"}
+
+	if !chat.IsSuperGroup() {
 		t.Fail()
 	}
 }
