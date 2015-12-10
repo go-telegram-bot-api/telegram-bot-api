@@ -88,3 +88,5 @@ func main() {
 If you need, you may generate a self signed certficate, as this requires HTTPS / TLS. The above example tells Telegram that this is your certificate and that it should be trusted, even though it is not properly signed.
 
     openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
+
+Now that [Let's Encrypt](https://letsencrypt.org) has entered public beta, you may wish to generate your free TLS certificate there.
