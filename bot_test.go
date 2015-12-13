@@ -1,7 +1,7 @@
 package tgbotapi_test
 
 import (
-	"github.com/Syfaro/telegram-bot-api"
+	"github.com/zhulik/telegram-bot-api"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -184,6 +184,8 @@ func TestSendWithNewAudio(t *testing.T) {
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
+	msg.MimeType = "audio/mpeg"
+	msg.FileSize = 688
 	_, err := bot.Send(msg)
 
 	if err != nil {

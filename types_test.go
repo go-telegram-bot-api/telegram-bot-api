@@ -1,7 +1,7 @@
 package tgbotapi_test
 
 import (
-	"github.com/Syfaro/telegram-bot-api"
+	"github.com/zhulik/telegram-bot-api"
 	"testing"
 	"time"
 )
