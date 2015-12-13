@@ -93,8 +93,8 @@ type BaseFile struct {
 	File        interface{}
 	FileID      string
 	UseExisting bool
-	MimeType  string
-	FileSize  int
+	MimeType    string
+	FileSize    int
 }
 
 // Params returns map[string]string representation of BaseFile
