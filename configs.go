@@ -93,6 +93,8 @@ type BaseFile struct {
 	File        interface{}
 	FileID      string
 	UseExisting bool
+	MimeType    string
+	FileSize    int
 }
 
 // Params returns map[string]string representation of BaseFile
@@ -116,6 +118,14 @@ func (file BaseFile) Params() (map[string]string, error) {
 		}
 
 		params["reply_markup"] = string(data)
+	}
+
+	if len(file.MimeType) > 0 {
+		params["mime_type"] = file.MimeType
+	}
+
+	if file.FileSize > 0 {
+		params["file_size"] = strconv.Itoa(file.FileSize)
 	}
 
 	return params, nil

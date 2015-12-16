@@ -31,6 +31,75 @@ func TestMessageTime(t *testing.T) {
 	}
 }
 
+func TestMessageIsCommandWithCommand(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command"}
+
+	if message.IsCommand() != true {
+		t.Fail()
+	}
+}
+
+func TestIsCommandWithText(t *testing.T) {
+	message := tgbotapi.Message{Text: "some text"}
+
+	if message.IsCommand() != false {
+		t.Fail()
+	}
+}
+
+func TestIsCommandWithEmptyText(t *testing.T) {
+	message := tgbotapi.Message{Text: ""}
+
+	if message.IsCommand() != false {
+		t.Fail()
+	}
+}
+
+func TestCommandWithCommand(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command"}
+
+	if message.Command() != "/command" {
+		t.Fail()
+	}
+}
+
+func TestCommandWithEmptyText(t *testing.T) {
+	message := tgbotapi.Message{Text: ""}
+
+	if message.Command() != "" {
+		t.Fail()
+	}
+}
+
+func TestCommandWithNonCommand(t *testing.T) {
+	message := tgbotapi.Message{Text: "test text"}
+
+	if message.Command() != "" {
+		t.Fail()
+	}
+}
+
+func TestMessageCommandArgumentsWithArguments(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command with arguments"}
+	if message.CommandArguments() != "with arguments" {
+		t.Fail()
+	}
+}
+
+func TestMessageCommandArgumentsWithoutArguments(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command"}
+	if message.CommandArguments() != "" {
+		t.Fail()
+	}
+}
+
+func TestMessageCommandArgumentsForNonCommand(t *testing.T) {
+	message := tgbotapi.Message{Text: "test text"}
+	if message.CommandArguments() != "" {
+		t.Fail()
+	}
+}
+
 func TestChatIsPrivate(t *testing.T) {
 	chat := tgbotapi.Chat{ID: 10, Type: "private"}
 

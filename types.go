@@ -127,9 +127,25 @@ func (m *Message) IsCommand() bool {
 	return m.Text != "" && m.Text[0] == '/'
 }
 
-// Command returns first word from message
+// Command if message is command returns first word from message(entire command)
+// otherwise returns empty string
 func (m *Message) Command() string {
-	return strings.Split(m.Text, " ")[0]
+	if m.IsCommand() {
+		return strings.SplitN(m.Text, " ", 2)[0]
+	}
+	return ""
+}
+
+// CommandArguments if message is command, returns all text after command, excluding the command itself
+// otherwise returns empty string
+func (m *Message) CommandArguments() string {
+	if m.IsCommand() {
+		split := strings.SplitN(m.Text, " ", 2)
+		if len(split) == 2 {
+			return strings.SplitN(m.Text, " ", 2)[1]
+		}
+	}
+	return ""
 }
 
 // PhotoSize contains information about photos, including ID and Width and Height.

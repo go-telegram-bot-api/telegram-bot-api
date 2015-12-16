@@ -184,6 +184,8 @@ func TestSendWithNewAudio(t *testing.T) {
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
+	msg.MimeType = "audio/mpeg"
+	msg.FileSize = 688
 	_, err := bot.Send(msg)
 
 	if err != nil {
