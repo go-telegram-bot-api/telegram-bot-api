@@ -220,12 +220,6 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	}
 }
 
-// QuickSend will send message to selected chat
-func (bot *BotAPI) QuickSend(chatID int, message string) (Message, error) {
-	msg := NewMessage(chatID, message)
-	return bot.Send(msg)
-}
-
 func (bot *BotAPI) debugLog(context string, v url.Values, message interface{}) {
 	if bot.Debug {
 		log.Printf("%s req : %+v\n", context, v)

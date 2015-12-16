@@ -342,16 +342,6 @@ func TestSendChatConfig(t *testing.T) {
 	}
 }
 
-func TestQuickSend(t *testing.T) {
-	bot, _ := getBot(t)
-
-	_, err := bot.QuickSend(ChatID, "test message")
-
-	if err != nil {
-		t.Fail()
-	}
-}
-
 func TestGetUserProfilePhotos(t *testing.T) {
 	bot, _ := getBot(t)
 
