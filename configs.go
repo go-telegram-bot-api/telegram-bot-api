@@ -38,13 +38,13 @@ const (
 	ModeMarkdown = "Markdown"
 )
 
-//Chattable represents any event in chat(MessageConfig, PhotoConfig, ChatActionConfig and others)
+// Chattable represents any event in chat(MessageConfig, PhotoConfig, ChatActionConfig and others)
 type Chattable interface {
 	Values() (url.Values, error)
 	Method() string
 }
 
-//Fileable represents any file event(PhotoConfig, DocumentConfig, AudioConfig, VoiceConfig, VideoConfig, StickerConfig)
+// Fileable represents any file event(PhotoConfig, DocumentConfig, AudioConfig, VoiceConfig, VideoConfig, StickerConfig)
 type Fileable interface {
 	Chattable
 	Params() (map[string]string, error)
@@ -53,7 +53,7 @@ type Fileable interface {
 	UseExistingFile() bool
 }
 
-// BaseChat is base struct for all chat event(Message, Photo and so on)
+// BaseChat is base struct for all chat events (Message, Photo and so on)
 type BaseChat struct {
 	ChatID           int
 	ChannelUsername  string
@@ -86,7 +86,7 @@ func (chat *BaseChat) Values() (url.Values, error) {
 	return v, nil
 }
 
-// BaseFile is base struct for all file events(PhotoConfig, DocumentConfig, AudioConfig, VoiceConfig, VideoConfig, StickerConfig)
+// BaseFile is base struct for all file events (PhotoConfig, DocumentConfig, AudioConfig, VoiceConfig, VideoConfig, StickerConfig)
 type BaseFile struct {
 	BaseChat
 	FilePath    string
@@ -504,4 +504,13 @@ type FileReader struct {
 	Name   string
 	Reader io.Reader
 	Size   int64
+}
+
+// InlineConfig contains information on making an InlineQuery response.
+type InlineConfig struct {
+	InlineQueryID string              `json:"inline_query_id"`
+	Results       []InlineQueryResult `json:"results"`
+	CacheTime     int                 `json:"cache_time"`
+	IsPersonal    bool                `json:"is_personal"`
+	NextOffset    string              `json:"next_offset"`
 }

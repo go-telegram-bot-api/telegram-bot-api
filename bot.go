@@ -121,28 +121,30 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		buf := bytes.NewBuffer(f.Bytes)
 		ms.WriteReader(fieldname, f.Name, int64(len(f.Bytes)), buf)
 	case FileReader:
-		if f.Size == -1 {
-			data, err := ioutil.ReadAll(f.Reader)
-			if err != nil {
-				return APIResponse{}, err
-			}
-			buf := bytes.NewBuffer(data)
-
-			ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
+		if f.Size != -1 {
+			ms.WriteReader(fieldname, f.Name, f.Size, f.Reader)
 
 			break
 		}
 
-		ms.WriteReader(fieldname, f.Name, f.Size, f.Reader)
+		data, err := ioutil.ReadAll(f.Reader)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		buf := bytes.NewBuffer(data)
+
+		ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
 	default:
 		return APIResponse{}, errors.New("bad file type")
 	}
 
 	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), nil)
-	ms.SetupRequest(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
+
+	ms.SetupRequest(req)
 
 	res, err := bot.Client.Do(req)
 	if err != nil {
@@ -156,7 +158,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	}
 
 	if bot.Debug {
-		log.Println(string(bytes[:]))
+		log.Println(string(bytes))
 	}
 
 	var apiResp APIResponse
@@ -194,9 +196,7 @@ func (bot *BotAPI) GetMe() (User, error) {
 	var user User
 	json.Unmarshal(resp.Result, &user)
 
-	if bot.Debug {
-		log.Printf("getMe: %+v\n", user)
-	}
+	bot.debugLog("getMe", nil, user)
 
 	return user, nil
 }
@@ -450,4 +450,21 @@ func (bot *BotAPI) ListenForWebhook(pattern string) (<-chan Update, http.Handler
 	http.HandleFunc(pattern, handler)
 
 	return updatesChan, handler
+}
+
+// AnswerInlineQuery sends a response to an inline query.
+func (bot *BotAPI) AnswerInlineQuery(config InlineConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("inline_query_id", config.InlineQueryID)
+	v.Add("cache_time", strconv.Itoa(config.CacheTime))
+	v.Add("is_personal", strconv.FormatBool(config.IsPersonal))
+	v.Add("next_offset", config.NextOffset)
+	data, err := json.Marshal(config.Results)
+	if err != nil {
+		return APIResponse{}, err
+	}
+	v.Add("results", string(data))
+
+	return bot.MakeRequest("answerInlineQuery", v)
 }

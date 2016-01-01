@@ -17,8 +17,9 @@ type APIResponse struct {
 
 // Update is an update response, from GetUpdates.
 type Update struct {
-	UpdateID int     `json:"update_id"`
-	Message  Message `json:"message"`
+	UpdateID    int         `json:"update_id"`
+	Message     Message     `json:"message"`
+	InlineQuery InlineQuery `json:"inline_query"`
 }
 
 // User is a user, contained in Message and returned by GetSelf.
@@ -256,4 +257,92 @@ type ReplyKeyboardHide struct {
 type ForceReply struct {
 	ForceReply bool `json:"force_reply"`
 	Selective  bool `json:"selective"`
+}
+
+// InlineQuery is a Query from Telegram for an inline request
+type InlineQuery struct {
+	ID     string `json:"id"`
+	From   User   `json:"user"`
+	Query  string `json:"query"`
+	Offset string `json:"offset"`
+}
+
+// InlineQueryResult is the base type that all InlineQuery Results have.
+type InlineQueryResult struct {
+	Type string `json:"type"` // required
+	ID   string `json:"id"`   // required
+}
+
+// InlineQueryResultArticle is an inline query response article.
+type InlineQueryResultArticle struct {
+	InlineQueryResult
+	Title                 string `json:"title"`        // required
+	MessageText           string `json:"message_text"` // required
+	ParseMode             string `json:"parse_mode"`   // required
+	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	URL                   string `json:"url"`
+	HideURL               bool   `json:"hide_url"`
+	Description           string `json:"description"`
+	ThumbURL              string `json:"thumb_url"`
+	ThumbWidth            int    `json:"thumb_width"`
+	ThumbHeight           int    `json:"thumb_height"`
+}
+
+// InlineQueryResultPhoto is an inline query response photo.
+type InlineQueryResultPhoto struct {
+	InlineQueryResult
+	URL                   string `json:"photo_url"` // required
+	MimeType              string `json:"mime_type"`
+	Width                 int    `json:"photo_width"`
+	Height                int    `json:"photo_height"`
+	ThumbURL              string `json:"thumb_url"`
+	Title                 string `json:"title"`
+	Description           string `json:"description"`
+	Caption               string `json:"caption"`
+	MessageText           string `json:"message_text"`
+	ParseMode             string `json:"parse_mode"`
+	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+}
+
+// InlineQueryResultGIF is an inline query response GIF.
+type InlineQueryResultGIF struct {
+	InlineQueryResult
+	URL                   string `json:"gif_url"` // required
+	Width                 int    `json:"gif_width"`
+	Height                int    `json:"gif_height"`
+	ThumbURL              string `json:"thumb_url"`
+	Title                 string `json:"title"`
+	Caption               string `json:"caption"`
+	MessageText           string `json:"message_text"`
+	ParseMode             string `json:"parse_mode"`
+	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+}
+
+// InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
+type InlineQueryResultMPEG4GIF struct {
+	InlineQueryResult
+	URL                   string `json:"mpeg4_url"` // required
+	Width                 int    `json:"mpeg4_width"`
+	Height                int    `json:"mpeg4_height"`
+	ThumbURL              string `json:"thumb_url"`
+	Title                 string `json:"title"`
+	Caption               string `json:"caption"`
+	MessageText           string `json:"message_text"`
+	ParseMode             string `json:"parse_mode"`
+	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+}
+
+// InlineQueryResultVideo is an inline query response video.
+type InlineQueryResultVideo struct {
+	InlineQueryResult
+	URL                   string `json:"video_url"`    // required
+	MimeType              string `json:"mime_type"`    // required
+	MessageText           string `json:"message_text"` // required
+	ParseMode             string `json:"parse_mode"`
+	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	Width                 int    `json:"video_width"`
+	Height                int    `json:"video_height"`
+	ThumbURL              string `json:"thumb_url"`
+	Title                 string `json:"title"`
+	Description           string `json:"description"`
 }
