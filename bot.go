@@ -1,4 +1,5 @@
-// Package tgbotapi has bindings for interacting with the Telegram Bot API.
+// Package tgbotapi has functions and types used for interacting with
+// the Telegram Bot API.
 package tgbotapi
 
 import (
@@ -17,7 +18,7 @@ import (
 	"time"
 )
 
-// BotAPI has methods for interacting with all of Telegram's Bot API endpoints.
+// BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
 	Token  string       `json:"token"`
 	Debug  bool         `json:"debug"`
@@ -26,13 +27,16 @@ type BotAPI struct {
 }
 
 // NewBotAPI creates a new BotAPI instance.
-// Requires a token, provided by @BotFather on Telegram
+//
+// It requires a token, provided by @BotFather on Telegram.
 func NewBotAPI(token string) (*BotAPI, error) {
 	return NewBotAPIWithClient(token, &http.Client{})
 }
 
-// NewBotAPIWithClient creates a new BotAPI instance passing an http.Client.
-// Requires a token, provided by @BotFather on Telegram
+// NewBotAPIWithClient creates a new BotAPI instance
+// and allows you to pass a http.Client.
+//
+// It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:  token,
@@ -50,9 +54,10 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
-// All requests are POSTs because Telegram doesn't care, and it's easier.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	resp, err := bot.Client.PostForm(fmt.Sprintf(APIEndpoint, bot.Token, endpoint), params)
+	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+
+	resp, err := bot.Client.PostForm(method, params)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -81,6 +86,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	return apiResp, nil
 }
 
+// makeMessageRequest makes a request to a method that returns a Message.
 func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Message, error) {
 	resp, err := bot.MakeRequest(endpoint, params)
 	if err != nil {
@@ -98,7 +104,11 @@ func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Messa
 // UploadFile makes a request to the API with a file.
 //
 // Requires the parameter to hold the file not be in the params.
-// File should be a string to a file path, a FileBytes struct, or a FileReader struct.
+// File should be a string to a file path, a FileBytes struct,
+// or a FileReader struct.
+//
+// Note that if your FileReader has a size set to -1, it will read
+// the file into memory to calculate a size.
 func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
 	ms := multipartstreamer.New()
 	ms.WriteFields(params)
@@ -139,7 +149,9 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		return APIResponse{}, errors.New("bad file type")
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf(APIEndpoint, bot.Token, endpoint), nil)
+	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+
+	req, err := http.NewRequest("POST", method, nil)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -173,7 +185,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 // GetFileDirectURL returns direct URL to file
 //
-// Requires fileID
+// It requires the FileID.
 func (bot *BotAPI) GetFileDirectURL(fileID string) (string, error) {
 	file, err := bot.GetFile(FileConfig{fileID})
 
@@ -186,7 +198,9 @@ func (bot *BotAPI) GetFileDirectURL(fileID string) (string, error) {
 
 // GetMe fetches the currently authenticated bot.
 //
-// There are no parameters for this method.
+// This method is called upon creation to validate the token,
+// and so you may get this data from BotAPI.Self without the need for
+// another request.
 func (bot *BotAPI) GetMe() (User, error) {
 	resp, err := bot.MakeRequest("getMe", nil)
 	if err != nil {
@@ -201,16 +215,16 @@ func (bot *BotAPI) GetMe() (User, error) {
 	return user, nil
 }
 
-// IsMessageToMe returns true if message directed to this bot
+// IsMessageToMe returns true if message directed to this bot.
 //
-// Requires message
+// It requires the Message.
 func (bot *BotAPI) IsMessageToMe(message Message) bool {
 	return strings.Contains(message.Text, "@"+bot.Self.UserName)
 }
 
-// Send will send event(Message, Photo, Audio, ChatAction, anything) to Telegram
+// Send will send a Chattable item to Telegram.
 //
-// Requires Chattable
+// It requires the Chattable to send.
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	switch c.(type) {
 	case Fileable:
@@ -220,6 +234,9 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	}
 }
 
+// debugLog checks if the bot is currently running in debug mode, and if
+// so will display information about the request and response in the
+// debug log.
 func (bot *BotAPI) debugLog(context string, v url.Values, message interface{}) {
 	if bot.Debug {
 		log.Printf("%s req : %+v\n", context, v)
@@ -227,8 +244,9 @@ func (bot *BotAPI) debugLog(context string, v url.Values, message interface{}) {
 	}
 }
 
+// sendExisting will send a Message with an existing file to Telegram.
 func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error) {
-	v, err := config.Values()
+	v, err := config.values()
 
 	if err != nil {
 		return Message{}, err
@@ -242,15 +260,16 @@ func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error)
 	return message, nil
 }
 
+// uploadAndSend will send a Message with a new file to Telegram.
 func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error) {
-	params, err := config.Params()
+	params, err := config.params()
 	if err != nil {
 		return Message{}, err
 	}
 
-	file := config.GetFile()
+	file := config.getFile()
 
-	resp, err := bot.UploadFile(method, params, config.Name(), file)
+	resp, err := bot.UploadFile(method, params, config.name(), file)
 	if err != nil {
 		return Message{}, err
 	}
@@ -258,28 +277,29 @@ func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error
 	var message Message
 	json.Unmarshal(resp.Result, &message)
 
-	if bot.Debug {
-		log.Printf("%s resp: %+v\n", method, message)
-	}
+	bot.debugLog(method, nil, message)
 
 	return message, nil
 }
 
+// sendFile determines if the file is using an existing file or uploading
+// a new file, then sends it as needed.
 func (bot *BotAPI) sendFile(config Fileable) (Message, error) {
-	if config.UseExistingFile() {
-		return bot.sendExisting(config.Method(), config)
+	if config.useExistingFile() {
+		return bot.sendExisting(config.method(), config)
 	}
 
-	return bot.uploadAndSend(config.Method(), config)
+	return bot.uploadAndSend(config.method(), config)
 }
 
+// sendChattable sends a Chattable.
 func (bot *BotAPI) sendChattable(config Chattable) (Message, error) {
-	v, err := config.Values()
+	v, err := config.values()
 	if err != nil {
 		return Message{}, err
 	}
 
-	message, err := bot.makeMessageRequest(config.Method(), v)
+	message, err := bot.makeMessageRequest(config.method(), v)
 
 	if err != nil {
 		return Message{}, err
@@ -290,7 +310,7 @@ func (bot *BotAPI) sendChattable(config Chattable) (Message, error) {
 
 // GetUserProfilePhotos gets a user's profile photos.
 //
-// Requires UserID.
+// It requires UserID.
 // Offset and Limit are optional.
 func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error) {
 	v := url.Values{}
@@ -315,7 +335,7 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	return profilePhotos, nil
 }
 
-// GetFile returns a file_id required to download a file.
+// GetFile returns a File which can download a file from Telegram.
 //
 // Requires FileID.
 func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
@@ -339,8 +359,9 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // If a WebHook is set, this will not return any data!
 //
 // Offset, Limit, and Timeout are optional.
-// To not get old items, set Offset to one higher than the previous item.
-// Set Timeout to a large number to reduce requests and get responses instantly.
+// To avoid stale items, set Offset to one higher than the previous item.
+// Set Timeout to a large number to reduce requests so you can get updates
+// instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	v := url.Values{}
 	if config.Offset > 0 {
@@ -361,24 +382,22 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	var updates []Update
 	json.Unmarshal(resp.Result, &updates)
 
-	if bot.Debug {
-		log.Printf("getUpdates: %+v\n", updates)
-	}
+	bot.debugLog("getUpdates", v, updates)
 
 	return updates, nil
 }
 
-// RemoveWebhook removes webhook
-//
-// There are no parameters for this method.
+// RemoveWebhook unsets the webhook.
 func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 	return bot.MakeRequest("setWebhook", url.Values{})
 }
 
 // SetWebhook sets a webhook.
+//
 // If this is set, GetUpdates will not get any data!
 //
-// Requires URL OR to set Clear to true.
+// If you do not have a legitmate TLS certificate, you need to include
+// your self signed certificate with the config.
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	if config.Certificate == nil {
 		v := url.Values{}
@@ -406,8 +425,6 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 }
 
 // GetUpdatesChan starts and returns a channel for getting updates.
-//
-// Requires UpdateConfig
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 	updatesChan := make(chan Update, 100)
 
@@ -453,6 +470,8 @@ func (bot *BotAPI) ListenForWebhook(pattern string) (<-chan Update, http.Handler
 }
 
 // AnswerInlineQuery sends a response to an inline query.
+//
+// Note that you must respond to an inline query within 30 seconds.
 func (bot *BotAPI) AnswerInlineQuery(config InlineConfig) (APIResponse, error) {
 	v := url.Values{}
 

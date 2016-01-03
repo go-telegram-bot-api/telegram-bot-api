@@ -4,17 +4,22 @@
 [![Travis](https://travis-ci.org/Syfaro/telegram-bot-api.svg)](https://travis-ci.org/Syfaro/telegram-bot-api)
 
 All methods have been added, and all features should be available.
-If you want a feature that hasn't been added yet or something is broken, open an issue and I'll see what I can do.
+If you want a feature that hasn't been added yet or something is broken,
+open an issue and I'll see what I can do.
 
-All methods are fairly self explanatory, and reading the godoc page should explain everything. If something isn't clear, open an issue or submit a pull request.
+All methods are fairly self explanatory, and reading the godoc page should
+explain everything. If something isn't clear, open an issue or submit
+a pull request.
 
-The scope of this project is just to provide a wrapper around the API without any additional features. There are other projects for creating something with plugins and command handlers without having to design all that yourself.
-
-Note to previous users, there was just a large change that broke some methods. The main changes are that all the `Send*` functions have been replaced with a single `Send`, and `UpdatesChan` was renamed `GetUpdatesChan` and returns `(chan, err)` instead of storing the chan in `Updates`.
+The scope of this project is just to provide a wrapper around the API
+without any additional features. There are other projects for creating
+something with plugins and command handlers without having to design
+all that yourself.
 
 ## Example
 
-This is a very simple bot that just displays any gotten updates, then replies it to that chat.
+This is a very simple bot that just displays any gotten updates,
+then replies it to that chat.
 
 ```go
 package main
@@ -50,7 +55,8 @@ func main() {
 }
 ```
 
-If you need to use webhooks for some reason (such as running on Google App Engine), you may use a slightly different method.
+If you need to use webhooks (if you wish to run on Google App Engine),
+you may use a slightly different method.
 
 ```go
 package main
@@ -85,8 +91,12 @@ func main() {
 }
 ```
 
-If you need, you may generate a self signed certficate, as this requires HTTPS / TLS. The above example tells Telegram that this is your certificate and that it should be trusted, even though it is not properly signed.
+If you need, you may generate a self signed certficate, as this requires
+HTTPS / TLS. The above example tells Telegram that this is your
+certificate and that it should be trusted, even though it is not
+properly signed.
 
     openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
 
-Now that [Let's Encrypt](https://letsencrypt.org) has entered public beta, you may wish to generate your free TLS certificate there.
+Now that [Let's Encrypt](https://letsencrypt.org) has entered public beta,
+you may wish to generate your free TLS certificate there.
