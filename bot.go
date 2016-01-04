@@ -64,7 +64,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusForbidden {
-		return APIResponse{}, errors.New(APIForbidden)
+		return APIResponse{}, errors.New(ErrAPIForbidden)
 	}
 
 	bytes, err := ioutil.ReadAll(resp.Body)
