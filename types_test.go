@@ -58,7 +58,7 @@ func TestIsCommandWithEmptyText(t *testing.T) {
 func TestCommandWithCommand(t *testing.T) {
 	message := tgbotapi.Message{Text: "/command"}
 
-	if message.Command() != "/command" {
+	if message.Command() != "command" {
 		t.Fail()
 	}
 }
@@ -75,6 +75,14 @@ func TestCommandWithNonCommand(t *testing.T) {
 	message := tgbotapi.Message{Text: "test text"}
 
 	if message.Command() != "" {
+		t.Fail()
+	}
+}
+
+func TestCommandWithBotName(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command@testbot"}
+
+	if message.Command() != "command" {
 		t.Fail()
 	}
 }

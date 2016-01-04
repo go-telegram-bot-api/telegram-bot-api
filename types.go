@@ -129,12 +129,20 @@ func (m *Message) IsCommand() bool {
 
 // Command checks if the message was a command and if it was, returns the
 // command. If the Message was not a command, it returns an empty string.
+//
+// If the command contains the at bot syntax, it removes the bot name.
 func (m *Message) Command() string {
 	if !m.IsCommand() {
 		return ""
 	}
 
-	return strings.SplitN(m.Text, " ", 2)[0]
+	command := strings.SplitN(m.Text, " ", 2)[0][1:]
+
+	if i := strings.Index(command, "@"); i != -1 {
+		command = command[:i]
+	}
+
+	return command
 }
 
 // CommandArguments checks if the message was a command and if it was,
