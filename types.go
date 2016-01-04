@@ -123,15 +123,6 @@ func (m *Message) Time() time.Time {
 	return time.Unix(int64(m.Date), 0)
 }
 
-// IsGroup returns if the message was sent to a group.
-//
-// Deprecated in favor of Chat.IsGroup.
-func (m *Message) IsGroup() bool {
-	log.Println("Message.IsGroup is deprecated.")
-	log.Println("Please use Chat.IsGroup instead.")
-	return m.Chat.IsGroup()
-}
-
 // IsCommand returns true if message starts with '/'.
 func (m *Message) IsCommand() bool {
 	return m.Text != "" && m.Text[0] == '/'
