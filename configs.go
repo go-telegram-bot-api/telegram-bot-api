@@ -39,6 +39,12 @@ const (
 	ModeMarkdown = "Markdown"
 )
 
+// Library errors
+const (
+	// ErrBadFileType happens when you pass an unknown type
+	ErrBadFileType = "bad file type"
+)
+
 // Chattable is any config type that can be sent.
 type Chattable interface {
 	values() (url.Values, error)
