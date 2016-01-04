@@ -30,8 +30,8 @@ const (
 
 // API errors
 const (
-	// APIForbidden happens when a token is bad
-	APIForbidden = "forbidden"
+	// ErrAPIForbidden happens when a token is bad
+	ErrAPIForbidden = "forbidden"
 )
 
 // Constant values for ParseMode in MessageConfig
