@@ -1,7 +1,7 @@
 # Golang bindings for the Telegram Bot API
 
-[![GoDoc](https://godoc.org/github.com/Syfaro/telegram-bot-api?status.svg)](http://godoc.org/github.com/Syfaro/telegram-bot-api)
-[![Travis](https://travis-ci.org/Syfaro/telegram-bot-api.svg)](https://travis-ci.org/Syfaro/telegram-bot-api)
+[![GoDoc](https://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api?status.svg)](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api)
+[![Travis](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api.svg)](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api)
 
 All methods have been added, and all features should be available.
 If you want a feature that hasn't been added yet or something is broken,
@@ -16,6 +16,9 @@ without any additional features. There are other projects for creating
 something with plugins and command handlers without having to design
 all that yourself.
 
+Use github.com/go-telegram-bot-api/telegram-bot-api for the latest build,
+or use gopkg.in/telegram-bot-api.v1 for the current version.
+
 ## Example
 
 This is a very simple bot that just displays any gotten updates,
@@ -26,7 +29,7 @@ package main
 
 import (
 	"log"
-	"github.com/Syfaro/telegram-bot-api"
+	"gopkg.in/telegram-bot-api.v1"
 )
 
 func main() {
@@ -62,7 +65,7 @@ you may use a slightly different method.
 package main
 
 import (
-	"github.com/Syfaro/telegram-bot-api"
+	"gopkg.in/telegram-bot-api.v1"
 	"log"
 	"net/http"
 )
