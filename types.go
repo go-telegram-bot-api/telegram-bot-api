@@ -19,9 +19,10 @@ type APIResponse struct {
 
 // Update is an update response, from GetUpdates.
 type Update struct {
-	UpdateID    int         `json:"update_id"`
-	Message     Message     `json:"message"`
-	InlineQuery InlineQuery `json:"inline_query"`
+	UpdateID           int                `json:"update_id"`
+	Message            Message            `json:"message"`
+	InlineQuery        InlineQuery        `json:"inline_query"`
+	ChosenInlineResult ChosenInlineResult `json:"chosen_inline_result"`
 }
 
 // User is a user on Telegram.
@@ -360,4 +361,11 @@ type InlineQueryResultVideo struct {
 	ThumbURL              string `json:"thumb_url"`
 	Title                 string `json:"title"`
 	Description           string `json:"description"`
+}
+
+// ChosenInlineResult is an inline query result chosen by a User
+type ChosenInlineResult struct {
+	ResultID string `json:"result_id"`
+	From     User   `json:"from"`
+	Query    string `json:"query"`
 }
