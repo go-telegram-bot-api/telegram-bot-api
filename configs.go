@@ -3,7 +3,6 @@ package tgbotapi
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/url"
 	"strconv"
 )
@@ -91,7 +90,6 @@ func (chat *BaseChat) values() (url.Values, error) {
 // BaseFile is a base type for all file config types.
 type BaseFile struct {
 	BaseChat
-	FilePath    string
 	File        interface{}
 	FileID      string
 	UseExisting bool
@@ -135,16 +133,7 @@ func (file BaseFile) params() (map[string]string, error) {
 
 // getFile returns the file.
 func (file BaseFile) getFile() interface{} {
-	var result interface{}
-	if file.FilePath == "" {
-		result = file.File
-	} else {
-		log.Println("FilePath is deprecated.")
-		log.Println("Please use BaseFile.File instead.")
-		result = file.FilePath
-	}
-
-	return result
+	return file.File
 }
 
 // useExistingFile returns if the BaseFile has already been uploaded.
