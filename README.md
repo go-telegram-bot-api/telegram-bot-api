@@ -16,8 +16,8 @@ without any additional features. There are other projects for creating
 something with plugins and command handlers without having to design
 all that yourself.
 
-Use github.com/go-telegram-bot-api/telegram-bot-api for the latest build,
-or use gopkg.in/telegram-bot-api.v1 for the current version.
+Use `github.com/go-telegram-bot-api/telegram-bot-api` for the latest
+version, or use `gopkg.in/telegram-bot-api.v1` for the stable build.
 
 ## Example
 
