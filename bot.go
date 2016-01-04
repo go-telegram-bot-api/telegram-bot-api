@@ -146,7 +146,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 		ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
 	default:
-		return APIResponse{}, errors.New("bad file type")
+		return APIResponse{}, errors.New(ErrBadFileType)
 	}
 
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
