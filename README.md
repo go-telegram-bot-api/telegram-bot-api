@@ -85,7 +85,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	updates, _ := bot.ListenForWebhook("/" + bot.Token)
+	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
 	for update := range updates {
