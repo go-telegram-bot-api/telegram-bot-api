@@ -452,10 +452,10 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 }
 
 // ListenForWebhook registers a http handler for a webhook.
-func (bot *BotAPI) ListenForWebhook(pattern string) (<-chan Update, http.Handler) {
+func (bot *BotAPI) ListenForWebhook(pattern string) <-chan Update {
 	updatesChan := make(chan Update, 100)
 
-	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
 
 		var update Update
@@ -464,9 +464,7 @@ func (bot *BotAPI) ListenForWebhook(pattern string) (<-chan Update, http.Handler
 		updatesChan <- update
 	})
 
-	http.HandleFunc(pattern, handler)
-
-	return updatesChan, handler
+	return updatesChan
 }
 
 // AnswerInlineQuery sends a response to an inline query.
