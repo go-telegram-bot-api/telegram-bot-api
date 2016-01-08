@@ -34,6 +34,8 @@ func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
+//
+// Note that you must send animated GIFs as a document.
 func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
