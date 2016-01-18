@@ -483,5 +483,7 @@ func (bot *BotAPI) AnswerInlineQuery(config InlineConfig) (APIResponse, error) {
 	}
 	v.Add("results", string(data))
 
+	bot.debugLog("answerInlineQuery", v, nil)
+
 	return bot.MakeRequest("answerInlineQuery", v)
 }
