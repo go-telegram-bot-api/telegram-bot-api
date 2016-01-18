@@ -281,18 +281,13 @@ type InlineQuery struct {
 	Offset string `json:"offset"`
 }
 
-// InlineQueryResult is the base type that all InlineQuery Results have.
-type InlineQueryResult struct {
-	Type string `json:"type"` // required
-	ID   string `json:"id"`   // required
-}
-
 // InlineQueryResultArticle is an inline query response article.
 type InlineQueryResultArticle struct {
-	InlineQueryResult
+	Type                  string `json:"type"`         // required
+	ID                    string `json:"id"`           // required
 	Title                 string `json:"title"`        // required
 	MessageText           string `json:"message_text"` // required
-	ParseMode             string `json:"parse_mode"`   // required
+	ParseMode             string `json:"parse_mode"`
 	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
 	URL                   string `json:"url"`
 	HideURL               bool   `json:"hide_url"`
@@ -304,7 +299,8 @@ type InlineQueryResultArticle struct {
 
 // InlineQueryResultPhoto is an inline query response photo.
 type InlineQueryResultPhoto struct {
-	InlineQueryResult
+	Type                  string `json:"type"`      // required
+	ID                    string `json:"id"`        // required
 	URL                   string `json:"photo_url"` // required
 	MimeType              string `json:"mime_type"`
 	Width                 int    `json:"photo_width"`
@@ -320,7 +316,8 @@ type InlineQueryResultPhoto struct {
 
 // InlineQueryResultGIF is an inline query response GIF.
 type InlineQueryResultGIF struct {
-	InlineQueryResult
+	Type                  string `json:"type"`    // required
+	ID                    string `json:"id"`      // required
 	URL                   string `json:"gif_url"` // required
 	Width                 int    `json:"gif_width"`
 	Height                int    `json:"gif_height"`
@@ -334,7 +331,8 @@ type InlineQueryResultGIF struct {
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
 type InlineQueryResultMPEG4GIF struct {
-	InlineQueryResult
+	Type                  string `json:"type"`      // required
+	ID                    string `json:"id"`        // required
 	URL                   string `json:"mpeg4_url"` // required
 	Width                 int    `json:"mpeg4_width"`
 	Height                int    `json:"mpeg4_height"`
@@ -348,7 +346,8 @@ type InlineQueryResultMPEG4GIF struct {
 
 // InlineQueryResultVideo is an inline query response video.
 type InlineQueryResultVideo struct {
-	InlineQueryResult
+	Type                  string `json:"type"`         // required
+	ID                    string `json:"id"`           // required
 	URL                   string `json:"video_url"`    // required
 	MimeType              string `json:"mime_type"`    // required
 	MessageText           string `json:"message_text"` // required
