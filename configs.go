@@ -37,6 +37,7 @@ const (
 // Constant values for ParseMode in MessageConfig
 const (
 	ModeMarkdown = "Markdown"
+	ModeHTML     = "HTML"
 )
 
 // Library errors
