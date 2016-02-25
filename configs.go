@@ -63,10 +63,11 @@ type Fileable interface {
 
 // BaseChat is base type for all chat config types.
 type BaseChat struct {
-	ChatID           int // required
-	ChannelUsername  string
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	ChatID              int // required
+	ChannelUsername     string
+	ReplyToMessageID    int
+	ReplyMarkup         interface{}
+	DisableNotification bool
 }
 
 // values returns url.Values representation of BaseChat
@@ -90,6 +91,8 @@ func (chat *BaseChat) values() (url.Values, error) {
 
 		v.Add("reply_markup", string(data))
 	}
+
+	v.Add("disable_notification", strconv.FormatBool(chat.DisableNotification))
 
 	return v, nil
 }
@@ -134,6 +137,8 @@ func (file BaseFile) params() (map[string]string, error) {
 	if file.FileSize > 0 {
 		params["file_size"] = strconv.Itoa(file.FileSize)
 	}
+
+	params["disable_notification"] = strconv.FormatBool(file.DisableNotification)
 
 	return params, nil
 }
