@@ -294,7 +294,7 @@ type InlineQueryResultArticle struct {
 	InlineQueryResult
 	Title                 string `json:"title"`        // required
 	MessageText           string `json:"message_text"` // required
-	ParseMode             string `json:"parse_mode"`   // required
+	ParseMode             string `json:"parse_mode"`
 	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
 	URL                   string `json:"url"`
 	HideURL               bool   `json:"hide_url"`
