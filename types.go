@@ -276,7 +276,7 @@ type ForceReply struct {
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {
 	ID     string `json:"id"`
-	From   User   `json:"user"`
+	From   User   `json:"from"`
 	Query  string `json:"query"`
 	Offset string `json:"offset"`
 }
