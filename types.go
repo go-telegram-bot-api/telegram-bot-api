@@ -232,7 +232,7 @@ type Location struct {
 	Latitude  float32 `json:"latitude"`
 }
 
-// UserProfilePhotos contains information a set of user profile photos.
+// UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
 	TotalCount int         `json:"total_count"`
 	Photos     []PhotoSize `json:"photos"`
