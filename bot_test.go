@@ -436,3 +436,37 @@ func ExampleNewWebhook() {
 		log.Printf("%+v\n", update)
 	}
 }
+
+func ExampleAnswerInlineQuery() {
+	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken") // create new bot
+	if err != nil {
+		log.Panic(err)
+	}
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
+
+	updates, err := bot.GetUpdatesChan(u)
+
+	for update := range updates {
+		if update.InlineQuery.Query == "" { // if no inline query, ignore it
+			continue
+		}
+
+		article := tgbotapi.NewInlineQueryResultArticle(update.InlineQuery.ID, "Echo", update.InlineQuery.Query)
+		article.Description = update.InlineQuery.Query
+
+		inlineConf := tgbotapi.InlineConfig{
+			InlineQueryID: update.InlineQuery.ID,
+			IsPersonal:    true,
+			CacheTime:     0,
+			Results:       []interface{}{article},
+		}
+
+		if _, err := bot.AnswerInlineQuery(inlineConf); err != nil {
+			log.Println(err)
+		}
+	}
+}
