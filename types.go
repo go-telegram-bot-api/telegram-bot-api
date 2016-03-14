@@ -167,8 +167,13 @@ func (m *Message) Command() string {
 	if !m.IsCommand() {
 		return ""
 	}
+	command := strings.SplitN(m.Text, " ", 2)[0]
 
-	return strings.SplitN(m.Text, " ", 2)[0]
+	if i := strings.Index(command, "@"); i != -1 {
+		command = command[:i]
+	}
+
+	return command
 }
 
 // CommandArguments checks if the message was a command and if it was,
