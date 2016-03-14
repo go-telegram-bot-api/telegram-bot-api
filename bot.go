@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/technoweenie/multipartstreamer"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,14 +15,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/technoweenie/multipartstreamer"
 )
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
-	Token  string       `json:"token"`
-	Debug  bool         `json:"debug"`
-	Self   User         `json:"-"`
-	Client *http.Client `json:"-"`
+	Token           string       `json:"token"`
+	Debug           bool         `json:"debug"`
+	Self            User         `json:"-"`
+	Client          *http.Client `json:"-"`
+	CommandHandlers map[string]MessageHandlerFunc
+	TextHandler     MessageHandlerFunc
+	InlineHandler   InlineHandlerFunc
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -39,8 +43,9 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:  token,
-		Client: client,
+		Token:           token,
+		Client:          client,
+		CommandHandlers: map[string]MessageHandlerFunc{},
 	}
 
 	self, err := bot.GetMe()
@@ -51,6 +56,55 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot.Self = self
 
 	return bot, nil
+}
+
+// ProcessUpdate calls corresponding handler for update
+func (bot *BotAPI) ProcessUpdate(update Update) {
+	if !update.IsInlineQuery() {
+		msg := update.Message
+		if msg.IsCommand() {
+			cmd := msg.Command()
+			if f, ok := bot.CommandHandlers[cmd]; ok {
+				f.Serve(bot, msg)
+			} else {
+				log.Fatal("No handler defined for: " + cmd)
+			}
+		} else {
+			if f := bot.TextHandler; f != nil {
+				f.Serve(bot, msg)
+			} else {
+				log.Fatal("No Text Handler defined")
+			}
+		}
+	} else {
+		query := update.InlineQuery
+		if f := bot.InlineHandler; f != nil {
+			f.Serve(bot, query)
+		} else {
+			log.Fatal("No Inline Query Handler defined")
+		}
+	}
+}
+
+// AddCommandHandler adds a MessageHandlerFunc for commands
+//
+//
+func (bot *BotAPI) AddCommandHandler(cmd string, f MessageHandlerFunc) {
+	bot.CommandHandlers[cmd] = f
+}
+
+// AddTextHandler adds a MessageHandlerFunc for non-commands
+//
+//
+func (bot *BotAPI) AddTextHandler(f MessageHandlerFunc) {
+	bot.TextHandler = f
+}
+
+// AddInlineHandler adds a InlineHandlerFunc for inline querys
+//
+//
+func (bot *BotAPI) AddInlineHandler(f InlineHandlerFunc) {
+	bot.InlineHandler = f
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.

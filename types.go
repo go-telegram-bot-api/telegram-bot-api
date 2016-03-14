@@ -25,6 +25,14 @@ type Update struct {
 	ChosenInlineResult ChosenInlineResult `json:"chosen_inline_result"`
 }
 
+// Checks if Update is InlineQuery
+func (u Update) IsInlineQuery() bool {
+	if u.InlineQuery.ID != "" {
+		return true
+	}
+	return false
+}
+
 // User is a user on Telegram.
 type User struct {
 	ID        int    `json:"id"`
@@ -368,4 +376,20 @@ type ChosenInlineResult struct {
 	ResultID string `json:"result_id"`
 	From     User   `json:"from"`
 	Query    string `json:"query"`
+}
+
+// MessageHandlerFunc for handling Messages
+// Something similar in line to http.HandlerFunc
+type MessageHandlerFunc func(*BotAPI, Message)
+
+func (f MessageHandlerFunc) Serve(bot *BotAPI, msg Message) {
+	f(bot, msg)
+}
+
+// InlineHandlerFunc for handling Inline Query
+// Something similar in line to http.HandlerFunc
+type InlineHandlerFunc func(*BotAPI, InlineQuery)
+
+func (f InlineHandlerFunc) Serve(bot *BotAPI, q InlineQuery) {
+	f(bot, q)
 }
