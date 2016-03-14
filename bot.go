@@ -21,13 +21,14 @@ import (
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
-	Token           string       `json:"token"`
-	Debug           bool         `json:"debug"`
-	Self            User         `json:"-"`
-	Client          *http.Client `json:"-"`
-	CommandHandlers map[string]MessageHandlerFunc
-	TextHandler     MessageHandlerFunc
-	InlineHandler   InlineHandlerFunc
+	Token               string       `json:"token"`
+	Debug               bool         `json:"debug"`
+	Self                User         `json:"-"`
+	Client              *http.Client `json:"-"`
+	CommandHandlers     map[string]MessageHandlerFunc
+	TextHandler         MessageHandlerFunc
+	InlineHandler       InlineHandlerFunc
+	InlineResultHandler InlineResultHandlerFunc
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -60,7 +61,7 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 
 // ProcessUpdate calls corresponding handler for update
 func (bot *BotAPI) ProcessUpdate(update Update) {
-	if !update.IsInlineQuery() {
+	if update.IsMessage() {
 		msg := update.Message
 		if msg.IsCommand() {
 			cmd := msg.Command()
@@ -76,13 +77,22 @@ func (bot *BotAPI) ProcessUpdate(update Update) {
 				log.Fatal("No Text Handler defined")
 			}
 		}
-	} else {
+	} else if update.IsInlineQuery() {
 		query := update.InlineQuery
 		if f := bot.InlineHandler; f != nil {
 			f.Serve(bot, query)
 		} else {
 			log.Fatal("No Inline Query Handler defined")
 		}
+	} else if update.IsChosenInlineResult() {
+		rt := update.ChosenInlineResult
+		if f := bot.InlineResultHandler; f != nil {
+			f.Serve(bot, rt)
+		} else {
+			log.Fatal("No Inline Result  Handler defined")
+		}
+	} else {
+		log.Printf("Invalid Update")
 	}
 }
 
@@ -105,6 +115,13 @@ func (bot *BotAPI) AddTextHandler(f MessageHandlerFunc) {
 //
 func (bot *BotAPI) AddInlineHandler(f InlineHandlerFunc) {
 	bot.InlineHandler = f
+}
+
+// AddInlineResultHandler adds a InlineResultHandlerFunc for chosen inline result
+//
+//
+func (bot *BotAPI) AddInlineResultHandler(f InlineResultHandlerFunc) {
+	bot.InlineResultHandler = f
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
