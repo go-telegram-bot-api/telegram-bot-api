@@ -3,7 +3,6 @@ package tgbotapi
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/url"
 	"strconv"
 )
@@ -31,13 +30,20 @@ const (
 
 // API errors
 const (
-	// APIForbidden happens when a token is bad
-	APIForbidden = "forbidden"
+	// ErrAPIForbidden happens when a token is bad
+	ErrAPIForbidden = "forbidden"
 )
 
 // Constant values for ParseMode in MessageConfig
 const (
 	ModeMarkdown = "Markdown"
+	ModeHTML     = "HTML"
+)
+
+// Library errors
+const (
+	// ErrBadFileType happens when you pass an unknown type
+	ErrBadFileType = "bad file type"
 )
 
 // Chattable is any config type that can be sent.
@@ -57,10 +63,11 @@ type Fileable interface {
 
 // BaseChat is base type for all chat config types.
 type BaseChat struct {
-	ChatID           int // required
-	ChannelUsername  string
-	ReplyToMessageID int
-	ReplyMarkup      interface{}
+	ChatID              int // required
+	ChannelUsername     string
+	ReplyToMessageID    int
+	ReplyMarkup         interface{}
+	DisableNotification bool
 }
 
 // values returns url.Values representation of BaseChat
@@ -85,13 +92,14 @@ func (chat *BaseChat) values() (url.Values, error) {
 		v.Add("reply_markup", string(data))
 	}
 
+	v.Add("disable_notification", strconv.FormatBool(chat.DisableNotification))
+
 	return v, nil
 }
 
 // BaseFile is a base type for all file config types.
 type BaseFile struct {
 	BaseChat
-	FilePath    string
 	File        interface{}
 	FileID      string
 	UseExisting bool
@@ -130,21 +138,14 @@ func (file BaseFile) params() (map[string]string, error) {
 		params["file_size"] = strconv.Itoa(file.FileSize)
 	}
 
+	params["disable_notification"] = strconv.FormatBool(file.DisableNotification)
+
 	return params, nil
 }
 
 // getFile returns the file.
 func (file BaseFile) getFile() interface{} {
-	var result interface{}
-	if file.FilePath == "" {
-		result = file.File
-	} else {
-		log.Println("FilePath is deprecated.")
-		log.Println("Please use BaseFile.File instead.")
-		result = file.FilePath
-	}
-
-	return result
+	return file.File
 }
 
 // useExistingFile returns if the BaseFile has already been uploaded.
@@ -515,9 +516,9 @@ type FileReader struct {
 
 // InlineConfig contains information on making an InlineQuery response.
 type InlineConfig struct {
-	InlineQueryID string              `json:"inline_query_id"`
-	Results       []InlineQueryResult `json:"results"`
-	CacheTime     int                 `json:"cache_time"`
-	IsPersonal    bool                `json:"is_personal"`
-	NextOffset    string              `json:"next_offset"`
+	InlineQueryID string        `json:"inline_query_id"`
+	Results       []interface{} `json:"results"`
+	CacheTime     int           `json:"cache_time"`
+	IsPersonal    bool          `json:"is_personal"`
+	NextOffset    string        `json:"next_offset"`
 }

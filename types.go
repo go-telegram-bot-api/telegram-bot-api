@@ -3,7 +3,6 @@ package tgbotapi
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 )
@@ -147,15 +146,6 @@ func (m *Message) Time() time.Time {
 	return time.Unix(int64(m.Date), 0)
 }
 
-// IsGroup returns if the message was sent to a group.
-//
-// Deprecated in favor of Chat.IsGroup.
-func (m *Message) IsGroup() bool {
-	log.Println("Message.IsGroup is deprecated.")
-	log.Println("Please use Chat.IsGroup instead.")
-	return m.Chat.IsGroup()
-}
-
 // IsCommand returns true if message starts with '/'.
 func (m *Message) IsCommand() bool {
 	return m.Text != "" && m.Text[0] == '/'
@@ -163,11 +153,13 @@ func (m *Message) IsCommand() bool {
 
 // Command checks if the message was a command and if it was, returns the
 // command. If the Message was not a command, it returns an empty string.
+//
+// If the command contains the at bot syntax, it removes the bot name.
 func (m *Message) Command() string {
 	if !m.IsCommand() {
 		return ""
 	}
-	command := strings.SplitN(m.Text, " ", 2)[0]
+	command := strings.SplitN(m.Text, " ", 2)[0][1:]
 
 	if i := strings.Index(command, "@"); i != -1 {
 		command = command[:i]
@@ -263,7 +255,7 @@ type Location struct {
 	Latitude  float32 `json:"latitude"`
 }
 
-// UserProfilePhotos contains information a set of user profile photos.
+// UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
 	TotalCount int         `json:"total_count"`
 	Photos     []PhotoSize `json:"photos"`
@@ -307,20 +299,15 @@ type ForceReply struct {
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {
 	ID     string `json:"id"`
-	From   User   `json:"user"`
+	From   User   `json:"from"`
 	Query  string `json:"query"`
 	Offset string `json:"offset"`
 }
 
-// InlineQueryResult is the base type that all InlineQuery Results have.
-type InlineQueryResult struct {
-	Type string `json:"type"` // required
-	ID   string `json:"id"`   // required
-}
-
 // InlineQueryResultArticle is an inline query response article.
 type InlineQueryResultArticle struct {
-	InlineQueryResult
+	Type                  string `json:"type"`         // required
+	ID                    string `json:"id"`           // required
 	Title                 string `json:"title"`        // required
 	MessageText           string `json:"message_text"` // required
 	ParseMode             string `json:"parse_mode"`
@@ -335,7 +322,8 @@ type InlineQueryResultArticle struct {
 
 // InlineQueryResultPhoto is an inline query response photo.
 type InlineQueryResultPhoto struct {
-	InlineQueryResult
+	Type                  string `json:"type"`      // required
+	ID                    string `json:"id"`        // required
 	URL                   string `json:"photo_url"` // required
 	MimeType              string `json:"mime_type"`
 	Width                 int    `json:"photo_width"`
@@ -351,7 +339,8 @@ type InlineQueryResultPhoto struct {
 
 // InlineQueryResultGIF is an inline query response GIF.
 type InlineQueryResultGIF struct {
-	InlineQueryResult
+	Type                  string `json:"type"`    // required
+	ID                    string `json:"id"`      // required
 	URL                   string `json:"gif_url"` // required
 	Width                 int    `json:"gif_width"`
 	Height                int    `json:"gif_height"`
@@ -365,7 +354,8 @@ type InlineQueryResultGIF struct {
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
 type InlineQueryResultMPEG4GIF struct {
-	InlineQueryResult
+	Type                  string `json:"type"`      // required
+	ID                    string `json:"id"`        // required
 	URL                   string `json:"mpeg4_url"` // required
 	Width                 int    `json:"mpeg4_width"`
 	Height                int    `json:"mpeg4_height"`
@@ -379,7 +369,8 @@ type InlineQueryResultMPEG4GIF struct {
 
 // InlineQueryResultVideo is an inline query response video.
 type InlineQueryResultVideo struct {
-	InlineQueryResult
+	Type                  string `json:"type"`         // required
+	ID                    string `json:"id"`           // required
 	URL                   string `json:"video_url"`    // required
 	MimeType              string `json:"mime_type"`    // required
 	MessageText           string `json:"message_text"` // required

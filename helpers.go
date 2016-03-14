@@ -281,3 +281,49 @@ func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
 		Certificate: file,
 	}
 }
+
+// NewInlineQueryResultArticle creates a new inline query article.
+func NewInlineQueryResultArticle(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:        "article",
+		ID:          id,
+		Title:       title,
+		MessageText: messageText,
+	}
+}
+
+// NewInlineQueryResultGIF creates a new inline query GIF.
+func NewInlineQueryResultGIF(id, url string) InlineQueryResultGIF {
+	return InlineQueryResultGIF{
+		Type: "gif",
+		ID:   id,
+		URL:  url,
+	}
+}
+
+// NewInlineQueryResultMPEG4GIF creates a new inline query MPEG4 GIF.
+func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
+	return InlineQueryResultMPEG4GIF{
+		Type: "mpeg4_gif",
+		ID:   id,
+		URL:  url,
+	}
+}
+
+// NewInlineQueryResultPhoto creates a new inline query photo.
+func NewInlineQueryResultPhoto(id, url string) InlineQueryResultPhoto {
+	return InlineQueryResultPhoto{
+		Type: "photo",
+		ID:   id,
+		URL:  url,
+	}
+}
+
+// NewInlineQueryResultVideo creates a new inline query video.
+func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
+	return InlineQueryResultVideo{
+		Type: "video",
+		ID:   id,
+		URL:  url,
+	}
+}
