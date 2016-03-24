@@ -57,7 +57,7 @@ type GroupChat struct {
 
 // Chat contains information about the place a message was sent.
 type Chat struct {
-	ID        int    `json:"id"`
+	ID        int64  `json:"id"`
 	Type      string `json:"type"`
 	Title     string `json:"title"`      // optional
 	UserName  string `json:"username"`   // optional
@@ -113,8 +113,8 @@ type Message struct {
 	GroupChatCreated      bool        `json:"group_chat_created"`      // optional
 	SuperGroupChatCreated bool        `json:"supergroup_chat_created"` // optional
 	ChannelChatCreated    bool        `json:"channel_chat_created"`    // optional
-	MigrateToChatID       int         `json:"migrate_to_chat_id"`      // optional
-	MigrateFromChatID     int         `json:"migrate_from_chat_id"`    // optional
+	MigrateToChatID       int64       `json:"migrate_to_chat_id"`      // optional
+	MigrateFromChatID     int64       `json:"migrate_from_chat_id"`    // optional
 }
 
 // Time converts the message timestamp into a Time.
