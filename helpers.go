@@ -7,7 +7,7 @@ import (
 // NewMessage creates a new Message.
 //
 // chatID is where to send it, text is the message text.
-func NewMessage(chatID int, text string) MessageConfig {
+func NewMessage(chatID int64, text string) MessageConfig {
 	return MessageConfig{
 		BaseChat: BaseChat{
 			ChatID:           chatID,
@@ -22,7 +22,7 @@ func NewMessage(chatID int, text string) MessageConfig {
 //
 // chatID is where to send it, fromChatID is the source chat,
 // and messageID is the ID of the original message.
-func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
+func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	return ForwardConfig{
 		BaseChat:   BaseChat{ChatID: chatID},
 		FromChatID: fromChatID,
@@ -36,7 +36,7 @@ func NewForward(chatID int, fromChatID int, messageID int) ForwardConfig {
 // FileReader, or FileBytes.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
+func NewPhotoUpload(chatID int64, file interface{}) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -51,7 +51,7 @@ func NewPhotoUpload(chatID int, file interface{}) PhotoConfig {
 //
 // chatID is where to send it, fileID is the ID of the file
 // already uploaded.
-func NewPhotoShare(chatID int, fileID string) PhotoConfig {
+func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -65,7 +65,7 @@ func NewPhotoShare(chatID int, fileID string) PhotoConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewAudioUpload(chatID int, file interface{}) AudioConfig {
+func NewAudioUpload(chatID int64, file interface{}) AudioConfig {
 	return AudioConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -81,7 +81,7 @@ func NewAudioUpload(chatID int, file interface{}) AudioConfig {
 //
 // chatID is where to send it, fileID is the ID of the audio
 // already uploaded.
-func NewAudioShare(chatID int, fileID string) AudioConfig {
+func NewAudioShare(chatID int64, fileID string) AudioConfig {
 	return AudioConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -95,7 +95,7 @@ func NewAudioShare(chatID int, fileID string) AudioConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
+func NewDocumentUpload(chatID int64, file interface{}) DocumentConfig {
 	return DocumentConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -111,7 +111,7 @@ func NewDocumentUpload(chatID int, file interface{}) DocumentConfig {
 //
 // chatID is where to send it, fileID is the ID of the document
 // already uploaded.
-func NewDocumentShare(chatID int, fileID string) DocumentConfig {
+func NewDocumentShare(chatID int64, fileID string) DocumentConfig {
 	return DocumentConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -125,7 +125,7 @@ func NewDocumentShare(chatID int, fileID string) DocumentConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewStickerUpload(chatID int, file interface{}) StickerConfig {
+func NewStickerUpload(chatID int64, file interface{}) StickerConfig {
 	return StickerConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -141,7 +141,7 @@ func NewStickerUpload(chatID int, file interface{}) StickerConfig {
 //
 // chatID is where to send it, fileID is the ID of the sticker
 // already uploaded.
-func NewStickerShare(chatID int, fileID string) StickerConfig {
+func NewStickerShare(chatID int64, fileID string) StickerConfig {
 	return StickerConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -155,7 +155,7 @@ func NewStickerShare(chatID int, fileID string) StickerConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewVideoUpload(chatID int, file interface{}) VideoConfig {
+func NewVideoUpload(chatID int64, file interface{}) VideoConfig {
 	return VideoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -170,7 +170,7 @@ func NewVideoUpload(chatID int, file interface{}) VideoConfig {
 //
 // chatID is where to send it, fileID is the ID of the video
 // already uploaded.
-func NewVideoShare(chatID int, fileID string) VideoConfig {
+func NewVideoShare(chatID int64, fileID string) VideoConfig {
 	return VideoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -184,7 +184,7 @@ func NewVideoShare(chatID int, fileID string) VideoConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
+func NewVoiceUpload(chatID int64, file interface{}) VoiceConfig {
 	return VoiceConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -199,7 +199,7 @@ func NewVoiceUpload(chatID int, file interface{}) VoiceConfig {
 //
 // chatID is where to send it, fileID is the ID of the video
 // already uploaded.
-func NewVoiceShare(chatID int, fileID string) VoiceConfig {
+func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
 	return VoiceConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
@@ -212,7 +212,7 @@ func NewVoiceShare(chatID int, fileID string) VoiceConfig {
 // NewLocation shares your location.
 //
 // chatID is where to send it, latitude and longitude are coordinates.
-func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig {
+func NewLocation(chatID int64, latitude float64, longitude float64) LocationConfig {
 	return LocationConfig{
 		BaseChat: BaseChat{
 			ChatID:           chatID,
@@ -228,7 +228,7 @@ func NewLocation(chatID int, latitude float64, longitude float64) LocationConfig
 // Actions last for 5 seconds, or until your next action.
 //
 // chatID is where to send it, action should be set via Chat constants.
-func NewChatAction(chatID int, action string) ChatActionConfig {
+func NewChatAction(chatID int64, action string) ChatActionConfig {
 	return ChatActionConfig{
 		BaseChat: BaseChat{ChatID: chatID},
 		Action:   action,

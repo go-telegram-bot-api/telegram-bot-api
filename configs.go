@@ -63,7 +63,7 @@ type Fileable interface {
 
 // BaseChat is base type for all chat config types.
 type BaseChat struct {
-	ChatID              int // required
+	ChatID              int64 // required
 	ChannelUsername     string
 	ReplyToMessageID    int
 	ReplyMarkup         interface{}
@@ -76,7 +76,7 @@ func (chat *BaseChat) values() (url.Values, error) {
 	if chat.ChannelUsername != "" {
 		v.Add("chat_id", chat.ChannelUsername)
 	} else {
-		v.Add("chat_id", strconv.Itoa(chat.ChatID))
+		v.Add("chat_id", strconv.FormatInt(chat.ChatID, 10))
 	}
 
 	if chat.ReplyToMessageID != 0 {
@@ -114,7 +114,7 @@ func (file BaseFile) params() (map[string]string, error) {
 	if file.ChannelUsername != "" {
 		params["chat_id"] = file.ChannelUsername
 	} else {
-		params["chat_id"] = strconv.Itoa(file.ChatID)
+		params["chat_id"] = strconv.FormatInt(file.ChatID, 10)
 	}
 
 	if file.ReplyToMessageID != 0 {
@@ -181,7 +181,7 @@ func (config MessageConfig) method() string {
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
 	BaseChat
-	FromChatID          int // required
+	FromChatID          int64 // required
 	FromChannelUsername string
 	MessageID           int // required
 }
@@ -189,7 +189,7 @@ type ForwardConfig struct {
 // values returns a url.Values representation of ForwardConfig.
 func (config ForwardConfig) values() (url.Values, error) {
 	v, _ := config.BaseChat.values()
-	v.Add("from_chat_id", strconv.Itoa(config.FromChatID))
+	v.Add("from_chat_id", strconv.FormatInt(config.FromChatID, 10))
 	v.Add("message_id", strconv.Itoa(config.MessageID))
 	return v, nil
 }
