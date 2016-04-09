@@ -234,8 +234,8 @@ type Location struct {
 
 // UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
-	TotalCount int         `json:"total_count"`
-	Photos     []PhotoSize `json:"photos"`
+	TotalCount int           `json:"total_count"`
+	Photos     [][]PhotoSize `json:"photos"`
 }
 
 // File contains information about a file to download from Telegram.
