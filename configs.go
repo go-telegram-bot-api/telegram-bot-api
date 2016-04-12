@@ -513,6 +513,28 @@ func (config VenueConfig) method() string {
 	return "sendVenue"
 }
 
+// ContactConfig allows you to send a contact.
+type ContactConfig struct {
+	BaseChat
+	PhoneNumber string
+	FirstName   string
+	LastName    string
+}
+
+func (config ContactConfig) values() (url.Values, error) {
+	v, _ := config.BaseChat.values()
+
+	v.Add("phone_number", config.PhoneNumber)
+	v.Add("first_name", config.FirstName)
+	v.Add("last_name", config.LastName)
+
+	return v, nil
+}
+
+func (config ContactConfig) method() string {
+	return "sendContact"
+}
+
 // ChatActionConfig contains information about a SendChatAction request.
 type ChatActionConfig struct {
 	BaseChat
