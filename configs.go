@@ -560,6 +560,8 @@ type CallbackConfig struct {
 	ShowAlert       bool   `json:"show_alert"`
 }
 
+// ChatMemberConfig contains information about a user in a chat for use
+// with administrative functions such as kicking or unbanning a user.
 type ChatMemberConfig struct {
 	ChatID             int64
 	SuperGroupUsername string

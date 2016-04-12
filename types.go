@@ -425,17 +425,23 @@ type ChosenInlineResult struct {
 	Query    string `json:"query"`
 }
 
+// InputTextMessageContent contains text for displaying
+// as an inline query result.
 type InputTextMessageContent struct {
 	Text                  string `json:"message_text"`
 	ParseMode             string `json:"parse_mode"`
 	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
 }
 
+// InputLocationMessageContent contains a location for displaying
+// as an inline query result.
 type InputLocationMessageContent struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
+// InputVenueMessageContent contains a venue for displaying
+// as an inline query result.
 type InputVenueMessageContent struct {
 	Latitude     float64 `json:"latitude"`
 	Longitude    float64 `json:"longitude"`
@@ -444,6 +450,8 @@ type InputVenueMessageContent struct {
 	FoursquareID string  `json:"foursquare_id"`
 }
 
+// InputContactMessageContent contains a contact for displaying
+// as an inline query result.
 type InputContactMessageContent struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
