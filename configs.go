@@ -153,6 +153,37 @@ func (file BaseFile) useExistingFile() bool {
 	return file.UseExisting
 }
 
+// BaseEdit is base type of all chat edits.
+type BaseEdit struct {
+	ChatID          int64
+	ChannelUsername string
+	MessageID       int
+	InlineMessageID string
+	ReplyMarkup     *InlineKeyboardMarkup
+}
+
+func (edit BaseEdit) values() (url.Values, error) {
+	v := url.Values{}
+
+	if edit.ChannelUsername != "" {
+		v.Add("chat_id", edit.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(edit.ChatID, 10))
+	}
+	v.Add("message_id", strconv.Itoa(edit.MessageID))
+	v.Add("inline_message_id", edit.InlineMessageID)
+
+	if edit.ReplyMarkup != nil {
+		data, err := json.Marshal(edit.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
+
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
 	BaseChat
@@ -498,6 +529,63 @@ func (config ChatActionConfig) values() (url.Values, error) {
 // method returns Telegram API method name for sending ChatAction.
 func (config ChatActionConfig) method() string {
 	return "sendChatAction"
+}
+
+// EditMessageTextConfig allows you to modify the text in a message.
+type EditMessageTextConfig struct {
+	BaseEdit
+	Text                  string
+	ParseMode             string
+	DisableWebPagePreview bool
+	ReplyMarkup           InlineKeyboardMarkup
+}
+
+func (config EditMessageTextConfig) values() (url.Values, error) {
+	v, _ := config.BaseEdit.values()
+
+	v.Add("text", config.Text)
+	v.Add("parse_mode", config.ParseMode)
+	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
+
+	return v, nil
+}
+
+func (config EditMessageTextConfig) method() string {
+	return "editMessageText"
+}
+
+// EditMessageCaptionConfig allows you to modify the caption of a message.
+type EditMessageCaptionConfig struct {
+	BaseEdit
+	Caption     string
+	ReplyMarkup InlineKeyboardMarkup
+}
+
+func (config EditMessageCaptionConfig) values() (url.Values, error) {
+	v, _ := config.BaseEdit.values()
+
+	v.Add("caption", config.Caption)
+
+	return v, nil
+}
+
+func (config EditMessageCaptionConfig) method() string {
+	return "editMessageCaption"
+}
+
+// EditMessageReplyMarkup allows you to modify the reply markup
+// of a message.
+type EditMessageReplyMarkup struct {
+	BaseEdit
+	ReplyMarkup InlineKeyboardMarkup
+}
+
+func (config EditMessageReplyMarkup) values() (url.Values, error) {
+	return config.BaseEdit.values()
+}
+
+func (config EditMessageReplyMarkup) method() string {
+	return "editMessageReplyMarkup"
 }
 
 // UserProfilePhotosConfig contains information about a

@@ -340,6 +340,28 @@ func TestSendChatConfig(t *testing.T) {
 	}
 }
 
+func TestSendEditMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg, err := bot.Send(tgbotapi.NewMessage(ChatID, "Testing editing."))
+	if err != nil {
+		t.Fail()
+	}
+
+	edit := tgbotapi.EditMessageTextConfig{
+		BaseEdit: tgbotapi.BaseEdit{
+			ChatID:    ChatID,
+			MessageID: msg.MessageID,
+		},
+		Text: "Updated text.",
+	}
+
+	_, err = bot.Send(edit)
+	if err != nil {
+		t.Fail()
+	}
+}
+
 func TestGetUserProfilePhotos(t *testing.T) {
 	bot, _ := getBot(t)
 
