@@ -3,6 +3,7 @@ package tgbotapi
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -22,6 +23,7 @@ type Update struct {
 	Message            Message            `json:"message"`
 	InlineQuery        InlineQuery        `json:"inline_query"`
 	ChosenInlineResult ChosenInlineResult `json:"chosen_inline_result"`
+	CallbackQuery      CallbackQuery      `json:"callback_query"`
 }
 
 // User is a user on Telegram.
@@ -88,33 +90,36 @@ func (c *Chat) IsChannel() bool {
 // Message is returned by almost every request, and contains data about
 // almost anything.
 type Message struct {
-	MessageID             int         `json:"message_id"`
-	From                  User        `json:"from"` // optional
-	Date                  int         `json:"date"`
-	Chat                  Chat        `json:"chat"`
-	ForwardFrom           User        `json:"forward_from"`            // optional
-	ForwardDate           int         `json:"forward_date"`            // optional
-	ReplyToMessage        *Message    `json:"reply_to_message"`        // optional
-	Text                  string      `json:"text"`                    // optional
-	Audio                 Audio       `json:"audio"`                   // optional
-	Document              Document    `json:"document"`                // optional
-	Photo                 []PhotoSize `json:"photo"`                   // optional
-	Sticker               Sticker     `json:"sticker"`                 // optional
-	Video                 Video       `json:"video"`                   // optional
-	Voice                 Voice       `json:"voice"`                   // optional
-	Caption               string      `json:"caption"`                 // optional
-	Contact               Contact     `json:"contact"`                 // optional
-	Location              Location    `json:"location"`                // optional
-	NewChatParticipant    User        `json:"new_chat_participant"`    // optional
-	LeftChatParticipant   User        `json:"left_chat_participant"`   // optional
-	NewChatTitle          string      `json:"new_chat_title"`          // optional
-	NewChatPhoto          []PhotoSize `json:"new_chat_photo"`          // optional
-	DeleteChatPhoto       bool        `json:"delete_chat_photo"`       // optional
-	GroupChatCreated      bool        `json:"group_chat_created"`      // optional
-	SuperGroupChatCreated bool        `json:"supergroup_chat_created"` // optional
-	ChannelChatCreated    bool        `json:"channel_chat_created"`    // optional
-	MigrateToChatID       int64       `json:"migrate_to_chat_id"`      // optional
-	MigrateFromChatID     int64       `json:"migrate_from_chat_id"`    // optional
+	MessageID             int             `json:"message_id"`
+	From                  User            `json:"from"` // optional
+	Date                  int             `json:"date"`
+	Chat                  Chat            `json:"chat"`
+	ForwardFrom           User            `json:"forward_from"`            // optional
+	ForwardDate           int             `json:"forward_date"`            // optional
+	ReplyToMessage        *Message        `json:"reply_to_message"`        // optional
+	Text                  string          `json:"text"`                    // optional
+	Entities              []MessageEntity `json:"entities"`                // optional
+	Audio                 Audio           `json:"audio"`                   // optional
+	Document              Document        `json:"document"`                // optional
+	Photo                 []PhotoSize     `json:"photo"`                   // optional
+	Sticker               Sticker         `json:"sticker"`                 // optional
+	Video                 Video           `json:"video"`                   // optional
+	Voice                 Voice           `json:"voice"`                   // optional
+	Caption               string          `json:"caption"`                 // optional
+	Contact               Contact         `json:"contact"`                 // optional
+	Location              Location        `json:"location"`                // optional
+	Venue                 Venue           `json:"venue"`                   // optional
+	NewChatMember         User            `json:"new_chat_member"`         // optional
+	LeftChatMember        User            `json:"left_chat_member"`        // optional
+	NewChatTitle          string          `json:"new_chat_title"`          // optional
+	NewChatPhoto          []PhotoSize     `json:"new_chat_photo"`          // optional
+	DeleteChatPhoto       bool            `json:"delete_chat_photo"`       // optional
+	GroupChatCreated      bool            `json:"group_chat_created"`      // optional
+	SuperGroupChatCreated bool            `json:"supergroup_chat_created"` // optional
+	ChannelChatCreated    bool            `json:"channel_chat_created"`    // optional
+	MigrateToChatID       int64           `json:"migrate_to_chat_id"`      // optional
+	MigrateFromChatID     int64           `json:"migrate_from_chat_id"`    // optional
+	PinnedMessage         *Message        `json:"pinned_message"`          // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -159,6 +164,19 @@ func (m *Message) CommandArguments() string {
 	}
 
 	return strings.SplitN(m.Text, " ", 2)[1]
+}
+
+// MessageEntity contains information about data in a Message.
+type MessageEntity struct {
+	Type   string `json:"type"`
+	Offset int    `json:"offset"`
+	Length int    `json:"length"`
+	URL    string `json:"url"` // optional
+}
+
+// ParseURL attempts to parse a URL contained within a MessageEntity.
+func (entity MessageEntity) ParseURL() (*url.URL, error) {
+	return url.Parse(entity.URL)
 }
 
 // PhotoSize contains information about photos.
@@ -232,6 +250,14 @@ type Location struct {
 	Latitude  float32 `json:"latitude"`
 }
 
+// Venue contains information about a venue, including its Location.
+type Venue struct {
+	Location     Location `json:"location"`
+	Title        string   `json:"title"`
+	Address      string   `json:"address"`
+	FoursquareID string   `json:"foursquare_id"` // optional
+}
+
 // UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
 	TotalCount int           `json:"total_count"`
@@ -254,16 +280,50 @@ func (f *File) Link(token string) string {
 
 // ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
 type ReplyKeyboardMarkup struct {
-	Keyboard        [][]string `json:"keyboard"`
-	ResizeKeyboard  bool       `json:"resize_keyboard"`   // optional
-	OneTimeKeyboard bool       `json:"one_time_keyboard"` // optional
-	Selective       bool       `json:"selective"`         // optional
+	Keyboard        [][]KeyboardButton `json:"keyboard"`
+	ResizeKeyboard  bool               `json:"resize_keyboard"`   // optional
+	OneTimeKeyboard bool               `json:"one_time_keyboard"` // optional
+	Selective       bool               `json:"selective"`         // optional
+}
+
+// KeyboardButton is a button within a custom keyboard.
+type KeyboardButton struct {
+	Text            string `json:"text"`
+	RequestContact  bool   `json:"request_contact"`
+	RequestLocation bool   `json:"request_location"`
 }
 
 // ReplyKeyboardHide allows the Bot to hide a custom keyboard.
 type ReplyKeyboardHide struct {
 	HideKeyboard bool `json:"hide_keyboard"`
 	Selective    bool `json:"selective"` // optional
+}
+
+// InlineKeyboardMarkup is a custom keyboard presented for an inline bot.
+type InlineKeyboardMarkup struct {
+	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
+}
+
+// InlineKeyboardButton is a button within a custom keyboard for
+// inline query responses.
+//
+// Note that some values are references as even an empty string
+// will change behavior.
+type InlineKeyboardButton struct {
+	Text              string  `json:"text"`
+	URL               *string `json:"url"`                 // optional
+	CallbackData      *string `json:"callback_data"`       // optional
+	SwitchInlineQuery *string `json:"switch_inline_query"` // optional
+}
+
+// CallbackQuery is data sent when a keyboard button with callback data
+// is clicked.
+type CallbackQuery struct {
+	ID              string  `json:"id"`
+	From            User    `json:"from"`
+	Message         Message `json:"message"`           // optional
+	InlineMessageID string  `json:"inline_message_id"` // optional
+	Data            string  `json:"data"`              // optional
 }
 
 // ForceReply allows the Bot to have users directly reply to it without
@@ -275,10 +335,11 @@ type ForceReply struct {
 
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {
-	ID     string `json:"id"`
-	From   User   `json:"from"`
-	Query  string `json:"query"`
-	Offset string `json:"offset"`
+	ID       string   `json:"id"`
+	From     User     `json:"from"`
+	Location Location `json:"location"` // optional
+	Query    string   `json:"query"`
+	Offset   string   `json:"offset"`
 }
 
 // InlineQueryResultArticle is an inline query response article.

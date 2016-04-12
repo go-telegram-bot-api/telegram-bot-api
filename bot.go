@@ -482,8 +482,23 @@ func (bot *BotAPI) AnswerInlineQuery(config InlineConfig) (APIResponse, error) {
 		return APIResponse{}, err
 	}
 	v.Add("results", string(data))
+	v.Add("switch_pm_text", config.SwitchPMText)
+	v.Add("switch_pm_parameter", config.SwitchPMParameter)
 
 	bot.debugLog("answerInlineQuery", v, nil)
 
 	return bot.MakeRequest("answerInlineQuery", v)
+}
+
+// AnswerCallbackQuery sends a response to an inline query callback.
+func (bot *BotAPI) AnswerCallbackQuery(config CallbackConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("callback_query_id", config.CallbackQueryID)
+	v.Add("text", config.Text)
+	v.Add("show_alert", strconv.FormatBool(config.ShowAlert))
+
+	bot.debugLog("answerCallbackQuery", v, nil)
+
+	return bot.MakeRequest("answerCallbackQuery", v)
 }

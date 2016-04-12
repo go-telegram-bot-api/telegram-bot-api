@@ -454,6 +454,34 @@ func (config LocationConfig) method() string {
 	return "sendLocation"
 }
 
+// VenueConfig contains information about a SendVenue request.
+type VenueConfig struct {
+	BaseChat
+	Latitude     float64 // required
+	Longitude    float64 // required
+	Title        string  // required
+	Address      string  // required
+	FoursquareID string
+}
+
+func (config VenueConfig) values() (url.Values, error) {
+	v, _ := config.BaseChat.values()
+
+	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
+	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
+	v.Add("title", config.Title)
+	v.Add("address", config.Address)
+	if config.FoursquareID != "" {
+		v.Add("foursquare_id", config.FoursquareID)
+	}
+
+	return v, nil
+}
+
+func (config VenueConfig) method() string {
+	return "sendVenue"
+}
+
 // ChatActionConfig contains information about a SendChatAction request.
 type ChatActionConfig struct {
 	BaseChat
@@ -516,9 +544,18 @@ type FileReader struct {
 
 // InlineConfig contains information on making an InlineQuery response.
 type InlineConfig struct {
-	InlineQueryID string        `json:"inline_query_id"`
-	Results       []interface{} `json:"results"`
-	CacheTime     int           `json:"cache_time"`
-	IsPersonal    bool          `json:"is_personal"`
-	NextOffset    string        `json:"next_offset"`
+	InlineQueryID     string        `json:"inline_query_id"`
+	Results           []interface{} `json:"results"`
+	CacheTime         int           `json:"cache_time"`
+	IsPersonal        bool          `json:"is_personal"`
+	NextOffset        string        `json:"next_offset"`
+	SwitchPMText      string        `json:"switch_pm_text"`
+	SwitchPMParameter string        `json:"switch_pm_parameter"`
+}
+
+// CallbackConfig contains information on making a CallbackQuery response.
+type CallbackConfig struct {
+	CallbackQueryID string `json:"callback_query_id"`
+	Text            string `json:"text"`
+	ShowAlert       bool   `json:"show_alert"`
 }
