@@ -344,81 +344,78 @@ type InlineQuery struct {
 
 // InlineQueryResultArticle is an inline query response article.
 type InlineQueryResultArticle struct {
-	Type                  string `json:"type"`         // required
-	ID                    string `json:"id"`           // required
-	Title                 string `json:"title"`        // required
-	MessageText           string `json:"message_text"` // required
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
-	URL                   string `json:"url"`
-	HideURL               bool   `json:"hide_url"`
-	Description           string `json:"description"`
-	ThumbURL              string `json:"thumb_url"`
-	ThumbWidth            int    `json:"thumb_width"`
-	ThumbHeight           int    `json:"thumb_height"`
+	Type                string               `json:"type"`                  // required
+	ID                  string               `json:"id"`                    // required
+	Title               string               `json:"title"`                 // required
+	InputMessageContent interface{}          `json:"input_message_content"` // required
+	ReplyMarkup         InlineKeyboardMarkup `json:"reply_markup"`
+	URL                 string               `json:"url"`
+	HideURL             bool                 `json:"hide_url"`
+	Description         string               `json:"description"`
+	ThumbURL            string               `json:"thumb_url"`
+	ThumbWidth          int                  `json:"thumb_width"`
+	ThumbHeight         int                  `json:"thumb_height"`
 }
 
 // InlineQueryResultPhoto is an inline query response photo.
 type InlineQueryResultPhoto struct {
-	Type                  string `json:"type"`      // required
-	ID                    string `json:"id"`        // required
-	URL                   string `json:"photo_url"` // required
-	MimeType              string `json:"mime_type"`
-	Width                 int    `json:"photo_width"`
-	Height                int    `json:"photo_height"`
-	ThumbURL              string `json:"thumb_url"`
-	Title                 string `json:"title"`
-	Description           string `json:"description"`
-	Caption               string `json:"caption"`
-	MessageText           string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	Type                string               `json:"type"`      // required
+	ID                  string               `json:"id"`        // required
+	URL                 string               `json:"photo_url"` // required
+	MimeType            string               `json:"mime_type"`
+	Width               int                  `json:"photo_width"`
+	Height              int                  `json:"photo_height"`
+	ThumbURL            string               `json:"thumb_url"`
+	Title               string               `json:"title"`
+	Description         string               `json:"description"`
+	Caption             string               `json:"caption"`
+	ReplyMarkup         InlineKeyboardMarkup `json:"reply_markup"`
+	InputMessageContent interface{}          `json:"input_message_content"`
 }
 
 // InlineQueryResultGIF is an inline query response GIF.
 type InlineQueryResultGIF struct {
-	Type                  string `json:"type"`    // required
-	ID                    string `json:"id"`      // required
-	URL                   string `json:"gif_url"` // required
-	Width                 int    `json:"gif_width"`
-	Height                int    `json:"gif_height"`
-	ThumbURL              string `json:"thumb_url"`
-	Title                 string `json:"title"`
-	Caption               string `json:"caption"`
-	MessageText           string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	Type                string               `json:"type"`    // required
+	ID                  string               `json:"id"`      // required
+	URL                 string               `json:"gif_url"` // required
+	Width               int                  `json:"gif_width"`
+	Height              int                  `json:"gif_height"`
+	ThumbURL            string               `json:"thumb_url"`
+	Title               string               `json:"title"`
+	Caption             string               `json:"caption"`
+	ReplyMarkup         InlineKeyboardMarkup `json:"reply_markup"`
+	InputMessageContent interface{}          `json:"input_message_content"`
 }
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
 type InlineQueryResultMPEG4GIF struct {
-	Type                  string `json:"type"`      // required
-	ID                    string `json:"id"`        // required
-	URL                   string `json:"mpeg4_url"` // required
-	Width                 int    `json:"mpeg4_width"`
-	Height                int    `json:"mpeg4_height"`
-	ThumbURL              string `json:"thumb_url"`
-	Title                 string `json:"title"`
-	Caption               string `json:"caption"`
-	MessageText           string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	Type                string               `json:"type"`      // required
+	ID                  string               `json:"id"`        // required
+	URL                 string               `json:"mpeg4_url"` // required
+	Width               int                  `json:"mpeg4_width"`
+	Height              int                  `json:"mpeg4_height"`
+	ThumbURL            string               `json:"thumb_url"`
+	Title               string               `json:"title"`
+	Caption             string               `json:"caption"`
+	ReplyMarkup         InlineKeyboardMarkup `json:"reply_markup"`
+	InputMessageContent interface{}          `json:"input_message_content"`
 }
 
 // InlineQueryResultVideo is an inline query response video.
 type InlineQueryResultVideo struct {
-	Type                  string `json:"type"`         // required
-	ID                    string `json:"id"`           // required
-	URL                   string `json:"video_url"`    // required
-	MimeType              string `json:"mime_type"`    // required
-	MessageText           string `json:"message_text"` // required
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
-	Width                 int    `json:"video_width"`
-	Height                int    `json:"video_height"`
-	ThumbURL              string `json:"thumb_url"`
-	Title                 string `json:"title"`
-	Description           string `json:"description"`
+	Type                string               `json:"type"`      // required
+	ID                  string               `json:"id"`        // required
+	URL                 string               `json:"video_url"` // required
+	MimeType            string               `json:"mime_type"` // required
+	ThumbURL            string               `json:"thumb_url"`
+	Title               string               `json:"title"`
+	Caption             string               `json:"caption"`
+	Width               int                  `json:"video_width"`
+	Height              int                  `json:"video_height"`
+	Duration            int                  `json:"video_duration"`
+	Description         string               `json:"description"`
+	ReplyMarkup         InlineKeyboardMarkup `json:"reply_markup"`
+	InputMessageContent interface{}          `json:"input_message_content"`
 }
 
 // ChosenInlineResult is an inline query result chosen by a User
@@ -426,4 +423,29 @@ type ChosenInlineResult struct {
 	ResultID string `json:"result_id"`
 	From     User   `json:"from"`
 	Query    string `json:"query"`
+}
+
+type InputTextMessageContent struct {
+	Text                  string `json:"message_text"`
+	ParseMode             string `json:"parse_mode"`
+	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+}
+
+type InputLocationMessageContent struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
+type InputVenueMessageContent struct {
+	Latitude     float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
+	Title        string  `json:"title"`
+	Address      string  `json:"address"`
+	FoursquareID string  `json:"foursquare_id"`
+}
+
+type InputContactMessageContent struct {
+	PhoneNumber string `json:"phone_number"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
 }

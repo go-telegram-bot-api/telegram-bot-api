@@ -559,3 +559,9 @@ type CallbackConfig struct {
 	Text            string `json:"text"`
 	ShowAlert       bool   `json:"show_alert"`
 }
+
+type ChatMemberConfig struct {
+	ChatID             int64
+	SuperGroupUsername string
+	UserID             int
+}

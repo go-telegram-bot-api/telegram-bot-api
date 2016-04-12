@@ -502,3 +502,38 @@ func (bot *BotAPI) AnswerCallbackQuery(config CallbackConfig) (APIResponse, erro
 
 	return bot.MakeRequest("answerCallbackQuery", v)
 }
+
+// KickChatMember kicks a user from a chat. Note that this only will work
+// in supergroups, and requires the bot to be an admin. Also note they
+// will be unable to rejoin until they are unbanned.
+func (bot *BotAPI) KickChatMember(config ChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	bot.debugLog("kickChatMember", v, nil)
+
+	return bot.MakeRequest("kickChatMember", v)
+}
+
+// UnbanChatMember unbans a user from a chat. Note that this only will work
+// in supergroups, and requires the bot to be an admin.
+func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	bot.debugLog("unbanChatMember", v, nil)
+
+	return bot.MakeRequest("unbanChatMember", v)
+}
