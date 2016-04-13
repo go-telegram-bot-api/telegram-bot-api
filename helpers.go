@@ -209,16 +209,38 @@ func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
 	}
 }
 
+// NewContact allows you to send a shared contact.
+func NewContact(chatID int64, phoneNumber, firstName string) ContactConfig {
+	return ContactConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		PhoneNumber: phoneNumber,
+		FirstName:   firstName,
+	}
+}
+
 // NewLocation shares your location.
 //
 // chatID is where to send it, latitude and longitude are coordinates.
 func NewLocation(chatID int64, latitude float64, longitude float64) LocationConfig {
 	return LocationConfig{
 		BaseChat: BaseChat{
-			ChatID:           chatID,
-			ReplyToMessageID: 0,
-			ReplyMarkup:      nil,
+			ChatID: chatID,
 		},
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
+// NewVenue allows you to send a venue and its location.
+func NewVenue(chatID int64, title, address string, latitude, longitude float64) VenueConfig {
+	return VenueConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Title:     title,
+		Address:   address,
 		Latitude:  latitude,
 		Longitude: longitude,
 	}
