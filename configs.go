@@ -44,6 +44,7 @@ const (
 const (
 	// ErrBadFileType happens when you pass an unknown type
 	ErrBadFileType = "bad file type"
+	ErrBadURL      = "bad or empty url"
 )
 
 // Chattable is any config type that can be sent.

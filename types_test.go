@@ -108,6 +108,22 @@ func TestMessageCommandArgumentsForNonCommand(t *testing.T) {
 	}
 }
 
+func TestMessageEntityParseURLGood(t *testing.T) {
+	entity := tgbotapi.MessageEntity{URL: "https://www.google.com"}
+
+	if _, err := entity.ParseURL(); err != nil {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityParseURLBad(t *testing.T) {
+	entity := tgbotapi.MessageEntity{URL: ""}
+
+	if _, err := entity.ParseURL(); err == nil {
+		t.Fail()
+	}
+}
+
 func TestChatIsPrivate(t *testing.T) {
 	chat := tgbotapi.Chat{ID: 10, Type: "private"}
 

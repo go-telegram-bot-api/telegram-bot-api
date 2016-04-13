@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -176,6 +177,10 @@ type MessageEntity struct {
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
 func (entity MessageEntity) ParseURL() (*url.URL, error) {
+	if entity.URL == "" {
+		return nil, errors.New(ErrBadURL)
+	}
+
 	return url.Parse(entity.URL)
 }
 

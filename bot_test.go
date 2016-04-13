@@ -230,12 +230,32 @@ func TestSendWithExistingVoice(t *testing.T) {
 	}
 }
 
+func TestSendWithContact(t *testing.T) {
+	bot, _ := getBot(t)
+
+	contact := tgbotapi.NewContact(ChatID, "5551234567", "Test")
+
+	if _, err := bot.Send(contact); err != nil {
+		t.Fail()
+	}
+}
+
 func TestSendWithLocation(t *testing.T) {
 	bot, _ := getBot(t)
 
 	_, err := bot.Send(tgbotapi.NewLocation(ChatID, 40, 40))
 
 	if err != nil {
+		t.Fail()
+	}
+}
+
+func TestSendWithVenue(t *testing.T) {
+	bot, _ := getBot(t)
+
+	venue := tgbotapi.NewVenue(ChatID, "A Test Location", "123 Test Street", 40, 40)
+
+	if _, err := bot.Send(venue); err != nil {
 		t.Fail()
 	}
 }
@@ -397,6 +417,95 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	}
 
 	bot.RemoveWebhook()
+}
+
+func TestNewInlineQueryResultArticle(t *testing.T) {
+	result := tgbotapi.NewInlineQueryResultArticle("id", "title", "message")
+
+	if result.Type != "article" ||
+		result.ID != "id" ||
+		result.Title != "title" ||
+		result.InputMessageContent.(tgbotapi.InputTextMessageContent).Text != "message" {
+		t.Fail()
+	}
+}
+
+func TestNewInlineQueryResultGIF(t *testing.T) {
+	result := tgbotapi.NewInlineQueryResultGIF("id", "google.com")
+
+	if result.Type != "gif" ||
+		result.ID != "id" ||
+		result.URL != "google.com" {
+		t.Fail()
+	}
+}
+
+func TestNewInlineQueryResultMPEG4GIF(t *testing.T) {
+	result := tgbotapi.NewInlineQueryResultMPEG4GIF("id", "google.com")
+
+	if result.Type != "mpeg4_gif" ||
+		result.ID != "id" ||
+		result.URL != "google.com" {
+		t.Fail()
+	}
+}
+
+func TestNewInlineQueryResultPhoto(t *testing.T) {
+	result := tgbotapi.NewInlineQueryResultPhoto("id", "google.com")
+
+	if result.Type != "photo" ||
+		result.ID != "id" ||
+		result.URL != "google.com" {
+		t.Fail()
+	}
+}
+
+func TestNewInlineQueryResultVideo(t *testing.T) {
+	result := tgbotapi.NewInlineQueryResultVideo("id", "google.com")
+
+	if result.Type != "video" ||
+		result.ID != "id" ||
+		result.URL != "google.com" {
+	}
+}
+
+func TestNewEditMessageText(t *testing.T) {
+	edit := tgbotapi.NewEditMessageText(ChatID, ReplyToMessageID, "new text")
+
+	if edit.Text != "new text" ||
+		edit.BaseEdit.ChatID != ChatID ||
+		edit.BaseEdit.MessageID != ReplyToMessageID {
+		t.Fail()
+	}
+}
+
+func TestNewEditMessageCaption(t *testing.T) {
+	edit := tgbotapi.NewEditMessageCaption(ChatID, ReplyToMessageID, "new caption")
+
+	if edit.Caption != "new caption" ||
+		edit.BaseEdit.ChatID != ChatID ||
+		edit.BaseEdit.MessageID != ReplyToMessageID {
+		t.Fail()
+	}
+}
+
+func TestNewEditMessageReplyMarkup(t *testing.T) {
+	markup := tgbotapi.InlineKeyboardMarkup{
+		InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
+			[]tgbotapi.InlineKeyboardButton{
+				tgbotapi.InlineKeyboardButton{Text: "test"},
+			},
+		},
+	}
+
+	edit := tgbotapi.NewEditMessageReplyMarkup(ChatID, ReplyToMessageID, markup)
+
+	if edit.ReplyMarkup.InlineKeyboard[0][0].Text != "test" ||
+		edit.BaseEdit.ChatID != ChatID ||
+		edit.BaseEdit.MessageID != ReplyToMessageID {
+		t.Fail()
+	}
+
 }
 
 func TestUpdatesChan(t *testing.T) {
