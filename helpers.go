@@ -351,3 +351,37 @@ func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
 		URL:  url,
 	}
 }
+
+// NewEditMessageText allows you to edit the text of a message.
+func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTextConfig {
+	return EditMessageTextConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		Text: text,
+	}
+}
+
+// NewEditMessageCaption allows you to edit the caption of a message.
+func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMessageCaptionConfig {
+	return EditMessageCaptionConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		Caption: caption,
+	}
+}
+
+// NewEditMessageReplyMarkup allows you to edit the inline
+// keyboard markup.
+func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKeyboardMarkup) EditMessageReplyMarkupConfig {
+	return EditMessageReplyMarkupConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		ReplyMarkup: &replyMarkup,
+	}
+}

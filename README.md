@@ -17,7 +17,10 @@ something with plugins and command handlers without having to design
 all that yourself.
 
 Use `github.com/go-telegram-bot-api/telegram-bot-api` for the latest
-version, or use `gopkg.in/telegram-bot-api.v3` for the stable build.
+version, or use `gopkg.in/telegram-bot-api.v4` for the stable build.
+
+Join [the development group](https://telegram.me/go_telegram_bot_api) if
+you want to ask questions or discuss development.
 
 ## Example
 
@@ -29,7 +32,7 @@ package main
 
 import (
 	"log"
-	"gopkg.in/telegram-bot-api.v3"
+	"gopkg.in/telegram-bot-api.v4"
 )
 
 func main() {
@@ -65,7 +68,7 @@ you may use a slightly different method.
 package main
 
 import (
-	"gopkg.in/telegram-bot-api.v3"
+	"gopkg.in/telegram-bot-api.v4"
 	"log"
 	"net/http"
 )

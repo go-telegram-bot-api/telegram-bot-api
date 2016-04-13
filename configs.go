@@ -559,7 +559,7 @@ type EditMessageTextConfig struct {
 	Text                  string
 	ParseMode             string
 	DisableWebPagePreview bool
-	ReplyMarkup           InlineKeyboardMarkup
+	ReplyMarkup           *InlineKeyboardMarkup
 }
 
 func (config EditMessageTextConfig) values() (url.Values, error) {
@@ -580,7 +580,7 @@ func (config EditMessageTextConfig) method() string {
 type EditMessageCaptionConfig struct {
 	BaseEdit
 	Caption     string
-	ReplyMarkup InlineKeyboardMarkup
+	ReplyMarkup *InlineKeyboardMarkup
 }
 
 func (config EditMessageCaptionConfig) values() (url.Values, error) {
@@ -595,18 +595,18 @@ func (config EditMessageCaptionConfig) method() string {
 	return "editMessageCaption"
 }
 
-// EditMessageReplyMarkup allows you to modify the reply markup
+// EditMessageReplyMarkupConfig allows you to modify the reply markup
 // of a message.
-type EditMessageReplyMarkup struct {
+type EditMessageReplyMarkupConfig struct {
 	BaseEdit
-	ReplyMarkup InlineKeyboardMarkup
+	ReplyMarkup *InlineKeyboardMarkup
 }
 
-func (config EditMessageReplyMarkup) values() (url.Values, error) {
+func (config EditMessageReplyMarkupConfig) values() (url.Values, error) {
 	return config.BaseEdit.values()
 }
 
-func (config EditMessageReplyMarkup) method() string {
+func (config EditMessageReplyMarkupConfig) method() string {
 	return "editMessageReplyMarkup"
 }
 
