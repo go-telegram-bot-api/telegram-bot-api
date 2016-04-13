@@ -348,7 +348,7 @@ type InlineQueryResultArticle struct {
 	ID                  string                `json:"id"`                    // required
 	Title               string                `json:"title"`                 // required
 	InputMessageContent interface{}           `json:"input_message_content"` // required
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	URL                 string                `json:"url"`
 	HideURL             bool                  `json:"hide_url"`
 	Description         string                `json:"description"`
@@ -369,7 +369,7 @@ type InlineQueryResultPhoto struct {
 	Title               string                `json:"title"`
 	Description         string                `json:"description"`
 	Caption             string                `json:"caption"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 }
 
@@ -383,7 +383,7 @@ type InlineQueryResultGIF struct {
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 }
 
@@ -397,7 +397,7 @@ type InlineQueryResultMPEG4GIF struct {
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 }
 
@@ -414,7 +414,7 @@ type InlineQueryResultVideo struct {
 	Height              int                   `json:"video_height"`
 	Duration            int                   `json:"video_duration"`
 	Description         string                `json:"description"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 }
 
@@ -426,7 +426,7 @@ type InlineQueryResultAudio struct {
 	Title               string                `json:"title"`     // required
 	Performer           string                `json:"performer"`
 	Duration            int                   `json:"audio_duration"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 }
 
@@ -437,7 +437,7 @@ type InlineQueryResultVoice struct {
 	URL                 string                `json:"voice_url"` // required
 	Title               string                `json:"title"`     // required
 	Duration            int                   `json:"voice_duration"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 }
 
@@ -450,7 +450,7 @@ type InlineQueryResultDocument struct {
 	URL                 string                `json:"document_url"` // required
 	MimeType            string                `json:"mime_type"`    // required
 	Description         string                `json:"description"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 	ThumbURL            string                `json:"thumb_url"`
 	ThumbWidth          int                   `json:"thumb_width"`
@@ -464,7 +464,7 @@ type InlineQueryResultLocation struct {
 	Latitude            float64               `json:"latitude"`  // required
 	Longitude           float64               `json:"longitude"` // required
 	Title               string                `json:"title"`     // required
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content"`
 	ThumbURL            string                `json:"thumb_url"`
 	ThumbWidth          int                   `json:"thumb_width"`
