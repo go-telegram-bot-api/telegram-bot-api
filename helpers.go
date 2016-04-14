@@ -427,3 +427,113 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 		ReplyMarkup: &replyMarkup,
 	}
 }
+
+// NewHideKeyboard hides the keyboard, with the option for being selective
+// or hiding for everyone.
+func NewHideKeyboard(selective bool) ReplyKeyboardHide {
+	return ReplyKeyboardHide{
+		HideKeyboard: true,
+		Selective:    selective,
+	}
+}
+
+// NewKeyboardButton creates a regular keyboard button.
+func NewKeyboardButton(text string) KeyboardButton {
+	return KeyboardButton{
+		Text: text,
+	}
+}
+
+// NewKeyboardButtonContact creates a keyboard button that requests
+// user contact information upon click.
+func NewKeyboardButtonContact(text string) KeyboardButton {
+	return KeyboardButton{
+		Text:           text,
+		RequestContact: true,
+	}
+}
+
+// NewKeyboardButtonLocation creates a keyboard button that requests
+// user location information upon click.
+func NewKeyboardButtonLocation(text string) KeyboardButton {
+	return KeyboardButton{
+		Text:            text,
+		RequestLocation: true,
+	}
+}
+
+// NewKeyboardButtonRow creates a row of keyboard buttons.
+func NewKeyboardButtonRow(buttons ...KeyboardButton) []KeyboardButton {
+	var row []KeyboardButton
+
+	for _, button := range buttons {
+		row = append(row, button)
+	}
+
+	return row
+}
+
+// NewReplyKeyboard creates a new regular keyboard with sane defaults.
+func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
+	var keyboard [][]KeyboardButton
+
+	for _, row := range rows {
+		keyboard = append(keyboard, row)
+	}
+
+	return ReplyKeyboardMarkup{
+		ResizeKeyboard: true,
+		Keyboard:       keyboard,
+	}
+}
+
+// NewInlineKeyboardButtonData creates an inline keyboard button with text
+// and data for a callback.
+func NewInlineKeyboardButtonData(text, data string) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text:         text,
+		CallbackData: &data,
+	}
+}
+
+// NewInlineKeyboardButtonURL creates an inline keyboard button with text
+// which goes to a URL.
+func NewInlineKeyboardButtonURL(text, url string) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text: text,
+		URL:  &url,
+	}
+}
+
+// NewInlineKeyboardButtonSwitch creates an inline keyboard button with
+// text which allows the user to switch to a chat or return to a chat.
+func NewInlineKeyboardButtonSwitch(text, sw string) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text:              text,
+		SwitchInlineQuery: &sw,
+	}
+}
+
+// NewInlineKeyboardRow creates an inline keyboard row with buttons.
+func NewInlineKeyboardRow(buttons ...InlineKeyboardButton) []InlineKeyboardButton {
+	var row []InlineKeyboardButton
+
+	for _, button := range buttons {
+		row = append(row, button)
+	}
+
+	return row
+}
+
+// NewInlineKeyboardMarkup creates a new inline keyboard.
+func NewInlineKeyboardMarkup(rows ...[]InlineKeyboardButton) InlineKeyboardMarkup {
+	var keyboard [][]InlineKeyboardButton
+
+	for _, row := range rows {
+		keyboard = append(keyboard, row)
+	}
+
+	return InlineKeyboardMarkup{
+		InlineKeyboard: keyboard,
+	}
+}
