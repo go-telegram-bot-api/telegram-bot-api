@@ -251,8 +251,8 @@ type Contact struct {
 
 // Location contains information about a place.
 type Location struct {
-	Longitude float32 `json:"longitude"`
-	Latitude  float32 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
 }
 
 // Venue contains information about a venue, including its Location.
