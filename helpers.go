@@ -352,6 +352,48 @@ func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
 	}
 }
 
+// NewInlineQueryResultAudio creates a new inline query audio.
+func NewInlineQueryResultAudio(id, url, title string) InlineQueryResultAudio {
+	return InlineQueryResultAudio{
+		Type:  "audio",
+		ID:    id,
+		URL:   url,
+		Title: title,
+	}
+}
+
+// NewInlineQueryResultVoice creates a new inline query voice.
+func NewInlineQueryResultVoice(id, url, title string) InlineQueryResultVoice {
+	return InlineQueryResultVoice{
+		Type:  "voice",
+		ID:    id,
+		URL:   url,
+		Title: title,
+	}
+}
+
+// NewInlineQueryResultDocument creates a new inline query document.
+func NewInlineQueryResultDocument(id, url, title, mimeType string) InlineQueryResultDocument {
+	return InlineQueryResultDocument{
+		Type:     "document",
+		ID:       id,
+		URL:      url,
+		Title:    title,
+		MimeType: mimeType,
+	}
+}
+
+// NewInlineQueryResultLocation creates a new inline query location.
+func NewInlineQueryResultLocation(id, title string, latitude, longitude float64) InlineQueryResultLocation {
+	return InlineQueryResultLocation{
+		Type:      "location",
+		ID:        id,
+		Title:     title,
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
 // NewEditMessageText allows you to edit the text of a message.
 func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTextConfig {
 	return EditMessageTextConfig{
