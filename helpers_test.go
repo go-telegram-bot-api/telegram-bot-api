@@ -52,6 +52,7 @@ func TestNewInlineQueryResultVideo(t *testing.T) {
 	if result.Type != "video" ||
 		result.ID != "id" ||
 		result.URL != "google.com" {
+		t.Fail()
 	}
 }
 
@@ -62,6 +63,7 @@ func TestNewInlineQueryResultAudio(t *testing.T) {
 		result.ID != "id" ||
 		result.URL != "google.com" ||
 		result.Title != "title" {
+		t.Fail()
 	}
 }
 
@@ -72,6 +74,7 @@ func TestNewInlineQueryResultVoice(t *testing.T) {
 		result.ID != "id" ||
 		result.URL != "google.com" ||
 		result.Title != "title" {
+		t.Fail()
 	}
 }
 
@@ -83,6 +86,7 @@ func TestNewInlineQueryResultDocument(t *testing.T) {
 		result.URL != "google.com" ||
 		result.Title != "title" ||
 		result.MimeType != "mime/type" {
+		t.Fail()
 	}
 }
 
@@ -94,6 +98,7 @@ func TestNewInlineQueryResultLocation(t *testing.T) {
 		result.Title != "name" ||
 		result.Latitude != 40 ||
 		result.Longitude != 50 {
+		t.Fail()
 	}
 }
 
