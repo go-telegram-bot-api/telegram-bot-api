@@ -316,9 +316,9 @@ type InlineKeyboardMarkup struct {
 // will change behavior.
 type InlineKeyboardButton struct {
 	Text              string  `json:"text"`
-	URL               *string `json:"url"`                 // optional
-	CallbackData      *string `json:"callback_data"`       // optional
-	SwitchInlineQuery *string `json:"switch_inline_query"` // optional
+	URL               *string `json:"url,omitempty"`                 // optional
+	CallbackData      *string `json:"callback_data,omitempty"`       // optional
+	SwitchInlineQuery *string `json:"switch_inline_query,omitempty"` // optional
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
