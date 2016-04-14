@@ -537,3 +537,22 @@ func NewInlineKeyboardMarkup(rows ...[]InlineKeyboardButton) InlineKeyboardMarku
 		InlineKeyboard: keyboard,
 	}
 }
+
+// NewCallback creates a new callback message.
+func NewCallback(id, text string) CallbackConfig {
+	return CallbackConfig{
+		CallbackQueryID: id,
+		Text:            text,
+		ShowAlert:       false,
+	}
+}
+
+// NewCallbackWithAlert creates a new callback message that alerts
+// the user.
+func NewCallbackWithAlert(id, text string) CallbackConfig {
+	return CallbackConfig{
+		CallbackQueryID: id,
+		Text:            text,
+		ShowAlert:       true,
+	}
+}
