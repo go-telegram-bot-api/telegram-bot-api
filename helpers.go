@@ -423,8 +423,8 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 		BaseEdit: BaseEdit{
 			ChatID:    chatID,
 			MessageID: messageID,
+			ReplyMarkup: &replyMarkup,
 		},
-		ReplyMarkup: &replyMarkup,
 	}
 }
 
