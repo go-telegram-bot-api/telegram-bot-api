@@ -600,7 +600,6 @@ func (config EditMessageCaptionConfig) method() string {
 // of a message.
 type EditMessageReplyMarkupConfig struct {
 	BaseEdit
-	ReplyMarkup *InlineKeyboardMarkup
 }
 
 func (config EditMessageReplyMarkupConfig) values() (url.Values, error) {
