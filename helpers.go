@@ -421,8 +421,8 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKeyboardMarkup) EditMessageReplyMarkupConfig {
 	return EditMessageReplyMarkupConfig{
 		BaseEdit: BaseEdit{
-			ChatID:    chatID,
-			MessageID: messageID,
+			ChatID:      chatID,
+			MessageID:   messageID,
 			ReplyMarkup: &replyMarkup,
 		},
 	}
@@ -466,9 +466,7 @@ func NewKeyboardButtonLocation(text string) KeyboardButton {
 func NewKeyboardButtonRow(buttons ...KeyboardButton) []KeyboardButton {
 	var row []KeyboardButton
 
-	for _, button := range buttons {
-		row = append(row, button)
-	}
+	row = append(row, buttons...)
 
 	return row
 }
@@ -477,9 +475,7 @@ func NewKeyboardButtonRow(buttons ...KeyboardButton) []KeyboardButton {
 func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
 	var keyboard [][]KeyboardButton
 
-	for _, row := range rows {
-		keyboard = append(keyboard, row)
-	}
+	keyboard = append(keyboard, rows...)
 
 	return ReplyKeyboardMarkup{
 		ResizeKeyboard: true,
@@ -518,9 +514,7 @@ func NewInlineKeyboardButtonSwitch(text, sw string) InlineKeyboardButton {
 func NewInlineKeyboardRow(buttons ...InlineKeyboardButton) []InlineKeyboardButton {
 	var row []InlineKeyboardButton
 
-	for _, button := range buttons {
-		row = append(row, button)
-	}
+	row = append(row, buttons...)
 
 	return row
 }
@@ -529,9 +523,7 @@ func NewInlineKeyboardRow(buttons ...InlineKeyboardButton) []InlineKeyboardButto
 func NewInlineKeyboardMarkup(rows ...[]InlineKeyboardButton) InlineKeyboardMarkup {
 	var keyboard [][]InlineKeyboardButton
 
-	for _, row := range rows {
-		keyboard = append(keyboard, row)
-	}
+	keyboard = append(keyboard, rows...)
 
 	return InlineKeyboardMarkup{
 		InlineKeyboard: keyboard,
