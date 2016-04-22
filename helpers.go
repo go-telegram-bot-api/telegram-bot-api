@@ -18,6 +18,18 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewMessageToChannel creates a new Message that is sent to a channel
+// by username.
+// username is the username of the channel, text is the message text.
+func NewMessageToChannel(username string, text string) MessageConfig {
+	return MessageConfig{
+		BaseChat: BaseChat{
+			ChannelUsername: username,
+		},
+		Text: text,
+	}
+}
+
 // NewForward creates a new forward.
 //
 // chatID is where to send it, fromChatID is the source chat,
