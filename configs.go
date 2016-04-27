@@ -560,7 +560,6 @@ type EditMessageTextConfig struct {
 	Text                  string
 	ParseMode             string
 	DisableWebPagePreview bool
-	ReplyMarkup           *InlineKeyboardMarkup
 }
 
 func (config EditMessageTextConfig) values() (url.Values, error) {
@@ -580,8 +579,7 @@ func (config EditMessageTextConfig) method() string {
 // EditMessageCaptionConfig allows you to modify the caption of a message.
 type EditMessageCaptionConfig struct {
 	BaseEdit
-	Caption     string
-	ReplyMarkup *InlineKeyboardMarkup
+	Caption string
 }
 
 func (config EditMessageCaptionConfig) values() (url.Values, error) {
