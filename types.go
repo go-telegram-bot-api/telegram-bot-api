@@ -96,6 +96,7 @@ type Message struct {
 	Date                  int              `json:"date"`
 	Chat                  *Chat            `json:"chat"`
 	ForwardFrom           *User            `json:"forward_from"`            // optional
+	ForwardFromChat       *Chat            `json:"forward_from_chat"`       // optional
 	ForwardDate           int              `json:"forward_date"`            // optional
 	ReplyToMessage        *Message         `json:"reply_to_message"`        // optional
 	Text                  string           `json:"text"`                    // optional
@@ -217,6 +218,7 @@ type Sticker struct {
 	Width     int        `json:"width"`
 	Height    int        `json:"height"`
 	Thumbnail *PhotoSize `json:"thumb"`     // optional
+	Emoji     string     `json:"emoji"`     // optional
 	FileSize  int        `json:"file_size"` // optional
 }
 
