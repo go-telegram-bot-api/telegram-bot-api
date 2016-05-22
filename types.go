@@ -22,6 +22,7 @@ type APIResponse struct {
 type Update struct {
 	UpdateID           int                 `json:"update_id"`
 	Message            *Message            `json:"message"`
+	EditedMessage      *Message            `json:"edited_message"`
 	InlineQuery        *InlineQuery        `json:"inline_query"`
 	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result"`
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
@@ -99,6 +100,7 @@ type Message struct {
 	ForwardFromChat       *Chat            `json:"forward_from_chat"`       // optional
 	ForwardDate           int              `json:"forward_date"`            // optional
 	ReplyToMessage        *Message         `json:"reply_to_message"`        // optional
+	EditDate              int              `json:"edit_date"`               // optional
 	Text                  string           `json:"text"`                    // optional
 	Entities              *[]MessageEntity `json:"entities"`                // optional
 	Audio                 *Audio           `json:"audio"`                   // optional
@@ -173,7 +175,8 @@ type MessageEntity struct {
 	Type   string `json:"type"`
 	Offset int    `json:"offset"`
 	Length int    `json:"length"`
-	URL    string `json:"url"` // optional
+	URL    string `json:"url"`  // optional
+	User   *User  `json:"user"` // optional
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
