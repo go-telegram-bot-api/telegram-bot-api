@@ -521,6 +521,117 @@ func (bot *BotAPI) KickChatMember(config ChatMemberConfig) (APIResponse, error) 
 	return bot.MakeRequest("kickChatMember", v)
 }
 
+// LeaveChat makes the bot leave the chat.
+func (bot *BotAPI) LeaveChat(config ChatConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	bot.debugLog("leaveChat", v, nil)
+
+	return bot.MakeRequest("leaveChat", v)
+}
+
+// GetChat gets information about a chat.
+func (bot *BotAPI) GetChat(config ChatConfig) (Chat, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	resp, err := bot.MakeRequest("getChat", v)
+	if err != nil {
+		return Chat{}, err
+	}
+
+	var chat Chat
+	err = json.Unmarshal(resp.Result, &chat)
+
+	bot.debugLog("getChat", v, chat)
+
+	return chat, err
+}
+
+// GetChatAdministrators gets a list of administrators in the chat.
+//
+// If none have been appointed, only the creator will be returned.
+// Bots are not shown, even if they are an administrator.
+func (bot *BotAPI) GetChatAdministrators(config ChatConfig) ([]ChatMember, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	resp, err := bot.MakeRequest("getChatAdministrators", v)
+	if err != nil {
+		return []ChatMember{}, err
+	}
+
+	var members []ChatMember
+	err = json.Unmarshal(resp.Result, &members)
+
+	bot.debugLog("getChatAdministrators", v, members)
+
+	return members, err
+}
+
+// GetChatMembersCount gets the number of users in a chat.
+func (bot *BotAPI) GetChatMembersCount(config ChatConfig) (int, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	resp, err := bot.MakeRequest("getChatMembersCount", v)
+	if err != nil {
+		return -1, err
+	}
+
+	var count int
+	err = json.Unmarshal(resp.Result, &count)
+
+	bot.debugLog("getChatMembersCount", v, count)
+
+	return count, err
+}
+
+// GetChatMember gets a specific chat member.
+func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	resp, err := bot.MakeRequest("getChatMember", v)
+	if err != nil {
+		return ChatMember{}, err
+	}
+
+	var member ChatMember
+	err = json.Unmarshal(resp.Result, &member)
+
+	bot.debugLog("getChatMember", v, member)
+
+	return member, err
+}
+
 // UnbanChatMember unbans a user from a chat. Note that this only will work
 // in supergroups, and requires the bot to be an admin.
 func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {

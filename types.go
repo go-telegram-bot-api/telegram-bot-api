@@ -70,23 +70,28 @@ type Chat struct {
 }
 
 // IsPrivate returns if the Chat is a private conversation.
-func (c *Chat) IsPrivate() bool {
+func (c Chat) IsPrivate() bool {
 	return c.Type == "private"
 }
 
 // IsGroup returns if the Chat is a group.
-func (c *Chat) IsGroup() bool {
+func (c Chat) IsGroup() bool {
 	return c.Type == "group"
 }
 
 // IsSuperGroup returns if the Chat is a supergroup.
-func (c *Chat) IsSuperGroup() bool {
+func (c Chat) IsSuperGroup() bool {
 	return c.Type == "supergroup"
 }
 
 // IsChannel returns if the Chat is a channel.
-func (c *Chat) IsChannel() bool {
+func (c Chat) IsChannel() bool {
 	return c.Type == "channel"
+}
+
+// ChatConfig returns a ChatConfig struct for chat related methods.
+func (c Chat) ChatConfig() ChatConfig {
+	return ChatConfig{ChatID: c.ID}
 }
 
 // Message is returned by almost every request, and contains data about
@@ -342,6 +347,27 @@ type ForceReply struct {
 	ForceReply bool `json:"force_reply"`
 	Selective  bool `json:"selective"` // optional
 }
+
+// ChatMember is information about a member in a chat.
+type ChatMember struct {
+	User   *User  `json:"user"`
+	Status string `json:"status"`
+}
+
+// IsCreator returns if the ChatMember was the creator of the chat.
+func (chat ChatMember) IsCreator() bool { return chat.Status == "creator" }
+
+// IsAdministrator returns if the ChatMember is a chat administrator.
+func (chat ChatMember) IsAdministrator() bool { return chat.Status == "administrator" }
+
+// IsMember returns if the ChatMember is a current member of the chat.
+func (chat ChatMember) IsMember() bool { return chat.Status == "member" }
+
+// HasLeft returns if the ChatMember left the chat.
+func (chat ChatMember) HasLeft() bool { return chat.Status == "left" }
+
+// WasKicked returns if the ChatMember was kicked from the chat.
+func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
 
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {

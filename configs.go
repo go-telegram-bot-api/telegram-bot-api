@@ -675,3 +675,17 @@ type ChatMemberConfig struct {
 	SuperGroupUsername string
 	UserID             int
 }
+
+// ChatConfig contains information about getting information on a chat.
+type ChatConfig struct {
+	ChatID             int64
+	SuperGroupUsername string
+}
+
+// ChatConfigWithUser contains information about getting information on
+// a specific user within a chat.
+type ChatConfigWithUser struct {
+	ChatID             int64
+	SuperGroupUsername string
+	UserID             int
+}

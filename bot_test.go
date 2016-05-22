@@ -447,6 +447,10 @@ func ExampleNewBotAPI() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
+
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
@@ -493,7 +497,7 @@ func ExampleAnswerInlineQuery() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.InlineQuery.Query == "" { // if no inline query, ignore it
+		if update.InlineQuery == nil { // if no inline query, ignore it
 			continue
 		}
 
