@@ -335,7 +335,7 @@ func NewInlineQueryResultArticleMarkdown(id, title, messageText string) InlineQu
 		ID:    id,
 		Title: title,
 		InputMessageContent: InputTextMessageContent{
-			Text: messageText,
+			Text:      messageText,
 			ParseMode: "Markdown",
 		},
 	}
@@ -348,7 +348,7 @@ func NewInlineQueryResultArticleHTML(id, title, messageText string) InlineQueryR
 		ID:    id,
 		Title: title,
 		InputMessageContent: InputTextMessageContent{
-			Text: messageText,
+			Text:      messageText,
 			ParseMode: "HTML",
 		},
 	}
