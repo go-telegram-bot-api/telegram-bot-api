@@ -328,6 +328,32 @@ func NewInlineQueryResultArticle(id, title, messageText string) InlineQueryResul
 	}
 }
 
+// NewInlineQueryResultArticleMarkdown creates a new inline query article with Markdown parsing.
+func NewInlineQueryResultArticleMarkdown(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text: messageText,
+			ParseMode: "Markdown",
+		},
+	}
+}
+
+// NewInlineQueryResultArticleHTML creates a new inline query article with HTML parsing.
+func NewInlineQueryResultArticleHTML(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text: messageText,
+			ParseMode: "HTML",
+		},
+	}
+}
+
 // NewInlineQueryResultGIF creates a new inline query GIF.
 func NewInlineQueryResultGIF(id, url string) InlineQueryResultGIF {
 	return InlineQueryResultGIF{
