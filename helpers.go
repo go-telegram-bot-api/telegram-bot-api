@@ -317,14 +317,39 @@ func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
 }
 
 // NewInlineQueryResultArticle creates a new inline query article.
-func NewInlineQueryResultArticle(id, title, messageText string, parseMode string) InlineQueryResultArticle {
+func NewInlineQueryResultArticle(id, title, messageText string) InlineQueryResultArticle {
 	return InlineQueryResultArticle{
 		Type:  "article",
 		ID:    id,
 		Title: title,
 		InputMessageContent: InputTextMessageContent{
 			Text: messageText,
-			ParseMode: parseMode,
+		},
+	}
+}
+
+// NewInlineQueryResultArticleMarkdown creates a new inline query article with Markdown parsing.
+func NewInlineQueryResultArticleMarkdown(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text: messageText,
+			ParseMode: "Markdown",
+		},
+	}
+}
+
+// NewInlineQueryResultArticleHTML creates a new inline query article with HTML parsing.
+func NewInlineQueryResultArticleHTML(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text: messageText,
+			ParseMode: "HTML",
 		},
 	}
 }
