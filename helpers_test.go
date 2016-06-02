@@ -6,12 +6,13 @@ import (
 )
 
 func TestNewInlineQueryResultArticle(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultArticle("id", "title", "message")
+	result := tgbotapi.NewInlineQueryResultArticle("id", "title", "message", "Markdown")
 
 	if result.Type != "article" ||
 		result.ID != "id" ||
 		result.Title != "title" ||
-		result.InputMessageContent.(tgbotapi.InputTextMessageContent).Text != "message" {
+		result.InputMessageContent.(tgbotapi.InputTextMessageContent).Text != "message" ||
+		result.InputMessageContent.(tgbotapi.InputTextMessageContent).ParseMode != "Markdown" {
 		t.Fail()
 	}
 }

@@ -317,13 +317,14 @@ func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
 }
 
 // NewInlineQueryResultArticle creates a new inline query article.
-func NewInlineQueryResultArticle(id, title, messageText string) InlineQueryResultArticle {
+func NewInlineQueryResultArticle(id, title, messageText string, parseMode string) InlineQueryResultArticle {
 	return InlineQueryResultArticle{
 		Type:  "article",
 		ID:    id,
 		Title: title,
 		InputMessageContent: InputTextMessageContent{
 			Text: messageText,
+			ParseMode: parseMode,
 		},
 	}
 }
