@@ -501,7 +501,7 @@ func ExampleAnswerInlineQuery() {
 			continue
 		}
 
-		article := tgbotapi.NewInlineQueryResultArticle(update.InlineQuery.ID, "Echo", update.InlineQuery.Query)
+		article := tgbotapi.NewInlineQueryResultArticle(update.InlineQuery.ID, "Echo", update.InlineQuery.Query, "Markdown")
 		article.Description = update.InlineQuery.Query
 
 		inlineConf := tgbotapi.InlineConfig{
