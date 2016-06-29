@@ -364,7 +364,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	v := url.Values{}
-	if config.Offset > 0 {
+	if config.Offset != 0 {
 		v.Add("offset", strconv.Itoa(config.Offset))
 	}
 	if config.Limit > 0 {
