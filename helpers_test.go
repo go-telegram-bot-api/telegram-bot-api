@@ -70,6 +70,17 @@ func TestNewInlineQueryResultPhoto(t *testing.T) {
 	}
 }
 
+func TestNewInlineQueryResultPhotoWithThumb(t *testing.T) {
+	result := tgbotapi.NewInlineQueryResultPhotoWithThumb("id", "google.com", "thumb.com")
+
+	if result.Type != "photo" ||
+		result.ID != "id" ||
+		result.URL != "google.com" ||
+		result.ThumbURL != "thumb.com" {
+		t.Fail()
+	}
+}
+
 func TestNewInlineQueryResultVideo(t *testing.T) {
 	result := tgbotapi.NewInlineQueryResultVideo("id", "google.com")
 

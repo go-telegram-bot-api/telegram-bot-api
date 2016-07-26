@@ -381,6 +381,16 @@ func NewInlineQueryResultPhoto(id, url string) InlineQueryResultPhoto {
 	}
 }
 
+// NewInlineQueryResultPhotoWithThumb creates a new inline query photo.
+func NewInlineQueryResultPhotoWithThumb(id, url, thumb string) InlineQueryResultPhoto {
+	return InlineQueryResultPhoto{
+		Type:     "photo",
+		ID:       id,
+		URL:      url,
+		ThumbURL: thumb,
+	}
+}
+
 // NewInlineQueryResultVideo creates a new inline query video.
 func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
 	return InlineQueryResultVideo{

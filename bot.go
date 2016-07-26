@@ -396,7 +396,7 @@ func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 //
 // If this is set, GetUpdates will not get any data!
 //
-// If you do not have a legitmate TLS certificate, you need to include
+// If you do not have a legitimate TLS certificate, you need to include
 // your self signed certificate with the config.
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	if config.Certificate == nil {
