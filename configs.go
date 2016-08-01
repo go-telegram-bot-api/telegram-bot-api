@@ -166,13 +166,16 @@ type BaseEdit struct {
 func (edit BaseEdit) values() (url.Values, error) {
 	v := url.Values{}
 
-	if edit.ChannelUsername != "" {
-		v.Add("chat_id", edit.ChannelUsername)
+	if edit.InlineMessageID == "" {
+		if edit.ChannelUsername != "" {
+			v.Add("chat_id", edit.ChannelUsername)
+		} else {
+			v.Add("chat_id", strconv.FormatInt(edit.ChatID, 10))
+		}
+		v.Add("message_id", strconv.Itoa(edit.MessageID))
 	} else {
-		v.Add("chat_id", strconv.FormatInt(edit.ChatID, 10))
+		v.Add("inline_message_id", edit.InlineMessageID)
 	}
-	v.Add("message_id", strconv.Itoa(edit.MessageID))
-	v.Add("inline_message_id", edit.InlineMessageID)
 
 	if edit.ReplyMarkup != nil {
 		data, err := json.Marshal(edit.ReplyMarkup)
