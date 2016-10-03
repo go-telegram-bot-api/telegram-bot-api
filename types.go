@@ -12,10 +12,17 @@ import (
 // APIResponse is a response from the Telegram API with the result
 // stored raw.
 type APIResponse struct {
-	Ok          bool            `json:"ok"`
-	Result      json.RawMessage `json:"result"`
-	ErrorCode   int             `json:"error_code"`
-	Description string          `json:"description"`
+	Ok          bool                `json:"ok"`
+	Result      json.RawMessage     `json:"result"`
+	ErrorCode   int                 `json:"error_code"`
+	Description string              `json:"description"`
+	Parameters  *ResponseParameters `json:"parameters"`
+}
+
+// ResponseParameters are various errors that can be returned in APIResponse.
+type ResponseParameters struct {
+	MigrateToChatID int `json:"migrate_to_chat_id"` // optional
+	RetryAfter      int `json:"retry_after"`        // optional
 }
 
 // Update is an update response, from GetUpdates.
@@ -61,12 +68,13 @@ type GroupChat struct {
 
 // Chat contains information about the place a message was sent.
 type Chat struct {
-	ID        int64  `json:"id"`
-	Type      string `json:"type"`
-	Title     string `json:"title"`      // optional
-	UserName  string `json:"username"`   // optional
-	FirstName string `json:"first_name"` // optional
-	LastName  string `json:"last_name"`  // optional
+	ID                  int64  `json:"id"`
+	Type                string `json:"type"`
+	Title               string `json:"title"`                          // optional
+	UserName            string `json:"username"`                       // optional
+	FirstName           string `json:"first_name"`                     // optional
+	LastName            string `json:"last_name"`                      // optional
+	AllMembersAreAdmins bool   `json:"all_members_are_administrators"` // optional
 }
 
 // IsPrivate returns if the Chat is a private conversation.
@@ -110,6 +118,7 @@ type Message struct {
 	Entities              *[]MessageEntity `json:"entities"`                // optional
 	Audio                 *Audio           `json:"audio"`                   // optional
 	Document              *Document        `json:"document"`                // optional
+	Game                  *Game            `json:"game"`                    // optional
 	Photo                 *[]PhotoSize     `json:"photo"`                   // optional
 	Sticker               *Sticker         `json:"sticker"`                 // optional
 	Video                 *Video           `json:"video"`                   // optional
@@ -324,11 +333,15 @@ type InlineKeyboardMarkup struct {
 //
 // Note that some values are references as even an empty string
 // will change behavior.
+//
+// CallbackGame, if set, MUST be first button in first row.
 type InlineKeyboardButton struct {
-	Text              string  `json:"text"`
-	URL               *string `json:"url,omitempty"`                 // optional
-	CallbackData      *string `json:"callback_data,omitempty"`       // optional
-	SwitchInlineQuery *string `json:"switch_inline_query,omitempty"` // optional
+	Text                         string        `json:"text"`
+	URL                          *string       `json:"url,omitempty"`                    // optional
+	CallbackData                 *string       `json:"callback_data,omitempty"`          // optional
+	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`    // optional
+	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat"` // optional
+	CallbackGame                 *CallbackGame `json:"callback_game"`                    // optional
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
@@ -338,7 +351,9 @@ type CallbackQuery struct {
 	From            *User    `json:"from"`
 	Message         *Message `json:"message"`           // optional
 	InlineMessageID string   `json:"inline_message_id"` // optional
-	Data            string   `json:"data"`              // optional
+	ChatInstance    string   `json:"chat_instance"`
+	Data            string   `json:"data"`            // optional
+	GameShortName   string   `json:"game_short_name"` // optional
 }
 
 // ForceReply allows the Bot to have users directly reply to it without
@@ -368,6 +383,49 @@ func (chat ChatMember) HasLeft() bool { return chat.Status == "left" }
 
 // WasKicked returns if the ChatMember was kicked from the chat.
 func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
+
+// Game is a game within Telegram.
+type Game struct {
+	Title        string          `json:"title"`
+	Description  string          `json:"description"`
+	Photo        []PhotoSize     `json:"photo"`
+	Text         string          `json:"text"`
+	TextEntities []MessageEntity `json:"text_entities"`
+	Animation    Animation       `json:"animation"`
+}
+
+// Animation is a GIF animation demonstrating the game.
+type Animation struct {
+	FileID   string    `json:"file_id"`
+	Thumb    PhotoSize `json:"thumb"`
+	FileName string    `json:"file_name"`
+	MimeType string    `json:"mime_type"`
+	FileSize int       `json:"file_size"`
+}
+
+// GameHighScore is a user's score and position on the leaderboard.
+type GameHighScore struct {
+	Position int  `json:"position"`
+	User     User `json:"user"`
+	Score    int  `json:"score"`
+}
+
+// CallbackGame is for starting a game in an inline keyboard button.
+type CallbackGame struct{}
+
+// WebhookInfo is information about a currently set webhook.
+type WebhookInfo struct {
+	URL                  string `json:"url"`
+	HasCustomCertificate bool   `json:"has_custom_certificate"`
+	PendingUpdateCount   int    `json:"pending_update_count"`
+	LastErrorDate        int    `json:"last_error_date"`    // optional
+	LastErrorMessage     string `json:"last_error_message"` // optional
+}
+
+// IsSet returns true if a webhook is currently set.
+func (info WebhookInfo) IsSet() bool {
+	return info.URL != ""
+}
 
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {
@@ -460,6 +518,7 @@ type InlineQueryResultAudio struct {
 	ID                  string                `json:"id"`        // required
 	URL                 string                `json:"audio_url"` // required
 	Title               string                `json:"title"`     // required
+	Caption             string                `json:"caption"`
 	Performer           string                `json:"performer"`
 	Duration            int                   `json:"audio_duration"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -472,6 +531,7 @@ type InlineQueryResultVoice struct {
 	ID                  string                `json:"id"`        // required
 	URL                 string                `json:"voice_url"` // required
 	Title               string                `json:"title"`     // required
+	Caption             string                `json:"caption"`
 	Duration            int                   `json:"voice_duration"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
@@ -505,6 +565,14 @@ type InlineQueryResultLocation struct {
 	ThumbURL            string                `json:"thumb_url"`
 	ThumbWidth          int                   `json:"thumb_width"`
 	ThumbHeight         int                   `json:"thumb_height"`
+}
+
+// InlineQueryResultGame is an inline query response game.
+type InlineQueryResultGame struct {
+	Type          string                `json:"type"`
+	ID            string                `json:"id"`
+	GameShortName string                `json:"game_short_name"`
+	ReplyMarkup   *InlineKeyboardMarkup `json:"reply_markup"`
 }
 
 // ChosenInlineResult is an inline query result chosen by a User

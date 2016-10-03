@@ -105,16 +105,17 @@ func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Messa
 //
 // Requires the parameter to hold the file not be in the params.
 // File should be a string to a file path, a FileBytes struct,
-// or a FileReader struct.
+// a FileReader struct, or a url.URL.
 //
 // Note that if your FileReader has a size set to -1, it will read
 // the file into memory to calculate a size.
 func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
 	ms := multipartstreamer.New()
-	ms.WriteFields(params)
 
 	switch f := file.(type) {
 	case string:
+		ms.WriteFields(params)
+
 		fileHandle, err := os.Open(f)
 		if err != nil {
 			return APIResponse{}, err
@@ -128,9 +129,13 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 		ms.WriteReader(fieldname, fileHandle.Name(), fi.Size(), fileHandle)
 	case FileBytes:
+		ms.WriteFields(params)
+
 		buf := bytes.NewBuffer(f.Bytes)
 		ms.WriteReader(fieldname, f.Name, int64(len(f.Bytes)), buf)
 	case FileReader:
+		ms.WriteFields(params)
+
 		if f.Size != -1 {
 			ms.WriteReader(fieldname, f.Name, f.Size, f.Reader)
 
@@ -145,6 +150,10 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		buf := bytes.NewBuffer(data)
 
 		ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
+	case url.URL:
+		params[fieldname] = f.String()
+
+		ms.WriteFields(params)
 	default:
 		return APIResponse{}, errors.New(ErrBadFileType)
 	}
@@ -424,6 +433,20 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 	return apiResp, nil
 }
 
+// GetWebhookInfo allows you to fetch information about a webhook and if
+// one currently is set, along with pending update count and error messages.
+func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
+	resp, err := bot.MakeRequest("getWebhookInfo", url.Values{})
+	if err != nil {
+		return WebhookInfo{}, err
+	}
+
+	var info WebhookInfo
+	err = json.Unmarshal(resp.Result, &info)
+
+	return info, err
+}
+
 // GetUpdatesChan starts and returns a channel for getting updates.
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 	updatesChan := make(chan Update, 100)
@@ -495,8 +518,13 @@ func (bot *BotAPI) AnswerCallbackQuery(config CallbackConfig) (APIResponse, erro
 	v := url.Values{}
 
 	v.Add("callback_query_id", config.CallbackQueryID)
-	v.Add("text", config.Text)
+	if config.Text != "" {
+		v.Add("text", config.Text)
+	}
 	v.Add("show_alert", strconv.FormatBool(config.ShowAlert))
+	if config.URL != "" {
+		v.Add("url", config.URL)
+	}
 
 	bot.debugLog("answerCallbackQuery", v, nil)
 
@@ -647,4 +675,19 @@ func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error)
 	bot.debugLog("unbanChatMember", v, nil)
 
 	return bot.MakeRequest("unbanChatMember", v)
+}
+
+// GetGameHighScores allows you to get the high scores for a game.
+func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHighScore, error) {
+	v, _ := config.values()
+
+	resp, err := bot.MakeRequest(config.method(), v)
+	if err != nil {
+		return []GameHighScore{}, err
+	}
+
+	var highScores []GameHighScore
+	err = json.Unmarshal(resp.Result, &highScores)
+
+	return highScores, err
 }
