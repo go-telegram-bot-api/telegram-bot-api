@@ -278,6 +278,7 @@ type AudioConfig struct {
 	Duration  int
 	Performer string
 	Title     string
+	Caption   string
 }
 
 // values returns a url.Values representation of AudioConfig.
@@ -294,6 +295,9 @@ func (config AudioConfig) values() (url.Values, error) {
 	}
 	if config.Title != "" {
 		v.Add("title", config.Title)
+	}
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
 	}
 
 	return v, nil
