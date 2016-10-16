@@ -317,6 +317,9 @@ func (config AudioConfig) params() (map[string]string, error) {
 	if config.Title != "" {
 		params["title"] = config.Title
 	}
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+	}
 
 	return params, nil
 }
