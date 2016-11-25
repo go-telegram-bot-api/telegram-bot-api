@@ -525,6 +525,7 @@ func (bot *BotAPI) AnswerCallbackQuery(config CallbackConfig) (APIResponse, erro
 	if config.URL != "" {
 		v.Add("url", config.URL)
 	}
+	v.Add("cache_time", strconv.Itoa(config.CacheTime))
 
 	bot.debugLog("answerCallbackQuery", v, nil)
 

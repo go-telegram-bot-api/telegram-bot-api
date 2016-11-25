@@ -21,8 +21,8 @@ type APIResponse struct {
 
 // ResponseParameters are various errors that can be returned in APIResponse.
 type ResponseParameters struct {
-	MigrateToChatID int `json:"migrate_to_chat_id"` // optional
-	RetryAfter      int `json:"retry_after"`        // optional
+	MigrateToChatID int64 `json:"migrate_to_chat_id"` // optional
+	RetryAfter      int   `json:"retry_after"`        // optional
 }
 
 // Update is an update response, from GetUpdates.
@@ -30,6 +30,8 @@ type Update struct {
 	UpdateID           int                 `json:"update_id"`
 	Message            *Message            `json:"message"`
 	EditedMessage      *Message            `json:"edited_message"`
+	ChannelPost        *Message            `json:"channel_post"`
+	EditedChannelPost  *Message            `json:"edited_channel_post"`
 	InlineQuery        *InlineQuery        `json:"inline_query"`
 	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result"`
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
@@ -111,6 +113,7 @@ type Message struct {
 	Chat                  *Chat            `json:"chat"`
 	ForwardFrom           *User            `json:"forward_from"`            // optional
 	ForwardFromChat       *Chat            `json:"forward_from_chat"`       // optional
+	ForwardFromMessageID  int              `json:"forward_from_message_id"` // optional
 	ForwardDate           int              `json:"forward_date"`            // optional
 	ReplyToMessage        *Message         `json:"reply_to_message"`        // optional
 	EditDate              int              `json:"edit_date"`               // optional
@@ -321,6 +324,12 @@ type KeyboardButton struct {
 type ReplyKeyboardHide struct {
 	HideKeyboard bool `json:"hide_keyboard"`
 	Selective    bool `json:"selective"` // optional
+}
+
+// ReplyKeyboardRemove allows the Bot to hide a custom keyboard.
+type ReplyKeyboardRemove struct {
+	RemoveKeyboard bool `json:"remove_keyboard"`
+	Selective      bool `json:"selective"`
 }
 
 // InlineKeyboardMarkup is a custom keyboard presented for an inline bot.

@@ -296,6 +296,9 @@ func (config AudioConfig) values() (url.Values, error) {
 	if config.Title != "" {
 		v.Add("title", config.Title)
 	}
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+	}
 
 	return v, nil
 }
@@ -313,6 +316,9 @@ func (config AudioConfig) params() (map[string]string, error) {
 	}
 	if config.Title != "" {
 		params["title"] = config.Title
+	}
+	if config.Caption != "" {
+		params["caption"] = config.Caption
 	}
 
 	return params, nil
@@ -561,13 +567,14 @@ func (config GameConfig) method() string {
 
 // SetGameScoreConfig allows you to update the game score in a chat.
 type SetGameScoreConfig struct {
-	UserID          int
-	Score           int
-	ChatID          int
-	ChannelUsername string
-	MessageID       int
-	InlineMessageID string
-	EditMessage     bool
+	UserID             int
+	Score              int
+	Force              bool
+	DisableEditMessage bool
+	ChatID             int
+	ChannelUsername    string
+	MessageID          int
+	InlineMessageID    string
 }
 
 func (config SetGameScoreConfig) values() (url.Values, error) {
@@ -585,7 +592,7 @@ func (config SetGameScoreConfig) values() (url.Values, error) {
 	} else {
 		v.Add("inline_message_id", config.InlineMessageID)
 	}
-	v.Add("edit_message", strconv.FormatBool(config.EditMessage))
+	v.Add("disable_edit_message", strconv.FormatBool(config.DisableEditMessage))
 
 	return v, nil
 }
@@ -756,6 +763,7 @@ type CallbackConfig struct {
 	Text            string `json:"text"`
 	ShowAlert       bool   `json:"show_alert"`
 	URL             string `json:"url"`
+	CacheTime       int    `json:"cache_time"`
 }
 
 // ChatMemberConfig contains information about a user in a chat for use
