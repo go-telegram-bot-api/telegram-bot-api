@@ -198,7 +198,11 @@ type MessageConfig struct {
 
 // values returns a url.Values representation of MessageConfig.
 func (config MessageConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		data := url.Values{}
+		return data, err
+	}
 	v.Add("text", config.Text)
 	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
 	if config.ParseMode != "" {
