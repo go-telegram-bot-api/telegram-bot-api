@@ -198,7 +198,10 @@ type MessageConfig struct {
 
 // values returns a url.Values representation of MessageConfig.
 func (config MessageConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 	v.Add("text", config.Text)
 	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
 	if config.ParseMode != "" {
@@ -223,7 +226,10 @@ type ForwardConfig struct {
 
 // values returns a url.Values representation of ForwardConfig.
 func (config ForwardConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 	v.Add("from_chat_id", strconv.FormatInt(config.FromChatID, 10))
 	v.Add("message_id", strconv.Itoa(config.MessageID))
 	return v, nil
@@ -253,7 +259,10 @@ func (config PhotoConfig) params() (map[string]string, error) {
 
 // Values returns a url.Values representation of PhotoConfig.
 func (config PhotoConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add(config.name(), config.FileID)
 	if config.Caption != "" {
@@ -283,7 +292,10 @@ type AudioConfig struct {
 
 // values returns a url.Values representation of AudioConfig.
 func (config AudioConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add(config.name(), config.FileID)
 	if config.Duration != 0 {
@@ -341,7 +353,10 @@ type DocumentConfig struct {
 
 // values returns a url.Values representation of DocumentConfig.
 func (config DocumentConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add(config.name(), config.FileID)
 
@@ -372,7 +387,10 @@ type StickerConfig struct {
 
 // values returns a url.Values representation of StickerConfig.
 func (config StickerConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add(config.name(), config.FileID)
 
@@ -405,7 +423,10 @@ type VideoConfig struct {
 
 // values returns a url.Values representation of VideoConfig.
 func (config VideoConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add(config.name(), config.FileID)
 	if config.Duration != 0 {
@@ -444,7 +465,10 @@ type VoiceConfig struct {
 
 // values returns a url.Values representation of VoiceConfig.
 func (config VoiceConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add(config.name(), config.FileID)
 	if config.Duration != 0 {
@@ -484,7 +508,10 @@ type LocationConfig struct {
 
 // values returns a url.Values representation of LocationConfig.
 func (config LocationConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
@@ -508,7 +535,10 @@ type VenueConfig struct {
 }
 
 func (config VenueConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
@@ -534,7 +564,10 @@ type ContactConfig struct {
 }
 
 func (config ContactConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add("phone_number", config.PhoneNumber)
 	v.Add("first_name", config.FirstName)
@@ -554,7 +587,10 @@ type GameConfig struct {
 }
 
 func (config GameConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add("game_short_name", config.GameShortName)
 
@@ -640,7 +676,10 @@ type ChatActionConfig struct {
 
 // values returns a url.Values representation of ChatActionConfig.
 func (config ChatActionConfig) values() (url.Values, error) {
-	v, _ := config.BaseChat.values()
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
 	v.Add("action", config.Action)
 	return v, nil
 }
@@ -659,7 +698,10 @@ type EditMessageTextConfig struct {
 }
 
 func (config EditMessageTextConfig) values() (url.Values, error) {
-	v, _ := config.BaseEdit.values()
+	v, err := config.BaseEdit.values()
+	if err != nil {
+		return v, err
+	}
 
 	v.Add("text", config.Text)
 	v.Add("parse_mode", config.ParseMode)
