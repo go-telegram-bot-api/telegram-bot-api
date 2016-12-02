@@ -348,9 +348,9 @@ type InlineKeyboardButton struct {
 	Text                         string        `json:"text"`
 	URL                          *string       `json:"url,omitempty"`                    // optional
 	CallbackData                 *string       `json:"callback_data,omitempty"`          // optional
-	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`    // optional
-	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat"` // optional
-	CallbackGame                 *CallbackGame `json:"callback_game"`                    // optional
+	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty,omitempty"`    // optional
+	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
+	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
