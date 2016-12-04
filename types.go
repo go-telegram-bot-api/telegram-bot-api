@@ -597,8 +597,8 @@ type ChosenInlineResult struct {
 // as an inline query result.
 type InputTextMessageContent struct {
 	Text                  string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	ParseMode             string `json:"parse_mode,omitempty"`
+	DisableWebPagePreview bool   `json:"disable_web_page_preview,omitempty"`
 }
 
 // InputLocationMessageContent contains a location for displaying
