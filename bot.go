@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/technoweenie/multipartstreamer"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/technoweenie/multipartstreamer"
 )
 
 // BotAPI allows you to interact with the Telegram Bot API.
@@ -448,8 +449,9 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 }
 
 // GetUpdatesChan starts and returns a channel for getting updates.
-func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
-	updatesChan := make(chan Update, 100)
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (updatesChannel, error) {
+	ch := make(chan Update, 100)
+	var updatesCh updatesChannel = ch
 
 	go func() {
 		for {
@@ -465,18 +467,19 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 			for _, update := range updates {
 				if update.UpdateID >= config.Offset {
 					config.Offset = update.UpdateID + 1
-					updatesChan <- update
+					ch <- update
 				}
 			}
 		}
 	}()
 
-	return updatesChan, nil
+	return updatesCh, nil
 }
 
 // ListenForWebhook registers a http handler for a webhook.
-func (bot *BotAPI) ListenForWebhook(pattern string) <-chan Update {
-	updatesChan := make(chan Update, 100)
+func (bot *BotAPI) ListenForWebhook(pattern string) updatesChannel {
+	ch := make(chan Update, 100)
+	var updatesCh updatesChannel = ch
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
@@ -484,10 +487,10 @@ func (bot *BotAPI) ListenForWebhook(pattern string) <-chan Update {
 		var update Update
 		json.Unmarshal(bytes, &update)
 
-		updatesChan <- update
+		ch <- update
 	})
 
-	return updatesChan
+	return updatesCh
 }
 
 // AnswerInlineQuery sends a response to an inline query.

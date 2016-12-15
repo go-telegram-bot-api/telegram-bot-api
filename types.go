@@ -37,6 +37,16 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 }
 
+//updatesChannel is the channel for getting updates.
+type updatesChannel <-chan Update
+
+//Clear discards all the actual incoming updates
+func (ch updatesChannel) Clear() {
+	for len(ch) != 0 {
+		<-ch
+	}
+}
+
 // User is a user on Telegram.
 type User struct {
 	ID        int    `json:"id"`
