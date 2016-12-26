@@ -1,13 +1,14 @@
 package tgbotapi_test
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -483,6 +484,12 @@ func ExampleNewBotAPI() {
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
+
+	//If you need to clear all the updates when bot just started:
+	//Wait to gather all the new updates (choose the time conveniently)
+	time.Sleep(time.Millisecond * 500)
+	//discard all the updates preventing the spam after your server has been down
+	updates.Clear()
 
 	for update := range updates {
 		if update.Message == nil {
