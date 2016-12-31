@@ -81,7 +81,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	json.Unmarshal(bytes, &apiResp)
 
 	if !apiResp.Ok {
-		return APIResponse{}, errors.New(apiResp.Description)
+		return apiResp, errors.New(apiResp.Description)
 	}
 
 	return apiResp, nil
