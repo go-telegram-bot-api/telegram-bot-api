@@ -18,14 +18,14 @@ const (
 
 // Constant values for ChatActions
 const (
-	ChatTyping         = "typing"
-	ChatUploadPhoto    = "upload_photo"
-	ChatRecordVideo    = "record_video"
-	ChatUploadVideo    = "upload_video"
-	ChatRecordAudio    = "record_audio"
-	ChatUploadAudio    = "upload_audio"
+	ChatTyping = "typing"
+	ChatUploadPhoto = "upload_photo"
+	ChatRecordVideo = "record_video"
+	ChatUploadVideo = "upload_video"
+	ChatRecordAudio = "record_audio"
+	ChatUploadAudio = "upload_audio"
 	ChatUploadDocument = "upload_document"
-	ChatFindLocation   = "find_location"
+	ChatFindLocation = "find_location"
 )
 
 // API errors
@@ -37,14 +37,14 @@ const (
 // Constant values for ParseMode in MessageConfig
 const (
 	ModeMarkdown = "Markdown"
-	ModeHTML     = "HTML"
+	ModeHTML = "HTML"
 )
 
 // Library errors
 const (
 	// ErrBadFileType happens when you pass an unknown type
 	ErrBadFileType = "bad file type"
-	ErrBadURL      = "bad or empty url"
+	ErrBadURL = "bad or empty url"
 )
 
 // Chattable is any config type that can be sent.
@@ -221,7 +221,7 @@ type ForwardConfig struct {
 	BaseChat
 	FromChatID          int64 // required
 	FromChannelUsername string
-	MessageID           int // required
+	MessageID           int   // required
 }
 
 // values returns a url.Values representation of ForwardConfig.
@@ -349,7 +349,7 @@ func (config AudioConfig) method() string {
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
-	Caption  string
+	Caption string
 }
 
 // values returns a url.Values representation of DocumentConfig.
@@ -480,6 +480,10 @@ func (config VoiceConfig) values() (url.Values, error) {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}
 
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+	}
+
 	return v, nil
 }
 
@@ -489,6 +493,10 @@ func (config VoiceConfig) params() (map[string]string, error) {
 
 	if config.Duration != 0 {
 		params["duration"] = strconv.Itoa(config.Duration)
+	}
+
+	if config.Caption != "" {
+		params["caption"] = config.Caption
 	}
 
 	return params, nil
