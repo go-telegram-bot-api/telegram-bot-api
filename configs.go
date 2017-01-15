@@ -474,6 +474,9 @@ func (config VoiceConfig) values() (url.Values, error) {
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
 	}
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+	}
 
 	return v, nil
 }
@@ -484,6 +487,9 @@ func (config VoiceConfig) params() (map[string]string, error) {
 
 	if config.Duration != 0 {
 		params["duration"] = strconv.Itoa(config.Duration)
+	}
+	if config.Caption != "" {
+		params["caption"] = config.Caption
 	}
 
 	return params, nil
