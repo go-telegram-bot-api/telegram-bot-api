@@ -770,6 +770,7 @@ type UpdateConfig struct {
 type WebhookConfig struct {
 	URL         *url.URL
 	Certificate interface{}
+	MaxConnections int
 }
 
 // FileBytes contains information about a set of bytes to upload
