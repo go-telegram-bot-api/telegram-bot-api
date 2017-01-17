@@ -409,15 +409,22 @@ func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 // If you do not have a legitimate TLS certificate, you need to include
 // your self signed certificate with the config.
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
+
 	if config.Certificate == nil {
 		v := url.Values{}
 		v.Add("url", config.URL.String())
+		if config.MaxConnections != 0 {
+			v.Add("max_connections", strconv.Itoa(config.MaxConnections))
+		}
 
 		return bot.MakeRequest("setWebhook", v)
 	}
 
 	params := make(map[string]string)
 	params["url"] = config.URL.String()
+	if config.MaxConnections != 0 {
+		params["max_connections"] = strconv.Itoa(config.MaxConnections)
+	}
 
 	resp, err := bot.UploadFile("setWebhook", params, "certificate", config.Certificate)
 	if err != nil {
