@@ -482,9 +482,19 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (updatesChannel, error) {
 	return ch, nil
 }
 
-// ListenForWebhook registers a http handler for a webhook.
+// ListenForWebhook registers a http handler for a webhook with custom buffer size.
+// Beware: larger values will increase memory consumption.
+func (bot *BotAPI) ListenForWebhookWithBufferSize(pattern string, bufferSize int) updatesChannel {
+	return listenForWebhookWithBufferSize(pattern, bufferSize)
+}
+
+// ListenForWebhook registers a http handler for a webhook, with buffer size set to default value - 100.
 func (bot *BotAPI) ListenForWebhook(pattern string) updatesChannel {
-	ch := make(chan Update, 100)
+	return listenForWebhookWithBufferSize(pattern, 100)
+}
+
+func listenForWebhookWithBufferSize(pattern string, bufferSize int) updatesChannel {
+	ch := make(chan Update, bufferSize)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
