@@ -372,6 +372,10 @@ func (config DocumentConfig) values() (url.Values, error) {
 func (config DocumentConfig) params() (map[string]string, error) {
 	params, _ := config.BaseFile.params()
 
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+	}
+
 	return params, nil
 }
 
