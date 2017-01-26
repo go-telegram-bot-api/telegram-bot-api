@@ -37,11 +37,11 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 }
 
-//updatesChannel is the channel for getting updates.
-type updatesChannel <-chan Update
+// UpdatesChannel is the channel for getting updates.
+type UpdatesChannel <-chan Update
 
-//Clear discards all the actual incoming updates
-func (ch updatesChannel) Clear() {
+// Clear discards all unprocessed incoming updates.
+func (ch UpdatesChannel) Clear() {
 	for len(ch) != 0 {
 		<-ch
 	}

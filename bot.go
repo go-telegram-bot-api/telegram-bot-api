@@ -456,7 +456,7 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 }
 
 // GetUpdatesChan starts and returns a channel for getting updates.
-func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (updatesChannel, error) {
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	ch := make(chan Update, 100)
 
 	go func() {
@@ -483,7 +483,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (updatesChannel, error) {
 }
 
 // ListenForWebhook registers a http handler for a webhook.
-func (bot *BotAPI) ListenForWebhook(pattern string) updatesChannel {
+func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, 100)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {

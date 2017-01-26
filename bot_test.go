@@ -485,10 +485,9 @@ func ExampleNewBotAPI() {
 
 	updates, err := bot.GetUpdatesChan(u)
 
-	//If you need to clear all the updates when bot just started:
-	//Wait to gather all the new updates (choose the time conveniently)
+	// Optional: wait for updates and clear them if you don't want to handle
+	// a large backlog of old messages
 	time.Sleep(time.Millisecond * 500)
-	//discard all the updates preventing the spam after your server has been down
 	updates.Clear()
 
 	for update := range updates {
