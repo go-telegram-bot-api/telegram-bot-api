@@ -68,6 +68,10 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 		return APIResponse{}, errors.New(ErrAPIForbidden)
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return APIResponse{}, errors.New(http.StatusText(resp.StatusCode))
+	}
+
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return APIResponse{}, err
