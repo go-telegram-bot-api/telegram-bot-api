@@ -21,8 +21,10 @@ import (
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
-	Token  string       `json:"token"`
-	Debug  bool         `json:"debug"`
+	Token  string `json:"token"`
+	Debug  bool   `json:"debug"`
+	Buffer int    `json:"buffer"`
+
 	Self   User         `json:"-"`
 	Client *http.Client `json:"-"`
 }
@@ -42,11 +44,12 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:  token,
 		Client: client,
+		Buffer: 100,
 	}
 
 	self, err := bot.GetMe()
 	if err != nil {
-		return &BotAPI{}, err
+		return nil, err
 	}
 
 	bot.Self = self
@@ -461,7 +464,7 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 
 // GetUpdatesChan starts and returns a channel for getting updates.
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
-	ch := make(chan Update, 100)
+	ch := make(chan Update, bot.Buffer)
 
 	go func() {
 		for {
@@ -488,7 +491,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 
 // ListenForWebhook registers a http handler for a webhook.
 func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
-	ch := make(chan Update, 100)
+	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
