@@ -451,6 +451,10 @@ func (config VideoConfig) values() (url.Values, error) {
 func (config VideoConfig) params() (map[string]string, error) {
 	params, _ := config.BaseFile.params()
 
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+	}
+
 	return params, nil
 }
 
