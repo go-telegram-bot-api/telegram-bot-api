@@ -12,19 +12,21 @@ import (
 )
 
 const (
-	TestToken              = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
-	ChatID                 = 76918703
-	ReplyToMessageID       = 35
-	ExistingPhotoFileID    = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
-	ExistingDocumentFileID = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
-	ExistingAudioFileID    = "BQADAgADRgADjMcoCdXg3lSIN49lAg"
-	ExistingVoiceFileID    = "AwADAgADWQADjMcoCeul6r_q52IyAg"
-	ExistingVideoFileID    = "BAADAgADZgADjMcoCav432kYe0FRAg"
-	ExistingStickerFileID  = "BQADAgADcwADjMcoCbdl-6eB--YPAg"
+	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
+	ChatID                  = 76918703
+	ReplyToMessageID        = 35
+	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
+	ExistingDocumentFileID  = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
+	ExistingAudioFileID     = "BQADAgADRgADjMcoCdXg3lSIN49lAg"
+	ExistingVoiceFileID     = "AwADAgADWQADjMcoCeul6r_q52IyAg"
+	ExistingVideoFileID     = "BAADAgADZgADjMcoCav432kYe0FRAg"
+	ExistingVideoNoteFileID = "DQADAgADdQAD70cQSUK41dLsRMqfAg"
+	ExistingStickerFileID   = "BQADAgADcwADjMcoCbdl-6eB--YPAg"
 )
 
 func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
 	bot, err := tgbotapi.NewBotAPI(TestToken)
+	bot.Debug = true
 
 	if err != nil {
 		t.Error(err)
@@ -303,6 +305,34 @@ func TestSendWithExistingVideo(t *testing.T) {
 	msg := tgbotapi.NewVideoShare(ChatID, ExistingVideoFileID)
 	msg.Duration = 10
 	msg.Caption = "TEST"
+
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendWithNewVideoNote(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewVideoNoteUpload(ChatID, 240, "tests/videonote.mp4")
+	msg.Duration = 10
+
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendWithExistingVideoNote(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewVideoNoteShare(ChatID, 240, ExistingVideoNoteFileID)
+	msg.Duration = 10
 
 	_, err := bot.Send(msg)
 
