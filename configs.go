@@ -468,6 +468,57 @@ func (config VideoConfig) method() string {
 	return "sendVideo"
 }
 
+// VideoNoteConfig contains information about a SendVideoNote request.
+type VideoNoteConfig struct {
+	BaseFile
+	Duration int
+	Length   int
+}
+
+// values returns a url.Values representation of VideoNoteConfig.
+func (config VideoNoteConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add(config.name(), config.FileID)
+	if config.Duration != 0 {
+		v.Add("duration", strconv.Itoa(config.Duration))
+	}
+
+	// Telegram API seems to have a bug, if no length is provided or it is 0, it will send an error response
+	if config.Length != 0 {
+		v.Add("length", strconv.Itoa(config.Length))
+	}
+
+	return v, nil
+}
+
+// params returns a map[string]string representation of VideoNoteConfig.
+func (config VideoNoteConfig) params() (map[string]string, error) {
+	params, _ := config.BaseFile.params()
+
+	if config.Length != 0 {
+		params["length"] = strconv.Itoa(config.Length)
+	}
+	if config.Duration != 0 {
+		params["duration"] = strconv.Itoa(config.Duration)
+	}
+
+	return params, nil
+}
+
+// name returns the field name for the VideoNote.
+func (config VideoNoteConfig) name() string {
+	return "video_note"
+}
+
+// method returns Telegram API method name for sending VideoNote.
+func (config VideoNoteConfig) method() string {
+	return "sendVideoNote"
+}
+
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
