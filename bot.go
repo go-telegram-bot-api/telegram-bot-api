@@ -255,6 +255,20 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	}
 }
 
+// DeleteMessage deletes a message from a Chat
+//
+// It requires the Message to delete
+func (bot *BotAPI) DeleteMessage(message Message) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(message.Chat.ID, 10))
+	v.Add("message_id", strconv.Itoa(message.MessageID))
+
+	bot.debugLog("deleteMessage", v, nil)
+
+	return bot.MakeRequest("deleteMessage", v)
+}
+
 // debugLog checks if the bot is currently running in debug mode, and if
 // so will display information about the request and response in the
 // debug log.
