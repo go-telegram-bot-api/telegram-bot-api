@@ -899,3 +899,87 @@ type ChatConfigWithUser struct {
 	SuperGroupUsername string
 	UserID             int
 }
+
+type InvoiceConfig struct {
+	BaseChat
+	Title               string          // required
+	Description         string          // required
+	Payload             string          // required
+	ProviderToken       string          // required
+	StartParameter      string          // required
+	Currency            string          // required
+	Prices              *[]LabeledPrice // required
+	PhotoUrl            string
+	PhotoSize           int
+	PhotoWidth          int
+	PhotoHeight         int
+	NeedName            bool
+	NeedPhoneNumber     bool
+	NeedEmail           bool
+	NeedShippingAddress bool
+	IsFlexible          bool
+}
+
+func (config InvoiceConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+	v.Add("title", config.Title)
+	v.Add("description", config.Description)
+	v.Add("payload", config.Payload)
+	v.Add("provider_token", config.ProviderToken)
+	v.Add("start_parameter", config.StartParameter)
+	v.Add("currency", config.Currency)
+	data, err := json.Marshal(config.Prices)
+	if err != nil {
+		return v, err
+	}
+	v.Add("prices", string(data))
+	if config.PhotoUrl != "" {
+		v.Add("photo_url", config.PhotoUrl)
+	}
+	if config.PhotoSize != 0 {
+		v.Add("photo_size", strconv.Itoa(config.PhotoSize))
+	}
+	if config.PhotoWidth != 0 {
+		v.Add("photo_width", strconv.Itoa(config.PhotoWidth))
+	}
+	if config.PhotoHeight != 0 {
+		v.Add("photo_height", strconv.Itoa(config.PhotoHeight))
+	}
+	if config.NeedName != false {
+		v.Add("need_name", strconv.FormatBool(config.NeedName))
+	}
+	if config.NeedPhoneNumber != false {
+		v.Add("need_phone_number", strconv.FormatBool(config.NeedPhoneNumber))
+	}
+	if config.NeedEmail != false {
+		v.Add("need_email", strconv.FormatBool(config.NeedEmail))
+	}
+	if config.NeedShippingAddress != false {
+		v.Add("need_shipping_address", strconv.FormatBool(config.NeedShippingAddress))
+	}
+	if config.IsFlexible != false {
+		v.Add("is_flexible", strconv.FormatBool(config.IsFlexible))
+	}
+
+	return v, nil
+}
+
+func (config InvoiceConfig) method() string {
+	return "sendInvoice"
+}
+
+type ShippingConfig struct {
+	ShippingQueryID string // required
+	Ok              bool   // required
+	ShippingOptions *[]ShippingOption
+	ErrorMessage    string
+}
+
+type PreCheckoutConfig struct {
+	PreCheckoutQueryID string // required
+	Ok                 bool   // required
+	ErrorMessage       string
+}

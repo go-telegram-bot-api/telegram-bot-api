@@ -640,3 +640,24 @@ func NewCallbackWithAlert(id, text string) CallbackConfig {
 		ShowAlert:       true,
 	}
 }
+
+func NewInvoice(chatID int64, title, description, payload, providerToken, startParameter, currency string, prices *[]LabeledPrice, photoUrl string, photoSize, photoWidth, photoHeight int, needName, needPhoneNumber, needEmail, needShippingAddress, isFlexible bool) InvoiceConfig {
+	return InvoiceConfig{
+		BaseChat:            BaseChat{ChatID: chatID},
+		Title:               title,
+		Description:         description,
+		Payload:             payload,
+		ProviderToken:       providerToken,
+		StartParameter:      startParameter,
+		Currency:            currency,
+		Prices:              prices,
+		PhotoUrl:            photoUrl,
+		PhotoSize:           photoSize,
+		PhotoWidth:          photoWidth,
+		PhotoHeight:         photoHeight,
+		NeedName:            needName,
+		NeedPhoneNumber:     needPhoneNumber,
+		NeedEmail:           needEmail,
+		NeedShippingAddress: needShippingAddress,
+		IsFlexible:          isFlexible}
+}

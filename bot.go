@@ -704,3 +704,37 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 
 	return highScores, err
 }
+
+func (bot *BotAPI) AnswerShippingQuery(config ShippingConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("shipping_query_id", config.ShippingQueryID)
+	v.Add("ok", strconv.FormatBool(config.Ok))
+	if config.Ok == true {
+		data, err := json.Marshal(config.ShippingOptions)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		v.Add("shipping_options", string(data))
+	} else {
+		v.Add("error_message", config.ErrorMessage)
+	}
+
+	bot.debugLog("answerShippingQuery", v, nil)
+
+	return bot.MakeRequest("answerShippingQuery", v)
+}
+
+func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("pre_checkout_query_id", config.PreCheckoutQueryID)
+	v.Add("ok", strconv.FormatBool(config.Ok))
+	if config.Ok != true {
+		v.Add("error", config.ErrorMessage)
+	}
+
+	bot.debugLog("answerPreCheckoutQuery", v, nil)
+
+	return bot.MakeRequest("answerPreCheckoutQuery", v)
+}
