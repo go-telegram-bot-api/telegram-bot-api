@@ -144,7 +144,7 @@ type Message struct {
 	Contact               *Contact           `json:"contact"`                 // optional
 	Location              *Location          `json:"location"`                // optional
 	Venue                 *Venue             `json:"venue"`                   // optional
-	NewChatMember         *User              `json:"new_chat_member"`         // optional
+	NewChatMembers        *[]User            `json:"new_chat_members"`        // optional
 	LeftChatMember        *User              `json:"left_chat_member"`        // optional
 	NewChatTitle          string             `json:"new_chat_title"`          // optional
 	NewChatPhoto          *[]PhotoSize       `json:"new_chat_photo"`          // optional
@@ -509,6 +509,7 @@ type InlineQueryResultGIF struct {
 	URL                 string                `json:"gif_url"` // required
 	Width               int                   `json:"gif_width"`
 	Height              int                   `json:"gif_height"`
+	Duration            int                   `json:"gif_duration"`
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
@@ -523,6 +524,7 @@ type InlineQueryResultMPEG4GIF struct {
 	URL                 string                `json:"mpeg4_url"` // required
 	Width               int                   `json:"mpeg4_width"`
 	Height              int                   `json:"mpeg4_height"`
+	Duration            int                   `json:"mpeg4_duration"`
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
