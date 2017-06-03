@@ -58,6 +58,21 @@ func TestGetUpdates(t *testing.T) {
 	}
 }
 
+func TestDeleteMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	_, err := bot.DeleteMessage(message)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
 func TestSendWithMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
