@@ -288,6 +288,7 @@ type AudioConfig struct {
 	Duration  int
 	Performer string
 	Title     string
+	Caption   string
 }
 
 // values returns a url.Values representation of AudioConfig.
