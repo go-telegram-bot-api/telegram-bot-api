@@ -900,6 +900,7 @@ type ChatConfigWithUser struct {
 	UserID             int
 }
 
+// InvoiceConfig contains information for sendInvoice request.
 type InvoiceConfig struct {
 	BaseChat
 	Title               string          // required
@@ -909,7 +910,7 @@ type InvoiceConfig struct {
 	StartParameter      string          // required
 	Currency            string          // required
 	Prices              *[]LabeledPrice // required
-	PhotoUrl            string
+	PhotoURL            string
 	PhotoSize           int
 	PhotoWidth          int
 	PhotoHeight         int
@@ -936,8 +937,8 @@ func (config InvoiceConfig) values() (url.Values, error) {
 		return v, err
 	}
 	v.Add("prices", string(data))
-	if config.PhotoUrl != "" {
-		v.Add("photo_url", config.PhotoUrl)
+	if config.PhotoURL != "" {
+		v.Add("photo_url", config.PhotoURL)
 	}
 	if config.PhotoSize != 0 {
 		v.Add("photo_size", strconv.Itoa(config.PhotoSize))
@@ -971,15 +972,17 @@ func (config InvoiceConfig) method() string {
 	return "sendInvoice"
 }
 
+// ShippingConfig contains information for answerShippingQuery request.
 type ShippingConfig struct {
 	ShippingQueryID string // required
-	Ok              bool   // required
+	OK              bool   // required
 	ShippingOptions *[]ShippingOption
 	ErrorMessage    string
 }
 
+// PreCheckoutConfig conatins information for answerPreCheckoutQuery request.
 type PreCheckoutConfig struct {
 	PreCheckoutQueryID string // required
-	Ok                 bool   // required
+	OK                 bool   // required
 	ErrorMessage       string
 }

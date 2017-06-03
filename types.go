@@ -652,7 +652,7 @@ type InputContactMessageContent struct {
 	LastName    string `json:"last_name"`
 }
 
-// Invoice contains information about invoice
+// Invoice contains basic information about an invoice.
 type Invoice struct {
 	Title          string `json:"title"`
 	Description    string `json:"description"`
@@ -661,11 +661,13 @@ type Invoice struct {
 	TotalAmount    int    `json:"total_amount"`
 }
 
+// LabeledPrice represents a portion of the price for goods or services.
 type LabeledPrice struct {
 	Label  string `json:"label"`
 	Amount int    `json:"amount"`
 }
 
+// ShippingAddress represents a shipping address.
 type ShippingAddress struct {
 	CountryCode string `json:"country_code"`
 	State       string `json:"state"`
@@ -675,6 +677,7 @@ type ShippingAddress struct {
 	PostCode    string `json:"post_code"`
 }
 
+// OrderInfo represents information about an order.
 type OrderInfo struct {
 	Name            string           `json:"name,omitempty"`
 	PhoneNumber     string           `json:"phone_number,omitempty"`
@@ -682,12 +685,14 @@ type OrderInfo struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
+// ShippingOption represents one shipping option.
 type ShippingOption struct {
 	ID     string          `json:"id"`
 	Title  string          `json:"title"`
 	Prices *[]LabeledPrice `json:"prices"`
 }
 
+// SuccessfulPayment contains basic information about a successful payment.
 type SuccessfulPayment struct {
 	Currency                string     `json:"currency"`
 	TotalAmount             int        `json:"total_amount"`
@@ -698,6 +703,7 @@ type SuccessfulPayment struct {
 	ProviderPaymentChargeID string     `json:"provider_payment_charge_id"`
 }
 
+// ShippingQuery contains information about an incoming shipping query.
 type ShippingQuery struct {
 	ID              string           `json:"id"`
 	From            *User            `json:"from"`
@@ -705,6 +711,7 @@ type ShippingQuery struct {
 	ShippingAddress *ShippingAddress `json:"shipping_address"`
 }
 
+// PreCheckoutQuery contains information about an incoming pre-checkout query.
 type PreCheckoutQuery struct {
 	ID               string     `json:"id"`
 	From             *User      `json:"from"`
