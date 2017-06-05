@@ -21,6 +21,8 @@ import (
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
+	APIEndpoint string `json:"api_endpoint"`
+
 	Token  string `json:"token"`
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
@@ -42,6 +44,7 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
+		APIEndpoint: APIEndpoint,
 		Token:  token,
 		Client: client,
 		Buffer: 100,
@@ -59,7 +62,7 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 
 // MakeRequest makes a request to a specific endpoint with our token.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.APIEndpoint, bot.Token, endpoint)
 
 	resp, err := bot.Client.PostForm(method, params)
 	if err != nil {
