@@ -740,3 +740,15 @@ func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse
 
 	return bot.MakeRequest("answerPreCheckoutQuery", v)
 }
+
+// DeleteMessage deletes a message in a chat
+func (bot *BotAPI) DeleteMessage(config DeleteMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
