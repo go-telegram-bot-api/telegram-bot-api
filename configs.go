@@ -883,6 +883,7 @@ type CallbackConfig struct {
 type ChatMemberConfig struct {
 	ChatID             int64
 	SuperGroupUsername string
+	ChannelUsername    string
 	UserID             int
 }
 
