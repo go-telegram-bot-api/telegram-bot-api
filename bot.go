@@ -674,14 +674,16 @@ func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) 
 }
 
 // UnbanChatMember unbans a user from a chat. Note that this only will work
-// in supergroups, and requires the bot to be an admin.
+// in supergroups and channels, and requires the bot to be an admin.
 func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
+	if config.SuperGroupUsername != "" {
 		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
 
