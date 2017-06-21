@@ -616,3 +616,22 @@ func ExampleAnswerInlineQuery() {
 		}
 	}
 }
+
+func TestDeleteMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	deleteMessageConfig := tgbotapi.DeleteMessageConfig{
+		ChatID:    message.Chat.ID,
+		MessageID: message.MessageID,
+	}
+	_, err := bot.DeleteMessage(deleteMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}

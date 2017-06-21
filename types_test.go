@@ -1,13 +1,14 @@
 package tgbotapi_test
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"testing"
 	"time"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func TestUserStringWith(t *testing.T) {
-	user := tgbotapi.User{0, "Test", "Test", ""}
+	user := tgbotapi.User{0, "Test", "Test", "", "en"}
 
 	if user.String() != "Test Test" {
 		t.Fail()
@@ -15,7 +16,7 @@ func TestUserStringWith(t *testing.T) {
 }
 
 func TestUserStringWithUserName(t *testing.T) {
-	user := tgbotapi.User{0, "Test", "Test", "@test"}
+	user := tgbotapi.User{0, "Test", "Test", "@test", "en"}
 
 	if user.String() != "@test" {
 		t.Fail()

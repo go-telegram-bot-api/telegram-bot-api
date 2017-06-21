@@ -674,14 +674,16 @@ func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) 
 }
 
 // UnbanChatMember unbans a user from a chat. Note that this only will work
-// in supergroups, and requires the bot to be an admin.
+// in supergroups and channels, and requires the bot to be an admin.
 func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
+	if config.SuperGroupUsername != "" {
 		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
 
@@ -703,4 +705,52 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 	err = json.Unmarshal(resp.Result, &highScores)
 
 	return highScores, err
+}
+
+// AnswerShippingQuery allows you to reply to Update with shipping_query parameter.
+func (bot *BotAPI) AnswerShippingQuery(config ShippingConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("shipping_query_id", config.ShippingQueryID)
+	v.Add("ok", strconv.FormatBool(config.OK))
+	if config.OK == true {
+		data, err := json.Marshal(config.ShippingOptions)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		v.Add("shipping_options", string(data))
+	} else {
+		v.Add("error_message", config.ErrorMessage)
+	}
+
+	bot.debugLog("answerShippingQuery", v, nil)
+
+	return bot.MakeRequest("answerShippingQuery", v)
+}
+
+// AnswerPreCheckoutQuery allows you to reply to Update with pre_checkout_query.
+func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("pre_checkout_query_id", config.PreCheckoutQueryID)
+	v.Add("ok", strconv.FormatBool(config.OK))
+	if config.OK != true {
+		v.Add("error", config.ErrorMessage)
+	}
+
+	bot.debugLog("answerPreCheckoutQuery", v, nil)
+
+	return bot.MakeRequest("answerPreCheckoutQuery", v)
+}
+
+// DeleteMessage deletes a message in a chat
+func (bot *BotAPI) DeleteMessage(config DeleteMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
 }
