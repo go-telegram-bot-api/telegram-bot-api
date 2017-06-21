@@ -422,12 +422,17 @@ func TestSendChatConfig(t *testing.T) {
 func TestSendEditMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg, err := bot.Send(tgbotapi.NewMessage(ChatID, "Testing editing."))
+	testMsg := tgbotapi.NewMessage(ChatID, "Testing editing.")
+	testBtn := tgbotapi.NewInlineKeyboardButtonData("Test", "testdata")
+	testMsg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(testBtn))
+
+	msg, err := bot.Send(testMsg)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
 	}
 
+	//Keyboard should be removed here!
 	edit := tgbotapi.EditMessageTextConfig{
 		BaseEdit: tgbotapi.BaseEdit{
 			ChatID:    ChatID,
@@ -437,6 +442,27 @@ func TestSendEditMessage(t *testing.T) {
 	}
 
 	_, err = bot.Send(edit)
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendDeleteMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg, err := bot.Send(tgbotapi.NewMessage(ChatID, "Testing deleting."))
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	delete := tgbotapi.DeleteMessageConfig{
+		ChatID:    ChatID,
+		MessageID: msg.MessageID,
+	}
+
+	_, err = bot.Send(delete)
 	if err != nil {
 		t.Error(err)
 		t.Fail()

@@ -509,6 +509,14 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 	}
 }
 
+// NewDeleteMessage allows you to delete an existing message (sent previously by the bot)
+func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
+	return DeleteMessageConfig{
+		ChatID:    chatID,
+		MessageID: messageID,
+	}
+}
+
 // NewHideKeyboard hides the keyboard, with the option for being selective
 // or hiding for everyone.
 func NewHideKeyboard(selective bool) ReplyKeyboardHide {
