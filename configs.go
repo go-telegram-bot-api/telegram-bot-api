@@ -815,6 +815,25 @@ func (config EditMessageReplyMarkupConfig) method() string {
 	return "editMessageReplyMarkup"
 }
 
+// DeleteMessageConfig allows you to delete an existing message (sent by the bot).
+type DeleteMessageConfig struct {
+	ChatID    int64
+	MessageID int
+}
+
+func (config DeleteMessageConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("message_id", strconv.Itoa(config.MessageID))
+
+	return v, nil
+}
+
+func (config DeleteMessageConfig) method() string {
+	return "deleteMessage"
+}
+
 // UserProfilePhotosConfig contains information about a
 // GetUserProfilePhotos request.
 type UserProfilePhotosConfig struct {
