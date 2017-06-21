@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	TestToken               = "378975008:AAHqfRjhWiCGrxI4zJP8O5dpfdxUH3ezhxQ"
-	ChatID                  = 41507975
+	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
+	ChatID                  = 76918703
 	ReplyToMessageID        = 35
 	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
 	ExistingDocumentFileID  = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
