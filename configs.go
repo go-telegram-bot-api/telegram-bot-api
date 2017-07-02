@@ -887,6 +887,35 @@ type ChatMemberConfig struct {
 	UserID             int
 }
 
+// KickChatMemberConfig contains extra fields to kick user
+type KickChatMemberConfig struct {
+	ChatMemberConfig
+	UntilDate int64
+}
+
+// RestrictChatMemberConfig contains fields to restrict members of chat
+type RestrictChatMemberConfig struct {
+	ChatMemberConfig
+	UntilDate             int64
+	CanSendMessages       *bool
+	CanSendMediaMessages  *bool
+	CanSendOtherMessages  *bool
+	CanAddWebPagePreviews *bool
+}
+
+// PromoteChatMemberConfig contains fields to promote members of chat
+type PromoteChatMemberConfig struct {
+	ChatMemberConfig
+	CanChangeInfo      *bool
+	CanPostMessages    *bool
+	CanEditMessages    *bool
+	CanDeleteMessages  *bool
+	CanInviteUsers     *bool
+	CanRestrictMembers *bool
+	CanPinMessages     *bool
+	CanPromoteMembers  *bool
+}
+
 // ChatConfig contains information about getting information on a chat.
 type ChatConfig struct {
 	ChatID             int64
