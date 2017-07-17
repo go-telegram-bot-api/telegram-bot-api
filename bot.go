@@ -834,3 +834,21 @@ func (bot *BotAPI) DeleteMessage(config DeleteMessageConfig) (APIResponse, error
 
 	return bot.MakeRequest(config.method(), v)
 }
+
+// GetInviteLink get InviteLink for a chat
+func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
+        v := url.Values{}
+
+        if config.SuperGroupUsername == "" {
+                v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+        } else {
+                v.Add("chat_id", config.SuperGroupUsername)
+        }
+
+        resp, err := bot.MakeRequest("exportChatInviteLink", v)
+
+        var inviteLink string
+        err = json.Unmarshal(resp.Result, &inviteLink)
+
+        return inviteLink, err
+}
