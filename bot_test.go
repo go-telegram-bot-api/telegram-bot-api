@@ -14,6 +14,7 @@ import (
 const (
 	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
 	ChatID                  = 76918703
+	SupergroupChatID        = -1001120141283
 	ReplyToMessageID        = 35
 	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
 	ExistingDocumentFileID  = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
@@ -613,7 +614,7 @@ func TestDeleteMessage(t *testing.T) {
 func TestPinChatMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
 	message, _ := bot.Send(msg)
 
@@ -633,7 +634,7 @@ func TestPinChatMessage(t *testing.T) {
 func TestUnpinChatMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
 	message, _ := bot.Send(msg)
 
