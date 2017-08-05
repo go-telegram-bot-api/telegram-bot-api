@@ -609,3 +609,49 @@ func TestDeleteMessage(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestPinChatMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+		ChatID:    message.Chat.ID,
+		MessageID: message.MessageID,
+		DisableNotification: false,
+	}
+	_, err := bot.PinChatMessage(pinChatMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestUnpinChatMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	// We need pin message to unpin something
+	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+		ChatID:    message.Chat.ID,
+		MessageID: message.MessageID,
+		DisableNotification: false,
+	}
+	_, err := bot.PinChatMessage(pinChatMessageConfig)
+
+	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
+		ChatID:    message.Chat.ID,
+	}
+	_, err = bot.UnpinChatMessage(unpinChatMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
