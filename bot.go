@@ -837,18 +837,42 @@ func (bot *BotAPI) DeleteMessage(config DeleteMessageConfig) (APIResponse, error
 
 // GetInviteLink get InviteLink for a chat
 func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
-        v := url.Values{}
+	v := url.Values{}
 
-        if config.SuperGroupUsername == "" {
-                v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-        } else {
-                v.Add("chat_id", config.SuperGroupUsername)
-        }
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
 
-        resp, err := bot.MakeRequest("exportChatInviteLink", v)
+	resp, err := bot.MakeRequest("exportChatInviteLink", v)
 
-        var inviteLink string
-        err = json.Unmarshal(resp.Result, &inviteLink)
+	var inviteLink string
+	err = json.Unmarshal(resp.Result, &inviteLink)
 
-        return inviteLink, err
+	return inviteLink, err
+}
+
+// Pin message in supergroup
+func (bot *BotAPI) PinChatMessage(config PinChatMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// Unpin message in supergroup
+func (bot *BotAPI) UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
 }
