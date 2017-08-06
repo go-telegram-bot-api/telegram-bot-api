@@ -14,6 +14,7 @@ import (
 const (
 	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
 	ChatID                  = 76918703
+	SupergroupChatID        = -1001120141283
 	ReplyToMessageID        = 35
 	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
 	ExistingDocumentFileID  = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
@@ -603,6 +604,52 @@ func TestDeleteMessage(t *testing.T) {
 		MessageID: message.MessageID,
 	}
 	_, err := bot.DeleteMessage(deleteMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestPinChatMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+		ChatID:    message.Chat.ID,
+		MessageID: message.MessageID,
+		DisableNotification: false,
+	}
+	_, err := bot.PinChatMessage(pinChatMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestUnpinChatMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	// We need pin message to unpin something
+	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+		ChatID:    message.Chat.ID,
+		MessageID: message.MessageID,
+		DisableNotification: false,
+	}
+	_, err := bot.PinChatMessage(pinChatMessageConfig)
+
+	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
+		ChatID:    message.Chat.ID,
+	}
+	_, err = bot.UnpinChatMessage(unpinChatMessageConfig)
 
 	if err != nil {
 		t.Error(err)
