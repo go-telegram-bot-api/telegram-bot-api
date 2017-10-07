@@ -173,21 +173,23 @@ func (m *Message) Time() time.Time {
 	return time.Unix(int64(m.Date), 0)
 }
 
-// IsCommand returns true if message starts with '/'.
+// IsCommand returns true if message starts with a "bot_command" entity.
 func (m *Message) IsCommand() bool {
-	return m.Text != "" && m.Text[0] == '/'
+	if m.Entities == nil || len(*m.Entities) == 0 {
+		return false
+	}
+
+	entity := (*m.Entities)[0]
+	return entity.Offset == 0 && entity.Type == "bot_command"
 }
 
 // Command checks if the message was a command and if it was, returns the
 // command. If the Message was not a command, it returns an empty string.
 //
-// If the command contains the at bot syntax, it removes the bot name.
+// If the command contains the at name syntax, it is removed. Use
+// CommandWithAt() if you do not want that.
 func (m *Message) Command() string {
-	if !m.IsCommand() {
-		return ""
-	}
-
-	command := strings.SplitN(m.Text, " ", 2)[0][1:]
+	command := m.CommandWithAt()
 
 	if i := strings.Index(command, "@"); i != -1 {
 		command = command[:i]
@@ -196,20 +198,42 @@ func (m *Message) Command() string {
 	return command
 }
 
+// CommandWithAt checks if the message was a command and if it was, returns the
+// command. If the Message was not a command, it returns an empty string.
+//
+// If the command contains the at name syntax, it is not removed. Use Command()
+// if you want that.
+func (m *Message) CommandWithAt() string {
+	if !m.IsCommand() {
+		return ""
+	}
+
+	// IsCommand() checks that the message begins with a bot_command entity
+	entity := (*m.Entities)[0]
+	return m.Text[1:entity.Length]
+}
+
 // CommandArguments checks if the message was a command and if it was,
 // returns all text after the command name. If the Message was not a
 // command, it returns an empty string.
+//
+// Note: The first character after the command name is omitted:
+// - "/foo bar baz" yields "bar baz", not " bar baz"
+// - "/foo-bar baz" yields "bar baz", too
+// Even though the latter is not a command conforming to the spec, the API
+// marks "/foo" as command entity.
 func (m *Message) CommandArguments() string {
 	if !m.IsCommand() {
 		return ""
 	}
 
-	split := strings.SplitN(m.Text, " ", 2)
-	if len(split) != 2 {
-		return ""
+	// IsCommand() checks that the message begins with a bot_command entity
+	entity := (*m.Entities)[0]
+	if len(m.Text) == entity.Length {
+		return "" // The command makes up the whole message
+	} else {
+		return m.Text[entity.Length+1:]
 	}
-
-	return split[1]
 }
 
 // MessageEntity contains information about data in a Message.

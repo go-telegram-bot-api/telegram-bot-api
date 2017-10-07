@@ -34,6 +34,7 @@ func TestMessageTime(t *testing.T) {
 
 func TestMessageIsCommandWithCommand(t *testing.T) {
 	message := tgbotapi.Message{Text: "/command"}
+	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 8}}
 
 	if message.IsCommand() != true {
 		t.Fail()
@@ -58,6 +59,7 @@ func TestIsCommandWithEmptyText(t *testing.T) {
 
 func TestCommandWithCommand(t *testing.T) {
 	message := tgbotapi.Message{Text: "/command"}
+	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 8}}
 
 	if message.Command() != "command" {
 		t.Fail()
@@ -82,15 +84,34 @@ func TestCommandWithNonCommand(t *testing.T) {
 
 func TestCommandWithBotName(t *testing.T) {
 	message := tgbotapi.Message{Text: "/command@testbot"}
+	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 16}}
 
 	if message.Command() != "command" {
 		t.Fail()
 	}
 }
 
+func TestCommandWithAtWithBotName(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command@testbot"}
+	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 16}}
+
+	if message.CommandWithAt() != "command@testbot" {
+		t.Fail()
+	}
+}
+
 func TestMessageCommandArgumentsWithArguments(t *testing.T) {
 	message := tgbotapi.Message{Text: "/command with arguments"}
+	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 8}}
 	if message.CommandArguments() != "with arguments" {
+		t.Fail()
+	}
+}
+
+func TestMessageCommandArgumentsWithMalformedArguments(t *testing.T) {
+	message := tgbotapi.Message{Text: "/command-without argument space"}
+	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 8}}
+	if message.CommandArguments() != "without argument space" {
 		t.Fail()
 	}
 }
