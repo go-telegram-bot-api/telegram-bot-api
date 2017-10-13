@@ -268,13 +268,14 @@ func NewContact(chatID int64, phoneNumber, firstName string) ContactConfig {
 // NewLocation shares your location.
 //
 // chatID is where to send it, latitude and longitude are coordinates.
-func NewLocation(chatID int64, latitude float64, longitude float64) LocationConfig {
+func NewLocation(chatID int64, latitude float64, longitude float64, live_period int) LocationConfig {
 	return LocationConfig{
 		BaseChat: BaseChat{
 			ChatID: chatID,
 		},
-		Latitude:  latitude,
-		Longitude: longitude,
+		Latitude:   latitude,
+		Longitude:  longitude,
+		LivePeriod: live_period,
 	}
 }
 
@@ -465,13 +466,14 @@ func NewInlineQueryResultDocument(id, url, title, mimeType string) InlineQueryRe
 }
 
 // NewInlineQueryResultLocation creates a new inline query location.
-func NewInlineQueryResultLocation(id, title string, latitude, longitude float64) InlineQueryResultLocation {
+func NewInlineQueryResultLocation(id, title string, latitude, longitude float64, live_period int) InlineQueryResultLocation {
 	return InlineQueryResultLocation{
-		Type:      "location",
-		ID:        id,
-		Title:     title,
-		Latitude:  latitude,
-		Longitude: longitude,
+		Type:       "location",
+		ID:         id,
+		Title:      title,
+		Latitude:   latitude,
+		Longitude:  longitude,
+		LivePeriod: live_period,
 	}
 }
 

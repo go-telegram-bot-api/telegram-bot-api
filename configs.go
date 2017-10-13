@@ -571,8 +571,9 @@ func (config VoiceConfig) method() string {
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	BaseChat
-	Latitude  float64 // required
-	Longitude float64 // required
+	Latitude   float64 // required
+	Longitude  float64 // required
+	LivePeriod int     // optional
 }
 
 // values returns a url.Values representation of LocationConfig.
@@ -584,6 +585,9 @@ func (config LocationConfig) values() (url.Values, error) {
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
+	if config.LivePeriod != 0 {
+		v.Add("live_period", strconv.Itoa(config.LivePeriod))
+	}
 
 	return v, nil
 }
