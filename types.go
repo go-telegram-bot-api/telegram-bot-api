@@ -331,9 +331,8 @@ type Contact struct {
 
 // Location contains information about a place.
 type Location struct {
-	Longitude  float64 `json:"longitude"`
-	Latitude   float64 `json:"latitude"`
-	LivePeriod int     `json:"live_period"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
 }
 
 // Venue contains information about a venue, including its Location.
@@ -640,12 +639,11 @@ type InlineQueryResultDocument struct {
 
 // InlineQueryResultLocation is an inline query response location.
 type InlineQueryResultLocation struct {
-	Type                string                `json:"type"`        // required
-	ID                  string                `json:"id"`          // required
-	Latitude            float64               `json:"latitude"`    // required
-	Longitude           float64               `json:"longitude"`   // required
-	LivePeriod          int                   `json:"live_period"` // optional
-	Title               string                `json:"title"`       // required
+	Type                string                `json:"type"`      // required
+	ID                  string                `json:"id"`        // required
+	Latitude            float64               `json:"latitude"`  // required
+	Longitude           float64               `json:"longitude"` // required
+	Title               string                `json:"title"`     // required
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`
@@ -681,9 +679,8 @@ type InputTextMessageContent struct {
 // InputLocationMessageContent contains a location for displaying
 // as an inline query result.
 type InputLocationMessageContent struct {
-	Latitude   float64 `json:"latitude"`
-	Longitude  float64 `json:"longitude"`
-	LivePeriod int     `json:"live_period"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 // InputVenueMessageContent contains a venue for displaying
