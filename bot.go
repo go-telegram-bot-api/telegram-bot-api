@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -67,6 +68,15 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 	defer resp.Body.Close()
 
+	var apiResp APIResponse
+	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
+	if err != nil {
+		return apiResp, err
+	}
+	if bot.Debug {
+		log.Printf("%s %s", endpoint, bytes)
+	}
+
 	if resp.StatusCode == http.StatusForbidden {
 		return APIResponse{}, errors.New(ErrAPIForbidden)
 	}
@@ -75,23 +85,32 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 		return APIResponse{}, errors.New(http.StatusText(resp.StatusCode))
 	}
 
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return APIResponse{}, err
-	}
-
-	if bot.Debug {
-		log.Println(endpoint, string(bytes))
-	}
-
-	var apiResp APIResponse
-	json.Unmarshal(bytes, &apiResp)
-
 	if !apiResp.Ok {
 		return apiResp, errors.New(apiResp.Description)
 	}
 
 	return apiResp, nil
+}
+
+func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
+	if !bot.Debug {
+		dec := json.NewDecoder(responseBody)
+		err = dec.Decode(resp)
+		return
+	}
+
+	// if debug, read reponse body
+	data, err := ioutil.ReadAll(responseBody)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(data, resp)
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // makeMessageRequest makes a request to a method that returns a Message.
