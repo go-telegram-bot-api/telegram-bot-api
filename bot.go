@@ -73,8 +73,9 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	if err != nil {
 		return apiResp, err
 	}
+
 	if bot.Debug {
-		log.Printf("%s %s", endpoint, bytes)
+		log.Printf("%s resp: %s", endpoint, bytes)
 	}
 
 	if resp.StatusCode == http.StatusForbidden {
@@ -110,7 +111,7 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 		return
 	}
 
-	return
+	return data, nil
 }
 
 // makeMessageRequest makes a request to a method that returns a Message.
