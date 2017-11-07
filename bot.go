@@ -78,14 +78,6 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 		log.Printf("%s resp: %s", endpoint, bytes)
 	}
 
-	if resp.StatusCode == http.StatusForbidden {
-		return APIResponse{}, errors.New(ErrAPIForbidden)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return APIResponse{}, errors.New(http.StatusText(resp.StatusCode))
-	}
-
 	if !apiResp.Ok {
 		return apiResp, errors.New(apiResp.Description)
 	}
@@ -93,6 +85,9 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	return apiResp, nil
 }
 
+// decodeAPIResponse decode response and return slice of bytes if debug enabled.
+// If debug disabled, just decode http.Response.Body stream to APIResponse struct
+// for efficient memory usage
 func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
 	if !bot.Debug {
 		dec := json.NewDecoder(responseBody)
