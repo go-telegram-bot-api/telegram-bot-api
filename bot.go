@@ -515,6 +515,7 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 
 		var update Update
 		json.Unmarshal(bytes, &update)
+		update.RawUpdateJson = string(bytes)
 
 		ch <- update
 	})
