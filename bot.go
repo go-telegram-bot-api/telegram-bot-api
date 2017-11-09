@@ -739,6 +739,9 @@ func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIRespo
 	if &config.CanAddWebPagePreviews != nil {
 		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
 	}
+	if config.UntilDate != 0 {
+		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
+	}
 
 	bot.debugLog("restrictChatMember", v, nil)
 
