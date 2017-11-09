@@ -37,7 +37,7 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
-	RawUpdateJson      string
+	RawUpdateJSON      string
 }
 
 // UpdatesChannel is the channel for getting updates.

@@ -423,6 +423,14 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	var updates []Update
 	json.Unmarshal(resp.Result, &updates)
 
+	// Every update contains raw JSON which
+	// can include information about other
+	// updates. This is because response is
+	// single for all. Be aware.
+	for _, v := range updates {
+		v.RawUpdateJSON = string(resp.Result)
+	}
+
 	bot.debugLog("getUpdates", v, updates)
 
 	return updates, nil
@@ -515,7 +523,7 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 
 		var update Update
 		json.Unmarshal(bytes, &update)
-		update.RawUpdateJson = string(bytes)
+		update.RawUpdateJSON = string(bytes)
 
 		ch <- update
 	})
