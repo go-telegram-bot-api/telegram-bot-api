@@ -748,6 +748,7 @@ func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIRespo
 	return bot.MakeRequest("restrictChatMember", v)
 }
 
+// PromoteChatMember add admin rights to user
 func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
 
@@ -864,6 +865,9 @@ func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
 	}
 
 	resp, err := bot.MakeRequest("exportChatInviteLink", v)
+	if err != nil {
+		return "", err
+	}
 
 	var inviteLink string
 	err = json.Unmarshal(resp.Result, &inviteLink)
@@ -871,7 +875,7 @@ func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
 	return inviteLink, err
 }
 
-// Pin message in supergroup
+// PinChatMessage pin message in supergroup
 func (bot *BotAPI) PinChatMessage(config PinChatMessageConfig) (APIResponse, error) {
 	v, err := config.values()
 	if err != nil {
@@ -883,7 +887,7 @@ func (bot *BotAPI) PinChatMessage(config PinChatMessageConfig) (APIResponse, err
 	return bot.MakeRequest(config.method(), v)
 }
 
-// Unpin message in supergroup
+// UnpinChatMessage unpin message in supergroup
 func (bot *BotAPI) UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse, error) {
 	v, err := config.values()
 	if err != nil {

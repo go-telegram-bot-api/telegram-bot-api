@@ -619,8 +619,8 @@ func TestPinChatMessage(t *testing.T) {
 	message, _ := bot.Send(msg)
 
 	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
-		ChatID:    message.Chat.ID,
-		MessageID: message.MessageID,
+		ChatID:              message.Chat.ID,
+		MessageID:           message.MessageID,
 		DisableNotification: false,
 	}
 	_, err := bot.PinChatMessage(pinChatMessageConfig)
@@ -640,14 +640,14 @@ func TestUnpinChatMessage(t *testing.T) {
 
 	// We need pin message to unpin something
 	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
-		ChatID:    message.Chat.ID,
-		MessageID: message.MessageID,
+		ChatID:              message.Chat.ID,
+		MessageID:           message.MessageID,
 		DisableNotification: false,
 	}
 	_, err := bot.PinChatMessage(pinChatMessageConfig)
 
 	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
-		ChatID:    message.Chat.ID,
+		ChatID: message.Chat.ID,
 	}
 	_, err = bot.UnpinChatMessage(unpinChatMessageConfig)
 

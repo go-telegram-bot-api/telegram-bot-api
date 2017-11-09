@@ -8,7 +8,14 @@ import (
 )
 
 func TestUserStringWith(t *testing.T) {
-	user := tgbotapi.User{0, "Test", "Test", "", "en", false}
+	user := tgbotapi.User{
+		ID:           0,
+		FirstName:    "Test",
+		LastName:     "Test",
+		UserName:     "",
+		LanguageCode: "en",
+		IsBot:        false,
+	}
 
 	if user.String() != "Test Test" {
 		t.Fail()
@@ -16,7 +23,13 @@ func TestUserStringWith(t *testing.T) {
 }
 
 func TestUserStringWithUserName(t *testing.T) {
-	user := tgbotapi.User{0, "Test", "Test", "@test", "en"}
+	user := tgbotapi.User{
+		ID:           0,
+		FirstName:    "Test",
+		LastName:     "Test",
+		UserName:     "@test",
+		LanguageCode: "en",
+	}
 
 	if user.String() != "@test" {
 		t.Fail()
