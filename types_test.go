@@ -8,7 +8,7 @@ import (
 )
 
 func TestUserStringWith(t *testing.T) {
-	user := tgbotapi.User{0, "Test", "Test", "", "en"}
+	user := tgbotapi.User{0, "Test", "Test", "", "en", false}
 
 	if user.String() != "Test Test" {
 		t.Fail()
