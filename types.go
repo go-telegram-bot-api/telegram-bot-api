@@ -142,6 +142,7 @@ type Message struct {
 	EditDate              int                `json:"edit_date"`               // optional
 	Text                  string             `json:"text"`                    // optional
 	Entities              *[]MessageEntity   `json:"entities"`                // optional
+	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
 	Audio                 *Audio             `json:"audio"`                   // optional
 	Document              *Document          `json:"document"`                // optional
 	Game                  *Game              `json:"game"`                    // optional
@@ -410,7 +411,7 @@ type InlineKeyboardButton struct {
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
 	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
-	Pay                          bool          `json:"pay,omitempty"`			       // optional
+	Pay                          bool          `json:"pay,omitempty"`                              // optional
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data

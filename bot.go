@@ -63,10 +63,16 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
 
 	resp, err := bot.Client.PostForm(method, params)
+
 	if err != nil {
 		return APIResponse{}, err
 	}
 	defer resp.Body.Close()
+
+	// Check http response status
+	if resp.StatusCode != 200 {
+		return APIResponse{}, errors.New(resp.Status)
+	}
 
 	var apiResp APIResponse
 	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
