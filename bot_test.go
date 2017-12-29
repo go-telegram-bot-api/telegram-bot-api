@@ -266,7 +266,7 @@ func TestSendWithContact(t *testing.T) {
 func TestSendWithLocation(t *testing.T) {
 	bot, _ := getBot(t)
 
-	_, err := bot.Send(tgbotapi.NewLocation(ChatID, 40, 40, 86400))
+	_, err := bot.Send(tgbotapi.NewLocation(ChatID, 40, 40))
 
 	if err != nil {
 		t.Error(err)

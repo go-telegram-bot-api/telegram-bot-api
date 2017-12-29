@@ -127,14 +127,13 @@ func TestNewInlineQueryResultDocument(t *testing.T) {
 }
 
 func TestNewInlineQueryResultLocation(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultLocation("id", "name", 40, 50, 86400)
+	result := tgbotapi.NewInlineQueryResultLocation("id", "name", 40, 50)
 
 	if result.Type != "location" ||
 		result.ID != "id" ||
 		result.Title != "name" ||
 		result.Latitude != 40 ||
-		result.Longitude != 50 ||
-		result.LivePeriod != 86400 {
+		result.Longitude != 50 {
 		t.Fail()
 	}
 }

@@ -600,8 +600,8 @@ func (config LocationConfig) method() string {
 // LocationConfig contains information about a SendLocation request.
 type EditMessageLiveLocationConfig struct {
 	BaseEdit
-	Latitude   float64 // required
-	Longitude  float64 // required
+	Latitude  float64 // required
+	Longitude float64 // required
 }
 
 // values returns a url.Values representation of EditMessageLiveLocationConfig.
