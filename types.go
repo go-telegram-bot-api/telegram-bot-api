@@ -97,9 +97,12 @@ type Chat struct {
 	FirstName           string     `json:"first_name"`                     // optional
 	LastName            string     `json:"last_name"`                      // optional
 	AllMembersAreAdmins bool       `json:"all_members_are_administrators"` // optional
-	Photo               *ChatPhoto `json:"photo"`
-	Description         string     `json:"description,omitempty"` // optional
-	InviteLink          string     `json:"invite_link,omitempty"` // optional
+	Photo               *ChatPhoto `json:"photo"`                          // optional
+	Description         string     `json:"description,omitempty"`          // optional
+	InviteLink          string     `json:"invite_link,omitempty"`          // optional
+	PinnedMessage       *Message   `json:"pinned_message"`                 // optional
+	StickerSetName      string     `json:"sticker_set_name"`               // optional
+	CanSetStickerSet    bool       `json:"can_set_sticker_set"`            // optional
 }
 
 // IsPrivate returns if the Chat is a private conversation.
@@ -137,11 +140,15 @@ type Message struct {
 	ForwardFrom           *User              `json:"forward_from"`            // optional
 	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
 	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
+	ForwardSignature      string             `json:"forward_signature"`       // optional
 	ForwardDate           int                `json:"forward_date"`            // optional
 	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
 	EditDate              int                `json:"edit_date"`               // optional
+	MediaGroupID          string             `json:"media_group_id"`          // optional
+	AuthorSignature       string             `json:"author_signature"`        // optional
 	Text                  string             `json:"text"`                    // optional
 	Entities              *[]MessageEntity   `json:"entities"`                // optional
+	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
 	Audio                 *Audio             `json:"audio"`                   // optional
 	Document              *Document          `json:"document"`                // optional
 	Game                  *Game              `json:"game"`                    // optional
