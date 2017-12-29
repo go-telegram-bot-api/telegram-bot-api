@@ -467,7 +467,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.RemoveWebhook()
+	bot.Request(tgbotapi.RemoveWebhookConfig{})
 
 	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
 	_, err := bot.SetWebhook(wh)
@@ -476,7 +476,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Fail()
 	}
 
-	bot.RemoveWebhook()
+	bot.Request(tgbotapi.RemoveWebhookConfig{})
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -484,7 +484,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.RemoveWebhook()
+	bot.Request(tgbotapi.RemoveWebhookConfig{})
 
 	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 	_, err := bot.SetWebhook(wh)
@@ -493,7 +493,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Fail()
 	}
 
-	bot.RemoveWebhook()
+	bot.Request(tgbotapi.RemoveWebhookConfig{})
 }
 
 func TestUpdatesChan(t *testing.T) {
@@ -611,7 +611,7 @@ func TestDeleteMessage(t *testing.T) {
 		ChatID:    message.Chat.ID,
 		MessageID: message.MessageID,
 	}
-	_, err := bot.DeleteMessage(deleteMessageConfig)
+	_, err := bot.Request(deleteMessageConfig)
 
 	if err != nil {
 		t.Error(err)
@@ -631,7 +631,7 @@ func TestPinChatMessage(t *testing.T) {
 		MessageID:           message.MessageID,
 		DisableNotification: false,
 	}
-	_, err := bot.PinChatMessage(pinChatMessageConfig)
+	_, err := bot.Request(pinChatMessageConfig)
 
 	if err != nil {
 		t.Error(err)
@@ -652,12 +652,12 @@ func TestUnpinChatMessage(t *testing.T) {
 		MessageID:           message.MessageID,
 		DisableNotification: false,
 	}
-	_, err := bot.PinChatMessage(pinChatMessageConfig)
+	_, err := bot.Request(pinChatMessageConfig)
 
 	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
 		ChatID: message.Chat.ID,
 	}
-	_, err = bot.UnpinChatMessage(unpinChatMessageConfig)
+	_, err = bot.Request(unpinChatMessageConfig)
 
 	if err != nil {
 		t.Error(err)
