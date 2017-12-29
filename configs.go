@@ -842,6 +842,48 @@ type WebhookConfig struct {
 	MaxConnections int
 }
 
+func (config WebhookConfig) method() string {
+	return "setWebhook"
+}
+
+func (config WebhookConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.URL != nil {
+		v.Add("url", config.URL.String())
+	}
+	if config.MaxConnections != 0 {
+		v.Add("max_connections", strconv.Itoa(config.MaxConnections))
+	}
+
+	return v, nil
+}
+
+func (config WebhookConfig) params() (map[string]string, error) {
+	params := make(map[string]string)
+
+	if config.URL != nil {
+		params["url"] = config.URL.String()
+	}
+	if config.MaxConnections != 0 {
+		params["max_connections"] = strconv.Itoa(config.MaxConnections)
+	}
+
+	return params, nil
+}
+
+func (config WebhookConfig) name() string {
+	return "certificate"
+}
+
+func (config WebhookConfig) getFile() interface{} {
+	return config.Certificate
+}
+
+func (config WebhookConfig) useExistingFile() bool {
+	return config.URL != nil
+}
+
 // RemoveWebhookConfig is a helper to remove a webhook.
 type RemoveWebhookConfig struct {
 }
@@ -881,6 +923,28 @@ type InlineConfig struct {
 	SwitchPMParameter string        `json:"switch_pm_parameter"`
 }
 
+func (config InlineConfig) method() string {
+	return "answerInlineQuery"
+}
+
+func (config InlineConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("inline_query_id", config.InlineQueryID)
+	v.Add("cache_time", strconv.Itoa(config.CacheTime))
+	v.Add("is_personal", strconv.FormatBool(config.IsPersonal))
+	v.Add("next_offset", config.NextOffset)
+	data, err := json.Marshal(config.Results)
+	if err != nil {
+		return v, err
+	}
+	v.Add("results", string(data))
+	v.Add("switch_pm_text", config.SwitchPMText)
+	v.Add("switch_pm_parameter", config.SwitchPMParameter)
+
+	return v, nil
+}
+
 // CallbackConfig contains information on making a CallbackQuery response.
 type CallbackConfig struct {
 	CallbackQueryID string `json:"callback_query_id"`
@@ -888,6 +952,26 @@ type CallbackConfig struct {
 	ShowAlert       bool   `json:"show_alert"`
 	URL             string `json:"url"`
 	CacheTime       int    `json:"cache_time"`
+}
+
+func (config CallbackConfig) method() string {
+	return "answerCallbackQuery"
+}
+
+func (config CallbackConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("callback_query_id", config.CallbackQueryID)
+	if config.Text != "" {
+		v.Add("text", config.Text)
+	}
+	v.Add("show_alert", strconv.FormatBool(config.ShowAlert))
+	if config.URL != "" {
+		v.Add("url", config.URL)
+	}
+	v.Add("cache_time", strconv.Itoa(config.CacheTime))
+
+	return v, nil
 }
 
 // ChatMemberConfig contains information about a user in a chat for use
@@ -899,10 +983,55 @@ type ChatMemberConfig struct {
 	UserID             int
 }
 
+// UnbanChatMemberConfig allows you to unban a user.
+type UnbanChatMemberConfig struct {
+	ChatMemberConfig
+}
+
+func (config UnbanChatMemberConfig) method() string {
+	return "unbanChatMember"
+}
+
+func (config UnbanChatMemberConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	return v, nil
+}
+
 // KickChatMemberConfig contains extra fields to kick user
 type KickChatMemberConfig struct {
 	ChatMemberConfig
 	UntilDate int64
+}
+
+func (config KickChatMemberConfig) method() string {
+	return "kickChatMember"
+}
+
+func (config KickChatMemberConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.UntilDate != 0 {
+		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
+	}
+
+	return v, nil
 }
 
 // RestrictChatMemberConfig contains fields to restrict members of chat
@@ -913,6 +1042,41 @@ type RestrictChatMemberConfig struct {
 	CanSendMediaMessages  *bool
 	CanSendOtherMessages  *bool
 	CanAddWebPagePreviews *bool
+}
+
+func (config RestrictChatMemberConfig) method() string {
+	return "restrictChatMember"
+}
+
+func (config RestrictChatMemberConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.CanSendMessages != nil {
+		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
+	}
+	if config.CanSendMediaMessages != nil {
+		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
+	}
+	if config.CanSendOtherMessages != nil {
+		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
+	}
+	if config.CanAddWebPagePreviews != nil {
+		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
+	}
+	if config.UntilDate != 0 {
+		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
+	}
+
+	return v, nil
 }
 
 // PromoteChatMemberConfig contains fields to promote members of chat
@@ -928,10 +1092,76 @@ type PromoteChatMemberConfig struct {
 	CanPromoteMembers  *bool
 }
 
+func (config PromoteChatMemberConfig) method() string {
+	return "promoteChatMember"
+}
+
+func (config PromoteChatMemberConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.CanChangeInfo != nil {
+		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
+	}
+	if config.CanPostMessages != nil {
+		v.Add("can_post_messages", strconv.FormatBool(*config.CanPostMessages))
+	}
+	if config.CanEditMessages != nil {
+		v.Add("can_edit_messages", strconv.FormatBool(*config.CanEditMessages))
+	}
+	if config.CanDeleteMessages != nil {
+		v.Add("can_delete_messages", strconv.FormatBool(*config.CanDeleteMessages))
+	}
+	if config.CanInviteUsers != nil {
+		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
+	}
+	if config.CanRestrictMembers != nil {
+		v.Add("can_restrict_members", strconv.FormatBool(*config.CanRestrictMembers))
+	}
+	if config.CanPinMessages != nil {
+		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
+	}
+	if config.CanPromoteMembers != nil {
+		v.Add("can_promote_members", strconv.FormatBool(*config.CanPromoteMembers))
+	}
+
+	return v, nil
+}
+
 // ChatConfig contains information about getting information on a chat.
 type ChatConfig struct {
 	ChatID             int64
 	SuperGroupUsername string
+}
+
+// LeaveChatConfig allows you to leave a chat.
+type LeaveChatConfig struct {
+	ChatID          int64
+	ChannelUsername string
+}
+
+func (config LeaveChatConfig) method() string {
+	return "leaveChat"
+}
+
+func (config LeaveChatConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+
+	return v, nil
 }
 
 // ChatConfigWithUser contains information about getting information on

@@ -470,7 +470,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 	bot.Request(tgbotapi.RemoveWebhookConfig{})
 
 	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
-	_, err := bot.SetWebhook(wh)
+	_, err := bot.Request(wh)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -487,7 +487,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	bot.Request(tgbotapi.RemoveWebhookConfig{})
 
 	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
-	_, err := bot.SetWebhook(wh)
+	_, err := bot.Request(wh)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -553,7 +553,7 @@ func ExampleNewWebhook() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	_, err = bot.Request(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -594,7 +594,7 @@ func ExampleAnswerInlineQuery() {
 			Results:       []interface{}{article},
 		}
 
-		if _, err := bot.AnswerInlineQuery(inlineConf); err != nil {
+		if _, err := bot.Request(inlineConf); err != nil {
 			log.Println(err)
 		}
 	}
