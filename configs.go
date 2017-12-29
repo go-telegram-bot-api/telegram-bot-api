@@ -1715,3 +1715,51 @@ func (config DeleteStickerConfig) values() (url.Values, error) {
 
 	return v, nil
 }
+
+// SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
+type SetChatStickerSetConfig struct {
+	ChatID             int64
+	SuperGroupUsername string
+
+	StickerSetName string
+}
+
+func (config SetChatStickerSetConfig) method() string {
+	return "setChatStickerSet"
+}
+
+func (config SetChatStickerSetConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	v.Add("sticker_set_name", config.StickerSetName)
+
+	return v, nil
+}
+
+// DeleteChatStickerSetConfig allows you to remove a supergroup's sticker set.
+type DeleteChatStickerSetConfig struct {
+	ChatID             int64
+	SuperGroupUsername string
+}
+
+func (config DeleteChatStickerSetConfig) method() string {
+	return "deleteChatStickerSet"
+}
+
+func (config DeleteChatStickerSetConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	return v, nil
+}

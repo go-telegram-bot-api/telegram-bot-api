@@ -658,12 +658,12 @@ type InlineQueryResultDocument struct {
 
 // InlineQueryResultLocation is an inline query response location.
 type InlineQueryResultLocation struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	Latitude            float64               `json:"latitude"`  // required
-	Longitude           float64               `json:"longitude"` // required
+	Type                string                `json:"type"`        // required
+	ID                  string                `json:"id"`          // required
+	Latitude            float64               `json:"latitude"`    // required
+	Longitude           float64               `json:"longitude"`   // required
 	LivePeriod          int                   `json:"live_period"` // optional
-	Title               string                `json:"title"`     // required
+	Title               string                `json:"title"`       // required
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`
