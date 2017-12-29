@@ -1231,6 +1231,7 @@ type InvoiceConfig struct {
 	StartParameter      string          // required
 	Currency            string          // required
 	Prices              *[]LabeledPrice // required
+	ProviderData        string
 	PhotoURL            string
 	PhotoSize           int
 	PhotoWidth          int
@@ -1258,6 +1259,9 @@ func (config InvoiceConfig) values() (url.Values, error) {
 		return v, err
 	}
 	v.Add("prices", string(data))
+	if config.ProviderData != "" {
+		v.Add("provider_data", config.ProviderData)
+	}
 	if config.PhotoURL != "" {
 		v.Add("photo_url", config.PhotoURL)
 	}
@@ -1330,6 +1334,7 @@ func (config DeleteMessageConfig) values() (url.Values, error) {
 // PinChatMessageConfig contains information of a message in a chat to pin.
 type PinChatMessageConfig struct {
 	ChatID              int64
+	ChannelUsername     string
 	MessageID           int
 	DisableNotification bool
 }
@@ -1341,7 +1346,11 @@ func (config PinChatMessageConfig) method() string {
 func (config PinChatMessageConfig) values() (url.Values, error) {
 	v := url.Values{}
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
 	v.Add("message_id", strconv.Itoa(config.MessageID))
 	v.Add("disable_notification", strconv.FormatBool(config.DisableNotification))
 
@@ -1350,7 +1359,8 @@ func (config PinChatMessageConfig) values() (url.Values, error) {
 
 // UnpinChatMessageConfig contains information of chat to unpin.
 type UnpinChatMessageConfig struct {
-	ChatID int64
+	ChatID          int64
+	ChannelUsername string
 }
 
 func (config UnpinChatMessageConfig) method() string {
@@ -1360,7 +1370,11 @@ func (config UnpinChatMessageConfig) method() string {
 func (config UnpinChatMessageConfig) values() (url.Values, error) {
 	v := url.Values{}
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
 
 	return v, nil
 }
@@ -1759,6 +1773,45 @@ func (config DeleteChatStickerSetConfig) values() (url.Values, error) {
 		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 	} else {
 		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	return v, nil
+}
+
+// MediaGroupConfig allows you to send a group of media.
+//
+// Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
+type MediaGroupConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	Media               []interface{}
+	DisableNotification bool
+	ReplyToMessageID    int
+}
+
+func (config MediaGroupConfig) method() string {
+	return "sendMediaGroup"
+}
+
+func (config MediaGroupConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+	bytes, err := json.Marshal(config.Media)
+	if err != nil {
+		return v, err
+	}
+	v.Add("media", string(bytes))
+	if config.DisableNotification {
+		v.Add("disable_notification", strconv.FormatBool(config.DisableNotification))
+	}
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
 	}
 
 	return v, nil

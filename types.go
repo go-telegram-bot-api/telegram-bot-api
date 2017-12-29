@@ -798,3 +798,24 @@ type StickerSet struct {
 	ContainsMasks bool      `json:"contains_masks"`
 	Stickers      []Sticker `json:"stickers"`
 }
+
+// InputMediaPhoto is a photo to send as part of a media group.
+//
+// Telegram recommends to use a file_id instead of uploading.
+type InputMediaPhoto struct {
+	Type    string `json:"type"`
+	Media   string `json:"media"`
+	Caption string `json:"caption"`
+}
+
+// InputMediaVideo is a video to send as part of a media group.
+//
+// Telegram recommends to use a file_id instead of uploading.
+type InputMediaVideo struct {
+	Type     string `json:"type"`
+	Media    string `json:"media"`
+	Caption  string `json:"caption,omitempty"`
+	Width    int    `json:"width,omitempty"`
+	Height   int    `json:"height,omitempty"`
+	Duration int    `json:"duration,omitempty"`
+}
