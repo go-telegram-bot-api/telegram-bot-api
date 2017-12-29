@@ -842,6 +842,18 @@ type WebhookConfig struct {
 	MaxConnections int
 }
 
+// RemoveWebhookConfig is a helper to remove a webhook.
+type RemoveWebhookConfig struct {
+}
+
+func (config RemoveWebhookConfig) method() string {
+	return "setWebhook"
+}
+
+func (config RemoveWebhookConfig) values() (url.Values, error) {
+	return url.Values{}, nil
+}
+
 // FileBytes contains information about a set of bytes to upload
 // as a File.
 type FileBytes struct {
@@ -1038,8 +1050,8 @@ func (config DeleteMessageConfig) values() (url.Values, error) {
 
 // PinChatMessageConfig contains information of a message in a chat to pin.
 type PinChatMessageConfig struct {
-	ChatID int64
-	MessageID int
+	ChatID              int64
+	MessageID           int
 	DisableNotification bool
 }
 
@@ -1070,6 +1082,357 @@ func (config UnpinChatMessageConfig) values() (url.Values, error) {
 	v := url.Values{}
 
 	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+
+	return v, nil
+}
+
+// SetChatPhotoConfig allows you to set a group, supergroup, or channel's photo.
+type SetChatPhotoConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	Photo interface{}
+}
+
+func (config SetChatPhotoConfig) method() string {
+	return "setChatPhoto"
+}
+
+func (config SetChatPhotoConfig) name() string {
+	return "photo"
+}
+
+func (config SetChatPhotoConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+
+	return v, nil
+}
+
+func (config SetChatPhotoConfig) params() map[string]string {
+	params := make(map[string]string)
+
+	if config.ChannelUsername == "" {
+		params["chat_id"] = strconv.FormatInt(config.ChatID, 10)
+	} else {
+		params["chat_id"] = config.ChannelUsername
+	}
+
+	return params
+}
+
+func (config SetChatPhotoConfig) getFile() interface{} {
+	return config.Photo
+}
+
+func (config SetChatPhotoConfig) useExistingFile() bool {
+	return false
+}
+
+// DeleteChatPhotoConfig allows you to delete a group, supergroup, or channel's photo.
+type DeleteChatPhotoConfig struct {
+	ChatID          int64
+	ChannelUsername string
+}
+
+func (config DeleteChatPhotoConfig) method() string {
+	return "deleteChatPhoto"
+}
+
+func (config DeleteChatPhotoConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+
+	return v, nil
+}
+
+// SetChatTitleConfig allows you to set the title of something other than a private chat.
+type SetChatTitleConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	Title string
+}
+
+func (config SetChatTitleConfig) method() string {
+	return "setChatTitle"
+}
+
+func (config SetChatTitleConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+
+	v.Add("title", config.Title)
+
+	return v, nil
+}
+
+// SetChatDescriptionConfig allows you to set the description of a supergroup or channel.
+type SetChatDescriptionConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	Description string
+}
+
+func (config SetChatDescriptionConfig) method() string {
+	return "setChatDescription"
+}
+
+func (config SetChatDescriptionConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+
+	v.Add("description", config.Description)
+
+	return v, nil
+}
+
+// GetStickerSetConfig allows you to get the stickers in a set.
+type GetStickerSetConfig struct {
+	Name string
+}
+
+func (config GetStickerSetConfig) method() string {
+	return "getStickerSet"
+}
+
+func (config GetStickerSetConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("name", config.Name)
+
+	return v, nil
+}
+
+// UploadStickerConfig allows you to upload a sticker for use in a set later.
+type UploadStickerConfig struct {
+	UserID     int64
+	PNGSticker interface{}
+}
+
+func (config UploadStickerConfig) method() string {
+	return "uploadStickerFile"
+}
+
+func (config UploadStickerConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("user_id", strconv.FormatInt(config.UserID, 10))
+
+	return v, nil
+}
+
+func (config UploadStickerConfig) params() (map[string]string, error) {
+	params := make(map[string]string)
+
+	params["user_id"] = strconv.FormatInt(config.UserID, 10)
+
+	return params, nil
+}
+
+func (config UploadStickerConfig) name() string {
+	return "png_sticker"
+}
+
+func (config UploadStickerConfig) getFile() interface{} {
+	return config.PNGSticker
+}
+
+func (config UploadStickerConfig) useExistingFile() bool {
+	return false
+}
+
+// NewStickerSetConfig allows creating a new sticker set.
+type NewStickerSetConfig struct {
+	UserID        int64
+	Name          string
+	Title         string
+	PNGSticker    interface{}
+	Emojis        string
+	ContainsMasks bool
+	MaskPosition  *MaskPosition
+}
+
+func (config NewStickerSetConfig) method() string {
+	return "createNewStickerSet"
+}
+
+func (config NewStickerSetConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("user_id", strconv.FormatInt(config.UserID, 10))
+	v.Add("name", config.Name)
+	v.Add("title", config.Title)
+	if sticker, ok := config.PNGSticker.(string); ok {
+		v.Add("png_sticker", sticker)
+	}
+	v.Add("emojis", config.Emojis)
+	if config.ContainsMasks {
+		v.Add("contains_masks", strconv.FormatBool(config.ContainsMasks))
+
+		data, err := json.Marshal(config.MaskPosition)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("mask_position", string(data))
+	}
+
+	return v, nil
+}
+
+func (config NewStickerSetConfig) params() (map[string]string, error) {
+	params := make(map[string]string)
+
+	params["user_id"] = strconv.FormatInt(config.UserID, 10)
+	params["name"] = config.Name
+	params["title"] = config.Title
+	params["emojis"] = config.Emojis
+	if config.ContainsMasks {
+		params["contains_masks"] = strconv.FormatBool(config.ContainsMasks)
+
+		data, err := json.Marshal(config.MaskPosition)
+		if err != nil {
+			return params, err
+		}
+
+		params["mask_position"] = string(data)
+	}
+
+	return params, nil
+}
+
+func (config NewStickerSetConfig) getFile() interface{} {
+	return config.PNGSticker
+}
+
+func (config NewStickerSetConfig) name() string {
+	return "png_sticker"
+}
+
+func (config NewStickerSetConfig) useExistingFile() bool {
+	_, ok := config.PNGSticker.(string)
+
+	return ok
+}
+
+// AddStickerConfig allows you to add a sticker to a set.
+type AddStickerConfig struct {
+	UserID       int64
+	Name         string
+	PNGSticker   interface{}
+	Emojis       string
+	MaskPosition *MaskPosition
+}
+
+func (config AddStickerConfig) method() string {
+	return "addStickerToSet"
+}
+
+func (config AddStickerConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("user_id", strconv.FormatInt(config.UserID, 10))
+	v.Add("name", config.Name)
+	if sticker, ok := config.PNGSticker.(string); ok {
+		v.Add("png_sticker", sticker)
+	}
+	v.Add("emojis", config.Emojis)
+	if config.MaskPosition != nil {
+		data, err := json.Marshal(config.MaskPosition)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("mask_position", string(data))
+	}
+
+	return v, nil
+}
+
+func (config AddStickerConfig) params() (map[string]string, error) {
+	params := make(map[string]string)
+
+	params["user_id"] = strconv.FormatInt(config.UserID, 10)
+	params["name"] = config.Name
+	params["emojis"] = config.Emojis
+	if config.MaskPosition != nil {
+		data, err := json.Marshal(config.MaskPosition)
+		if err != nil {
+			return params, err
+		}
+
+		params["mask_position"] = string(data)
+	}
+
+	return params, nil
+}
+
+func (config AddStickerConfig) name() string {
+	return "png_sticker"
+}
+
+func (config AddStickerConfig) getFile() interface{} {
+	return config.PNGSticker
+}
+
+func (config AddStickerConfig) useExistingFile() bool {
+	return false
+}
+
+// SetStickerPositionConfig allows you to change the position of a sticker in a set.
+type SetStickerPositionConfig struct {
+	Sticker  string
+	Position int
+}
+
+func (config SetStickerPositionConfig) method() string {
+	return "setStickerPositionInSet"
+}
+
+func (config SetStickerPositionConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("sticker", config.Sticker)
+	v.Add("position", strconv.Itoa(config.Position))
+
+	return v, nil
+}
+
+// DeleteStickerConfig allows you to delete a sticker from a set.
+type DeleteStickerConfig struct {
+	Sticker string
+}
+
+func (config DeleteStickerConfig) method() string {
+	return "deleteStickerFromSet"
+}
+
+func (config DeleteStickerConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("sticker", config.Sticker)
 
 	return v, nil
 }

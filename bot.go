@@ -109,21 +109,6 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 	return data, nil
 }
 
-// makeMessageRequest makes a request to a method that returns a Message.
-func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Message, error) {
-	resp, err := bot.MakeRequest(endpoint, params)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	bot.debugLog(endpoint, params, message)
-
-	return message, nil
-}
-
 // UploadFile makes a request to the API with a file.
 //
 // Requires the parameter to hold the file not be in the params.
@@ -262,11 +247,44 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 //
 // It requires the Chattable to send.
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
-	switch c.(type) {
+	resp, err := bot.Request(c)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	err = json.Unmarshal(resp.Result, &message)
+
+	return message, err
+}
+
+// Request makes a request to Telegram that returns an APIResponse, rather than
+// a Message.
+func (bot *BotAPI) Request(c Chattable) (APIResponse, error) {
+	switch t := c.(type) {
 	case Fileable:
-		return bot.sendFile(c.(Fileable))
+		if t.useExistingFile() {
+			v, err := t.values()
+			if err != nil {
+				return APIResponse{}, err
+			}
+
+			return bot.MakeRequest(t.method(), v)
+		}
+
+		p, err := t.params()
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		return bot.UploadFile(t.method(), p, t.name(), t.getFile())
 	default:
-		return bot.sendChattable(c)
+		v, err := c.values()
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		return bot.MakeRequest(c.method(), v)
 	}
 }
 
@@ -278,70 +296,6 @@ func (bot *BotAPI) debugLog(context string, v url.Values, message interface{}) {
 		log.Printf("%s req : %+v\n", context, v)
 		log.Printf("%s resp: %+v\n", context, message)
 	}
-}
-
-// sendExisting will send a Message with an existing file to Telegram.
-func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error) {
-	v, err := config.values()
-
-	if err != nil {
-		return Message{}, err
-	}
-
-	message, err := bot.makeMessageRequest(method, v)
-	if err != nil {
-		return Message{}, err
-	}
-
-	return message, nil
-}
-
-// uploadAndSend will send a Message with a new file to Telegram.
-func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error) {
-	params, err := config.params()
-	if err != nil {
-		return Message{}, err
-	}
-
-	file := config.getFile()
-
-	resp, err := bot.UploadFile(method, params, config.name(), file)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	json.Unmarshal(resp.Result, &message)
-
-	bot.debugLog(method, nil, message)
-
-	return message, nil
-}
-
-// sendFile determines if the file is using an existing file or uploading
-// a new file, then sends it as needed.
-func (bot *BotAPI) sendFile(config Fileable) (Message, error) {
-	if config.useExistingFile() {
-		return bot.sendExisting(config.method(), config)
-	}
-
-	return bot.uploadAndSend(config.method(), config)
-}
-
-// sendChattable sends a Chattable.
-func (bot *BotAPI) sendChattable(config Chattable) (Message, error) {
-	v, err := config.values()
-	if err != nil {
-		return Message{}, err
-	}
-
-	message, err := bot.makeMessageRequest(config.method(), v)
-
-	if err != nil {
-		return Message{}, err
-	}
-
-	return message, nil
 }
 
 // GetUserProfilePhotos gets a user's profile photos.
@@ -423,11 +377,6 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	return updates, nil
 }
 
-// RemoveWebhook unsets the webhook.
-func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
-	return bot.MakeRequest("setWebhook", url.Values{})
-}
-
 // SetWebhook sets a webhook.
 //
 // If this is set, GetUpdates will not get any data!
@@ -435,7 +384,6 @@ func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 // If you do not have a legitimate TLS certificate, you need to include
 // your self signed certificate with the config.
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
-
 	if config.Certificate == nil {
 		v := url.Values{}
 		v.Add("url", config.URL.String())
@@ -806,54 +754,6 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 	return highScores, err
 }
 
-// AnswerShippingQuery allows you to reply to Update with shipping_query parameter.
-func (bot *BotAPI) AnswerShippingQuery(config ShippingConfig) (APIResponse, error) {
-	v := url.Values{}
-
-	v.Add("shipping_query_id", config.ShippingQueryID)
-	v.Add("ok", strconv.FormatBool(config.OK))
-	if config.OK == true {
-		data, err := json.Marshal(config.ShippingOptions)
-		if err != nil {
-			return APIResponse{}, err
-		}
-		v.Add("shipping_options", string(data))
-	} else {
-		v.Add("error_message", config.ErrorMessage)
-	}
-
-	bot.debugLog("answerShippingQuery", v, nil)
-
-	return bot.MakeRequest("answerShippingQuery", v)
-}
-
-// AnswerPreCheckoutQuery allows you to reply to Update with pre_checkout_query.
-func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse, error) {
-	v := url.Values{}
-
-	v.Add("pre_checkout_query_id", config.PreCheckoutQueryID)
-	v.Add("ok", strconv.FormatBool(config.OK))
-	if config.OK != true {
-		v.Add("error", config.ErrorMessage)
-	}
-
-	bot.debugLog("answerPreCheckoutQuery", v, nil)
-
-	return bot.MakeRequest("answerPreCheckoutQuery", v)
-}
-
-// DeleteMessage deletes a message in a chat
-func (bot *BotAPI) DeleteMessage(config DeleteMessageConfig) (APIResponse, error) {
-	v, err := config.values()
-	if err != nil {
-		return APIResponse{}, err
-	}
-
-	bot.debugLog(config.method(), v, nil)
-
-	return bot.MakeRequest(config.method(), v)
-}
-
 // GetInviteLink get InviteLink for a chat
 func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
 	v := url.Values{}
@@ -875,26 +775,20 @@ func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
 	return inviteLink, err
 }
 
-// PinChatMessage pin message in supergroup
-func (bot *BotAPI) PinChatMessage(config PinChatMessageConfig) (APIResponse, error) {
+// GetStickerSet returns a StickerSet.
+func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error) {
 	v, err := config.values()
 	if err != nil {
-		return APIResponse{}, err
+		return StickerSet{}, nil
 	}
 
-	bot.debugLog(config.method(), v, nil)
-
-	return bot.MakeRequest(config.method(), v)
-}
-
-// UnpinChatMessage unpin message in supergroup
-func (bot *BotAPI) UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse, error) {
-	v, err := config.values()
+	resp, err := bot.MakeRequest(config.method(), v)
 	if err != nil {
-		return APIResponse{}, err
+		return StickerSet{}, nil
 	}
 
-	bot.debugLog(config.method(), v, nil)
+	var stickers StickerSet
+	err = json.Unmarshal(resp.Result, &stickers)
 
-	return bot.MakeRequest(config.method(), v)
+	return stickers, err
 }

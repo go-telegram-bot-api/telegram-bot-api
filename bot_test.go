@@ -420,7 +420,7 @@ func TestGetFile(t *testing.T) {
 func TestSendChatConfig(t *testing.T) {
 	bot, _ := getBot(t)
 
-	_, err := bot.Send(tgbotapi.NewChatAction(ChatID, tgbotapi.ChatTyping))
+	_, err := bot.Request(tgbotapi.NewChatAction(ChatID, tgbotapi.ChatTyping))
 
 	if err != nil {
 		t.Error(err)

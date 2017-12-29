@@ -285,12 +285,22 @@ type Document struct {
 
 // Sticker contains information about a sticker.
 type Sticker struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	Emoji     string     `json:"emoji"`     // optional
-	FileSize  int        `json:"file_size"` // optional
+	FileID       string       `json:"file_id"`
+	Width        int          `json:"width"`
+	Height       int          `json:"height"`
+	Thumbnail    *PhotoSize   `json:"thumb"`         // optional
+	Emoji        string       `json:"emoji"`         // optional
+	SetName      string       `json:"set_name"`      // optional
+	MaskPosition MaskPosition `json:"mask_position"` //optional
+	FileSize     int          `json:"file_size"`     // optional
+}
+
+// MaskPosition is the position of a mask.
+type MaskPosition struct {
+	Point  string  `json:"point"`
+	XShift float32 `json:"x_shift"`
+	YShift float32 `json:"y_shift"`
+	Scale  float32 `json:"scale"`
 }
 
 // Video contains information about a video.
@@ -771,4 +781,12 @@ type PreCheckoutQuery struct {
 	InvoicePayload   string     `json:"invoice_payload"`
 	ShippingOptionID string     `json:"shipping_option_id,omitempty"`
 	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
+}
+
+// StickerSet is a collection of stickers.
+type StickerSet struct {
+	Name          string    `json:"name"`
+	Title         string    `json:"title"`
+	ContainsMasks bool      `json:"contains_masks"`
+	Stickers      []Sticker `json:"stickers"`
 }
