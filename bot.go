@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -60,6 +59,10 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 
 // MakeRequest makes a request to a specific endpoint with our token.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
+	if bot.Debug {
+		log.Printf("Endpoint: %s, values: %v\n", endpoint, params)
+	}
+
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
 
 	resp, err := bot.Client.PostForm(method, params)
@@ -68,14 +71,19 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 	defer resp.Body.Close()
 
-	var apiResp APIResponse
-	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
+	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return apiResp, err
+		return APIResponse{}, err
 	}
 
 	if bot.Debug {
-		log.Printf("%s resp: %s", endpoint, bytes)
+		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
+	}
+
+	var apiResp APIResponse
+	err = json.Unmarshal(bytes, &apiResp)
+	if err != nil {
+		return APIResponse{}, err
 	}
 
 	if !apiResp.Ok {
@@ -83,30 +91,6 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 
 	return apiResp, nil
-}
-
-// decodeAPIResponse decode response and return slice of bytes if debug enabled.
-// If debug disabled, just decode http.Response.Body stream to APIResponse struct
-// for efficient memory usage
-func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
-	if !bot.Debug {
-		dec := json.NewDecoder(responseBody)
-		err = dec.Decode(resp)
-		return
-	}
-
-	// if debug, read reponse body
-	data, err := ioutil.ReadAll(responseBody)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(data, resp)
-	if err != nil {
-		return
-	}
-
-	return data, nil
 }
 
 // UploadFile makes a request to the API with a file.
@@ -166,6 +150,10 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		return APIResponse{}, errors.New(ErrBadFileType)
 	}
 
+	if bot.Debug {
+		log.Printf("Endpoint: %s, fieldname: %s, params: %v, file: %T\n", endpoint, fieldname, params, file)
+	}
+
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
 
 	req, err := http.NewRequest("POST", method, nil)
@@ -187,7 +175,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	}
 
 	if bot.Debug {
-		log.Println(string(bytes))
+		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
 	}
 
 	var apiResp APIResponse
@@ -230,8 +218,6 @@ func (bot *BotAPI) GetMe() (User, error) {
 
 	var user User
 	json.Unmarshal(resp.Result, &user)
-
-	bot.debugLog("getMe", nil, user)
 
 	return user, nil
 }
@@ -286,16 +272,6 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	return message, err
 }
 
-// debugLog checks if the bot is currently running in debug mode, and if
-// so will display information about the request and response in the
-// debug log.
-func (bot *BotAPI) debugLog(context string, v url.Values, message interface{}) {
-	if bot.Debug {
-		log.Printf("%s req : %+v\n", context, v)
-		log.Printf("%s resp: %+v\n", context, message)
-	}
-}
-
 // GetUserProfilePhotos gets a user's profile photos.
 //
 // It requires UserID.
@@ -318,8 +294,6 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	var profilePhotos UserProfilePhotos
 	json.Unmarshal(resp.Result, &profilePhotos)
 
-	bot.debugLog("GetUserProfilePhoto", v, profilePhotos)
-
 	return profilePhotos, nil
 }
 
@@ -337,8 +311,6 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 
 	var file File
 	json.Unmarshal(resp.Result, &file)
-
-	bot.debugLog("GetFile", v, file)
 
 	return file, nil
 }
@@ -369,8 +341,6 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 
 	var updates []Update
 	json.Unmarshal(resp.Result, &updates)
-
-	bot.debugLog("getUpdates", v, updates)
 
 	return updates, nil
 }
@@ -450,8 +420,6 @@ func (bot *BotAPI) GetChat(config ChatConfig) (Chat, error) {
 	var chat Chat
 	err = json.Unmarshal(resp.Result, &chat)
 
-	bot.debugLog("getChat", v, chat)
-
 	return chat, err
 }
 
@@ -476,8 +444,6 @@ func (bot *BotAPI) GetChatAdministrators(config ChatConfig) ([]ChatMember, error
 	var members []ChatMember
 	err = json.Unmarshal(resp.Result, &members)
 
-	bot.debugLog("getChatAdministrators", v, members)
-
 	return members, err
 }
 
@@ -498,8 +464,6 @@ func (bot *BotAPI) GetChatMembersCount(config ChatConfig) (int, error) {
 
 	var count int
 	err = json.Unmarshal(resp.Result, &count)
-
-	bot.debugLog("getChatMembersCount", v, count)
 
 	return count, err
 }
@@ -522,8 +486,6 @@ func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) 
 
 	var member ChatMember
 	err = json.Unmarshal(resp.Result, &member)
-
-	bot.debugLog("getChatMember", v, member)
 
 	return member, err
 }
