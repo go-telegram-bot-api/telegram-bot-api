@@ -230,11 +230,12 @@ func (m *Message) CommandArguments() string {
 
 	// IsCommand() checks that the message begins with a bot_command entity
 	entity := (*m.Entities)[0]
+
 	if len(m.Text) == entity.Length {
 		return "" // The command makes up the whole message
-	} else {
-		return m.Text[entity.Length+1:]
 	}
+
+	return m.Text[entity.Length+1:]
 }
 
 // MessageEntity contains information about data in a Message.
@@ -410,7 +411,7 @@ type InlineKeyboardButton struct {
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
 	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
-	Pay                          bool          `json:"pay,omitempty"`			       // optional
+	Pay                          bool          `json:"pay,omitempty"`                              // optional
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
