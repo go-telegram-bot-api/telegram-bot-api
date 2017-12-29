@@ -1,8 +1,9 @@
 package tgbotapi_test
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"testing"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func TestNewInlineQueryResultArticle(t *testing.T) {

@@ -16,9 +16,6 @@ without any additional features. There are other projects for creating
 something with plugins and command handlers without having to design
 all that yourself.
 
-Use `github.com/go-telegram-bot-api/telegram-bot-api` for the latest
-version, or use `gopkg.in/telegram-bot-api.v4` for the stable build.
-
 Join [the development group](https://telegram.me/go_telegram_bot_api) if
 you want to ask questions or discuss development.
 
@@ -32,7 +29,8 @@ package main
 
 import (
 	"log"
-	"gopkg.in/telegram-bot-api.v4"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func main() {
@@ -72,9 +70,10 @@ you may use a slightly different method.
 package main
 
 import (
-	"gopkg.in/telegram-bot-api.v4"
 	"log"
 	"net/http"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func main() {
@@ -87,7 +86,7 @@ func main() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	_, err = bot.Request(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -108,5 +107,5 @@ properly signed.
 
     openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
 
-Now that [Let's Encrypt](https://letsencrypt.org) has entered public beta,
-you may wish to generate your free TLS certificate there.
+Now that [Let's Encrypt](https://letsencrypt.org) is available, you may
+wish to generate your free TLS certificate there.

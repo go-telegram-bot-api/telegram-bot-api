@@ -243,23 +243,7 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 	return strings.Contains(message.Text, "@"+bot.Self.UserName)
 }
 
-// Send will send a Chattable item to Telegram.
-//
-// It requires the Chattable to send.
-func (bot *BotAPI) Send(c Chattable) (Message, error) {
-	resp, err := bot.Request(c)
-	if err != nil {
-		return Message{}, err
-	}
-
-	var message Message
-	err = json.Unmarshal(resp.Result, &message)
-
-	return message, err
-}
-
-// Request makes a request to Telegram that returns an APIResponse, rather than
-// a Message.
+// Request sends a Chattable to Telegram, and returns the APIResponse.
 func (bot *BotAPI) Request(c Chattable) (APIResponse, error) {
 	switch t := c.(type) {
 	case Fileable:
@@ -286,6 +270,20 @@ func (bot *BotAPI) Request(c Chattable) (APIResponse, error) {
 
 		return bot.MakeRequest(c.method(), v)
 	}
+}
+
+// Send will send a Chattable item to Telegram and provides the
+// returned Message.
+func (bot *BotAPI) Send(c Chattable) (Message, error) {
+	resp, err := bot.Request(c)
+	if err != nil {
+		return Message{}, err
+	}
+
+	var message Message
+	err = json.Unmarshal(resp.Result, &message)
+
+	return message, err
 }
 
 // debugLog checks if the bot is currently running in debug mode, and if
