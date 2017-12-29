@@ -597,7 +597,7 @@ func (config LocationConfig) method() string {
 	return "sendLocation"
 }
 
-// LocationConfig contains information about a SendLocation request.
+// EditMessageLiveLocationConfig allows you to update a live location.
 type EditMessageLiveLocationConfig struct {
 	BaseEdit
 	Latitude  float64 // required
@@ -622,19 +622,14 @@ func (config EditMessageLiveLocationConfig) method() string {
 	return "editMessageLiveLocation"
 }
 
-// LocationConfig contains information about a StopMessageLiveLocation request.
+// StopMessageLiveLocationConfig stops updating a live location.
 type StopMessageLiveLocationConfig struct {
 	BaseEdit
 }
 
 // values returns a url.Values representation of StopMessageLiveLocationConfig.
 func (config StopMessageLiveLocationConfig) values() (url.Values, error) {
-	v, err := config.BaseEdit.values()
-	if err != nil {
-		return v, err
-	}
-
-	return v, nil
+	return config.BaseEdit.values()
 }
 
 // method returns Telegram API method name for stop message Live Location.
