@@ -217,9 +217,9 @@ func (bot *BotAPI) GetMe() (User, error) {
 	}
 
 	var user User
-	json.Unmarshal(resp.Result, &user)
+	err = json.Unmarshal(resp.Result, &user)
 
-	return user, nil
+	return user, err
 }
 
 // IsMessageToMe returns true if message directed to this bot.
@@ -292,9 +292,9 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 	}
 
 	var profilePhotos UserProfilePhotos
-	json.Unmarshal(resp.Result, &profilePhotos)
+	err = json.Unmarshal(resp.Result, &profilePhotos)
 
-	return profilePhotos, nil
+	return profilePhotos, err
 }
 
 // GetFile returns a File which can download a file from Telegram.
@@ -310,9 +310,9 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 	}
 
 	var file File
-	json.Unmarshal(resp.Result, &file)
+	err = json.Unmarshal(resp.Result, &file)
 
-	return file, nil
+	return file, err
 }
 
 // GetUpdates fetches updates.
@@ -340,9 +340,9 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	}
 
 	var updates []Update
-	json.Unmarshal(resp.Result, &updates)
+	err = json.Unmarshal(resp.Result, &updates)
 
-	return updates, nil
+	return updates, err
 }
 
 // GetWebhookInfo allows you to fetch information about a webhook and if
