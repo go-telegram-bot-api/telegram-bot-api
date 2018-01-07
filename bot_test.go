@@ -467,7 +467,13 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		t.Error(err)
+	}
+	if info.LastErrorDate != 0 {
+		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
 	bot.RemoveWebhook()
 }
 
@@ -484,7 +490,13 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		t.Error(err)
+	}
+	if info.LastErrorDate != 0 {
+		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
 	bot.RemoveWebhook()
 }
 
@@ -549,7 +561,13 @@ func ExampleNewWebhook() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if info.LastErrorDate != 0 {
+		log.Printf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
