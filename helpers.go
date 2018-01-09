@@ -641,7 +641,7 @@ func NewCallbackWithAlert(id, text string) CallbackConfig {
 	}
 }
 
-// NewInvoice created a new Invoice request to the user.
+// NewInvoice creates a new Invoice request to the user.
 func NewInvoice(chatID int64, title, description, payload, providerToken, startParameter, currency string, prices *[]LabeledPrice) InvoiceConfig {
 	return InvoiceConfig{
 		BaseChat:       BaseChat{ChatID: chatID},
