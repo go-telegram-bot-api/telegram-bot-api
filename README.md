@@ -22,6 +22,12 @@ version, or use `gopkg.in/telegram-bot-api.v4` for the stable build.
 Join [the development group](https://telegram.me/go_telegram_bot_api) if
 you want to ask questions or discuss development.
 
+## Requirement
+
+Just run this before running the example code.
+
+``` gopkg.in/telegram-bot-api.v4 ```
+
 ## Example
 
 This is a very simple bot that just displays any gotten updates,
