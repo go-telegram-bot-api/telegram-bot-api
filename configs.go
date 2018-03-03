@@ -1038,8 +1038,8 @@ func (config DeleteMessageConfig) values() (url.Values, error) {
 
 // PinChatMessageConfig contains information of a message in a chat to pin.
 type PinChatMessageConfig struct {
-	ChatID int64
-	MessageID int
+	ChatID              int64
+	MessageID           int
 	DisableNotification bool
 }
 
@@ -1070,6 +1070,44 @@ func (config UnpinChatMessageConfig) values() (url.Values, error) {
 	v := url.Values{}
 
 	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+
+	return v, nil
+}
+
+// SetChatTitleConfig contains information for change chat title.
+type SetChatTitleConfig struct {
+	ChatID int64
+	Title  string
+}
+
+func (config SetChatTitleConfig) method() string {
+	return "setChatTitle"
+}
+
+func (config SetChatTitleConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("title", config.Title)
+
+	return v, nil
+}
+
+// SetChatDescriptionConfig contains information for change chat description.
+type SetChatDescriptionConfig struct {
+	ChatID      int64
+	Description string
+}
+
+func (config SetChatDescriptionConfig) method() string {
+	return "setChatDescription"
+}
+
+func (config SetChatDescriptionConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("description", config.Description)
 
 	return v, nil
 }

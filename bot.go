@@ -898,3 +898,27 @@ func (bot *BotAPI) UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse,
 
 	return bot.MakeRequest(config.method(), v)
 }
+
+// SetChatTitle change title of chat.
+func (bot *BotAPI) SetChatTitle(config SetChatTitleConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// SetChatDescription change description of chat.
+func (bot *BotAPI) SetChatDescription(config SetChatDescriptionConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
