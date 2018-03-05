@@ -1111,3 +1111,18 @@ func (config SetChatDescriptionConfig) values() (url.Values, error) {
 
 	return v, nil
 }
+
+// SetChatPhotoConfig contains information for change chat photo
+type SetChatPhotoConfig struct {
+	BaseFile
+}
+
+// name returns the field name for the Photo.
+func (config SetChatPhotoConfig) name() string {
+	return "photo"
+}
+
+// method returns Telegram API method name for sending Photo.
+func (config SetChatPhotoConfig) method() string {
+	return "setChatPhoto"
+}

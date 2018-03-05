@@ -922,3 +922,15 @@ func (bot *BotAPI) SetChatDescription(config SetChatDescriptionConfig) (APIRespo
 
 	return bot.MakeRequest(config.method(), v)
 }
+
+// SetChatPhoto change photo of chat.
+func (bot *BotAPI) SetChatPhoto(config SetChatPhotoConfig) (APIResponse, error) {
+	params, err := config.params()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	file := config.getFile()
+
+	return bot.UploadFile(config.method(), params, config.name(), file)
+}
