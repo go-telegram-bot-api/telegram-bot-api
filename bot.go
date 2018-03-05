@@ -934,3 +934,15 @@ func (bot *BotAPI) SetChatPhoto(config SetChatPhotoConfig) (APIResponse, error) 
 
 	return bot.UploadFile(config.method(), params, config.name(), file)
 }
+
+// DeleteChatPhoto delete photo of chat.
+func (bot *BotAPI) DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}

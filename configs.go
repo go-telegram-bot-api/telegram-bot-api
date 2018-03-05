@@ -1126,3 +1126,20 @@ func (config SetChatPhotoConfig) name() string {
 func (config SetChatPhotoConfig) method() string {
 	return "setChatPhoto"
 }
+
+// DeleteChatPhotoConfig contains information for delete chat photo.
+type DeleteChatPhotoConfig struct {
+	ChatID int64
+}
+
+func (config DeleteChatPhotoConfig) method() string {
+	return "deleteChatPhoto"
+}
+
+func (config DeleteChatPhotoConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+
+	return v, nil
+}
