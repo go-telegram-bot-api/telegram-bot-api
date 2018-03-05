@@ -898,3 +898,51 @@ func (bot *BotAPI) UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse,
 
 	return bot.MakeRequest(config.method(), v)
 }
+
+// SetChatTitle change title of chat.
+func (bot *BotAPI) SetChatTitle(config SetChatTitleConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// SetChatDescription change description of chat.
+func (bot *BotAPI) SetChatDescription(config SetChatDescriptionConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// SetChatPhoto change photo of chat.
+func (bot *BotAPI) SetChatPhoto(config SetChatPhotoConfig) (APIResponse, error) {
+	params, err := config.params()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	file := config.getFile()
+
+	return bot.UploadFile(config.method(), params, config.name(), file)
+}
+
+// DeleteChatPhoto delete photo of chat.
+func (bot *BotAPI) DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}

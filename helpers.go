@@ -653,3 +653,34 @@ func NewInvoice(chatID int64, title, description, payload, providerToken, startP
 		Currency:       currency,
 		Prices:         prices}
 }
+
+// NewSetChatPhotoUpload creates a new chat photo uploader.
+//
+// chatID is where to send it, file is a string path to the file,
+// FileReader, or FileBytes.
+//
+// Note that you must send animated GIFs as a document.
+func NewSetChatPhotoUpload(chatID int64, file interface{}) SetChatPhotoConfig {
+	return SetChatPhotoConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			File:        file,
+			UseExisting: false,
+		},
+	}
+}
+
+// NewSetChatPhotoShare shares an existing photo.
+// You may use this to reshare an existing photo without reuploading it.
+//
+// chatID is where to send it, fileID is the ID of the file
+// already uploaded.
+func NewSetChatPhotoShare(chatID int64, fileID string) SetChatPhotoConfig {
+	return SetChatPhotoConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			FileID:      fileID,
+			UseExisting: true,
+		},
+	}
+}

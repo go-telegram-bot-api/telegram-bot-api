@@ -1038,8 +1038,8 @@ func (config DeleteMessageConfig) values() (url.Values, error) {
 
 // PinChatMessageConfig contains information of a message in a chat to pin.
 type PinChatMessageConfig struct {
-	ChatID int64
-	MessageID int
+	ChatID              int64
+	MessageID           int
 	DisableNotification bool
 }
 
@@ -1067,6 +1067,76 @@ func (config UnpinChatMessageConfig) method() string {
 }
 
 func (config UnpinChatMessageConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+
+	return v, nil
+}
+
+// SetChatTitleConfig contains information for change chat title.
+type SetChatTitleConfig struct {
+	ChatID int64
+	Title  string
+}
+
+func (config SetChatTitleConfig) method() string {
+	return "setChatTitle"
+}
+
+func (config SetChatTitleConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("title", config.Title)
+
+	return v, nil
+}
+
+// SetChatDescriptionConfig contains information for change chat description.
+type SetChatDescriptionConfig struct {
+	ChatID      int64
+	Description string
+}
+
+func (config SetChatDescriptionConfig) method() string {
+	return "setChatDescription"
+}
+
+func (config SetChatDescriptionConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("description", config.Description)
+
+	return v, nil
+}
+
+// SetChatPhotoConfig contains information for change chat photo
+type SetChatPhotoConfig struct {
+	BaseFile
+}
+
+// name returns the field name for the Photo.
+func (config SetChatPhotoConfig) name() string {
+	return "photo"
+}
+
+// method returns Telegram API method name for sending Photo.
+func (config SetChatPhotoConfig) method() string {
+	return "setChatPhoto"
+}
+
+// DeleteChatPhotoConfig contains information for delete chat photo.
+type DeleteChatPhotoConfig struct {
+	ChatID int64
+}
+
+func (config DeleteChatPhotoConfig) method() string {
+	return "deleteChatPhoto"
+}
+
+func (config DeleteChatPhotoConfig) values() (url.Values, error) {
 	v := url.Values{}
 
 	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
