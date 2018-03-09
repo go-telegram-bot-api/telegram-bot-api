@@ -28,6 +28,7 @@ type BotAPI struct {
 
 	Self   User         `json:"-"`
 	Client *http.Client `json:"-"`
+	shutdownChannel chan interface{}
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -46,6 +47,7 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 		Token:  token,
 		Client: client,
 		Buffer: 100,
+		shutdownChannel: make(chan interface{}),
 	}
 
 	self, err := bot.GetMe()
@@ -480,6 +482,12 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 
 	go func() {
 		for {
+			select {
+			case <-bot.shutdownChannel:
+				return
+			default:
+			}
+			
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
 				log.Println(err)
@@ -499,6 +507,14 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	}()
 
 	return ch, nil
+}
+
+// StopReceivingUpdates stops the go routine which receives updates
+func (bot *BotAPI) StopReceivingUpdates() {
+	if bot.Debug {
+		log.Println("Stopping the update receiver routine...")
+	}
+	close(bot.shutdownChannel)
 }
 
 // ListenForWebhook registers a http handler for a webhook.
