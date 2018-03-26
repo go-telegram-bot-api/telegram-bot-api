@@ -72,12 +72,20 @@ you may use a slightly different method.
 package main
 
 import (
-	"gopkg.in/telegram-bot-api.v4"
+	"flag"
 	"log"
 	"net/http"
+
+	"gopkg.in/telegram-bot-api.v4"
+)
+
+var (
+	reverse_proxy = flag.Bool("reverse_proxy", false, "Used reverse proxy (e.g., nginx)")
 )
 
 func main() {
+	flag.Parse()
+
 	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
 	if err != nil {
 		log.Fatal(err)
@@ -93,10 +101,59 @@ func main() {
 	}
 
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+	go func() {
+		var err error
+		if *reverse_proxy {
+			err = http.ListenAndServe("127.0.0.1:8444", nil)
+		} else {
+			err = http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+		}
+		log.Fatal(err)
+	}()
 
 	for update := range updates {
 		log.Printf("%+v\n", update)
+	}
+}
+```
+
+Example nginx config for multiple bots
+
+```nginx
+server {
+	listen 8443 ssl;
+	# listen [::]:80 default_server;
+	server_name _;
+
+	# ssl on;
+	ssl_certificate		 /etc/nginx/cert/cert.pem;
+	ssl_certificate_key  /etc/nginx/cert/key.pem;
+
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+
+	root /usr/share/nginx/html;
+	index index.html;
+
+	# MyAwesomeBotToken
+	location ^~ /MyAwesomeBotToken {
+		proxy_pass http://127.0.0.1:8444;
+		proxy_redirect	   off;
+		proxy_set_header   Host $host;
+		proxy_set_header   X-Real-IP $remote_addr;
+	}
+
+	# MyAwesomeBotToken2
+	location ^~ /MyAwesomeBotToken2 {
+		proxy_pass http://127.0.0.1:8445;
+		proxy_redirect	   off;
+		proxy_set_header   Host $host;
+		proxy_set_header   X-Real-IP $remote_addr;
+	}
+
+	location / {
+			# First attempt to serve request as file, then
+			# as directory, then fall back to displaying a 404.
+			try_files $uri $uri/ =404;
 	}
 }
 ```
