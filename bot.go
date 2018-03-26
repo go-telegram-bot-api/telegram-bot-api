@@ -79,7 +79,11 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 
 	if !apiResp.Ok {
-		return apiResp, errors.New(apiResp.Description)
+		parameters := ResponseParameters{}
+		if apiResp.Parameters != nil {
+			parameters = *apiResp.Parameters
+		}
+		return apiResp, Error{apiResp.Description, parameters}
 	}
 
 	return apiResp, nil
