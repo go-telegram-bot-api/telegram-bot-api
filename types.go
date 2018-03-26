@@ -232,9 +232,9 @@ func (m *Message) CommandArguments() string {
 	entity := (*m.Entities)[0]
 	if len(m.Text) == entity.Length {
 		return "" // The command makes up the whole message
-	} else {
-		return m.Text[entity.Length+1:]
 	}
+
+	return m.Text[entity.Length+1:]
 }
 
 // MessageEntity contains information about data in a Message.
@@ -772,6 +772,7 @@ type PreCheckoutQuery struct {
 	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
 }
 
+// Error is an error containing extra information returned by the Telegram API.
 type Error struct {
 	Message string
 	ResponseParameters

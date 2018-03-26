@@ -373,7 +373,10 @@ func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
-	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{true, false}
+	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{
+		RemoveKeyboard: true,
+		Selective:      false,
+	}
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -386,7 +389,10 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := tgbotapi.NewStickerShare(ChatID, ExistingStickerFileID)
-	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{true, false}
+	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{
+		RemoveKeyboard: true,
+		Selective:      false,
+	}
 
 	_, err := bot.Send(msg)
 
@@ -399,7 +405,7 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 func TestGetFile(t *testing.T) {
 	bot, _ := getBot(t)
 
-	file := tgbotapi.FileConfig{ExistingPhotoFileID}
+	file := tgbotapi.FileConfig{FileID: ExistingPhotoFileID}
 
 	_, err := bot.GetFile(file)
 
