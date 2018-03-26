@@ -1269,19 +1269,19 @@ func (config InvoiceConfig) values() (url.Values, error) {
 	if config.PhotoHeight != 0 {
 		v.Add("photo_height", strconv.Itoa(config.PhotoHeight))
 	}
-	if config.NeedName != false {
+	if config.NeedName {
 		v.Add("need_name", strconv.FormatBool(config.NeedName))
 	}
-	if config.NeedPhoneNumber != false {
+	if config.NeedPhoneNumber {
 		v.Add("need_phone_number", strconv.FormatBool(config.NeedPhoneNumber))
 	}
-	if config.NeedEmail != false {
+	if config.NeedEmail {
 		v.Add("need_email", strconv.FormatBool(config.NeedEmail))
 	}
-	if config.NeedShippingAddress != false {
+	if config.NeedShippingAddress {
 		v.Add("need_shipping_address", strconv.FormatBool(config.NeedShippingAddress))
 	}
-	if config.IsFlexible != false {
+	if config.IsFlexible {
 		v.Add("is_flexible", strconv.FormatBool(config.IsFlexible))
 	}
 

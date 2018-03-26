@@ -49,7 +49,7 @@ func TestMessageIsCommandWithCommand(t *testing.T) {
 	message := tgbotapi.Message{Text: "/command"}
 	message.Entities = &[]tgbotapi.MessageEntity{{Type: "bot_command", Offset: 0, Length: 8}}
 
-	if message.IsCommand() != true {
+	if !message.IsCommand() {
 		t.Fail()
 	}
 }
@@ -57,7 +57,7 @@ func TestMessageIsCommandWithCommand(t *testing.T) {
 func TestIsCommandWithText(t *testing.T) {
 	message := tgbotapi.Message{Text: "some text"}
 
-	if message.IsCommand() != false {
+	if message.IsCommand() {
 		t.Fail()
 	}
 }
@@ -65,7 +65,7 @@ func TestIsCommandWithText(t *testing.T) {
 func TestIsCommandWithEmptyText(t *testing.T) {
 	message := tgbotapi.Message{Text: ""}
 
-	if message.IsCommand() != false {
+	if message.IsCommand() {
 		t.Fail()
 	}
 }
@@ -162,7 +162,7 @@ func TestMessageEntityParseURLBad(t *testing.T) {
 func TestChatIsPrivate(t *testing.T) {
 	chat := tgbotapi.Chat{ID: 10, Type: "private"}
 
-	if chat.IsPrivate() != true {
+	if !chat.IsPrivate() {
 		t.Fail()
 	}
 }
@@ -170,7 +170,7 @@ func TestChatIsPrivate(t *testing.T) {
 func TestChatIsGroup(t *testing.T) {
 	chat := tgbotapi.Chat{ID: 10, Type: "group"}
 
-	if chat.IsGroup() != true {
+	if !chat.IsGroup() {
 		t.Fail()
 	}
 }
@@ -178,7 +178,7 @@ func TestChatIsGroup(t *testing.T) {
 func TestChatIsChannel(t *testing.T) {
 	chat := tgbotapi.Chat{ID: 10, Type: "channel"}
 
-	if chat.IsChannel() != true {
+	if !chat.IsChannel() {
 		t.Fail()
 	}
 }
