@@ -91,6 +91,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	info, err := bot.GetWebhookInfo()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if info.LastErrorDate != 0 {
+		log.Printf("failed to set webhook: %s", info.LastErrorMessage)
+	}
+
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 

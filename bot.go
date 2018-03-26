@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -71,26 +72,54 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(resp.Body)
+	var apiResp APIResponse
+	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
 	if err != nil {
-		return APIResponse{}, err
+		return apiResp, err
 	}
 
 	if bot.Debug {
 		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
 	}
 
-	var apiResp APIResponse
-	err = json.Unmarshal(bytes, &apiResp)
-	if err != nil {
-		return APIResponse{}, err
-	}
-
 	if !apiResp.Ok {
-		return apiResp, errors.New(apiResp.Description)
+		var parameters ResponseParameters
+
+		if apiResp.Parameters != nil {
+			parameters = *apiResp.Parameters
+		}
+
+		return apiResp, Error{
+			Message:            apiResp.Description,
+			ResponseParameters: parameters,
+		}
 	}
 
 	return apiResp, nil
+}
+
+// decodeAPIResponse decode response and return slice of bytes if debug enabled.
+// If debug disabled, just decode http.Response.Body stream to APIResponse struct
+// for efficient memory usage
+func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
+	if !bot.Debug {
+		dec := json.NewDecoder(responseBody)
+		err = dec.Decode(resp)
+		return
+	}
+
+	// if debug, read reponse body
+	data, err := ioutil.ReadAll(responseBody)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(data, resp)
+	if err != nil {
+		return
+	}
+
+	return data, nil
 }
 
 // UploadFile makes a request to the API with a file.
@@ -542,4 +571,46 @@ func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error)
 	err = json.Unmarshal(resp.Result, &stickers)
 
 	return stickers, err
+}
+
+// SetChatTitle change title of chat.
+func (bot *BotAPI) SetChatTitle(config SetChatTitleConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// SetChatDescription change description of chat.
+func (bot *BotAPI) SetChatDescription(config SetChatDescriptionConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// SetChatPhoto change photo of chat.
+func (bot *BotAPI) SetChatPhoto(config SetChatPhotoConfig) (APIResponse, error) {
+	params, err := config.params()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	file := config.getFile()
+
+	return bot.UploadFile(config.method(), params, config.name(), file)
+}
+
+// DeleteChatPhoto delete photo of chat.
+func (bot *BotAPI) DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	return bot.MakeRequest(config.method(), v)
 }

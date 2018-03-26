@@ -720,7 +720,7 @@ type SetGameScoreConfig struct {
 	Score              int
 	Force              bool
 	DisableEditMessage bool
-	ChatID             int
+	ChatID             int64
 	ChannelUsername    string
 	MessageID          int
 	InlineMessageID    string
@@ -733,7 +733,7 @@ func (config SetGameScoreConfig) values() (url.Values, error) {
 	v.Add("score", strconv.Itoa(config.Score))
 	if config.InlineMessageID == "" {
 		if config.ChannelUsername == "" {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
+			v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 		} else {
 			v.Add("chat_id", config.ChannelUsername)
 		}
@@ -1376,10 +1376,7 @@ func (config UnpinChatMessageConfig) values() (url.Values, error) {
 
 // SetChatPhotoConfig allows you to set a group, supergroup, or channel's photo.
 type SetChatPhotoConfig struct {
-	ChatID          int64
-	ChannelUsername string
-
-	Photo interface{}
+	BaseFile
 }
 
 func (config SetChatPhotoConfig) method() string {
@@ -1390,36 +1387,12 @@ func (config SetChatPhotoConfig) name() string {
 	return "photo"
 }
 
-func (config SetChatPhotoConfig) values() (url.Values, error) {
-	v := url.Values{}
-
-	if config.ChannelUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.ChannelUsername)
-	}
-
-	return v, nil
-}
-
-func (config SetChatPhotoConfig) params() map[string]string {
-	params := make(map[string]string)
-
-	if config.ChannelUsername == "" {
-		params["chat_id"] = strconv.FormatInt(config.ChatID, 10)
-	} else {
-		params["chat_id"] = config.ChannelUsername
-	}
-
-	return params
-}
-
 func (config SetChatPhotoConfig) getFile() interface{} {
-	return config.Photo
+	return config.File
 }
 
 func (config SetChatPhotoConfig) useExistingFile() bool {
-	return false
+	return config.UseExisting
 }
 
 // DeleteChatPhotoConfig allows you to delete a group, supergroup, or channel's photo.
