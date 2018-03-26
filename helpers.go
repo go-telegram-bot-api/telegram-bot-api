@@ -684,3 +684,38 @@ func NewSetChatPhotoShare(chatID int64, fileID string) SetChatPhotoConfig {
 		},
 	}
 }
+
+// NewChatTitle allows you to update the title of a chat.
+func NewChatTitle(chatID int64, title string) SetChatTitleConfig {
+	return SetChatTitleConfig{
+		ChatID: chatID,
+		Title:  title,
+	}
+}
+
+// NewChatDescription allows you to update the description of a chat.
+func NewChatDescription(chatID int64, description string) SetChatDescriptionConfig {
+	return SetChatDescriptionConfig{
+		ChatID:      chatID,
+		Description: description,
+	}
+}
+
+// NewChatPhoto allows you to update the photo for a chat.
+func NewChatPhoto(chatID int64, photo interface{}) SetChatPhotoConfig {
+	return SetChatPhotoConfig{
+		BaseFile: BaseFile{
+			BaseChat: BaseChat{
+				ChatID: chatID,
+			},
+			File: photo,
+		},
+	}
+}
+
+// NewDeleteChatPhoto allows you to delete the photo for a chat.
+func NewDeleteChatPhoto(chatID int64, photo interface{}) DeleteChatPhotoConfig {
+	return DeleteChatPhotoConfig{
+		ChatID: chatID,
+	}
+}
