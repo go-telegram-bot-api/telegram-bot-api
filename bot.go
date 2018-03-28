@@ -731,16 +731,16 @@ func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIRespo
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
 
-	if &config.CanSendMessages != nil {
+	if config.CanSendMessages != nil {
 		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
 	}
-	if &config.CanSendMediaMessages != nil {
+	if config.CanSendMediaMessages != nil {
 		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
 	}
-	if &config.CanSendOtherMessages != nil {
+	if config.CanSendOtherMessages != nil {
 		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
 	}
-	if &config.CanAddWebPagePreviews != nil {
+	if config.CanAddWebPagePreviews != nil {
 		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
 	}
 	if config.UntilDate != 0 {
@@ -765,28 +765,28 @@ func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIRespons
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
 
-	if &config.CanChangeInfo != nil {
+	if config.CanChangeInfo != nil {
 		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
 	}
-	if &config.CanPostMessages != nil {
+	if config.CanPostMessages != nil {
 		v.Add("can_post_messages", strconv.FormatBool(*config.CanPostMessages))
 	}
-	if &config.CanEditMessages != nil {
+	if config.CanEditMessages != nil {
 		v.Add("can_edit_messages", strconv.FormatBool(*config.CanEditMessages))
 	}
-	if &config.CanDeleteMessages != nil {
+	if config.CanDeleteMessages != nil {
 		v.Add("can_delete_messages", strconv.FormatBool(*config.CanDeleteMessages))
 	}
-	if &config.CanInviteUsers != nil {
+	if config.CanInviteUsers != nil {
 		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
 	}
-	if &config.CanRestrictMembers != nil {
+	if config.CanRestrictMembers != nil {
 		v.Add("can_restrict_members", strconv.FormatBool(*config.CanRestrictMembers))
 	}
-	if &config.CanPinMessages != nil {
+	if config.CanPinMessages != nil {
 		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
 	}
-	if &config.CanPromoteMembers != nil {
+	if config.CanPromoteMembers != nil {
 		v.Add("can_promote_members", strconv.FormatBool(*config.CanPromoteMembers))
 	}
 
