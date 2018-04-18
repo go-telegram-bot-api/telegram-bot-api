@@ -14,6 +14,7 @@ import (
 const (
 	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
 	ChatID                  = 76918703
+	SupergroupChatID        = -1001120141283
 	ReplyToMessageID        = 35
 	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
 	ExistingDocumentFileID  = "BQADAgADOQADjMcoCcioX1GrDvp3Ag"
@@ -372,7 +373,10 @@ func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
-	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{true, false}
+	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{
+		RemoveKeyboard: true,
+		Selective:      false,
+	}
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -385,7 +389,10 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := tgbotapi.NewStickerShare(ChatID, ExistingStickerFileID)
-	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{true, false}
+	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{
+		RemoveKeyboard: true,
+		Selective:      false,
+	}
 
 	_, err := bot.Send(msg)
 
@@ -398,7 +405,7 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 func TestGetFile(t *testing.T) {
 	bot, _ := getBot(t)
 
-	file := tgbotapi.FileConfig{ExistingPhotoFileID}
+	file := tgbotapi.FileConfig{FileID: ExistingPhotoFileID}
 
 	_, err := bot.GetFile(file)
 
@@ -466,7 +473,13 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		t.Error(err)
+	}
+	if info.LastErrorDate != 0 {
+		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
 	bot.RemoveWebhook()
 }
 
@@ -483,7 +496,13 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		t.Error(err)
+	}
+	if info.LastErrorDate != 0 {
+		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
 	bot.RemoveWebhook()
 }
 
@@ -548,7 +567,13 @@ func ExampleNewWebhook() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if info.LastErrorDate != 0 {
+		log.Printf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
@@ -603,6 +628,52 @@ func TestDeleteMessage(t *testing.T) {
 		MessageID: message.MessageID,
 	}
 	_, err := bot.DeleteMessage(deleteMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestPinChatMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+		ChatID:              message.Chat.ID,
+		MessageID:           message.MessageID,
+		DisableNotification: false,
+	}
+	_, err := bot.PinChatMessage(pinChatMessageConfig)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestUnpinChatMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = "markdown"
+	message, _ := bot.Send(msg)
+
+	// We need pin message to unpin something
+	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+		ChatID:              message.Chat.ID,
+		MessageID:           message.MessageID,
+		DisableNotification: false,
+	}
+	_, err := bot.PinChatMessage(pinChatMessageConfig)
+
+	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
+		ChatID: message.Chat.ID,
+	}
+	_, err = bot.UnpinChatMessage(unpinChatMessageConfig)
 
 	if err != nil {
 		t.Error(err)
