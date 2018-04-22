@@ -697,6 +697,22 @@ type EditMessageTextConfig struct {
 	DisableWebPagePreview bool
 }
 
+type DeleteMessageConfig struct {
+	ChatID    int64 `json:"chat_id"`
+	MessageID int   `json:"message_id"`
+}
+
+func (config DeleteMessageConfig) values() (url.Values, error) {
+	v := url.Values{}
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("message_id", strconv.FormatInt(int64(config.MessageID), 10))
+	return v, nil
+}
+
+func (config DeleteMessageConfig) method() string {
+	return "deleteMessage"
+}
+
 func (config EditMessageTextConfig) values() (url.Values, error) {
 	v, err := config.BaseEdit.values()
 	if err != nil {
