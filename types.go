@@ -290,6 +290,7 @@ type Sticker struct {
 	Thumbnail *PhotoSize `json:"thumb"`     // optional
 	Emoji     string     `json:"emoji"`     // optional
 	FileSize  int        `json:"file_size"` // optional
+	SetName   string     `json:"set_name"`  // optional
 }
 
 // Video contains information about a video.
@@ -410,7 +411,7 @@ type InlineKeyboardButton struct {
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
 	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
-	Pay                          bool          `json:"pay,omitempty"`			       // optional
+	Pay                          bool          `json:"pay,omitempty"`                              // optional
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
