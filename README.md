@@ -37,6 +37,7 @@ import (
 
 func main() {
 	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+	//bot, err := tgbotapi.NewBotAPI("my:token", "socks5", "192.168.1.1:1080", nil)   //SOCKS5 Proxy
 	if err != nil {
 		log.Panic(err)
 	}
