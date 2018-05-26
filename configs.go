@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/url"
 	"strconv"
@@ -1151,7 +1152,7 @@ type MediaGroupConfig struct {
 	ChatID          int64
 	ChannelUsername string
 
-	Media               []interface{}
+	Media               []interface{} `json:"media"`
 	DisableNotification bool
 	ReplyToMessageID    int
 }
@@ -1170,6 +1171,7 @@ func (config MediaGroupConfig) values() (url.Values, error) {
 	}
 	bytes, err := json.Marshal(config.Media)
 	if err != nil {
+		fmt.Println(err)
 		return v, err
 	}
 	v.Add("media", string(bytes))
@@ -1184,19 +1186,19 @@ func (config MediaGroupConfig) values() (url.Values, error) {
 }
 
 type InputMediaPhoto struct {
-	Type          string
-	Media string
-	Caption string
+	Type      string
+	Media     string
+	Caption   string
 	ParseMode string
 }
 
 type InputMediaVideo struct {
-	Type          string
-	Media string
-	Caption string
-	ParseMode string
-	Width int
-	Height int
-	Duration int
+	Type              string
+	Media             string
+	Caption           string
+	ParseMode         string
+	Width             int
+	Height            int
+	Duration          int
 	SupportsStreaming bool
 }
