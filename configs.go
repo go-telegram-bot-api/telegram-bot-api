@@ -2,10 +2,11 @@ package tgbotapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/url"
 	"strconv"
+
+	"github.com/kr/pretty"
 )
 
 // Telegram constants
@@ -1171,7 +1172,6 @@ func (config MediaGroupConfig) values() (url.Values, error) {
 	}
 	bytes, err := json.Marshal(config.Media)
 	if err != nil {
-		fmt.Println(err)
 		return v, err
 	}
 	v.Add("media", string(bytes))
@@ -1181,7 +1181,7 @@ func (config MediaGroupConfig) values() (url.Values, error) {
 	if config.ReplyToMessageID != 0 {
 		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
 	}
-
+	pretty.Println(v)
 	return v, nil
 }
 
