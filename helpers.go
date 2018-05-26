@@ -82,6 +82,17 @@ func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
 	}
 }
 
+// NewMediaGroupShare shares media group.
+//
+// chatID is where to send it, medias is the media interface
+// already uploaded.
+func NewMediaGroupShare(chatID int64, medias []interface{}) MediaGroupConfig {
+	return MediaGroupConfig{
+		ChatID: chatID,
+		Media:  medias,
+	}
+}
+
 // NewAudioUpload creates a new audio uploader.
 //
 // chatID is where to send it, file is a string path to the file,

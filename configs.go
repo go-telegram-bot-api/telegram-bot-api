@@ -1143,3 +1143,60 @@ func (config DeleteChatPhotoConfig) values() (url.Values, error) {
 
 	return v, nil
 }
+
+// MediaGroupConfig allows you to send a group of media.
+//
+// Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
+type MediaGroupConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	Media               []interface{}
+	DisableNotification bool
+	ReplyToMessageID    int
+}
+
+func (config MediaGroupConfig) method() string {
+	return "sendMediaGroup"
+}
+
+func (config MediaGroupConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+	bytes, err := json.Marshal(config.Media)
+	if err != nil {
+		return v, err
+	}
+	v.Add("media", string(bytes))
+	if config.DisableNotification {
+		v.Add("disable_notification", strconv.FormatBool(config.DisableNotification))
+	}
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
+	}
+
+	return v, nil
+}
+
+type InputMediaPhoto struct {
+	Type          string
+	Media string
+	Caption string
+	ParseMode string
+}
+
+type InputMediaVideo struct {
+	Type          string
+	Media string
+	Caption string
+	ParseMode string
+	Width int
+	Height int
+	Duration int
+	SupportsStreaming bool
+}
