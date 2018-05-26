@@ -5,8 +5,6 @@ import (
 	"io"
 	"net/url"
 	"strconv"
-
-	"github.com/kr/pretty"
 )
 
 // Telegram constants
@@ -1181,24 +1179,24 @@ func (config MediaGroupConfig) values() (url.Values, error) {
 	if config.ReplyToMessageID != 0 {
 		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
 	}
-	pretty.Println(v)
+
 	return v, nil
 }
 
 type InputMediaPhoto struct {
-	Type      string
-	Media     string
-	Caption   string
-	ParseMode string
+	Type      string `json:"type"`
+	Media     string `json:"media"`
+	Caption   string `json:"caption"`
+	ParseMode string `json:"parse_mode"`
 }
 
 type InputMediaVideo struct {
-	Type              string
-	Media             string
-	Caption           string
-	ParseMode         string
-	Width             int
-	Height            int
-	Duration          int
-	SupportsStreaming bool
+	Type              string `json:"type"`
+	Media             string `json:"media"`
+	Caption           string `json:"caption"`
+	ParseMode         string `json:"parse_mode"`
+	Width             int    `json:"width"`
+	Height            int    `json:"height"`
+	Duration          int    `json:"duration"`
+	SupportsStreaming bool   `json:"supports_streaming"`
 }
