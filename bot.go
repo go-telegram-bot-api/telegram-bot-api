@@ -950,3 +950,111 @@ func (bot *BotAPI) DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, e
 
 	return bot.MakeRequest(config.method(), v)
 }
+
+// GetStickerSet is used to get a sticker set.
+func (bot *BotAPI) GetStickerSet(name string) (StickerSet, error) {
+	v := url.Values{}
+
+	v.Add("name", name)
+	resp, err := bot.MakeRequest("getStickerSet", v)
+	if err != nil {
+		return StickerSet{}, err
+	}
+
+	var stickerSet StickerSet
+	err = json.Unmarshal(resp.Result, &stickerSet)
+
+	return stickerSet, err
+}
+
+// UploadStickerFile uploads a .png file with a sticker for later use in
+// createNewStickerSet and addStickerToSet methods (can be used multiple times).
+//
+// File should be a string to a file path, a FileBytes struct, or a FileReader
+// struct.
+func (bot *BotAPI) UploadStickerFile(userID int, file interface{}) (APIResponse, File, error) {
+	switch file.(type) {
+	case url.URL:
+		return APIResponse{}, File{}, errors.New(ErrBadFileType)
+	}
+
+	params := make(map[string]string)
+	params["user_id"] = strconv.Itoa(userID)
+
+	resp, err := bot.UploadFile("uploadStickerFile", params, "png_sticker", file)
+	if err != nil {
+		return resp, File{}, err
+	}
+
+	returnFile := File{}
+	err = json.Unmarshal(resp.Result, &returnFile)
+	if err != nil {
+		return resp, File{}, err
+	}
+
+	return resp, returnFile, nil
+}
+
+// CreateNewStickerSet creates a new sticker set owned by a user. The bot will
+// be able to edit the created sticker set.
+func (bot *BotAPI) CreateNewStickerSet(config CreateNewStickerSetConfig) (APIResponse, error) {
+	params := make(map[string]string)
+
+	params["user_id"] = strconv.Itoa(config.UserID)
+	params["name"] = config.Name
+	params["title"] = config.Title
+	params["emojis"] = config.Emojis
+
+	if config.ContainsMasks {
+		params["contains_masks"] = strconv.FormatBool(config.ContainsMasks)
+	}
+
+	if config.MaskPosition != nil {
+		maskPosition, err := json.Marshal(&config.MaskPosition)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		params["mask_position"] = string(maskPosition)
+	}
+
+	return bot.UploadFile("createNewStickerSet", params, "png_sticker", config.PNGSticker)
+}
+
+// AddStickerToSet adds a new sticker to a set created by the bot.
+func (bot *BotAPI) AddStickerToSet(config AddStickerToSetConfig) (APIResponse, error) {
+	params := make(map[string]string)
+
+	params["user_id"] = strconv.Itoa(config.UserID)
+	params["name"] = config.Name
+	params["emojis"] = config.Emojis
+
+	if config.MaskPosition != nil {
+		maskPosition, err := json.Marshal(&config.MaskPosition)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		params["mask_position"] = string(maskPosition)
+	}
+
+	return bot.UploadFile("addStickerToSet", params, "png_sticker", config.PNGSticker)
+}
+
+// SetStickerPositionInSet moves a sticker in a set created by the bot to a specific position.
+func (bot *BotAPI) SetStickerPositionInSet(config SetStickerPositionInSetConfig) (APIResponse, error) {
+	v, _ := config.values()
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// DeleteStickerFromSet deletes a sticker from a set created by the bot.
+func (bot *BotAPI) DeleteStickerFromSet(sticker string) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("sticker", sticker)
+
+	return bot.MakeRequest("deleteStickerFromSet", v)
+}

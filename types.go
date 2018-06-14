@@ -773,6 +773,34 @@ type PreCheckoutQuery struct {
 	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
 }
 
+// Sticker contains information about a sticker.
+type Sticker struct {
+	FileID       string        `json:"file_id"`
+	Width        int           `json:"width"`
+	Height       int           `json:"height"`
+	Thumbnail    *PhotoSize    `json:"thumb"`         // optional
+	Emoji        string        `json:"emoji"`         // optional
+	SetName      string        `json:"set_name"`      // optional
+	MaskPosition *MaskPosition `json:"mask_position"` // optional
+	FileSize     int           `json:"file_size"`     // optional
+}
+
+// StickerSet represents a sticker set.
+type StickerSet struct {
+	Name          string     `json:"name"`
+	Title         string     `json:"title"`
+	ContainsMasks bool       `json:"contains_masks"`
+	Stickers      *[]Sticker `json:"stickers"`
+}
+
+// MaskPosition describes the position on faces where a mask should be placed by default.
+type MaskPosition struct {
+	Point  string  `json:"point"`
+	XShift float64 `json:"x_shift"`
+	YShift float64 `json:"y_shift"`
+	scale  float64 `json:"scale"`
+}
+
 // Error is an error containing extra information returned by the Telegram API.
 type Error struct {
 	Message string

@@ -1200,3 +1200,44 @@ type InputMediaVideo struct {
 	Duration          int    `json:"duration"`
 	SupportsStreaming bool   `json:"supports_streaming"`
 }
+
+// CreateNewStickerSetConfig contains information about a CreateNewStickerSet
+// request.
+type CreateNewStickerSetConfig struct {
+	UserID        int         // required
+	Name          string      // required
+	Title         string      // required
+	PNGSticker    interface{} // required
+	Emojis        string      // required
+	ContainsMasks bool
+	MaskPosition  *MaskPosition
+}
+
+// AddStickerToSetConfig contains information about a AddToStickerSet request.
+type AddStickerToSetConfig struct {
+	UserID       int         // required
+	Name         string      // required
+	PNGSticker   interface{} // required
+	Emojis       string      // required
+	MaskPosition *MaskPosition
+}
+
+// SetStickerPositionInSetConfig contains information about a
+// SetStickerPositionInSet request.
+type SetStickerPositionInSetConfig struct {
+	Sticker  string // required
+	Position int64  // required
+}
+
+func (config SetStickerPositionInSetConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("sticker", config.Sticker)
+	v.Add("position", strconv.FormatInt(config.Position, 10))
+
+	return v, nil
+}
+
+func (config SetStickerPositionInSetConfig) method() string {
+	return "setStickerPositionInSet"
+}
