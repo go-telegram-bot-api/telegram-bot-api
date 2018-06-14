@@ -282,17 +282,6 @@ type Document struct {
 	FileSize  int        `json:"file_size"` // optional
 }
 
-// Sticker contains information about a sticker.
-type Sticker struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	Emoji     string     `json:"emoji"`     // optional
-	FileSize  int        `json:"file_size"` // optional
-	SetName   string     `json:"set_name"`  // optional
-}
-
 // Video contains information about a video.
 type Video struct {
 	FileID    string     `json:"file_id"`
