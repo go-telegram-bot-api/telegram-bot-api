@@ -494,13 +494,14 @@ func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTex
 }
 
 // NewEditMessageCaption allows you to edit the caption of a message.
-func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMessageCaptionConfig {
+func NewEditMessageCaption(chatID int64, messageID int, caption, parseMode string) EditMessageCaptionConfig {
 	return EditMessageCaptionConfig{
 		BaseEdit: BaseEdit{
 			ChatID:    chatID,
 			MessageID: messageID,
 		},
-		Caption: caption,
+		Caption:   caption,
+		ParseMode: parseMode,
 	}
 }
 

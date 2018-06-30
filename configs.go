@@ -793,13 +793,15 @@ func (config EditMessageTextConfig) method() string {
 // EditMessageCaptionConfig allows you to modify the caption of a message.
 type EditMessageCaptionConfig struct {
 	BaseEdit
-	Caption string
+	Caption   string
+	ParseMode string
 }
 
 func (config EditMessageCaptionConfig) values() (url.Values, error) {
 	v, _ := config.BaseEdit.values()
 
 	v.Add("caption", config.Caption)
+	v.Add("parse_mode", config.ParseMode)
 
 	return v, nil
 }
