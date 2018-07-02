@@ -184,6 +184,54 @@ func (m *Message) IsCommand() bool {
 	return entity.Offset == 0 && entity.Type == "bot_command"
 }
 
+//Command represents a command contained in a message
+type Command struct {
+	Name      string
+	Arguments []string
+}
+
+//Commands represents a slice of Command
+type Commands []Command
+
+//GetCommands returns all commands
+func (m *Message) GetCommands() (*Commands, error) {
+	var botCmdsEntries []MessageEntity
+	for _, e := range *m.Entities {
+		if e.Type == "bot_command" {
+			botCmdsEntries = append(botCmdsEntries, e)
+		}
+	}
+
+	var cmds Commands
+	text := []rune(m.Text)
+	textLen := len(text)
+	for i := 0; i < len(botCmdsEntries); i++ {
+		e := botCmdsEntries[i]
+		nOff := textLen
+		if i+1 < len(botCmdsEntries) {
+			nOff = (botCmdsEntries[i+1]).Offset
+		}
+		cmd := Command{
+			Name:      string(text[e.Offset+1 : e.Offset+e.Length]),
+			Arguments: strings.Fields(string(text[e.Offset+e.Length : nOff])),
+		}
+		cmds = append(cmds, cmd)
+	}
+
+	return &cmds, nil
+}
+
+//CountCommands counts all commands in a message
+func (m *Message) CountCommands() int {
+	var c int
+	for _, e := range *m.Entities {
+		if e.Type == "bot_command" {
+			c++
+		}
+	}
+	return c
+}
+
 // Command checks if the message was a command and if it was, returns the
 // command. If the Message was not a command, it returns an empty string.
 //

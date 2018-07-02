@@ -505,17 +505,25 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	return ch, nil
 }
 
+//GetWebhookUpdate gathers webhook information from a http.Request
+func GetWebhookUpdate(r *http.Request) (*Update, error) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+	
+	var update Update
+	err = json.Unmarshal(b, &update)	
+	return &update, err
+}
+
 // ListenForWebhook registers a http handler for a webhook.
 func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		bytes, _ := ioutil.ReadAll(r.Body)
-
-		var update Update
-		json.Unmarshal(bytes, &update)
-
-		ch <- update
+		update, _ := GetWebhookUpdate(r)
+		ch <- *update
 	})
 
 	return ch

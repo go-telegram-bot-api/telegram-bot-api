@@ -1,10 +1,11 @@
 package tgbotapi_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/TheMysteriousVincent/telegram-bot-api"
 )
 
 func TestUserStringWith(t *testing.T) {
@@ -42,6 +43,38 @@ func TestMessageTime(t *testing.T) {
 	date := time.Unix(0, 0)
 	if message.Time() != date {
 		t.Fail()
+	}
+}
+
+func TestGetCommands(t *testing.T) {
+	message := tgbotapi.Message{Text: "/test t\n/testCommandsWith2Arguments TestArgument1 TestArgument2"}
+	message.Entities = &[]tgbotapi.MessageEntity{
+		{
+			Type:   "bot_command",
+			Offset: 0,
+			Length: 5,
+		},
+		{
+			Type:   "bot_command",
+			Offset: 8,
+			Length: 27,
+		},
+	}
+
+	cmds, _ := message.GetCommands()
+	fmt.Println(*cmds)
+
+	if len(*cmds) != 2 {
+		t.Fatal("there have to be exactly two entries")
+	}
+
+	cmd := (*cmds)[0]
+	if cmd.Name != "test" {
+		t.Fatal("name of cmd 1 is '", cmd.Name, "' (test)")
+	}
+	cmd = (*cmds)[1]
+	if cmd.Name != "testCommandsWith2Arguments" {
+		t.Fatal("name of cmd 1 is '", cmd.Name, "' (testCommandsWith2Arguments)")
 	}
 }
 
