@@ -427,7 +427,7 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	return updates, nil
 }
 
-// Remove unsets the webhook.
+// RemoveWebhook unsets the webhook.
 func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 	return bot.MakeRequest("setWebhook", url.Values{})
 }
