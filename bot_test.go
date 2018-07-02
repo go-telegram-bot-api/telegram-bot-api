@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/TheMysteriousVincent/telegram-bot-api"
 )
 
 const (

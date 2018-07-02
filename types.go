@@ -204,15 +204,16 @@ func (m *Message) GetCommands() (*Commands, error) {
 
 	var cmds Commands
 	text := []rune(m.Text)
+	textLen := len(text)
 	for i := 0; i < len(botCmdsEntries); i++ {
 		e := botCmdsEntries[i]
-		nOff := len(text)
-		if i+1 >= len(botCmdsEntries) {
+		nOff := textLen
+		if i+1 < len(botCmdsEntries) {
 			nOff = (botCmdsEntries[i+1]).Offset
 		}
 		cmd := Command{
-			Name:      string(text[e.Offset : e.Offset+e.Length]),
-			Arguments: strings.Split(string(text[e.Offset+e.Length:nOff]), " "),
+			Name:      string(text[e.Offset+1 : e.Offset+e.Length]),
+			Arguments: strings.Fields(string(text[e.Offset+e.Length : nOff])),
 		}
 		cmds = append(cmds, cmd)
 	}
