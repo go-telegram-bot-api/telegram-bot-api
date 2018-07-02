@@ -184,13 +184,16 @@ func (m *Message) IsCommand() bool {
 	return entity.Offset == 0 && entity.Type == "bot_command"
 }
 
+//Command represents a command contained in a message
 type Command struct {
 	Name      string
 	Arguments []string
 }
 
+//Commands represents a slice of Command
 type Commands []Command
 
+//GetCommands returns all commands
 func (m *Message) GetCommands() (*Commands, error) {
 	var botCmdsEntries []MessageEntity
 	for _, e := range *m.Entities {
@@ -211,11 +214,13 @@ func (m *Message) GetCommands() (*Commands, error) {
 			Name:      string(text[e.Offset : e.Offset+e.Length]),
 			Arguments: strings.Split(string(text[e.Offset+e.Length:nOff]), " "),
 		}
+		cmds = append(cmds, cmd)
 	}
 
 	return &cmds, nil
 }
 
+//CountCommands counts all commands in a message
 func (m *Message) CountCommands() int {
 	var c int
 	for _, e := range *m.Entities {
@@ -224,10 +229,6 @@ func (m *Message) CountCommands() int {
 		}
 	}
 	return c
-}
-
-func (m *Message) nextCommand(currentOffset int) *MessageEntity {
-
 }
 
 // Command checks if the message was a command and if it was, returns the
