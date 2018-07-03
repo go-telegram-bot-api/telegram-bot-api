@@ -1021,6 +1021,29 @@ func (bot *BotAPI) CreateNewStickerSet(config CreateNewStickerSetConfig) (APIRes
 	return bot.UploadFile("createNewStickerSet", params, "png_sticker", config.PNGSticker)
 }
 
+// CreateNewStickerSet creates a new sticker set owned by a user. The bot will
+// be able to edit the created sticker set.
+func (bot *BotAPI) CreateNewStickerSetFileId(config CreateNewStickerSetConfig) (APIResponse, error) {
+	v := url.Values{}
+	v.Add("png_sticker", config.PNGSticker.(string))
+	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.Add("name", config.Name)
+	v.Add("title", config.Title)
+	v.Add("emojis", config.Emojis)
+
+	if config.MaskPosition != nil {
+		maskPosition, err := json.Marshal(&config.MaskPosition)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		v.Add("mask_position", string(maskPosition))
+	}
+	if config.ContainsMasks {
+		v.Add("contains_masks", strconv.FormatBool(config.ContainsMasks))
+	}
+	return bot.MakeRequest("createNewStickerSet", v)
+}
+
 // AddStickerToSet adds a new sticker to a set created by the bot.
 func (bot *BotAPI) AddStickerToSet(config AddStickerToSetConfig) (APIResponse, error) {
 	params := make(map[string]string)
@@ -1039,6 +1062,26 @@ func (bot *BotAPI) AddStickerToSet(config AddStickerToSetConfig) (APIResponse, e
 	}
 
 	return bot.UploadFile("addStickerToSet", params, "png_sticker", config.PNGSticker)
+}
+
+// AddStickerToSet adds a new sticker to a set created by the bot.
+func (bot *BotAPI) AddStickerToSetFileId(config AddStickerToSetConfig) (APIResponse, error) {
+
+	v := url.Values{}
+	v.Add("png_sticker", config.PNGSticker.(string))
+	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.Add("name", config.Name)
+	v.Add("emojis", config.Emojis)
+
+	if config.MaskPosition != nil {
+		maskPosition, err := json.Marshal(&config.MaskPosition)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		v.Add("mask_position", string(maskPosition))
+	}
+
+	return bot.MakeRequest("addStickerToSet", v)
 }
 
 // SetStickerPositionInSet moves a sticker in a set created by the bot to a specific position.
