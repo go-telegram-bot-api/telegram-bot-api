@@ -65,8 +65,30 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+	
+	// Uncomment for adding ability to connect via proxy
+	/*proxyStr := "http://proxy.com:3128" 
+	proxyURL, _ := url.Parse(proxyStr)	
+
+	transport := &http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	}
+	bot.Client = &http.Client{
+		Transport: transport,
+	}
+	*/
+	//==================
 
 	resp, err := bot.Client.PostForm(method, params)
+	
+	// Uncomment for adding auth params to header
+	/*
+	auth := "username:password"
+	basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+	resp.Header.Add("Proxy-Authorization", basicAuth)
+	*/
+	//==================
+	
 	if err != nil {
 		return APIResponse{}, err
 	}
