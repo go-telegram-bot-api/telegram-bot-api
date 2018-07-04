@@ -60,13 +60,31 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 
 // MakeRequest makes a request to a specific endpoint with our token.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	if bot.Debug {
-		log.Printf("Endpoint: %s, values: %v\n", endpoint, params)
-	}
-
+	
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
 
-	resp, err := bot.Client.PostForm(method, params)
+	// Uncomment to use proxy with auth
+	/*
+	proxyStr := "http://proxy.com:3128"
+	proxyURL, _ := url.Parse(proxyStr)
+
+	auth := "username:password"
+	basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+
+	hdr := http.Header{}
+	hdr.Add("Proxy-Authorization", basicAuth)
+	transport := &http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+		ProxyConnectHeader: hdr,
+	}
+	
+	bot.Client = &http.Client{
+		Transport: transport,
+	}
+	*/
+	
+	resp, err := bot.Client.PostForm(method, params)	
+
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -79,20 +97,15 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 
 	if bot.Debug {
-		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
+		log.Printf("%s resp: %s", endpoint, bytes)
 	}
 
 	if !apiResp.Ok {
-		var parameters ResponseParameters
-
+		parameters := ResponseParameters{}
 		if apiResp.Parameters != nil {
 			parameters = *apiResp.Parameters
 		}
-
-		return apiResp, Error{
-			Message:            apiResp.Description,
-			ResponseParameters: parameters,
-		}
+		return apiResp, Error{apiResp.Description, parameters}
 	}
 
 	return apiResp, nil
