@@ -406,8 +406,8 @@ func NewInlineQueryResultGIF(id, url string) InlineQueryResultGIF {
 // NewInlineQueryResultCachedGIF create a new inline query with cached photo.
 func NewInlineQueryResultCachedGIF(id, gifID string) InlineQueryResultCachedGIF {
 	return InlineQueryResultCachedGIF{
-		Type: "gif",
-		ID: id,
+		Type:  "gif",
+		ID:    id,
 		GifID: gifID,
 	}
 }
@@ -424,8 +424,8 @@ func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 // NewInlineQueryResultCachedPhoto create a new inline query with cached photo.
 func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GifID string) InlineQueryResultCachedMpeg4Gif {
 	return InlineQueryResultCachedMpeg4Gif{
-		Type: "mpeg4_gif",
-		ID: id,
+		Type:   "mpeg4_gif",
+		ID:     id,
 		MGifID: MPEG4GifID,
 	}
 }
@@ -452,8 +452,8 @@ func NewInlineQueryResultPhotoWithThumb(id, url, thumb string) InlineQueryResult
 // NewInlineQueryResultCachedPhoto create a new inline query with cached photo.
 func NewInlineQueryResultCachedPhoto(id, photoID string) InlineQueryResultCachedPhoto {
 	return InlineQueryResultCachedPhoto{
-		Type: "photo",
-		ID: id,
+		Type:    "photo",
+		ID:      id,
 		PhotoID: photoID,
 	}
 }
@@ -470,10 +470,10 @@ func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
 // NewInlineQueryResultCachedVideo create a new inline query with cached video.
 func NewInlineQueryResultCachedVideo(id, videoID, title string) InlineQueryResultCachedVideo {
 	return InlineQueryResultCachedVideo{
-		Type: "video",
-		ID: id,
+		Type:    "video",
+		ID:      id,
 		VideoID: videoID,
-		Title: title,
+		Title:   title,
 	}
 }
 
@@ -490,8 +490,8 @@ func NewInlineQueryResultAudio(id, url, title string) InlineQueryResultAudio {
 // NewInlineQueryResultCachedAudio create a new inline query with cached photo.
 func NewInlineQueryResultCachedAudio(id, audioID string) InlineQueryResultCachedAudio {
 	return InlineQueryResultCachedAudio{
-		Type: "audio",
-		ID: id,
+		Type:    "audio",
+		ID:      id,
 		AudioID: audioID,
 	}
 }
@@ -509,10 +509,10 @@ func NewInlineQueryResultVoice(id, url, title string) InlineQueryResultVoice {
 // NewInlineQueryResultCachedVoice create a new inline query with cached photo.
 func NewInlineQueryResultCachedVoice(id, voiceID, title string) InlineQueryResultCachedVoice {
 	return InlineQueryResultCachedVoice{
-		Type: "voice",
-		ID: id,
+		Type:    "voice",
+		ID:      id,
 		VoiceID: voiceID,
-		Title: title,
+		Title:   title,
 	}
 }
 
@@ -530,10 +530,10 @@ func NewInlineQueryResultDocument(id, url, title, mimeType string) InlineQueryRe
 // NewInlineQueryResultCachedDocument create a new inline query with cached photo.
 func NewInlineQueryResultCachedDocument(id, documentID, title string) InlineQueryResultCachedDocument {
 	return InlineQueryResultCachedDocument{
-		Type: "document",
-		ID: id,
+		Type:       "document",
+		ID:         id,
 		DocumentID: documentID,
-		Title: title,
+		Title:      title,
 	}
 }
 
