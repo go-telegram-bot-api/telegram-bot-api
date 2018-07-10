@@ -773,6 +773,17 @@ type PreCheckoutQuery struct {
 	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
 }
 
+// ProxyCredentials are credentials parameters for exchange data with
+// APIEndpoint via proxy-server.
+type ProxyCredentials struct {
+	UseProxy bool
+	Protocol string
+	Username string
+	Password string
+	IP       string
+	Port	 string
+}
+
 // Error is an error containing extra information returned by the Telegram API.
 type Error struct {
 	Message string
