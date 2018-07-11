@@ -67,7 +67,14 @@ func NewBotAPIViaProxy(token string, proxySettings ProxyCredentials) (*BotAPI, e
 	client := &http.Client{}
 
 	if proxySettings.UseProxy {
-		fixedURL, err := url.Parse(fmt.Sprintf("%s://%s:%s@%s:%s", proxySettings.Protocol, proxySettings.Username, proxySettings.Password, proxySettings.IP, proxySettings.Port))
+		var fixedURL *url.URL
+		var err error
+
+		if proxySettings.Username != "" && proxySettings.Password != "" {
+			fixedURL, err = url.Parse(fmt.Sprintf("%s://%s:%s@%s:%s", proxySettings.Protocol, proxySettings.Username, proxySettings.Password, proxySettings.IP, proxySettings.Port))
+		} else {
+			fixedURL, err = url.Parse(fmt.Sprintf("%s://%s:%s", proxySettings.Protocol, proxySettings.IP, proxySettings.Port))
+		}
 
 		if err == nil {
 			tr := &http.Transport{Proxy: http.ProxyURL(fixedURL)}

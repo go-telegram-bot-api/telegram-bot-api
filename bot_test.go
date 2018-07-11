@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-telegram-bot-api/telegram-bot-api/"
+	"github.com/mkutin/telegram-bot-api"
 )
 
 const (
@@ -23,12 +23,6 @@ const (
 	ExistingVideoFileID     = "BAADAgADZgADjMcoCav432kYe0FRAg"
 	ExistingVideoNoteFileID = "DQADAgADdQAD70cQSUK41dLsRMqfAg"
 	ExistingStickerFileID   = "BQADAgADcwADjMcoCbdl-6eB--YPAg"
-	UseProxy 				= true
-	ProxyProtocol  			= "SOCKS5"
-	ProxyUsername 			= "YGko8h"
-	ProxyPassword 			= "VofoA7"
-	ProxyIP 				= "185.179.113.223"
-	ProxyPort 				= "8000"
 )
 
 func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
@@ -41,15 +35,6 @@ func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
 	}
 
 	return bot, err
-}
-
-func TestNewBotAPIViaProxy(t *testing.T) {
-	_, err := tgbotapi.NewBotAPIViaProxy(TestToken, tgbotapi.NewProxyCredentials(UseProxy, ProxyProtocol, ProxyUsername, ProxyPassword, ProxyIP, ProxyPort))
-
-	if err != nil {
-		t.Error(err)
-		t.Fail()
-	}
 }
 
 func TestNewBotAPI_notoken(t *testing.T) {
