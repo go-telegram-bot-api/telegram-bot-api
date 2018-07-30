@@ -1218,6 +1218,17 @@ type InputMediaPhoto struct {
 	ParseMode string `json:"parse_mode"`
 }
 
+type InputMediaAudio struct {
+	Type      string `json:"type"`
+	Media     string `json:"media"`
+	Thumb     string `json:"thumb,-"`
+	Caption   string `json:"caption,-"`
+	ParseMode string `json:"parse_mode,-"`
+	Duration  int    `json:"duration,-"`
+	Performer string `json:"duration,-"`
+	Title     string `json:"title,-"`
+}
+
 type InputMediaVideo struct {
 	Type              string `json:"type"`
 	Media             string `json:"media"`

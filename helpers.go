@@ -515,14 +515,14 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 	}
 }
 
-// NewEditMessageText allows you to edit the text of a message.
-func NewEditMessageMedia(chatID int64, messageID int, text string) EditMessageTextConfig {
-	return EditMessageTextConfig{
+// NewEditMessageMedia allows you to edit the media of a message.
+func NewEditMessageMedia(chatID int64, messageID int, media interface{}) EditMessageMediaConfig {
+	return EditMessageMediaConfig{
 		BaseEdit: BaseEdit{
 			ChatID:    chatID,
 			MessageID: messageID,
 		},
-		Text: text,
+		Media: media,
 	}
 }
 
