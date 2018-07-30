@@ -783,6 +783,34 @@ func (config EditMessageTextConfig) method() string {
 	return "editMessageText"
 }
 
+// EditMessageMediaConfig allows you to modify the text in a message.
+type EditMessageMediaConfig struct {
+	BaseEdit
+	Media                 interface{} `json:"media"`
+	ParseMode             string
+	DisableWebPagePreview bool
+}
+
+func (config EditMessageMediaConfig) values() (url.Values, error) {
+	v, err := config.BaseEdit.values()
+	if err != nil {
+		return v, err
+	}
+	bytes, err := json.Marshal(config.Media)
+	if err != nil {
+		return v, err
+	}
+	v.Add("media", string(bytes))
+	v.Add("parse_mode", config.ParseMode)
+	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
+
+	return v, nil
+}
+
+func (config EditMessageMediaConfig) method() string {
+	return "editMessageMedia"
+}
+
 // EditMessageCaptionConfig allows you to modify the caption of a message.
 type EditMessageCaptionConfig struct {
 	BaseEdit
