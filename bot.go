@@ -27,6 +27,7 @@ type BotAPI struct {
 
 	Self   User         `json:"-"`
 	Client *http.Client `json:"-"`
+	ProxySettings ProxyCredentials `json:"-"`
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -55,6 +56,33 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot.Self = self
 
 	return bot, nil
+}
+
+// NewBotAPIViaProxy creates a new BotAPI instance and allows you
+// exchange data with APIEndpoint via proxy-server.
+//
+// It requires a token and proxy credentials.
+func NewBotAPIViaProxy(token string, proxySettings ProxyCredentials) (*BotAPI, error) {
+	client := &http.Client{}
+
+	if proxySettings.UseProxy {
+		var fixedURL *url.URL
+		var err error
+
+		if proxySettings.Username != "" && proxySettings.Password != "" {
+			fixedURL, err = url.Parse(fmt.Sprintf("%s://%s:%s@%s:%s", proxySettings.Protocol, proxySettings.Username, proxySettings.Password, proxySettings.IP, proxySettings.Port))
+		} else {
+			fixedURL, err = url.Parse(fmt.Sprintf("%s://%s:%s", proxySettings.Protocol, proxySettings.IP, proxySettings.Port))
+		}
+
+		if err == nil {
+			tr := &http.Transport{Proxy: http.ProxyURL(fixedURL)}
+
+			client.Transport = tr
+		}
+	}
+
+	return NewBotAPIWithClient(token, client)
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.

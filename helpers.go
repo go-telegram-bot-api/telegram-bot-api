@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"net/url"
+	"strings"
 )
 
 // NewMessage creates a new Message.
@@ -688,5 +689,34 @@ func NewSetChatPhotoShare(chatID int64, fileID string) SetChatPhotoConfig {
 			FileID:      fileID,
 			UseExisting: true,
 		},
+	}
+}
+
+// NewProxyCredentials create a new proxy credentials.
+// You may use this to create new credentials for exchange data
+// via proxy-server.
+//
+// useProxy tells you to use a proxy, protocol is one of the allowed protocols,
+// username and password are credentials for authentication user on proxy-server,
+// ip and port are parameters for connection to proxy-server.
+func NewProxyCredentials(useProxy bool, protocol, username, password, ip, port string) ProxyCredentials {
+	switch strings.ToLower(protocol) {
+	case "socks5":
+		protocol = "socks5"
+	case "http":
+		protocol = "http"
+	case "https":
+		protocol = "https"
+	default:
+		useProxy = false
+	}
+
+	return ProxyCredentials{
+		UseProxy: useProxy,
+		Protocol: protocol,
+		Username: username,
+		Password: password,
+		IP:       ip,
+		Port:     port,
 	}
 }
