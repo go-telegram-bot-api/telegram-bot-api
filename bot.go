@@ -15,7 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	
+	"golang.org/x/net/proxy"
 	"github.com/technoweenie/multipartstreamer"
 )
 
@@ -32,9 +33,30 @@ type BotAPI struct {
 // NewBotAPI creates a new BotAPI instance.
 //
 // It requires a token, provided by @BotFather on Telegram.
-func NewBotAPI(token string) (*BotAPI, error) {
+func NewBotAPI(token string, proxyparam ...interface{}) (*BotAPI, error) {
+	// create a socks5 dialer
+ 	if len(proxyparam) > 0 {
+ 		var auth *proxy.Auth
+		if proxyparam[0] == "socks5" {
+			if proxyparam[2] == nil {
+				auth = nil
+			} else {
+				auth = proxyparam[2].(*proxy.Auth)
+			}
+			dialer, err := proxy.SOCKS5("tcp", proxyparam[1].(string), auth, proxy.Direct)
+			if err != nil {
+				return nil, err
+			}
+			// setup a http client
+			httpTransport := &http.Transport{}
+ 			// set our socks5 as the dialer
+			httpTransport.Dial = dialer.Dial
+			return NewBotAPIWithClient(token, &http.Client{Transport: httpTransport})
+		}
+	}
 	return NewBotAPIWithClient(token, &http.Client{})
 }
+
 
 // NewBotAPIWithClient creates a new BotAPI instance
 // and allows you to pass a http.Client.
