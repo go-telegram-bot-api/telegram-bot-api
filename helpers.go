@@ -1,7 +1,6 @@
 package tgbotapi
 
 import (
-	"log"
 	"net/url"
 )
 
