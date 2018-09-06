@@ -13,7 +13,7 @@ func NewMessage(chatID int64, text string) MessageConfig {
 			ChatID:           chatID,
 			ReplyToMessageID: 0,
 		},
-		Text: text,
+		Text:                  text,
 		DisableWebPagePreview: false,
 	}
 }
@@ -192,6 +192,35 @@ func NewVideoUpload(chatID int64, file interface{}) VideoConfig {
 // already uploaded.
 func NewVideoShare(chatID int64, fileID string) VideoConfig {
 	return VideoConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			FileID:      fileID,
+			UseExisting: true,
+		},
+	}
+}
+
+// NewAnimationUpload creates a new animation uploader.
+//
+// chatID is where to send it, file is a string path to the file,
+// FileReader, or FileBytes.
+func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
+	return AnimationConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			File:        file,
+			UseExisting: false,
+		},
+	}
+}
+
+// NewAnimationShare shares an existing animation.
+// You may use this to reshare an existing animation without reuploading it.
+//
+// chatID is where to send it, fileID is the ID of the animation
+// already uploaded.
+func NewAnimationShare(chatID int64, fileID string) AnimationConfig {
+	return AnimationConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			FileID:      fileID,

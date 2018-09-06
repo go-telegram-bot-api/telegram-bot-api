@@ -497,6 +497,59 @@ func (config VideoConfig) method() string {
 	return "sendVideo"
 }
 
+// AnimationConfig contains information about a SendAnimation request.
+type AnimationConfig struct {
+	BaseFile
+	Duration  int
+	Caption   string
+	ParseMode string
+}
+
+// values returns a url.Values representation of AnimationConfig.
+func (config AnimationConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add(config.name(), config.FileID)
+	if config.Duration != 0 {
+		v.Add("duration", strconv.Itoa(config.Duration))
+	}
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
+	}
+
+	return v, nil
+}
+
+// params returns a map[string]string representation of AnimationConfig.
+func (config AnimationConfig) params() (map[string]string, error) {
+	params, _ := config.BaseFile.params()
+
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
+	}
+
+	return params, nil
+}
+
+// name returns the field name for the Animation.
+func (config AnimationConfig) name() string {
+	return "animation"
+}
+
+// method returns Telegram API method name for sending Animation.
+func (config AnimationConfig) method() string {
+	return "sendAnimation"
+}
+
 // VideoNoteConfig contains information about a SendVideoNote request.
 type VideoNoteConfig struct {
 	BaseFile
