@@ -1,34 +1,11 @@
 package tgbotapi
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/url"
-	"strconv"
-)
-
 // PassportRequestInfoConfig allows you to request passport info
 type PassportRequestInfoConfig struct {
 	BotID     int            `json:"bot_id"`
 	Scope     *PassportScope `json:"scope"`
 	Nonce     string         `json:"nonce"`
 	PublicKey string         `json:"public_key"`
-}
-
-func LinkToPassportRequest(config PassportRequestInfoConfig) (string, error) {
-	scope, err := json.Marshal(config.Scope)
-	if err != nil {
-		panic("couldn't pack scope")
-	}
-	tgurl := fmt.Sprintf("tg://resolve?domain=telegrampassport&bot_id=%v&scope=%v&public_key=%v&nonce=%v",
-		strconv.Itoa(config.BotID),
-		url.PathEscape(string(scope)),
-		url.PathEscape(config.PublicKey),
-		url.PathEscape(config.Nonce),
-	)
-	fmt.Println(tgurl)
-
-	return tgurl, nil
 }
 
 type PassportScopeElement interface {
