@@ -657,6 +657,32 @@ func (config VoiceConfig) method() string {
 	return "sendVoice"
 }
 
+// MediaGroupConfig contains information about a sendMediaGroup request.
+type MediaGroupConfig struct {
+	BaseChat
+	InputMedia []interface{}
+}
+
+func (config MediaGroupConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	data, err := json.Marshal(config.InputMedia)
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("media", string(data))
+
+	return v, nil
+}
+
+func (config MediaGroupConfig) method() string {
+	return "sendMediaGroup"
+}
+
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	BaseChat

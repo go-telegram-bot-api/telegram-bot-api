@@ -18,6 +18,7 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewDeleteMessage creates a request to delete a message.
 func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	return DeleteMessageConfig{
 		ChatID:    chatID,
@@ -286,6 +287,33 @@ func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
 			FileID:      fileID,
 			UseExisting: true,
 		},
+	}
+}
+
+// NewMediaGroup creates a new media group. Files should be an array of
+// two to ten InputMediaPhoto or InputMediaVideo.
+func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
+	return MediaGroupConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		InputMedia: files,
+	}
+}
+
+// NewInputMediaPhoto creates a new InputMediaPhoto.
+func NewInputMediaPhoto(media string) InputMediaPhoto {
+	return InputMediaPhoto{
+		Type:  "photo",
+		Media: media,
+	}
+}
+
+// NewInputMediaVideo creates a new InputMediaVideo.
+func NewInputMediaVideo(media string) InputMediaVideo {
+	return InputMediaVideo{
+		Type:  "video",
+		Media: media,
 	}
 }
 

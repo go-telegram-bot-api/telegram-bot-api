@@ -519,6 +519,20 @@ func TestUpdatesChan(t *testing.T) {
 	}
 }
 
+func TestSendWithMediaGroup(t *testing.T) {
+	bot, _ := getBot(t)
+
+	cfg := tgbotapi.NewMediaGroup(ChatID, []interface{}{
+		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
+		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
+		tgbotapi.NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
+	})
+	_, err := bot.Send(cfg)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func ExampleNewBotAPI() {
 	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
 	if err != nil {
