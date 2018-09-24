@@ -107,6 +107,64 @@ func main() {
 }
 ```
 
+If you need to use InlineKeyboards and respond to the CallbackQuery that is generated when the user selects a presented keyboard button.
+Example courtisy of Telegram user `@trigun117` (Vadim) in the [Golang Telegram Bot API](t.me/go_telegram_bot_api/9379) chat.
+
+```go
+package main
+
+import (
+	"gopkg.in/telegram-bot-api.v4"
+	"log"
+)
+
+// return tgbotapi.InlineKeyboardMarkup
+func createMarkup(btns ...string) tgbotapi.InlineKeyboardMarkup {
+	row := tgbotapi.NewInlineKeyboardRow()
+	for _, btn := range btns {
+		inlineBtn := tgbotapi.NewInlineKeyboardButtonData(btn, btn)
+		row = append(row, inlineBtn)
+	}
+	return tgbotapi.NewInlineKeyboardMarkup(row)
+}
+
+
+func main() {
+	bot, err := tgbotapi.NewBotAPI("Token")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	config := tgbotapi.NewUpdate(0)
+	updates, _ := bot.GetUpdatesChan(config)
+
+	for update := range updates {
+		if update.Message != nil && update.Message.Command() == "start" {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "hello")
+			mkp := tgbotapi.NewInlineKeyboardMarkup(
+					tgbotapi.NewInlineKeyboardRow(
+						tgbotapi.NewInlineKeyboardButtonData("1", "1"),
+						tgbotapi.NewInlineKeyboardButtonData("2", "2")))
+			msg.ReplyMarkup = mkp
+			bot.Send(msg)
+		} else if update.CallbackQuery != nil {
+			chatID := int64(update.CallbackQuery.From.ID)
+			msgID := update.CallbackQuery.Message.MessageID
+
+			// You can edit text, markup or both
+			
+			// Edit text
+			editText := tgbotapi.NewEditMessageText(chatID, msgID, "Got data " + update.CallbackQuery.Data)
+			bot.Send(editText)
+
+			// Edit Markup
+			editMarkUp := tgbotapi.NewEditMessageReplyMarkup(chatID, msgID, createMarkup("1", "2", "3"))
+			bot.Send(editMarkUp)
+		}
+	}
+}
+```
+
 If you need, you may generate a self signed certficate, as this requires
 HTTPS / TLS. The above example tells Telegram that this is your
 certificate and that it should be trusted, even though it is not
