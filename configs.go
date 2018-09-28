@@ -240,6 +240,47 @@ func (config ForwardConfig) method() string {
 	return "forwardMessage"
 }
 
+// AnimationConfig contains information about a SendAnimation request.
+type AnimationConfig struct {
+	BaseFile
+	Caption string
+}
+
+// Params returns a map[string]string representation of AnimationConfig.
+func (config AnimationConfig) params() (map[string]string, error) {
+	params, _ := config.BaseFile.params()
+
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+	}
+
+	return params, nil
+}
+
+// Values returns a url.Values representation of AnimationConfig.
+func (config AnimationConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add(config.name(), config.FileID)
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+	}
+	return v, nil
+}
+
+// name returns the field name for the Animation.
+func (config AnimationConfig) name() string {
+	return "animation"
+}
+
+// method returns Telegram API method name for sending Animation.
+func (config PhotoConfig) Animation() string {
+	return "sendAnimation"
+}
+
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile

@@ -51,6 +51,22 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
+// NewAnimationUpload creates a new animation uploader.
+//
+// chatID is where to send it, file is a string path to the file,
+// FileReader, or FileBytes.
+//
+// Note that you must send animated GIFs as a document.
+func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
+	return AnimationConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			File:        file,
+			UseExisting: false,
+		},
+	}
+}
+
 // NewPhotoUpload creates a new photo uploader.
 //
 // chatID is where to send it, file is a string path to the file,
