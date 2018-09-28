@@ -277,7 +277,7 @@ func (config AnimationConfig) name() string {
 }
 
 // method returns Telegram API method name for sending Animation.
-func (config Animation) method() string {
+func (config AnimationConfig) method() string {
 	return "sendAnimation"
 }
 
