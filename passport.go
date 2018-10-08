@@ -307,7 +307,7 @@ type (
 		MiddleNameNative     string `json:"middle_name_native"`
 	}
 
-	// IDDocumentData https://core.telegram.org/passport#iddocumentdata
+	// IdDocumentData https://core.telegram.org/passport#iddocumentdata
 	IDDocumentData struct {
 		DocumentNumber string `json:"document_no"`
 		ExpiryDate     string `json:"expiry_date"`
