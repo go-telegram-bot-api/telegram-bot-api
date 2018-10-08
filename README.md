@@ -15,6 +15,12 @@ all that yourself.
 Join [the development group](https://telegram.me/go_telegram_bot_api) if
 you want to ask questions or discuss development.
 
+## Requirement
+
+Just run this before running the example code.
+
+``` $ go get gopkg.in/telegram-bot-api.v4 ```
+
 ## Example
 
 First, ensure the library is installed and up to date by running
