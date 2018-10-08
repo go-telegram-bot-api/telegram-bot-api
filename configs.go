@@ -68,7 +68,6 @@ type BaseChat struct {
 	DisableNotification bool
 }
 
-// params returns Params representation of BaseChat
 func (chat *BaseChat) params() (Params, error) {
 	v := make(Params)
 
@@ -91,7 +90,6 @@ type BaseFile struct {
 	FileSize    int
 }
 
-// params returns a Params representation of BaseFile.
 func (file BaseFile) params() (Params, error) {
 	params, err := file.BaseChat.params()
 
@@ -101,12 +99,10 @@ func (file BaseFile) params() (Params, error) {
 	return params, err
 }
 
-// getFile returns the file.
 func (file BaseFile) getFile() interface{} {
 	return file.File
 }
 
-// useExistingFile returns if the BaseFile has already been uploaded.
 func (file BaseFile) useExistingFile() bool {
 	return file.UseExisting
 }
@@ -143,7 +139,6 @@ type MessageConfig struct {
 	DisableWebPagePreview bool
 }
 
-// values returns a url.Values representation of MessageConfig.
 func (config MessageConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 	if err != nil {
@@ -157,7 +152,6 @@ func (config MessageConfig) params() (Params, error) {
 	return v, nil
 }
 
-// method returns Telegram API method name for sending Message.
 func (config MessageConfig) method() string {
 	return "sendMessage"
 }
@@ -170,7 +164,6 @@ type ForwardConfig struct {
 	MessageID           int // required
 }
 
-// values returns a url.Values representation of ForwardConfig.
 func (config ForwardConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 	if err != nil {
@@ -183,7 +176,6 @@ func (config ForwardConfig) params() (Params, error) {
 	return v, nil
 }
 
-// method returns Telegram API method name for sending Forward.
 func (config ForwardConfig) method() string {
 	return "forwardMessage"
 }
@@ -195,7 +187,6 @@ type PhotoConfig struct {
 	ParseMode string
 }
 
-// Params returns a map[string]string representation of PhotoConfig.
 func (config PhotoConfig) params() (Params, error) {
 	params, err := config.BaseFile.params()
 
@@ -206,12 +197,10 @@ func (config PhotoConfig) params() (Params, error) {
 	return params, err
 }
 
-// name returns the field name for the Photo.
 func (config PhotoConfig) name() string {
 	return "photo"
 }
 
-// method returns Telegram API method name for sending Photo.
 func (config PhotoConfig) method() string {
 	return "sendPhoto"
 }
@@ -226,7 +215,6 @@ type AudioConfig struct {
 	Title     string
 }
 
-// values returns a url.Values representation of AudioConfig.
 func (config AudioConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 	if err != nil {
@@ -243,12 +231,10 @@ func (config AudioConfig) params() (Params, error) {
 	return v, nil
 }
 
-// name returns the field name for the Audio.
 func (config AudioConfig) name() string {
 	return "audio"
 }
 
-// method returns Telegram API method name for sending Audio.
 func (config AudioConfig) method() string {
 	return "sendAudio"
 }
@@ -260,7 +246,6 @@ type DocumentConfig struct {
 	ParseMode string
 }
 
-// params returns a map[string]string representation of DocumentConfig.
 func (config DocumentConfig) params() (Params, error) {
 	params, err := config.BaseFile.params()
 
@@ -271,12 +256,10 @@ func (config DocumentConfig) params() (Params, error) {
 	return params, err
 }
 
-// name returns the field name for the Document.
 func (config DocumentConfig) name() string {
 	return "document"
 }
 
-// method returns Telegram API method name for sending Document.
 func (config DocumentConfig) method() string {
 	return "sendDocument"
 }
@@ -286,7 +269,6 @@ type StickerConfig struct {
 	BaseFile
 }
 
-// values returns a url.Values representation of StickerConfig.
 func (config StickerConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -295,12 +277,10 @@ func (config StickerConfig) params() (Params, error) {
 	return v, err
 }
 
-// name returns the field name for the Sticker.
 func (config StickerConfig) name() string {
 	return "sticker"
 }
 
-// method returns Telegram API method name for sending Sticker.
 func (config StickerConfig) method() string {
 	return "sendSticker"
 }
@@ -313,7 +293,6 @@ type VideoConfig struct {
 	ParseMode string
 }
 
-// values returns a url.Values representation of VideoConfig.
 func (config VideoConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -325,12 +304,10 @@ func (config VideoConfig) params() (Params, error) {
 	return v, err
 }
 
-// name returns the field name for the Video.
 func (config VideoConfig) name() string {
 	return "video"
 }
 
-// method returns Telegram API method name for sending Video.
 func (config VideoConfig) method() string {
 	return "sendVideo"
 }
@@ -343,7 +320,6 @@ type AnimationConfig struct {
 	ParseMode string
 }
 
-// values returns a Params representation of AnimationConfig.
 func (config AnimationConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -355,12 +331,10 @@ func (config AnimationConfig) params() (Params, error) {
 	return v, err
 }
 
-// name returns the field name for the Animation.
 func (config AnimationConfig) name() string {
 	return "animation"
 }
 
-// method returns Telegram API method name for sending Animation.
 func (config AnimationConfig) method() string {
 	return "sendAnimation"
 }
@@ -372,7 +346,6 @@ type VideoNoteConfig struct {
 	Length   int
 }
 
-// values returns a url.Values representation of VideoNoteConfig.
 func (config VideoNoteConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -383,12 +356,10 @@ func (config VideoNoteConfig) params() (Params, error) {
 	return v, err
 }
 
-// name returns the field name for the VideoNote.
 func (config VideoNoteConfig) name() string {
 	return "video_note"
 }
 
-// method returns Telegram API method name for sending VideoNote.
 func (config VideoNoteConfig) method() string {
 	return "sendVideoNote"
 }
@@ -401,7 +372,6 @@ type VoiceConfig struct {
 	Duration  int
 }
 
-// values returns a url.Values representation of VoiceConfig.
 func (config VoiceConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -413,12 +383,10 @@ func (config VoiceConfig) params() (Params, error) {
 	return v, err
 }
 
-// name returns the field name for the Voice.
 func (config VoiceConfig) name() string {
 	return "voice"
 }
 
-// method returns Telegram API method name for sending Voice.
 func (config VoiceConfig) method() string {
 	return "sendVoice"
 }
@@ -431,7 +399,6 @@ type LocationConfig struct {
 	LivePeriod int     // optional
 }
 
-// values returns a url.Values representation of LocationConfig.
 func (config LocationConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -442,7 +409,6 @@ func (config LocationConfig) params() (Params, error) {
 	return v, err
 }
 
-// method returns Telegram API method name for sending Location.
 func (config LocationConfig) method() string {
 	return "sendLocation"
 }
@@ -454,7 +420,6 @@ type EditMessageLiveLocationConfig struct {
 	Longitude float64 // required
 }
 
-// values returns a url.Values representation of EditMessageLiveLocationConfig.
 func (config EditMessageLiveLocationConfig) params() (Params, error) {
 	v, err := config.BaseEdit.params()
 
@@ -464,7 +429,6 @@ func (config EditMessageLiveLocationConfig) params() (Params, error) {
 	return v, err
 }
 
-// method returns Telegram API method name for edit message Live Location.
 func (config EditMessageLiveLocationConfig) method() string {
 	return "editMessageLiveLocation"
 }
@@ -474,12 +438,10 @@ type StopMessageLiveLocationConfig struct {
 	BaseEdit
 }
 
-// values returns a url.Values representation of StopMessageLiveLocationConfig.
 func (config StopMessageLiveLocationConfig) params() (Params, error) {
 	return config.BaseEdit.params()
 }
 
-// method returns Telegram API method name for stop message Live Location.
 func (config StopMessageLiveLocationConfig) method() string {
 	return "stopMessageLiveLocation"
 }
@@ -617,7 +579,6 @@ type ChatActionConfig struct {
 	Action string // required
 }
 
-// values returns a url.Values representation of ChatActionConfig.
 func (config ChatActionConfig) params() (Params, error) {
 	v, err := config.BaseChat.params()
 
@@ -626,7 +587,6 @@ func (config ChatActionConfig) params() (Params, error) {
 	return v, err
 }
 
-// method returns Telegram API method name for sending ChatAction.
 func (config ChatActionConfig) method() string {
 	return "sendChatAction"
 }
