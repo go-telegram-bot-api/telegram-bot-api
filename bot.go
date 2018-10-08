@@ -4,6 +4,7 @@ package tgbotapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -27,6 +28,15 @@ type BotAPI struct {
 
 	Self   User         `json:"-"`
 	Client *http.Client `json:"-"`
+
+	// cancelUpdateLoop indicates that the update loop should break, if it is set
+	// to true
+	cancelUpdateLoop bool
+
+	// cancelFunction is a function that allows us to cancel an outgoing
+	// request to the Telegram Bot API servers
+	// it is updated each time a request is made
+	cancelRequest context.CancelFunc
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -57,11 +67,56 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	return bot, nil
 }
 
+// postWithCancel creates a context which allows canceling, saves the cancel function
+// in the internal struct variable and performs the given http request with this context
+func (bot *BotAPI) postWithCancel(url string, params url.Values) (*http.Response, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Save the cancel function of this context
+	bot.cancelRequest = cancel
+
+	// Create an anonymous struct to hold the response from the http client
+	data := make(chan struct {
+		r   *http.Response
+		err error
+	}, 1)
+
+	// Create an http request
+	encodedParams := strings.NewReader(params.Encode())
+	req, err := http.NewRequest("POST", url, encodedParams)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	// Submit the request in a goroutine
+	go func() {
+		resp, err := bot.Client.Do(req)
+		pack := struct {
+			r   *http.Response
+			err error
+		}{resp, err}
+		data <- pack
+	}()
+
+	// Wait for the request to finish, or for it to be cancelled
+	select {
+	case <-ctx.Done():
+		// Unblock the goroutine
+		<-data
+
+		return nil, ctx.Err()
+	case ok := <-data:
+		return ok.r, ok.err
+	}
+}
+
 // MakeRequest makes a request to a specific endpoint with our token.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
 
-	resp, err := bot.Client.PostForm(method, params)
+	resp, err := bot.postWithCancel(method, params)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -483,8 +538,18 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 
 	go func() {
 		for {
+			// Check if we need to bail out
+			if bot.cancelUpdateLoop {
+				break
+			}
+
 			updates, err := bot.GetUpdates(config)
-			if err != nil {
+			if err == context.Canceled {
+				// If the request was canceled, it's only because somebody called StopUpdates,
+				// which means we need to bail out
+				log.Println("Request to API server was canceled in-flight, exiting update loop")
+				break
+			} else if err != nil {
 				log.Println(err)
 				log.Println("Failed to get updates, retrying in 3 seconds...")
 				time.Sleep(time.Second * 3)
@@ -502,6 +567,21 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	}()
 
 	return ch, nil
+}
+
+// StopUpdates stops the update loop that was started by GetUpdatesChan
+func (bot *BotAPI) StopUpdates() {
+	// Set the canceled flag to true, so the next iteration of the update loop
+	// breaks
+	// This is needed for a case this function is called when a request is already
+	// finished, and the update loop is busy pushing the updates it got to the channel
+	bot.cancelUpdateLoop = true
+
+	// Stop the currect request to the Telegram Bot API servers
+	// NOTE(ms): Per the Go docs, we are allowed to call this function
+	// several times, so if the defer in the request itself just called it
+	// this subsequent call will just do nothing
+	bot.cancelRequest()
 }
 
 // ListenForWebhook registers a http handler for a webhook.
