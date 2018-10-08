@@ -50,7 +50,7 @@ func main() {
 
 	updates, err := bot.GetUpdatesChan(u)
 
-	for update := range updates {
+	for _, update := range updates {
 		if update.Message == nil {
 			continue
 		}
@@ -101,7 +101,7 @@ func main() {
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
-	for update := range updates {
+	for _, update := range updates {
 		log.Printf("%+v\n", update)
 	}
 }
