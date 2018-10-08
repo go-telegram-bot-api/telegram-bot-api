@@ -69,15 +69,15 @@ type BaseChat struct {
 }
 
 func (chat *BaseChat) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
-	v.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
-	v.AddBool("disable_notification", chat.DisableNotification)
+	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
+	params.AddBool("disable_notification", chat.DisableNotification)
 
-	err := v.AddInterface("reply_markup", chat.ReplyMarkup)
+	err := params.AddInterface("reply_markup", chat.ReplyMarkup)
 
-	return v, err
+	return params, err
 }
 
 // BaseFile is a base type for all file config types.
@@ -117,18 +117,18 @@ type BaseEdit struct {
 }
 
 func (edit BaseEdit) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
 	if edit.InlineMessageID != "" {
-		v["inline_message_id"] = edit.InlineMessageID
+		params["inline_message_id"] = edit.InlineMessageID
 	} else {
-		v.AddFirstValid("chat_id", edit.ChatID, edit.ChannelUsername)
-		v.AddNonZero("message_id", edit.MessageID)
+		params.AddFirstValid("chat_id", edit.ChatID, edit.ChannelUsername)
+		params.AddNonZero("message_id", edit.MessageID)
 	}
 
-	err := v.AddInterface("reply_markup", edit.ReplyMarkup)
+	err := params.AddInterface("reply_markup", edit.ReplyMarkup)
 
-	return v, err
+	return params, err
 }
 
 // MessageConfig contains information about a SendMessage request.
@@ -525,20 +525,20 @@ type SetGameScoreConfig struct {
 }
 
 func (config SetGameScoreConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddNonZero("user_id", config.UserID)
-	v.AddNonZero("scrore", config.Score)
-	v.AddBool("disable_edit_message", config.DisableEditMessage)
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero("scrore", config.Score)
+	params.AddBool("disable_edit_message", config.DisableEditMessage)
 
 	if config.InlineMessageID != "" {
-		v["inline_message_id"] = config.InlineMessageID
+		params["inline_message_id"] = config.InlineMessageID
 	} else {
-		v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-		v.AddNonZero("message_id", config.MessageID)
+		params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+		params.AddNonZero("message_id", config.MessageID)
 	}
 
-	return v, nil
+	return params, nil
 }
 
 func (config SetGameScoreConfig) method() string {
@@ -555,18 +555,18 @@ type GetGameHighScoresConfig struct {
 }
 
 func (config GetGameHighScoresConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddNonZero("user_id", config.UserID)
+	params.AddNonZero("user_id", config.UserID)
 
 	if config.InlineMessageID != "" {
-		v["inline_message_id"] = config.InlineMessageID
+		params["inline_message_id"] = config.InlineMessageID
 	} else {
-		v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-		v.AddNonZero("message_id", config.MessageID)
+		params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+		params.AddNonZero("message_id", config.MessageID)
 	}
 
-	return v, nil
+	return params, nil
 }
 
 func (config GetGameHighScoresConfig) method() string {
@@ -774,20 +774,20 @@ func (config InlineConfig) method() string {
 }
 
 func (config InlineConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v["inline_query_id"] = config.InlineQueryID
-	v.AddNonZero("cache_time", config.CacheTime)
-	v.AddBool("is_personal", config.IsPersonal)
-	v.AddNonEmpty("next_offset", config.NextOffset)
-	v.AddNonEmpty("switch_pm_text", config.SwitchPMText)
-	v.AddNonEmpty("switch_pm_parameter", config.SwitchPMParameter)
+	params["inline_query_id"] = config.InlineQueryID
+	params.AddNonZero("cache_time", config.CacheTime)
+	params.AddBool("is_personal", config.IsPersonal)
+	params.AddNonEmpty("next_offset", config.NextOffset)
+	params.AddNonEmpty("switch_pm_text", config.SwitchPMText)
+	params.AddNonEmpty("switch_pm_parameter", config.SwitchPMParameter)
 
-	if err := v.AddInterface("results", config.Results); err != nil {
-		return v, err
+	if err := params.AddInterface("results", config.Results); err != nil {
+		return params, err
 	}
 
-	return v, nil
+	return params, nil
 }
 
 // CallbackConfig contains information on making a CallbackQuery response.
@@ -804,15 +804,15 @@ func (config CallbackConfig) method() string {
 }
 
 func (config CallbackConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v["callback_query_id"] = config.CallbackQueryID
-	v.AddNonEmpty("text", config.Text)
-	v.AddBool("show_alert", config.ShowAlert)
-	v.AddNonEmpty("url", config.URL)
-	v.AddNonZero("cache_time", config.CacheTime)
+	params["callback_query_id"] = config.CallbackQueryID
+	params.AddNonEmpty("text", config.Text)
+	params.AddBool("show_alert", config.ShowAlert)
+	params.AddNonEmpty("url", config.URL)
+	params.AddNonZero("cache_time", config.CacheTime)
 
-	return v, nil
+	return params, nil
 }
 
 // ChatMemberConfig contains information about a user in a chat for use
@@ -834,12 +834,12 @@ func (config UnbanChatMemberConfig) method() string {
 }
 
 func (config UnbanChatMemberConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	v.AddNonZero("user_id", config.UserID)
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
 
-	return v, nil
+	return params, nil
 }
 
 // KickChatMemberConfig contains extra fields to kick user
@@ -853,13 +853,13 @@ func (config KickChatMemberConfig) method() string {
 }
 
 func (config KickChatMemberConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
-	v.AddNonZero("user_id", config.UserID)
-	v.AddNonZero64("until_date", config.UntilDate)
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("until_date", config.UntilDate)
 
-	return v, nil
+	return params, nil
 }
 
 // RestrictChatMemberConfig contains fields to restrict members of chat
@@ -877,18 +877,18 @@ func (config RestrictChatMemberConfig) method() string {
 }
 
 func (config RestrictChatMemberConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	v.AddNonZero("user_id", config.UserID)
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
 
-	v.AddNonNilBool("can_send_messages", config.CanSendMessages)
-	v.AddNonNilBool("can_send_media_messages", config.CanSendMediaMessages)
-	v.AddNonNilBool("can_send_other_messages", config.CanSendOtherMessages)
-	v.AddNonNilBool("can_add_web_page_previews", config.CanAddWebPagePreviews)
-	v.AddNonZero64("until_date", config.UntilDate)
+	params.AddNonNilBool("can_send_messages", config.CanSendMessages)
+	params.AddNonNilBool("can_send_media_messages", config.CanSendMediaMessages)
+	params.AddNonNilBool("can_send_other_messages", config.CanSendOtherMessages)
+	params.AddNonNilBool("can_add_web_page_previews", config.CanAddWebPagePreviews)
+	params.AddNonZero64("until_date", config.UntilDate)
 
-	return v, nil
+	return params, nil
 }
 
 // PromoteChatMemberConfig contains fields to promote members of chat
@@ -909,21 +909,21 @@ func (config PromoteChatMemberConfig) method() string {
 }
 
 func (config PromoteChatMemberConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	v.AddNonZero("user_id", config.UserID)
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
 
-	v.AddNonNilBool("can_change_info", config.CanChangeInfo)
-	v.AddNonNilBool("can_post_messages", config.CanPostMessages)
-	v.AddNonNilBool("can_edit_messages", config.CanEditMessages)
-	v.AddNonNilBool("can_delete_messages", config.CanDeleteMessages)
-	v.AddNonNilBool("can_invite_users", config.CanInviteUsers)
-	v.AddNonNilBool("can_restrict_members", config.CanRestrictMembers)
-	v.AddNonNilBool("can_pin_messages", config.CanPinMessages)
-	v.AddNonNilBool("can_promote_members", config.CanPromoteMembers)
+	params.AddNonNilBool("can_change_info", config.CanChangeInfo)
+	params.AddNonNilBool("can_post_messages", config.CanPostMessages)
+	params.AddNonNilBool("can_edit_messages", config.CanEditMessages)
+	params.AddNonNilBool("can_delete_messages", config.CanDeleteMessages)
+	params.AddNonNilBool("can_invite_users", config.CanInviteUsers)
+	params.AddNonNilBool("can_restrict_members", config.CanRestrictMembers)
+	params.AddNonNilBool("can_pin_messages", config.CanPinMessages)
+	params.AddNonNilBool("can_promote_members", config.CanPromoteMembers)
 
-	return v, nil
+	return params, nil
 }
 
 // ChatConfig contains information about getting information on a chat.
@@ -943,11 +943,11 @@ func (config LeaveChatConfig) method() string {
 }
 
 func (config LeaveChatConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
-	return v, nil
+	return params, nil
 }
 
 // ChatConfigWithUser contains information about getting information on
@@ -1041,12 +1041,12 @@ func (config DeleteMessageConfig) method() string {
 }
 
 func (config DeleteMessageConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddNonZero64("chat_id", config.ChatID)
-	v.AddNonZero("message_id", config.MessageID)
+	params.AddNonZero64("chat_id", config.ChatID)
+	params.AddNonZero("message_id", config.MessageID)
 
-	return v, nil
+	return params, nil
 }
 
 // PinChatMessageConfig contains information of a message in a chat to pin.
@@ -1062,13 +1062,13 @@ func (config PinChatMessageConfig) method() string {
 }
 
 func (config PinChatMessageConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-	v.AddNonZero("message_id", config.MessageID)
-	v.AddBool("disable_notification", config.DisableNotification)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddNonZero("message_id", config.MessageID)
+	params.AddBool("disable_notification", config.DisableNotification)
 
-	return v, nil
+	return params, nil
 }
 
 // UnpinChatMessageConfig contains information of chat to unpin.
@@ -1082,11 +1082,11 @@ func (config UnpinChatMessageConfig) method() string {
 }
 
 func (config UnpinChatMessageConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
-	return v, nil
+	return params, nil
 }
 
 // SetChatPhotoConfig allows you to set a group, supergroup, or channel's photo.
@@ -1121,11 +1121,11 @@ func (config DeleteChatPhotoConfig) method() string {
 }
 
 func (config DeleteChatPhotoConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
-	return v, nil
+	return params, nil
 }
 
 // SetChatTitleConfig allows you to set the title of something other than a private chat.
@@ -1141,12 +1141,12 @@ func (config SetChatTitleConfig) method() string {
 }
 
 func (config SetChatTitleConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-	v["title"] = config.Title
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params["title"] = config.Title
 
-	return v, nil
+	return params, nil
 }
 
 // SetChatDescriptionConfig allows you to set the description of a supergroup or channel.
@@ -1162,12 +1162,12 @@ func (config SetChatDescriptionConfig) method() string {
 }
 
 func (config SetChatDescriptionConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-	v["description"] = config.Description
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params["description"] = config.Description
 
-	return v, nil
+	return params, nil
 }
 
 // GetStickerSetConfig allows you to get the stickers in a set.
@@ -1180,11 +1180,11 @@ func (config GetStickerSetConfig) method() string {
 }
 
 func (config GetStickerSetConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v["name"] = config.Name
+	params["name"] = config.Name
 
-	return v, nil
+	return params, nil
 }
 
 // UploadStickerConfig allows you to upload a sticker for use in a set later.
@@ -1198,11 +1198,11 @@ func (config UploadStickerConfig) method() string {
 }
 
 func (config UploadStickerConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddNonZero64("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 
-	return v, nil
+	return params, nil
 }
 
 func (config UploadStickerConfig) name() string {
@@ -1233,23 +1233,23 @@ func (config NewStickerSetConfig) method() string {
 }
 
 func (config NewStickerSetConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddNonZero64("user_id", config.UserID)
-	v["name"] = config.Name
-	v["title"] = config.Title
+	params.AddNonZero64("user_id", config.UserID)
+	params["name"] = config.Name
+	params["title"] = config.Title
 
 	if sticker, ok := config.PNGSticker.(string); ok {
-		v[config.name()] = sticker
+		params[config.name()] = sticker
 	}
 
-	v["emojis"] = config.Emojis
+	params["emojis"] = config.Emojis
 
-	v.AddBool("contains_masks", config.ContainsMasks)
+	params.AddBool("contains_masks", config.ContainsMasks)
 
-	err := v.AddInterface("mask_position", config.MaskPosition)
+	err := params.AddInterface("mask_position", config.MaskPosition)
 
-	return v, err
+	return params, err
 }
 
 func (config NewStickerSetConfig) getFile() interface{} {
@@ -1280,19 +1280,19 @@ func (config AddStickerConfig) method() string {
 }
 
 func (config AddStickerConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddNonZero64("user_id", config.UserID)
-	v["name"] = config.Name
-	v["emojis"] = config.Emojis
+	params.AddNonZero64("user_id", config.UserID)
+	params["name"] = config.Name
+	params["emojis"] = config.Emojis
 
 	if sticker, ok := config.PNGSticker.(string); ok {
-		v[config.name()] = sticker
+		params[config.name()] = sticker
 	}
 
-	err := v.AddInterface("mask_position", config.MaskPosition)
+	err := params.AddInterface("mask_position", config.MaskPosition)
 
-	return v, err
+	return params, err
 }
 
 func (config AddStickerConfig) name() string {
@@ -1318,12 +1318,12 @@ func (config SetStickerPositionConfig) method() string {
 }
 
 func (config SetStickerPositionConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v["sticker"] = config.Sticker
-	v.AddNonZero("position", config.Position)
+	params["sticker"] = config.Sticker
+	params.AddNonZero("position", config.Position)
 
-	return v, nil
+	return params, nil
 }
 
 // DeleteStickerConfig allows you to delete a sticker from a set.
@@ -1336,11 +1336,11 @@ func (config DeleteStickerConfig) method() string {
 }
 
 func (config DeleteStickerConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v["sticker"] = config.Sticker
+	params["sticker"] = config.Sticker
 
-	return v, nil
+	return params, nil
 }
 
 // SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
@@ -1356,12 +1356,12 @@ func (config SetChatStickerSetConfig) method() string {
 }
 
 func (config SetChatStickerSetConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
-	v["sticker_set_name"] = config.StickerSetName
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params["sticker_set_name"] = config.StickerSetName
 
-	return v, nil
+	return params, nil
 }
 
 // DeleteChatStickerSetConfig allows you to remove a supergroup's sticker set.
@@ -1375,11 +1375,11 @@ func (config DeleteChatStickerSetConfig) method() string {
 }
 
 func (config DeleteChatStickerSetConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
-	return v, nil
+	return params, nil
 }
 
 // MediaGroupConfig allows you to send a group of media.
@@ -1399,14 +1399,14 @@ func (config MediaGroupConfig) method() string {
 }
 
 func (config MediaGroupConfig) params() (Params, error) {
-	v := make(Params)
+	params := make(Params)
 
-	v.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-	if err := v.AddInterface("media", config.Media); err != nil {
-		return v, nil
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	if err := params.AddInterface("media", config.Media); err != nil {
+		return params, nil
 	}
-	v.AddBool("disable_notification", config.DisableNotification)
-	v.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
+	params.AddBool("disable_notification", config.DisableNotification)
+	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
-	return v, nil
+	return params, nil
 }
