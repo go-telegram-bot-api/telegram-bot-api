@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -59,15 +58,31 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	return bot, nil
 }
 
+func buildParams(in Params) (out url.Values) {
+	if in == nil {
+		return url.Values{}
+	}
+
+	out = url.Values{}
+
+	for key, value := range in {
+		out.Set(key, value)
+	}
+
+	return
+}
+
 // MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
+func (bot *BotAPI) MakeRequest(endpoint string, params Params) (APIResponse, error) {
 	if bot.Debug {
-		log.Printf("Endpoint: %s, values: %v\n", endpoint, params)
+		log.Printf("Endpoint: %s, params: %v\n", endpoint, params)
 	}
 
 	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
 
-	resp, err := bot.Client.PostForm(method, params)
+	values := buildParams(params)
+
+	resp, err := bot.Client.PostForm(method, values)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -131,7 +146,7 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 //
 // Note that if your FileReader has a size set to -1, it will read
 // the file into memory to calculate a size.
-func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
+func (bot *BotAPI) UploadFile(endpoint string, params Params, fieldname string, file interface{}) (APIResponse, error) {
 	ms := multipartstreamer.New()
 
 	switch f := file.(type) {
@@ -261,30 +276,20 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 
 // Request sends a Chattable to Telegram, and returns the APIResponse.
 func (bot *BotAPI) Request(c Chattable) (APIResponse, error) {
+	params, err := c.params()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
 	switch t := c.(type) {
 	case Fileable:
 		if t.useExistingFile() {
-			v, err := t.values()
-			if err != nil {
-				return APIResponse{}, err
-			}
-
-			return bot.MakeRequest(t.method(), v)
+			return bot.MakeRequest(t.method(), params)
 		}
 
-		p, err := t.params()
-		if err != nil {
-			return APIResponse{}, err
-		}
-
-		return bot.UploadFile(t.method(), p, t.name(), t.getFile())
+		return bot.UploadFile(t.method(), params, t.name(), t.getFile())
 	default:
-		v, err := c.values()
-		if err != nil {
-			return APIResponse{}, err
-		}
-
-		return bot.MakeRequest(c.method(), v)
+		return bot.MakeRequest(c.method(), params)
 	}
 }
 
@@ -307,16 +312,9 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 // It requires UserID.
 // Offset and Limit are optional.
 func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error) {
-	v := url.Values{}
-	v.Add("user_id", strconv.Itoa(config.UserID))
-	if config.Offset != 0 {
-		v.Add("offset", strconv.Itoa(config.Offset))
-	}
-	if config.Limit != 0 {
-		v.Add("limit", strconv.Itoa(config.Limit))
-	}
+	params, _ := config.params()
 
-	resp, err := bot.MakeRequest("getUserProfilePhotos", v)
+	resp, err := bot.MakeRequest(config.method(), params)
 	if err != nil {
 		return UserProfilePhotos{}, err
 	}
@@ -331,8 +329,9 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 //
 // Requires FileID.
 func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
-	v := url.Values{}
-	v.Add("file_id", config.FileID)
+	v := make(Params)
+
+	v["file_id"] = config.FileID
 
 	resp, err := bot.MakeRequest("getFile", v)
 	if err != nil {
@@ -353,18 +352,9 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
-	v := url.Values{}
-	if config.Offset != 0 {
-		v.Add("offset", strconv.Itoa(config.Offset))
-	}
-	if config.Limit > 0 {
-		v.Add("limit", strconv.Itoa(config.Limit))
-	}
-	if config.Timeout > 0 {
-		v.Add("timeout", strconv.Itoa(config.Timeout))
-	}
+	params, _ := config.params()
 
-	resp, err := bot.MakeRequest("getUpdates", v)
+	resp, err := bot.MakeRequest(config.method(), params)
 	if err != nil {
 		return []Update{}, err
 	}
@@ -378,7 +368,7 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 // GetWebhookInfo allows you to fetch information about a webhook and if
 // one currently is set, along with pending update count and error messages.
 func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
-	resp, err := bot.MakeRequest("getWebhookInfo", url.Values{})
+	resp, err := bot.MakeRequest("getWebhookInfo", nil)
 	if err != nil {
 		return WebhookInfo{}, err
 	}
@@ -448,13 +438,9 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 
 // GetChat gets information about a chat.
 func (bot *BotAPI) GetChat(config ChatConfig) (Chat, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.SuperGroupUsername)
-	}
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	resp, err := bot.MakeRequest("getChat", v)
 	if err != nil {
@@ -472,13 +458,9 @@ func (bot *BotAPI) GetChat(config ChatConfig) (Chat, error) {
 // If none have been appointed, only the creator will be returned.
 // Bots are not shown, even if they are an administrator.
 func (bot *BotAPI) GetChatAdministrators(config ChatConfig) ([]ChatMember, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.SuperGroupUsername)
-	}
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	resp, err := bot.MakeRequest("getChatAdministrators", v)
 	if err != nil {
@@ -493,13 +475,9 @@ func (bot *BotAPI) GetChatAdministrators(config ChatConfig) ([]ChatMember, error
 
 // GetChatMembersCount gets the number of users in a chat.
 func (bot *BotAPI) GetChatMembersCount(config ChatConfig) (int, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.SuperGroupUsername)
-	}
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	resp, err := bot.MakeRequest("getChatMembersCount", v)
 	if err != nil {
@@ -514,14 +492,10 @@ func (bot *BotAPI) GetChatMembersCount(config ChatConfig) (int, error) {
 
 // GetChatMember gets a specific chat member.
 func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.SuperGroupUsername)
-	}
-	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	v.AddNonZero("user_id", config.UserID)
 
 	resp, err := bot.MakeRequest("getChatMember", v)
 	if err != nil {
@@ -537,16 +511,10 @@ func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) 
 // UnbanChatMember unbans a user from a chat. Note that this only will work
 // in supergroups and channels, and requires the bot to be an admin.
 func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername != "" {
-		v.Add("chat_id", config.SuperGroupUsername)
-	} else if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	}
-	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	v.AddNonZero("user_id", config.UserID)
 
 	return bot.MakeRequest("unbanChatMember", v)
 }
@@ -556,80 +524,45 @@ func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error)
 //appropriate admin rights. Pass True for all boolean parameters to lift
 //restrictions from a user. Returns True on success.
 func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIResponse, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername != "" {
-		v.Add("chat_id", config.SuperGroupUsername)
-	} else if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	}
-	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	v.AddNonZero("user_id", config.UserID)
 
-	if config.CanSendMessages != nil {
-		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
-	}
-	if config.CanSendMediaMessages != nil {
-		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
-	}
-	if config.CanSendOtherMessages != nil {
-		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
-	}
-	if config.CanAddWebPagePreviews != nil {
-		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
-	}
-	if config.UntilDate != 0 {
-		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
-	}
+	v.AddNonNilBool("can_send_messages", config.CanSendMessages)
+	v.AddNonNilBool("can_send_media_messages", config.CanSendMediaMessages)
+	v.AddNonNilBool("can_send_other_messages", config.CanSendOtherMessages)
+	v.AddNonNilBool("can_add_web_page_previews", config.CanAddWebPagePreviews)
+	v.AddNonZero64("until_date", config.UntilDate)
 
 	return bot.MakeRequest("restrictChatMember", v)
 }
 
 // PromoteChatMember add admin rights to user
 func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIResponse, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername != "" {
-		v.Add("chat_id", config.SuperGroupUsername)
-	} else if config.ChannelUsername != "" {
-		v.Add("chat_id", config.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	}
-	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	v.AddNonZero("user_id", config.UserID)
 
-	if config.CanChangeInfo != nil {
-		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
-	}
-	if config.CanPostMessages != nil {
-		v.Add("can_post_messages", strconv.FormatBool(*config.CanPostMessages))
-	}
-	if config.CanEditMessages != nil {
-		v.Add("can_edit_messages", strconv.FormatBool(*config.CanEditMessages))
-	}
-	if config.CanDeleteMessages != nil {
-		v.Add("can_delete_messages", strconv.FormatBool(*config.CanDeleteMessages))
-	}
-	if config.CanInviteUsers != nil {
-		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
-	}
-	if config.CanRestrictMembers != nil {
-		v.Add("can_restrict_members", strconv.FormatBool(*config.CanRestrictMembers))
-	}
-	if config.CanPinMessages != nil {
-		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
-	}
-	if config.CanPromoteMembers != nil {
-		v.Add("can_promote_members", strconv.FormatBool(*config.CanPromoteMembers))
-	}
+	v.AddNonNilBool("can_change_info", config.CanChangeInfo)
+	v.AddNonNilBool("can_post_messages", config.CanPostMessages)
+	v.AddNonNilBool("can_edit_messages", config.CanEditMessages)
+	v.AddNonNilBool("can_delete_messages", config.CanDeleteMessages)
+	v.AddNonNilBool("can_invite_members", config.CanInviteUsers)
+	v.AddNonNilBool("can_restrict_members", config.CanRestrictMembers)
+	v.AddNonNilBool("can_pin_messages", config.CanPinMessages)
+	v.AddNonNilBool("can_promote_members", config.CanPromoteMembers)
 
 	return bot.MakeRequest("promoteChatMember", v)
 }
 
 // GetGameHighScores allows you to get the high scores for a game.
 func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHighScore, error) {
-	v, _ := config.values()
+	v, err := config.params()
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := bot.MakeRequest(config.method(), v)
 	if err != nil {
@@ -644,13 +577,9 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 
 // GetInviteLink get InviteLink for a chat
 func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
-	v := url.Values{}
+	v := make(Params)
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.SuperGroupUsername)
-	}
+	v.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	resp, err := bot.MakeRequest("exportChatInviteLink", v)
 	if err != nil {
@@ -665,7 +594,7 @@ func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
 
 // GetStickerSet returns a StickerSet.
 func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error) {
-	v, err := config.values()
+	v, err := config.params()
 	if err != nil {
 		return StickerSet{}, nil
 	}

@@ -198,3 +198,44 @@ func TestFileLink(t *testing.T) {
 		t.Fail()
 	}
 }
+
+// Ensure all configs are sendable
+var (
+	_ tgbotapi.Chattable = tgbotapi.AnimationConfig{}
+	_ tgbotapi.Chattable = tgbotapi.AudioConfig{}
+	_ tgbotapi.Chattable = tgbotapi.CallbackConfig{}
+	_ tgbotapi.Chattable = tgbotapi.ChatActionConfig{}
+	_ tgbotapi.Chattable = tgbotapi.ContactConfig{}
+	_ tgbotapi.Chattable = tgbotapi.DeleteChatPhotoConfig{}
+	_ tgbotapi.Chattable = tgbotapi.DeleteChatStickerSetConfig{}
+	_ tgbotapi.Chattable = tgbotapi.DeleteMessageConfig{}
+	_ tgbotapi.Chattable = tgbotapi.DocumentConfig{}
+	_ tgbotapi.Chattable = tgbotapi.EditMessageCaptionConfig{}
+	_ tgbotapi.Chattable = tgbotapi.EditMessageLiveLocationConfig{}
+	_ tgbotapi.Chattable = tgbotapi.EditMessageReplyMarkupConfig{}
+	_ tgbotapi.Chattable = tgbotapi.EditMessageTextConfig{}
+	_ tgbotapi.Chattable = tgbotapi.ForwardConfig{}
+	_ tgbotapi.Chattable = tgbotapi.GameConfig{}
+	_ tgbotapi.Chattable = tgbotapi.GetGameHighScoresConfig{}
+	_ tgbotapi.Chattable = tgbotapi.InlineConfig{}
+	_ tgbotapi.Chattable = tgbotapi.InvoiceConfig{}
+	_ tgbotapi.Chattable = tgbotapi.KickChatMemberConfig{}
+	_ tgbotapi.Chattable = tgbotapi.LocationConfig{}
+	_ tgbotapi.Chattable = tgbotapi.MediaGroupConfig{}
+	_ tgbotapi.Chattable = tgbotapi.MessageConfig{}
+	_ tgbotapi.Chattable = tgbotapi.PhotoConfig{}
+	_ tgbotapi.Chattable = tgbotapi.PinChatMessageConfig{}
+	_ tgbotapi.Chattable = tgbotapi.SetChatDescriptionConfig{}
+	_ tgbotapi.Chattable = tgbotapi.SetChatPhotoConfig{}
+	_ tgbotapi.Chattable = tgbotapi.SetChatTitleConfig{}
+	_ tgbotapi.Chattable = tgbotapi.SetGameScoreConfig{}
+	_ tgbotapi.Chattable = tgbotapi.StickerConfig{}
+	_ tgbotapi.Chattable = tgbotapi.UnpinChatMessageConfig{}
+	_ tgbotapi.Chattable = tgbotapi.UpdateConfig{}
+	_ tgbotapi.Chattable = tgbotapi.UserProfilePhotosConfig{}
+	_ tgbotapi.Chattable = tgbotapi.VenueConfig{}
+	_ tgbotapi.Chattable = tgbotapi.VideoConfig{}
+	_ tgbotapi.Chattable = tgbotapi.VideoNoteConfig{}
+	_ tgbotapi.Chattable = tgbotapi.VoiceConfig{}
+	_ tgbotapi.Chattable = tgbotapi.WebhookConfig{}
+)
