@@ -8,21 +8,28 @@ type PassportRequestInfoConfig struct {
 	PublicKey string         `json:"public_key"`
 }
 
+// PassportScopeElement supports using one or one of several elements.
 type PassportScopeElement interface {
 	ScopeType() string
 }
+
+// PassportScope is the requested scopes of data.
 type PassportScope struct {
 	V    int                    `json:"v"`
 	Data []PassportScopeElement `json:"data"`
 }
 
+// PassportScopeElementOneOfSeveral allows you to request any one of the
+// requested documents.
 type PassportScopeElementOneOfSeveral struct {
 }
 
+// ScopeType is the scope type.
 func (eo *PassportScopeElementOneOfSeveral) ScopeType() string {
 	return "one_of"
 }
 
+// PassportScopeElementOne requires the specified element be provided.
 type PassportScopeElementOne struct {
 	Type        string `json:"type"` // One of “personal_details”, “passport”, “driver_license”, “identity_card”, “internal_passport”, “address”, “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”, “temporary_registration”, “phone_number”, “email”
 	Selfie      bool   `json:"selfie"`
@@ -30,6 +37,7 @@ type PassportScopeElementOne struct {
 	NativeNames bool   `json:"native_name"`
 }
 
+// ScopeType is the scope type.
 func (eo *PassportScopeElementOne) ScopeType() string {
 	return "one"
 }
@@ -146,6 +154,7 @@ type (
 		// Error message
 		Message string `json:"message"`
 	}
+
 	// PassportElementErrorFrontSide represents an issue with the front side of
 	// a document. The error is considered resolved when the file with the front
 	// side of the document changes.
@@ -237,12 +246,14 @@ type (
 		Message string `json:"message"`
 	}
 
+	// Credentials contains encrypted data.
 	Credentials struct {
 		Data SecureData `json:"secure_data"`
 		// Nonce the same nonce given in the request
 		Nonce string `json:"nonce"`
 	}
 
+	// SecureData is a map of the fields and their encrypted values.
 	SecureData map[string]*SecureValue
 	// PersonalDetails       *SecureValue `json:"personal_details"`
 	// Passport              *SecureValue `json:"passport"`
@@ -256,6 +267,7 @@ type (
 	// PassportRegistration  *SecureValue `json:"passport_registration"`
 	// TemporaryRegistration *SecureValue `json:"temporary_registration"`
 
+	// SecureValue contains encrypted values for a SecureData item.
 	SecureValue struct {
 		Data        *DataCredentials   `json:"data"`
 		FrontSide   *FileCredentials   `json:"front_side"`
@@ -264,6 +276,8 @@ type (
 		Translation []*FileCredentials `json:"translation"`
 		Files       []*FileCredentials `json:"files"`
 	}
+
+	// DataCredentials contains information required to decrypt data.
 	DataCredentials struct {
 		// DataHash checksum of encrypted data
 		DataHash string `json:"data_hash"`
@@ -271,12 +285,14 @@ type (
 		Secret string `json:"secret"`
 	}
 
+	// FileCredentials contains information required to decrypt files.
 	FileCredentials struct {
 		// FileHash checksum of encrypted data
 		FileHash string `json:"file_hash"`
 		// Secret of encrypted data
 		Secret string `json:"secret"`
 	}
+
 	// PersonalDetails https://core.telegram.org/passport#personaldetails
 	PersonalDetails struct {
 		FirstName            string `json:"first_name"`

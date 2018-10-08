@@ -51,7 +51,7 @@ func main() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message == nil {
+		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
 
@@ -64,6 +64,11 @@ func main() {
 	}
 }
 ```
+
+There are more examples on the [wiki](https://github.com/go-telegram-bot-api/telegram-bot-api/wiki)
+with detailed information on how to do many differen kinds of things.
+It's a great place to get started on using keyboards, commands, or other
+kinds of reply markup.
 
 If you need to use webhooks (if you wish to run on Google App Engine),
 you may use a slightly different method.
@@ -96,7 +101,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if info.LastErrorDate != 0 {
-		log.Printf("[Telegram callback failed]%s", info.LastErrorMessage)
+		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
@@ -114,5 +119,5 @@ properly signed.
 
     openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
 
-Now that [Let's Encrypt](https://letsencrypt.org) has entered public beta,
+Now that [Let's Encrypt](https://letsencrypt.org) is available,
 you may wish to generate your free TLS certificate there.

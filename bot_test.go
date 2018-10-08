@@ -473,12 +473,9 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-	info, err := bot.GetWebhookInfo()
+	_, err = bot.GetWebhookInfo()
 	if err != nil {
 		t.Error(err)
-	}
-	if info.LastErrorDate != 0 {
-		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
 	}
 	bot.RemoveWebhook()
 }
