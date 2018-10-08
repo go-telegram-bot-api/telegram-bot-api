@@ -3,10 +3,6 @@
 [![GoDoc](https://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api?status.svg)](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api)
 [![Travis](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api.svg)](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api)
 
-All methods have been added, and all features should be available.
-If you want a feature that hasn't been added yet or something is broken,
-open an issue and I'll see what I can do.
-
 All methods are fairly self explanatory, and reading the godoc page should
 explain everything. If something isn't clear, open an issue or submit
 a pull request.
@@ -20,6 +16,9 @@ Join [the development group](https://telegram.me/go_telegram_bot_api) if
 you want to ask questions or discuss development.
 
 ## Example
+
+First, ensure the library is installed and up to date by running
+`go get -u github.com/go-telegram-bot-api/telegram-bot-api`.
 
 This is a very simple bot that just displays any gotten updates,
 then replies it to that chat.
@@ -49,7 +48,7 @@ func main() {
 	updates, err := bot.GetUpdatesChan(u)
 
 	for update := range updates {
-		if update.Message == nil {
+		if update.Message == nil { // ignore any non-Message Updates
 			continue
 		}
 
@@ -62,6 +61,11 @@ func main() {
 	}
 }
 ```
+
+There are more examples on the [wiki](https://github.com/go-telegram-bot-api/telegram-bot-api/wiki)
+with detailed information on how to do many differen kinds of things.
+It's a great place to get started on using keyboards, commands, or other
+kinds of reply markup.
 
 If you need to use webhooks (if you wish to run on Google App Engine),
 you may use a slightly different method.
@@ -98,7 +102,7 @@ func main() {
 	}
 
 	if info.LastErrorDate != 0 {
-		log.Printf("failed to set webhook: %s", info.LastErrorMessage)
+		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 
 	updates := bot.ListenForWebhook("/" + bot.Token)

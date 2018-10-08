@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -26,8 +25,9 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self   User         `json:"-"`
-	Client *http.Client `json:"-"`
+	Self            User         `json:"-"`
+	Client          *http.Client `json:"-"`
+	shutdownChannel chan interface{}
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -43,9 +43,10 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:  token,
-		Client: client,
-		Buffer: 100,
+		Token:           token,
+		Client:          client,
+		Buffer:          100,
+		shutdownChannel: make(chan interface{}),
 	}
 
 	self, err := bot.GetMe()
@@ -394,6 +395,12 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 
 	go func() {
 		for {
+			select {
+			case <-bot.shutdownChannel:
+				return
+			default:
+			}
+
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
 				log.Println(err)
@@ -404,15 +411,20 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 			}
 
 			for _, update := range updates {
-				if update.UpdateID >= config.Offset {
-					config.Offset = update.UpdateID + 1
-					ch <- update
-				}
+				ch <- update
 			}
 		}
 	}()
 
 	return ch, nil
+}
+
+// StopReceivingUpdates stops the go routine which receives updates
+func (bot *BotAPI) StopReceivingUpdates() {
+	if bot.Debug {
+		log.Println("Stopping the update receiver routine...")
+	}
+	close(bot.shutdownChannel)
 }
 
 // ListenForWebhook registers a http handler for a webhook.
@@ -517,6 +529,99 @@ func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) 
 	err = json.Unmarshal(resp.Result, &member)
 
 	return member, err
+}
+
+// UnbanChatMember unbans a user from a chat. Note that this only will work
+// in supergroups and channels, and requires the bot to be an admin.
+func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	return bot.MakeRequest("unbanChatMember", v)
+}
+
+// RestrictChatMember to restrict a user in a supergroup. The bot must be an
+//administrator in the supergroup for this to work and must have the
+//appropriate admin rights. Pass True for all boolean parameters to lift
+//restrictions from a user. Returns True on success.
+func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.CanSendMessages != nil {
+		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
+	}
+	if config.CanSendMediaMessages != nil {
+		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
+	}
+	if config.CanSendOtherMessages != nil {
+		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
+	}
+	if config.CanAddWebPagePreviews != nil {
+		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
+	}
+	if config.UntilDate != 0 {
+		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
+	}
+
+	return bot.MakeRequest("restrictChatMember", v)
+}
+
+// PromoteChatMember add admin rights to user
+func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.CanChangeInfo != nil {
+		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
+	}
+	if config.CanPostMessages != nil {
+		v.Add("can_post_messages", strconv.FormatBool(*config.CanPostMessages))
+	}
+	if config.CanEditMessages != nil {
+		v.Add("can_edit_messages", strconv.FormatBool(*config.CanEditMessages))
+	}
+	if config.CanDeleteMessages != nil {
+		v.Add("can_delete_messages", strconv.FormatBool(*config.CanDeleteMessages))
+	}
+	if config.CanInviteUsers != nil {
+		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
+	}
+	if config.CanRestrictMembers != nil {
+		v.Add("can_restrict_members", strconv.FormatBool(*config.CanRestrictMembers))
+	}
+	if config.CanPinMessages != nil {
+		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
+	}
+	if config.CanPromoteMembers != nil {
+		v.Add("can_promote_members", strconv.FormatBool(*config.CanPromoteMembers))
+	}
+
+	return bot.MakeRequest("promoteChatMember", v)
 }
 
 // GetGameHighScores allows you to get the high scores for a game.

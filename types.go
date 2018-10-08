@@ -151,6 +151,7 @@ type Message struct {
 	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
 	Audio                 *Audio             `json:"audio"`                   // optional
 	Document              *Document          `json:"document"`                // optional
+	Animation             *ChatAnimation     `json:"animation"`               // optional
 	Game                  *Game              `json:"game"`                    // optional
 	Photo                 *[]PhotoSize       `json:"photo"`                   // optional
 	Sticker               *Sticker           `json:"sticker"`                 // optional
@@ -174,6 +175,7 @@ type Message struct {
 	PinnedMessage         *Message           `json:"pinned_message"`          // optional
 	Invoice               *Invoice           `json:"invoice"`                 // optional
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
+	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -304,10 +306,29 @@ type Sticker struct {
 
 // MaskPosition is the position of a mask.
 type MaskPosition struct {
-	Point  string  `json:"point"`
-	XShift float32 `json:"x_shift"`
-	YShift float32 `json:"y_shift"`
-	Scale  float32 `json:"scale"`
+	Point     string     `json:"point"`
+	XShift    float32    `json:"x_shift"`
+	YShift    float32    `json:"y_shift"`
+	Scale     float32    `json:"scale"`
+	FileID    string     `json:"file_id"`
+	Width     int        `json:"width"`
+	Height    int        `json:"height"`
+	Thumbnail *PhotoSize `json:"thumb"`     // optional
+	Emoji     string     `json:"emoji"`     // optional
+	FileSize  int        `json:"file_size"` // optional
+	SetName   string     `json:"set_name"`  // optional
+}
+
+// ChatAnimation contains information about an animation.
+type ChatAnimation struct {
+	FileID    string     `json:"file_id"`
+	Width     int        `json:"width"`
+	Height    int        `json:"height"`
+	Duration  int        `json:"duration"`
+	Thumbnail *PhotoSize `json:"thumb"`     // optional
+	FileName  string     `json:"file_name"` // optional
+	MimeType  string     `json:"mime_type"` // optional
+	FileSize  int        `json:"file_size"` // optional
 }
 
 // Video contains information about a video.
@@ -803,21 +824,25 @@ type StickerSet struct {
 //
 // Telegram recommends to use a file_id instead of uploading.
 type InputMediaPhoto struct {
-	Type    string `json:"type"`
-	Media   string `json:"media"`
-	Caption string `json:"caption"`
+	Type      string `json:"type"`
+	Media     string `json:"media"`
+	Caption   string `json:"caption"`
+	ParseMode string `json:"parse_mode"`
 }
 
 // InputMediaVideo is a video to send as part of a media group.
 //
 // Telegram recommends to use a file_id instead of uploading.
 type InputMediaVideo struct {
-	Type     string `json:"type"`
-	Media    string `json:"media"`
-	Caption  string `json:"caption,omitempty"`
-	Width    int    `json:"width,omitempty"`
-	Height   int    `json:"height,omitempty"`
-	Duration int    `json:"duration,omitempty"`
+	Type  string `json:"type"`
+	Media string `json:"media"`
+	// thumb intentionally missing as it is not currently compatible
+	Caption           string `json:"caption"`
+	ParseMode         string `json:"parse_mode"`
+	Width             int    `json:"width"`
+	Height            int    `json:"height"`
+	Duration          int    `json:"duration"`
+	SupportsStreaming bool   `json:"supports_streaming"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.

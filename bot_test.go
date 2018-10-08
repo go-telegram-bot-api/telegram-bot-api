@@ -476,14 +476,10 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Fail()
 	}
 
-	info, err := bot.GetWebhookInfo()
+	_, err = bot.GetWebhookInfo()
 
 	if err != nil {
 		t.Error(err)
-	}
-
-	if info.LastErrorDate != 0 {
-		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}
 
 	bot.Request(tgbotapi.RemoveWebhookConfig{})
@@ -526,6 +522,20 @@ func TestUpdatesChan(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 		t.Fail()
+	}
+}
+
+func TestSendWithMediaGroup(t *testing.T) {
+	bot, _ := getBot(t)
+
+	cfg := tgbotapi.NewMediaGroup(ChatID, []interface{}{
+		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
+		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
+		tgbotapi.NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
+	})
+	_, err := bot.Request(cfg)
+	if err != nil {
+		t.Error(err)
 	}
 }
 
