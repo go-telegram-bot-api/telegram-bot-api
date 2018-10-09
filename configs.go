@@ -1070,13 +1070,13 @@ func (GetChatMemberConfig) method() string {
 // InvoiceConfig contains information for sendInvoice request.
 type InvoiceConfig struct {
 	BaseChat
-	Title                     string          // required
-	Description               string          // required
-	Payload                   string          // required
-	ProviderToken             string          // required
-	StartParameter            string          // required
-	Currency                  string          // required
-	Prices                    *[]LabeledPrice // required
+	Title                     string         // required
+	Description               string         // required
+	Payload                   string         // required
+	ProviderToken             string         // required
+	StartParameter            string         // required
+	Currency                  string         // required
+	Prices                    []LabeledPrice // required
 	ProviderData              string
 	PhotoURL                  string
 	PhotoSize                 int
@@ -1132,7 +1132,7 @@ func (config InvoiceConfig) method() string {
 type ShippingConfig struct {
 	ShippingQueryID string // required
 	OK              bool   // required
-	ShippingOptions *[]ShippingOption
+	ShippingOptions []ShippingOption
 	ErrorMessage    string
 }
 

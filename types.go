@@ -147,13 +147,13 @@ type Message struct {
 	MediaGroupID          string             `json:"media_group_id"`          // optional
 	AuthorSignature       string             `json:"author_signature"`        // optional
 	Text                  string             `json:"text"`                    // optional
-	Entities              *[]MessageEntity   `json:"entities"`                // optional
-	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
+	Entities              []MessageEntity    `json:"entities"`                // optional
+	CaptionEntities       []MessageEntity    `json:"caption_entities"`        // optional
 	Audio                 *Audio             `json:"audio"`                   // optional
 	Document              *Document          `json:"document"`                // optional
 	Animation             *ChatAnimation     `json:"animation"`               // optional
 	Game                  *Game              `json:"game"`                    // optional
-	Photo                 *[]PhotoSize       `json:"photo"`                   // optional
+	Photo                 []PhotoSize        `json:"photo"`                   // optional
 	Sticker               *Sticker           `json:"sticker"`                 // optional
 	Video                 *Video             `json:"video"`                   // optional
 	VideoNote             *VideoNote         `json:"video_note"`              // optional
@@ -162,10 +162,10 @@ type Message struct {
 	Contact               *Contact           `json:"contact"`                 // optional
 	Location              *Location          `json:"location"`                // optional
 	Venue                 *Venue             `json:"venue"`                   // optional
-	NewChatMembers        *[]User            `json:"new_chat_members"`        // optional
+	NewChatMembers        []User             `json:"new_chat_members"`        // optional
 	LeftChatMember        *User              `json:"left_chat_member"`        // optional
 	NewChatTitle          string             `json:"new_chat_title"`          // optional
-	NewChatPhoto          *[]PhotoSize       `json:"new_chat_photo"`          // optional
+	NewChatPhoto          []PhotoSize        `json:"new_chat_photo"`          // optional
 	DeleteChatPhoto       bool               `json:"delete_chat_photo"`       // optional
 	GroupChatCreated      bool               `json:"group_chat_created"`      // optional
 	SuperGroupChatCreated bool               `json:"supergroup_chat_created"` // optional
@@ -186,11 +186,11 @@ func (m *Message) Time() time.Time {
 
 // IsCommand returns true if message starts with a "bot_command" entity.
 func (m *Message) IsCommand() bool {
-	if m.Entities == nil || len(*m.Entities) == 0 {
+	if m.Entities == nil || len(m.Entities) == 0 {
 		return false
 	}
 
-	entity := (*m.Entities)[0]
+	entity := m.Entities[0]
 	return entity.Offset == 0 && entity.Type == "bot_command"
 }
 
@@ -220,7 +220,7 @@ func (m *Message) CommandWithAt() string {
 	}
 
 	// IsCommand() checks that the message begins with a bot_command entity
-	entity := (*m.Entities)[0]
+	entity := m.Entities[0]
 	return m.Text[1:entity.Length]
 }
 
@@ -239,7 +239,7 @@ func (m *Message) CommandArguments() string {
 	}
 
 	// IsCommand() checks that the message begins with a bot_command entity
-	entity := (*m.Entities)[0]
+	entity := m.Entities[0]
 
 	if len(m.Text) == entity.Length {
 		return "" // The command makes up the whole message
@@ -795,9 +795,9 @@ type OrderInfo struct {
 
 // ShippingOption represents one shipping option.
 type ShippingOption struct {
-	ID     string          `json:"id"`
-	Title  string          `json:"title"`
-	Prices *[]LabeledPrice `json:"prices"`
+	ID     string         `json:"id"`
+	Title  string         `json:"title"`
+	Prices []LabeledPrice `json:"prices"`
 }
 
 // SuccessfulPayment contains basic information about a successful payment.
