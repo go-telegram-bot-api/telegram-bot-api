@@ -509,19 +509,6 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	bot.Request(RemoveWebhookConfig{})
 }
 
-func TestUpdatesChan(t *testing.T) {
-	bot, _ := getBot(t)
-
-	var ucfg = NewUpdate(0)
-	ucfg.Timeout = 60
-	_, err := bot.GetUpdatesChan(ucfg)
-
-	if err != nil {
-		t.Error(err)
-		t.Fail()
-	}
-}
-
 func TestSendWithMediaGroup(t *testing.T) {
 	bot, _ := getBot(t)
 
@@ -549,7 +536,7 @@ func ExampleNewBotAPI() {
 	u := NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
+	updates := bot.GetUpdatesChan(u)
 
 	// Optional: wait for updates and clear them if you don't want to handle
 	// a large backlog of old messages
@@ -614,7 +601,7 @@ func ExampleInlineConfig() {
 	u := NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
+	updates := bot.GetUpdatesChan(u)
 
 	for update := range updates {
 		if update.InlineQuery == nil { // if no inline query, ignore it
