@@ -1,14 +1,11 @@
-package tgbotapi_test
+package tgbotapi
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"testing"
 	"time"
-
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -25,8 +22,8 @@ const (
 	ExistingStickerFileID   = "BQADAgADcwADjMcoCbdl-6eB--YPAg"
 )
 
-func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
-	bot, err := tgbotapi.NewBotAPI(TestToken)
+func getBot(t *testing.T) (*BotAPI, error) {
+	bot, err := NewBotAPI(TestToken)
 	bot.Debug = true
 
 	if err != nil {
@@ -38,7 +35,7 @@ func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
 }
 
 func TestNewBotAPI_notoken(t *testing.T) {
-	_, err := tgbotapi.NewBotAPI("")
+	_, err := NewBotAPI("")
 
 	if err == nil {
 		t.Error(err)
@@ -49,7 +46,7 @@ func TestNewBotAPI_notoken(t *testing.T) {
 func TestGetUpdates(t *testing.T) {
 	bot, _ := getBot(t)
 
-	u := tgbotapi.NewUpdate(0)
+	u := NewUpdate(0)
 
 	_, err := bot.GetUpdates(u)
 
@@ -62,7 +59,7 @@ func TestGetUpdates(t *testing.T) {
 func TestSendWithMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
 	_, err := bot.Send(msg)
 
@@ -75,7 +72,7 @@ func TestSendWithMessage(t *testing.T) {
 func TestSendWithMessageReply(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
 	msg.ReplyToMessageID = ReplyToMessageID
 	_, err := bot.Send(msg)
 
@@ -88,7 +85,7 @@ func TestSendWithMessageReply(t *testing.T) {
 func TestSendWithMessageForward(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewForward(ChatID, ChatID, ReplyToMessageID)
+	msg := NewForward(ChatID, ChatID, ReplyToMessageID)
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -100,7 +97,7 @@ func TestSendWithMessageForward(t *testing.T) {
 func TestSendWithNewPhoto(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg")
+	msg := NewPhotoUpload(ChatID, "tests/image.jpg")
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -114,9 +111,9 @@ func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 	bot, _ := getBot(t)
 
 	data, _ := ioutil.ReadFile("tests/image.jpg")
-	b := tgbotapi.FileBytes{Name: "image.jpg", Bytes: data}
+	b := FileBytes{Name: "image.jpg", Bytes: data}
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, b)
+	msg := NewPhotoUpload(ChatID, b)
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -130,9 +127,9 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 	bot, _ := getBot(t)
 
 	f, _ := os.Open("tests/image.jpg")
-	reader := tgbotapi.FileReader{Name: "image.jpg", Reader: f, Size: -1}
+	reader := FileReader{Name: "image.jpg", Reader: f, Size: -1}
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, reader)
+	msg := NewPhotoUpload(ChatID, reader)
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -145,7 +142,7 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 func TestSendWithNewPhotoReply(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg")
+	msg := NewPhotoUpload(ChatID, "tests/image.jpg")
 	msg.ReplyToMessageID = ReplyToMessageID
 
 	_, err := bot.Send(msg)
@@ -159,7 +156,7 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 func TestSendWithExistingPhoto(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewPhotoShare(ChatID, ExistingPhotoFileID)
+	msg := NewPhotoShare(ChatID, ExistingPhotoFileID)
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -172,7 +169,7 @@ func TestSendWithExistingPhoto(t *testing.T) {
 func TestSendWithNewDocument(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewDocumentUpload(ChatID, "tests/image.jpg")
+	msg := NewDocumentUpload(ChatID, "tests/image.jpg")
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -184,7 +181,7 @@ func TestSendWithNewDocument(t *testing.T) {
 func TestSendWithExistingDocument(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewDocumentShare(ChatID, ExistingDocumentFileID)
+	msg := NewDocumentShare(ChatID, ExistingDocumentFileID)
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -196,7 +193,7 @@ func TestSendWithExistingDocument(t *testing.T) {
 func TestSendWithNewAudio(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewAudioUpload(ChatID, "tests/audio.mp3")
+	msg := NewAudioUpload(ChatID, "tests/audio.mp3")
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
@@ -213,7 +210,7 @@ func TestSendWithNewAudio(t *testing.T) {
 func TestSendWithExistingAudio(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewAudioShare(ChatID, ExistingAudioFileID)
+	msg := NewAudioShare(ChatID, ExistingAudioFileID)
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
@@ -229,7 +226,7 @@ func TestSendWithExistingAudio(t *testing.T) {
 func TestSendWithNewVoice(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVoiceUpload(ChatID, "tests/voice.ogg")
+	msg := NewVoiceUpload(ChatID, "tests/voice.ogg")
 	msg.Duration = 10
 	_, err := bot.Send(msg)
 
@@ -242,7 +239,7 @@ func TestSendWithNewVoice(t *testing.T) {
 func TestSendWithExistingVoice(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVoiceShare(ChatID, ExistingVoiceFileID)
+	msg := NewVoiceShare(ChatID, ExistingVoiceFileID)
 	msg.Duration = 10
 	_, err := bot.Send(msg)
 
@@ -255,7 +252,7 @@ func TestSendWithExistingVoice(t *testing.T) {
 func TestSendWithContact(t *testing.T) {
 	bot, _ := getBot(t)
 
-	contact := tgbotapi.NewContact(ChatID, "5551234567", "Test")
+	contact := NewContact(ChatID, "5551234567", "Test")
 
 	if _, err := bot.Send(contact); err != nil {
 		t.Error(err)
@@ -266,7 +263,7 @@ func TestSendWithContact(t *testing.T) {
 func TestSendWithLocation(t *testing.T) {
 	bot, _ := getBot(t)
 
-	_, err := bot.Send(tgbotapi.NewLocation(ChatID, 40, 40))
+	_, err := bot.Send(NewLocation(ChatID, 40, 40))
 
 	if err != nil {
 		t.Error(err)
@@ -277,7 +274,7 @@ func TestSendWithLocation(t *testing.T) {
 func TestSendWithVenue(t *testing.T) {
 	bot, _ := getBot(t)
 
-	venue := tgbotapi.NewVenue(ChatID, "A Test Location", "123 Test Street", 40, 40)
+	venue := NewVenue(ChatID, "A Test Location", "123 Test Street", 40, 40)
 
 	if _, err := bot.Send(venue); err != nil {
 		t.Error(err)
@@ -288,7 +285,7 @@ func TestSendWithVenue(t *testing.T) {
 func TestSendWithNewVideo(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVideoUpload(ChatID, "tests/video.mp4")
+	msg := NewVideoUpload(ChatID, "tests/video.mp4")
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
@@ -303,7 +300,7 @@ func TestSendWithNewVideo(t *testing.T) {
 func TestSendWithExistingVideo(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVideoShare(ChatID, ExistingVideoFileID)
+	msg := NewVideoShare(ChatID, ExistingVideoFileID)
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
@@ -318,7 +315,7 @@ func TestSendWithExistingVideo(t *testing.T) {
 func TestSendWithNewVideoNote(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVideoNoteUpload(ChatID, 240, "tests/videonote.mp4")
+	msg := NewVideoNoteUpload(ChatID, 240, "tests/videonote.mp4")
 	msg.Duration = 10
 
 	_, err := bot.Send(msg)
@@ -332,7 +329,7 @@ func TestSendWithNewVideoNote(t *testing.T) {
 func TestSendWithExistingVideoNote(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVideoNoteShare(ChatID, 240, ExistingVideoNoteFileID)
+	msg := NewVideoNoteShare(ChatID, 240, ExistingVideoNoteFileID)
 	msg.Duration = 10
 
 	_, err := bot.Send(msg)
@@ -346,7 +343,7 @@ func TestSendWithExistingVideoNote(t *testing.T) {
 func TestSendWithNewSticker(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
+	msg := NewStickerUpload(ChatID, "tests/image.jpg")
 
 	_, err := bot.Send(msg)
 
@@ -359,7 +356,7 @@ func TestSendWithNewSticker(t *testing.T) {
 func TestSendWithExistingSticker(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewStickerShare(ChatID, ExistingStickerFileID)
+	msg := NewStickerShare(ChatID, ExistingStickerFileID)
 
 	_, err := bot.Send(msg)
 
@@ -372,8 +369,8 @@ func TestSendWithExistingSticker(t *testing.T) {
 func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewStickerUpload(ChatID, "tests/image.jpg")
-	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{
+	msg := NewStickerUpload(ChatID, "tests/image.jpg")
+	msg.ReplyMarkup = ReplyKeyboardRemove{
 		RemoveKeyboard: true,
 		Selective:      false,
 	}
@@ -388,8 +385,8 @@ func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewStickerShare(ChatID, ExistingStickerFileID)
-	msg.ReplyMarkup = tgbotapi.ReplyKeyboardRemove{
+	msg := NewStickerShare(ChatID, ExistingStickerFileID)
+	msg.ReplyMarkup = ReplyKeyboardRemove{
 		RemoveKeyboard: true,
 		Selective:      false,
 	}
@@ -405,7 +402,7 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 func TestGetFile(t *testing.T) {
 	bot, _ := getBot(t)
 
-	file := tgbotapi.FileConfig{
+	file := FileConfig{
 		FileID: ExistingPhotoFileID,
 	}
 
@@ -420,7 +417,7 @@ func TestGetFile(t *testing.T) {
 func TestSendChatConfig(t *testing.T) {
 	bot, _ := getBot(t)
 
-	_, err := bot.Request(tgbotapi.NewChatAction(ChatID, tgbotapi.ChatTyping))
+	_, err := bot.Request(NewChatAction(ChatID, ChatTyping))
 
 	if err != nil {
 		t.Error(err)
@@ -431,14 +428,14 @@ func TestSendChatConfig(t *testing.T) {
 func TestSendEditMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg, err := bot.Send(tgbotapi.NewMessage(ChatID, "Testing editing."))
+	msg, err := bot.Send(NewMessage(ChatID, "Testing editing."))
 	if err != nil {
 		t.Error(err)
 		t.Fail()
 	}
 
-	edit := tgbotapi.EditMessageTextConfig{
-		BaseEdit: tgbotapi.BaseEdit{
+	edit := EditMessageTextConfig{
+		BaseEdit: BaseEdit{
 			ChatID:    ChatID,
 			MessageID: msg.MessageID,
 		},
@@ -455,7 +452,7 @@ func TestSendEditMessage(t *testing.T) {
 func TestGetUserProfilePhotos(t *testing.T) {
 	bot, _ := getBot(t)
 
-	_, err := bot.GetUserProfilePhotos(tgbotapi.NewUserProfilePhotos(ChatID))
+	_, err := bot.GetUserProfilePhotos(NewUserProfilePhotos(ChatID))
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -467,9 +464,9 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(tgbotapi.RemoveWebhookConfig{})
+	bot.Request(RemoveWebhookConfig{})
 
-	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
+	wh := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
 	_, err := bot.Request(wh)
 	if err != nil {
 		t.Error(err)
@@ -482,7 +479,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 	}
 
-	bot.Request(tgbotapi.RemoveWebhookConfig{})
+	bot.Request(RemoveWebhookConfig{})
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -490,9 +487,9 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(tgbotapi.RemoveWebhookConfig{})
+	bot.Request(RemoveWebhookConfig{})
 
-	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
+	wh := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 	_, err := bot.Request(wh)
 	if err != nil {
 		t.Error(err)
@@ -509,13 +506,13 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}
 
-	bot.Request(tgbotapi.RemoveWebhookConfig{})
+	bot.Request(RemoveWebhookConfig{})
 }
 
 func TestUpdatesChan(t *testing.T) {
 	bot, _ := getBot(t)
 
-	var ucfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
+	var ucfg = NewUpdate(0)
 	ucfg.Timeout = 60
 	_, err := bot.GetUpdatesChan(ucfg)
 
@@ -528,10 +525,10 @@ func TestUpdatesChan(t *testing.T) {
 func TestSendWithMediaGroup(t *testing.T) {
 	bot, _ := getBot(t)
 
-	cfg := tgbotapi.NewMediaGroup(ChatID, []interface{}{
-		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
-		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
-		tgbotapi.NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
+	cfg := NewMediaGroup(ChatID, []interface{}{
+		NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
+		NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
+		NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
 	})
 	_, err := bot.Request(cfg)
 	if err != nil {
@@ -540,16 +537,16 @@ func TestSendWithMediaGroup(t *testing.T) {
 }
 
 func ExampleNewBotAPI() {
-	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+	bot, err := NewBotAPI("MyAwesomeBotToken")
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	u := tgbotapi.NewUpdate(0)
+	u := NewUpdate(0)
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
@@ -566,7 +563,7 @@ func ExampleNewBotAPI() {
 
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		msg := NewMessage(update.Message.Chat.ID, update.Message.Text)
 		msg.ReplyToMessageID = update.Message.MessageID
 
 		bot.Send(msg)
@@ -574,24 +571,24 @@ func ExampleNewBotAPI() {
 }
 
 func ExampleNewWebhook() {
-	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+	bot, err := NewBotAPI("MyAwesomeBotToken")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	bot.Debug = true
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.Request(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	_, err = bot.Request(NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	info, err := bot.GetWebhookInfo()
 
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	if info.LastErrorDate != 0 {
@@ -607,14 +604,14 @@ func ExampleNewWebhook() {
 }
 
 func ExampleInlineConfig() {
-	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken") // create new bot
+	bot, err := NewBotAPI("MyAwesomeBotToken") // create new bot
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	u := tgbotapi.NewUpdate(0)
+	u := NewUpdate(0)
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
@@ -624,10 +621,10 @@ func ExampleInlineConfig() {
 			continue
 		}
 
-		article := tgbotapi.NewInlineQueryResultArticle(update.InlineQuery.ID, "Echo", update.InlineQuery.Query)
+		article := NewInlineQueryResultArticle(update.InlineQuery.ID, "Echo", update.InlineQuery.Query)
 		article.Description = update.InlineQuery.Query
 
-		inlineConf := tgbotapi.InlineConfig{
+		inlineConf := InlineConfig{
 			InlineQueryID: update.InlineQuery.ID,
 			IsPersonal:    true,
 			CacheTime:     0,
@@ -643,11 +640,11 @@ func ExampleInlineConfig() {
 func TestDeleteMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
 	message, _ := bot.Send(msg)
 
-	deleteMessageConfig := tgbotapi.DeleteMessageConfig{
+	deleteMessageConfig := DeleteMessageConfig{
 		ChatID:    message.Chat.ID,
 		MessageID: message.MessageID,
 	}
@@ -662,11 +659,11 @@ func TestDeleteMessage(t *testing.T) {
 func TestPinChatMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg := NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
 	message, _ := bot.Send(msg)
 
-	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+	pinChatMessageConfig := PinChatMessageConfig{
 		ChatID:              message.Chat.ID,
 		MessageID:           message.MessageID,
 		DisableNotification: false,
@@ -682,12 +679,12 @@ func TestPinChatMessage(t *testing.T) {
 func TestUnpinChatMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg := NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
 	msg.ParseMode = "markdown"
 	message, _ := bot.Send(msg)
 
 	// We need pin message to unpin something
-	pinChatMessageConfig := tgbotapi.PinChatMessageConfig{
+	pinChatMessageConfig := PinChatMessageConfig{
 		ChatID:              message.Chat.ID,
 		MessageID:           message.MessageID,
 		DisableNotification: false,
@@ -698,7 +695,7 @@ func TestUnpinChatMessage(t *testing.T) {
 		t.Fail()
 	}
 
-	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
+	unpinChatMessageConfig := UnpinChatMessageConfig{
 		ChatID: message.Chat.ID,
 	}
 
