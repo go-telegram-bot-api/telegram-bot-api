@@ -63,7 +63,7 @@ func main() {
 ```
 
 There are more examples on the [wiki](https://github.com/go-telegram-bot-api/telegram-bot-api/wiki)
-with detailed information on how to do many differen kinds of things.
+with detailed information on how to do many different kinds of things.
 It's a great place to get started on using keyboards, commands, or other
 kinds of reply markup.
 

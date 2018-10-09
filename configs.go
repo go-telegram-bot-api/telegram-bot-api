@@ -140,16 +140,16 @@ type MessageConfig struct {
 }
 
 func (config MessageConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
+		return params, err
 	}
 
-	v.AddNonEmpty("text", config.Text)
-	v.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
-	v.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddNonEmpty("text", config.Text)
+	params.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, nil
+	return params, nil
 }
 
 func (config MessageConfig) method() string {
@@ -165,15 +165,15 @@ type ForwardConfig struct {
 }
 
 func (config ForwardConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
+		return params, err
 	}
 
-	v.AddNonZero64("from_chat_id", config.FromChatID)
-	v.AddNonZero("message_id", config.MessageID)
+	params.AddNonZero64("from_chat_id", config.FromChatID)
+	params.AddNonZero("message_id", config.MessageID)
 
-	return v, nil
+	return params, nil
 }
 
 func (config ForwardConfig) method() string {
@@ -216,19 +216,19 @@ type AudioConfig struct {
 }
 
 func (config AudioConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
+		return params, err
 	}
 
-	v.AddNonEmpty(config.name(), config.FileID)
-	v.AddNonZero("duration", config.Duration)
-	v.AddNonEmpty("performer", config.Performer)
-	v.AddNonEmpty("title", config.Title)
-	v.AddNonEmpty("caption", config.Caption)
-	v.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("performer", config.Performer)
+	params.AddNonEmpty("title", config.Title)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, nil
+	return params, nil
 }
 
 func (config AudioConfig) name() string {
@@ -270,11 +270,11 @@ type StickerConfig struct {
 }
 
 func (config StickerConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonEmpty(config.name(), config.FileID)
 
-	return v, err
+	return params, err
 }
 
 func (config StickerConfig) name() string {
@@ -288,20 +288,22 @@ func (config StickerConfig) method() string {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
-	Duration  int
-	Caption   string
-	ParseMode string
+	Duration          int
+	Caption           string
+	ParseMode         string
+	SupportsStreaming bool
 }
 
 func (config VideoConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonEmpty(config.name(), config.FileID)
-	v.AddNonZero("duration", config.Duration)
-	v.AddNonEmpty("caption", config.Caption)
-	v.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddBool("supports_streaming", config.SupportsStreaming)
 
-	return v, err
+	return params, err
 }
 
 func (config VideoConfig) name() string {
@@ -321,14 +323,14 @@ type AnimationConfig struct {
 }
 
 func (config AnimationConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonEmpty(config.name(), config.FileID)
-	v.AddNonZero("duration", config.Duration)
-	v.AddNonEmpty("caption", config.Caption)
-	v.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, err
+	return params, err
 }
 
 func (config AnimationConfig) name() string {
@@ -347,13 +349,13 @@ type VideoNoteConfig struct {
 }
 
 func (config VideoNoteConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonEmpty(config.name(), config.FileID)
-	v.AddNonZero("duration", config.Duration)
-	v.AddNonZero("length", config.Length)
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonZero("length", config.Length)
 
-	return v, err
+	return params, err
 }
 
 func (config VideoNoteConfig) name() string {
@@ -373,14 +375,14 @@ type VoiceConfig struct {
 }
 
 func (config VoiceConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonEmpty(config.name(), config.FileID)
-	v.AddNonZero("duration", config.Duration)
-	v.AddNonEmpty("caption", config.Caption)
-	v.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, err
+	return params, err
 }
 
 func (config VoiceConfig) name() string {
@@ -400,13 +402,13 @@ type LocationConfig struct {
 }
 
 func (config LocationConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonZeroFloat("latitude", config.Latitude)
-	v.AddNonZeroFloat("longitude", config.Longitude)
-	v.AddNonZero("live_period", config.LivePeriod)
+	params.AddNonZeroFloat("latitude", config.Latitude)
+	params.AddNonZeroFloat("longitude", config.Longitude)
+	params.AddNonZero("live_period", config.LivePeriod)
 
-	return v, err
+	return params, err
 }
 
 func (config LocationConfig) method() string {
@@ -421,12 +423,12 @@ type EditMessageLiveLocationConfig struct {
 }
 
 func (config EditMessageLiveLocationConfig) params() (Params, error) {
-	v, err := config.BaseEdit.params()
+	params, err := config.BaseEdit.params()
 
-	v.AddNonZeroFloat("latitude", config.Latitude)
-	v.AddNonZeroFloat("longitude", config.Longitude)
+	params.AddNonZeroFloat("latitude", config.Latitude)
+	params.AddNonZeroFloat("longitude", config.Longitude)
 
-	return v, err
+	return params, err
 }
 
 func (config EditMessageLiveLocationConfig) method() string {
@@ -457,15 +459,15 @@ type VenueConfig struct {
 }
 
 func (config VenueConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v.AddNonZeroFloat("latitude", config.Latitude)
-	v.AddNonZeroFloat("longitude", config.Longitude)
-	v["title"] = config.Title
-	v["address"] = config.Address
-	v.AddNonEmpty("foursquare_id", config.FoursquareID)
+	params.AddNonZeroFloat("latitude", config.Latitude)
+	params.AddNonZeroFloat("longitude", config.Longitude)
+	params["title"] = config.Title
+	params["address"] = config.Address
+	params.AddNonEmpty("foursquare_id", config.FoursquareID)
 
-	return v, err
+	return params, err
 }
 
 func (config VenueConfig) method() string {
@@ -478,16 +480,19 @@ type ContactConfig struct {
 	PhoneNumber string
 	FirstName   string
 	LastName    string
+	VCard       string
 }
 
 func (config ContactConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v["phone_number"] = config.PhoneNumber
-	v["first_name"] = config.FirstName
-	v["last_name"] = config.LastName
+	params["phone_number"] = config.PhoneNumber
+	params["first_name"] = config.FirstName
 
-	return v, err
+	params.AddNonEmpty("last_name", config.LastName)
+	params.AddNonEmpty("vcard", config.VCard)
+
+	return params, err
 }
 
 func (config ContactConfig) method() string {
@@ -501,11 +506,11 @@ type GameConfig struct {
 }
 
 func (config GameConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v["game_short_name"] = config.GameShortName
+	params["game_short_name"] = config.GameShortName
 
-	return v, err
+	return params, err
 }
 
 func (config GameConfig) method() string {
@@ -580,11 +585,11 @@ type ChatActionConfig struct {
 }
 
 func (config ChatActionConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 
-	v["action"] = config.Action
+	params["action"] = config.Action
 
-	return v, err
+	return params, err
 }
 
 func (config ChatActionConfig) method() string {
@@ -600,13 +605,13 @@ type EditMessageTextConfig struct {
 }
 
 func (config EditMessageTextConfig) params() (Params, error) {
-	v, err := config.BaseEdit.params()
+	params, err := config.BaseEdit.params()
 
-	v["text"] = config.Text
-	v.AddNonEmpty("parse_mode", config.ParseMode)
-	v.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
+	params["text"] = config.Text
+	params.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
 
-	return v, err
+	return params, err
 }
 
 func (config EditMessageTextConfig) method() string {
@@ -621,16 +626,35 @@ type EditMessageCaptionConfig struct {
 }
 
 func (config EditMessageCaptionConfig) params() (Params, error) {
-	v, err := config.BaseEdit.params()
+	params, err := config.BaseEdit.params()
 
-	v["caption"] = config.Caption
-	v.AddNonEmpty("parse_mode", config.ParseMode)
+	params["caption"] = config.Caption
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, err
+	return params, err
 }
 
 func (config EditMessageCaptionConfig) method() string {
 	return "editMessageCaption"
+}
+
+// EditMessageMediaConfig contains information about editing a message's media.
+type EditMessageMediaConfig struct {
+	BaseEdit
+
+	Media interface{}
+}
+
+func (EditMessageMediaConfig) method() string {
+	return "editMessageMedia"
+}
+
+func (config EditMessageMediaConfig) params() (Params, error) {
+	params, err := config.BaseEdit.params()
+
+	params.AddInterface("media", config.Media)
+
+	return params, err
 }
 
 // EditMessageReplyMarkupConfig allows you to modify the reply markup
@@ -674,6 +698,18 @@ type FileConfig struct {
 	FileID string
 }
 
+func (FileConfig) method() string {
+	return "getFile"
+}
+
+func (config FileConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["file_id"] = config.FileID
+
+	return params, nil
+}
+
 // UpdateConfig contains information about a GetUpdates request.
 type UpdateConfig struct {
 	Offset  int
@@ -700,6 +736,7 @@ type WebhookConfig struct {
 	URL            *url.URL
 	Certificate    interface{}
 	MaxConnections int
+	AllowedUpdates []string
 }
 
 func (config WebhookConfig) method() string {
@@ -714,6 +751,7 @@ func (config WebhookConfig) params() (Params, error) {
 	}
 
 	params.AddNonZero("max_connections", config.MaxConnections)
+	params.AddInterface("allowed_updates", config.AllowedUpdates)
 
 	return params, nil
 }
@@ -932,6 +970,60 @@ type ChatConfig struct {
 	SuperGroupUsername string
 }
 
+func (config ChatConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
+// ChatInfoConfig contains information about getting chat information.
+type ChatInfoConfig struct {
+	ChatConfig
+}
+
+func (ChatInfoConfig) method() string {
+	return "getChat"
+}
+
+// ChatMemberCountConfig contains information about getting the number of users in a chat.
+type ChatMemberCountConfig struct {
+	ChatConfig
+}
+
+func (ChatMemberCountConfig) method() string {
+	return "getChatMembersCount"
+}
+
+// ChatAdministratorsConfig contains information about getting chat administrators.
+type ChatAdministratorsConfig struct {
+	ChatConfig
+}
+
+func (ChatAdministratorsConfig) method() string {
+	return "getChatAdministrators"
+}
+
+// ChatInviteLinkConfig contains information about getting a chat link.
+//
+// Note that generating a new link will revoke any previous links.
+type ChatInviteLinkConfig struct {
+	ChatConfig
+}
+
+func (ChatInviteLinkConfig) method() string {
+	return "exportChatInviteLink"
+}
+
+func (config ChatInviteLinkConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
 // LeaveChatConfig allows you to leave a chat.
 type LeaveChatConfig struct {
 	ChatID          int64
@@ -950,65 +1042,86 @@ func (config LeaveChatConfig) params() (Params, error) {
 	return params, nil
 }
 
-// ChatConfigWithUser contains information about getting information on
-// a specific user within a chat.
+// ChatConfigWithUser contains information about a chat and a user.
 type ChatConfigWithUser struct {
 	ChatID             int64
 	SuperGroupUsername string
 	UserID             int
 }
 
+func (config ChatConfigWithUser) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("user_id", config.UserID)
+
+	return params, nil
+}
+
+// GetChatMemberConfig is information about getting a specific member in a chat.
+type GetChatMemberConfig struct {
+	ChatConfigWithUser
+}
+
+func (GetChatMemberConfig) method() string {
+	return "getChatMember"
+}
+
 // InvoiceConfig contains information for sendInvoice request.
 type InvoiceConfig struct {
 	BaseChat
-	Title               string          // required
-	Description         string          // required
-	Payload             string          // required
-	ProviderToken       string          // required
-	StartParameter      string          // required
-	Currency            string          // required
-	Prices              *[]LabeledPrice // required
-	ProviderData        string
-	PhotoURL            string
-	PhotoSize           int
-	PhotoWidth          int
-	PhotoHeight         int
-	NeedName            bool
-	NeedPhoneNumber     bool
-	NeedEmail           bool
-	NeedShippingAddress bool
-	IsFlexible          bool
+	Title                     string          // required
+	Description               string          // required
+	Payload                   string          // required
+	ProviderToken             string          // required
+	StartParameter            string          // required
+	Currency                  string          // required
+	Prices                    *[]LabeledPrice // required
+	ProviderData              string
+	PhotoURL                  string
+	PhotoSize                 int
+	PhotoWidth                int
+	PhotoHeight               int
+	NeedName                  bool
+	NeedPhoneNumber           bool
+	NeedEmail                 bool
+	NeedShippingAddress       bool
+	SendPhoneNumberToProvider bool
+	SendEmailToProvider       bool
+	IsFlexible                bool
 }
 
 func (config InvoiceConfig) params() (Params, error) {
-	v, err := config.BaseChat.params()
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
+		return params, err
 	}
 
-	v["title"] = config.Title
-	v["description"] = config.Description
-	v["payload"] = config.Payload
-	v["provider_token"] = config.ProviderToken
-	v["start_parameter"] = config.StartParameter
-	v["currency"] = config.Currency
+	params["title"] = config.Title
+	params["description"] = config.Description
+	params["payload"] = config.Payload
+	params["provider_token"] = config.ProviderToken
+	params["start_parameter"] = config.StartParameter
+	params["currency"] = config.Currency
 
-	if err = v.AddInterface("prices", config.Prices); err != nil {
-		return v, err
+	if err = params.AddInterface("prices", config.Prices); err != nil {
+		return params, err
 	}
 
-	v.AddNonEmpty("provider_data", config.ProviderData)
-	v.AddNonEmpty("photo_url", config.PhotoURL)
-	v.AddNonZero("photo_size", config.PhotoSize)
-	v.AddNonZero("photo_width", config.PhotoWidth)
-	v.AddNonZero("photo_height", config.PhotoHeight)
-	v.AddBool("need_name", config.NeedName)
-	v.AddBool("need_phone_number", config.NeedPhoneNumber)
-	v.AddBool("need_email", config.NeedEmail)
-	v.AddBool("need_shipping_address", config.NeedShippingAddress)
-	v.AddBool("is_flexible", config.IsFlexible)
+	params.AddNonEmpty("provider_data", config.ProviderData)
+	params.AddNonEmpty("photo_url", config.PhotoURL)
+	params.AddNonZero("photo_size", config.PhotoSize)
+	params.AddNonZero("photo_width", config.PhotoWidth)
+	params.AddNonZero("photo_height", config.PhotoHeight)
+	params.AddBool("need_name", config.NeedName)
+	params.AddBool("need_phone_number", config.NeedPhoneNumber)
+	params.AddBool("need_email", config.NeedEmail)
+	params.AddBool("need_shipping_address", config.NeedShippingAddress)
+	params.AddBool("is_flexible", config.IsFlexible)
+	params.AddBool("send_phone_number_to_provider", config.SendPhoneNumberToProvider)
+	params.AddBool("send_email_to_provider", config.SendEmailToProvider)
 
-	return v, nil
+	return params, nil
 }
 
 func (config InvoiceConfig) method() string {

@@ -175,6 +175,7 @@ type Message struct {
 	PinnedMessage         *Message           `json:"pinned_message"`          // optional
 	Invoice               *Invoice           `json:"invoice"`                 // optional
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
+	ConnectedWebsite      string             `json:"connected_website"`       // optional
 	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
 }
 
@@ -367,6 +368,7 @@ type Contact struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"` // optional
 	UserID      int    `json:"user_id"`   // optional
+	VCard       string `json:"vcard"`     // optional
 }
 
 // Location contains information about a place.
@@ -692,6 +694,21 @@ type InlineQueryResultLocation struct {
 	ThumbHeight         int                   `json:"thumb_height"`
 }
 
+// InlineQueryResultContact is an inline query response contact.
+type InlineQueryResultContact struct {
+	Type                string                `json:"type"`         // required
+	ID                  string                `json:"id"`           // required
+	PhoneNumber         string                `json:"phone_number"` // required
+	FirstName           string                `json:"first_name"`   // required
+	LastName            string                `json:"last_name"`
+	VCard               string                `json:"vcard"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	ThumbURL            string                `json:"thumb_url"`
+	ThumbWidth          int                   `json:"thumb_width"`
+	ThumbHeight         int                   `json:"thumb_height"`
+}
+
 // InlineQueryResultGame is an inline query response game.
 type InlineQueryResultGame struct {
 	Type          string                `json:"type"`
@@ -740,6 +757,7 @@ type InputContactMessageContent struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
+	VCard       string `json:"vcard"`
 }
 
 // Invoice contains basic information about an invoice.
@@ -820,29 +838,47 @@ type StickerSet struct {
 	Stickers      []Sticker `json:"stickers"`
 }
 
-// InputMediaPhoto is a photo to send as part of a media group.
-//
-// Telegram recommends to use a file_id instead of uploading.
-type InputMediaPhoto struct {
+// BaseInputMedia is a base type for the InputMedia types.
+type BaseInputMedia struct {
 	Type      string `json:"type"`
 	Media     string `json:"media"`
 	Caption   string `json:"caption"`
 	ParseMode string `json:"parse_mode"`
 }
 
+// InputMediaPhoto is a photo to send as part of a media group.
+type InputMediaPhoto struct {
+	BaseInputMedia
+}
+
 // InputMediaVideo is a video to send as part of a media group.
-//
-// Telegram recommends to use a file_id instead of uploading.
 type InputMediaVideo struct {
-	Type  string `json:"type"`
-	Media string `json:"media"`
-	// thumb intentionally missing as it is not currently compatible
-	Caption           string `json:"caption"`
-	ParseMode         string `json:"parse_mode"`
-	Width             int    `json:"width"`
-	Height            int    `json:"height"`
-	Duration          int    `json:"duration"`
-	SupportsStreaming bool   `json:"supports_streaming"`
+	BaseInputMedia
+	Width             int  `json:"width"`
+	Height            int  `json:"height"`
+	Duration          int  `json:"duration"`
+	SupportsStreaming bool `json:"supports_streaming"`
+}
+
+// InputMediaAnimation is an animation to send as part of a media group.
+type InputMediaAnimation struct {
+	BaseInputMedia
+	Width    int `json:"width"`
+	Height   int `json:"height"`
+	Duration int `json:"duration"`
+}
+
+// InputMediaAudio is a audio to send as part of a media group.
+type InputMediaAudio struct {
+	BaseInputMedia
+	Duration  int    `json:"duration"`
+	Performer string `json:"performer"`
+	Title     string `json:"title"`
+}
+
+// InputMediaDocument is a audio to send as part of a media group.
+type InputMediaDocument struct {
+	BaseInputMedia
 }
 
 // Error is an error containing extra information returned by the Telegram API.

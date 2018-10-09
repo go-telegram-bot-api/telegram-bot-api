@@ -302,16 +302,50 @@ func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 // NewInputMediaPhoto creates a new InputMediaPhoto.
 func NewInputMediaPhoto(media string) InputMediaPhoto {
 	return InputMediaPhoto{
-		Type:  "photo",
-		Media: media,
+		BaseInputMedia{
+			Type:  "photo",
+			Media: media,
+		},
 	}
 }
 
 // NewInputMediaVideo creates a new InputMediaVideo.
 func NewInputMediaVideo(media string) InputMediaVideo {
 	return InputMediaVideo{
-		Type:  "video",
-		Media: media,
+		BaseInputMedia: BaseInputMedia{
+			Type:  "video",
+			Media: media,
+		},
+	}
+}
+
+// NewInputMediaAnimation creates a new InputMediaAnimation.
+func NewInputMediaAnimation(media string) InputMediaAnimation {
+	return InputMediaAnimation{
+		BaseInputMedia: BaseInputMedia{
+			Type:  "animation",
+			Media: media,
+		},
+	}
+}
+
+// NewInputMediaAudio creates a new InputMediaAudio.
+func NewInputMediaAudio(media string) InputMediaAudio {
+	return InputMediaAudio{
+		BaseInputMedia: BaseInputMedia{
+			Type:  "audio",
+			Media: media,
+		},
+	}
+}
+
+// NewInputMediaDocument creates a new InputMediaDocument.
+func NewInputMediaDocument(media string) InputMediaDocument {
+	return InputMediaDocument{
+		BaseInputMedia: BaseInputMedia{
+			Type:  "document",
+			Media: media,
+		},
 	}
 }
 
