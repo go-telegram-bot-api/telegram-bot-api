@@ -685,6 +685,13 @@ func NewInlineKeyboardMarkup(rows ...[]InlineKeyboardButton) InlineKeyboardMarku
 	}
 }
 
+// NewRemoveInlineKeyboardMarkup removes an inline keyboard entirely.
+func NewRemoveInlineKeyboardMarkup() InlineKeyboardMarkup {
+	return InlineKeyboardMarkup{
+		InlineKeyboard: make([][]InlineKeyboardButton,0),
+	}
+}
+
 // NewCallback creates a new callback message.
 func NewCallback(id, text string) CallbackConfig {
 	return CallbackConfig{
