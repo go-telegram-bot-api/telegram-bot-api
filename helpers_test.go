@@ -148,10 +148,9 @@ func TestNewEditMessageText(t *testing.T) {
 }
 
 func TestNewEditMessageCaption(t *testing.T) {
-	edit := tgbotapi.NewEditMessageCaption(ChatID, ReplyToMessageID, "new caption", tgbotapi.ModeHTML)
+	edit := tgbotapi.NewEditMessageCaption(ChatID, ReplyToMessageID, "new caption")
 
 	if edit.Caption != "new caption" ||
-		edit.ParseMode != tgbotapi.ModeHTML ||
 		edit.BaseEdit.ChatID != ChatID ||
 		edit.BaseEdit.MessageID != ReplyToMessageID {
 		t.Fail()
