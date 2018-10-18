@@ -284,7 +284,8 @@ func (config AnimationConfig) method() string {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
-	Caption string
+	Caption   string
+	ParseMode string
 }
 
 // Params returns a map[string]string representation of PhotoConfig.
@@ -293,6 +294,10 @@ func (config PhotoConfig) params() (map[string]string, error) {
 
 	if config.Caption != "" {
 		params["caption"] = config.Caption
+	}
+
+	if config.ParseMode != "" {
+		params["parse_mode"] = config.ParseMode
 	}
 
 	return params, nil
@@ -308,6 +313,9 @@ func (config PhotoConfig) values() (url.Values, error) {
 	v.Add(config.name(), config.FileID)
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
+	}
+	if config.ParseMode != "" {
+		v.Add("parse_mode", config.ParseMode)
 	}
 	return v, nil
 }
