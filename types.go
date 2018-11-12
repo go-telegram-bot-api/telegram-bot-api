@@ -178,7 +178,11 @@ func (m *Message) Time() time.Time {
 
 // IsCommand returns true if message starts with a "bot_command" entity.
 func (m *Message) IsCommand() bool {
-	if m.Entities == nil || len(*m.Entities) == 0 {
+	lenEntities := 0
+	if m.Entities != nil {
+		lenEntities = len(*m.Entities)
+	}
+	if m.Entities == nil || lenEntities == 0 {
 		return false
 	}
 
