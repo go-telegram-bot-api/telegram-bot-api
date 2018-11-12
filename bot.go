@@ -34,7 +34,7 @@ type BotAPI struct {
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPI(token string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, &http.Client{})
+	return CreateNewBotApi(token, &http.Client{}, false)
 }
 
 // NewBotAPIWithClient creates a new BotAPI instance
@@ -42,11 +42,28 @@ func NewBotAPI(token string) (*BotAPI, error) {
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
+	return CreateNewBotApi(token, client, false)
+}
+
+// NewBotAPIWithClient creates a new BotAPI instance
+// and enables debug by default.
+//
+// It requires a token, provided by @BotFather on Telegram.
+func NewBotApiWithDebug(token string) (*BotAPI, error) {
+	return CreateNewBotApi(token, &http.Client{}, true)
+}
+
+// NewBotAPIWithClient creates a new BotAPI instance
+// and allows you to pass all additional customization that you might need.
+//
+// It requires a token, provided by @BotFather on Telegram.
+func CreateNewBotApi(token string, client *http.Client, debug bool) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:  token,
 		Client: client,
 		Buffer: 100,
 		shutdownChannel: make(chan interface{}),
+		Debug: debug,
 	}
 
 	self, err := bot.GetMe()
