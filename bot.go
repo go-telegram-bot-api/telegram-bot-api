@@ -18,14 +18,23 @@ import (
 	"github.com/technoweenie/multipartstreamer"
 )
 
+// BotAPI configuration object to allow custom setups.
+//
+// BotAPIConfig allows to set http.Client and http.Server
+type BotAPIConfig struct {
+	Client   *http.Client
+	Server   *http.Server
+	ServeMux *http.ServeMux
+}
+
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
 	Token  string `json:"token"`
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self            User         `json:"-"`
-	Client          *http.Client `json:"-"`
+	Self            User          `json:"-"`
+	Config          *BotAPIConfig `json:"-"`
 	shutdownChannel chan interface{}
 }
 
@@ -33,18 +42,19 @@ type BotAPI struct {
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPI(token string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, &http.Client{})
+	return NewBotAPIWithConfig(token, &BotAPIConfig{http.DefaultClient,
+		nil, http.DefaultServeMux})
 }
 
 // NewBotAPIWithClient creates a new BotAPI instance
-// and allows you to pass a http.Client.
+// and allows you to pass BotAPIConfig.
 //
 // It requires a token, provided by @BotFather on Telegram.
-func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
+func NewBotAPIWithConfig(token string, config *BotAPIConfig) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:           token,
-		Client:          client,
 		Buffer:          100,
+		Config:          config,
 		shutdownChannel: make(chan interface{}),
 	}
 
@@ -82,7 +92,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (APIResponse, err
 
 	values := buildParams(params)
 
-	resp, err := bot.Client.PostForm(method, values)
+	resp, err := bot.Config.Client.PostForm(method, values)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -208,7 +218,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params Params, fieldname string, 
 
 	ms.SetupRequest(req)
 
-	res, err := bot.Client.Do(req)
+	res, err := bot.Config.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -422,7 +432,12 @@ func (bot *BotAPI) StopReceivingUpdates() {
 func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
-	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+	handleFunc := http.DefaultServeMux.HandleFunc
+	if mux := bot.Config.ServeMux; mux != nil {
+		handleFunc = mux.HandleFunc
+	}
+
+	handleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
 
 		var update Update
