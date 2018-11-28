@@ -1417,7 +1417,9 @@ func (config AddStickerConfig) getFile() interface{} {
 }
 
 func (config AddStickerConfig) useExistingFile() bool {
-	return false
+	_, ok := config.PNGSticker.(string)
+
+	return ok
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
