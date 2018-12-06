@@ -1327,7 +1327,9 @@ func (config UploadStickerConfig) getFile() interface{} {
 }
 
 func (config UploadStickerConfig) useExistingFile() bool {
-	return false
+	_, ok := config.PNGSticker.(string)
+
+	return ok
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
