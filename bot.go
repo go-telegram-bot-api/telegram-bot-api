@@ -208,30 +208,33 @@ func (bot *BotAPI) UploadFile(endpoint string, params Params, fieldname string, 
 
 	ms.SetupRequest(req)
 
-	res, err := bot.Client.Do(req)
+	resp, err := bot.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
-	defer res.Body.Close()
+	defer resp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(res.Body)
+	var apiResp APIResponse
+	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
 	if err != nil {
-		return APIResponse{}, err
+		return apiResp, err
 	}
 
 	if bot.Debug {
 		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
 	}
 
-	var apiResp APIResponse
-
-	err = json.Unmarshal(bytes, &apiResp)
-	if err != nil {
-		return APIResponse{}, err
-	}
-
 	if !apiResp.Ok {
-		return APIResponse{}, errors.New(apiResp.Description)
+		var parameters ResponseParameters
+
+		if apiResp.Parameters != nil {
+			parameters = *apiResp.Parameters
+		}
+
+		return apiResp, Error{
+			Message:            apiResp.Description,
+			ResponseParameters: parameters,
+		}
 	}
 
 	return apiResp, nil
