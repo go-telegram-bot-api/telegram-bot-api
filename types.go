@@ -142,10 +142,9 @@ type Message struct {
 	EditDate              int                `json:"edit_date"`               // optional
 	Text                  string             `json:"text"`                    // optional
 	Entities              *[]MessageEntity   `json:"entities"`                // optional
-	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
-	Animation             *Animation         `json:"animation"`               // optional
 	Audio                 *Audio             `json:"audio"`                   // optional
 	Document              *Document          `json:"document"`                // optional
+	Animation             *ChatAnimation     `json:"animation"`               // optional
 	Game                  *Game              `json:"game"`                    // optional
 	Photo                 *[]PhotoSize       `json:"photo"`                   // optional
 	Sticker               *Sticker           `json:"sticker"`                 // optional
@@ -169,6 +168,7 @@ type Message struct {
 	PinnedMessage         *Message           `json:"pinned_message"`          // optional
 	Invoice               *Invoice           `json:"invoice"`                 // optional
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
+	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -178,11 +178,7 @@ func (m *Message) Time() time.Time {
 
 // IsCommand returns true if message starts with a "bot_command" entity.
 func (m *Message) IsCommand() bool {
-	lenEntities := 0
-	if m.Entities != nil {
-		lenEntities = len(*m.Entities)
-	}
-	if m.Entities == nil || lenEntities == 0 {
+	if m.Entities == nil || len(*m.Entities) == 0 {
 		return false
 	}
 
@@ -282,6 +278,29 @@ type Audio struct {
 // Document contains information about a document.
 type Document struct {
 	FileID    string     `json:"file_id"`
+	Thumbnail *PhotoSize `json:"thumb"`     // optional
+	FileName  string     `json:"file_name"` // optional
+	MimeType  string     `json:"mime_type"` // optional
+	FileSize  int        `json:"file_size"` // optional
+}
+
+// Sticker contains information about a sticker.
+type Sticker struct {
+	FileID    string     `json:"file_id"`
+	Width     int        `json:"width"`
+	Height    int        `json:"height"`
+	Thumbnail *PhotoSize `json:"thumb"`     // optional
+	Emoji     string     `json:"emoji"`     // optional
+	FileSize  int        `json:"file_size"` // optional
+	SetName   string     `json:"set_name"`  // optional
+}
+
+// ChatAnimation contains information about an animation.
+type ChatAnimation struct {
+	FileID    string     `json:"file_id"`
+	Width     int        `json:"width"`
+	Height    int        `json:"height"`
+	Duration  int        `json:"duration"`
 	Thumbnail *PhotoSize `json:"thumb"`     // optional
 	FileName  string     `json:"file_name"` // optional
 	MimeType  string     `json:"mime_type"` // optional
@@ -504,6 +523,27 @@ type WebhookInfo struct {
 // IsSet returns true if a webhook is currently set.
 func (info WebhookInfo) IsSet() bool {
 	return info.URL != ""
+}
+
+// InputMediaPhoto contains a photo for displaying as part of a media group.
+type InputMediaPhoto struct {
+	Type      string `json:"type"`
+	Media     string `json:"media"`
+	Caption   string `json:"caption"`
+	ParseMode string `json:"parse_mode"`
+}
+
+// InputMediaVideo contains a video for displaying as part of a media group.
+type InputMediaVideo struct {
+	Type  string `json:"type"`
+	Media string `json:"media"`
+	// thumb intentionally missing as it is not currently compatible
+	Caption           string `json:"caption"`
+	ParseMode         string `json:"parse_mode"`
+	Width             int    `json:"width"`
+	Height            int    `json:"height"`
+	Duration          int    `json:"duration"`
+	SupportsStreaming bool   `json:"supports_streaming"`
 }
 
 // InlineQuery is a Query from Telegram for an inline request.
@@ -766,34 +806,6 @@ type PreCheckoutQuery struct {
 	InvoicePayload   string     `json:"invoice_payload"`
 	ShippingOptionID string     `json:"shipping_option_id,omitempty"`
 	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
-}
-
-// Sticker contains information about a sticker.
-type Sticker struct {
-	FileID       string        `json:"file_id"`
-	Width        int           `json:"width"`
-	Height       int           `json:"height"`
-	Thumbnail    *PhotoSize    `json:"thumb"`         // optional
-	Emoji        string        `json:"emoji"`         // optional
-	SetName      string        `json:"set_name"`      // optional
-	MaskPosition *MaskPosition `json:"mask_position"` // optional
-	FileSize     int           `json:"file_size"`     // optional
-}
-
-// StickerSet represents a sticker set.
-type StickerSet struct {
-	Name          string     `json:"name"`
-	Title         string     `json:"title"`
-	ContainsMasks bool       `json:"contains_masks"`
-	Stickers      *[]Sticker `json:"stickers"`
-}
-
-// MaskPosition describes the position on faces where a mask should be placed by default.
-type MaskPosition struct {
-	Point  string  `json:"point"`
-	XShift float64 `json:"x_shift"`
-	YShift float64 `json:"y_shift"`
-	scale  float64 `json:"scale"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.

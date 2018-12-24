@@ -19,6 +19,7 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewDeleteMessage creates a request to delete a message.
 func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	return DeleteMessageConfig{
 		ChatID:    chatID,
@@ -51,22 +52,6 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
-// NewAnimationUpload creates a new animation uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-//
-// Note that you must send animated GIFs as a document.
-func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
-	return AnimationConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
 // NewPhotoUpload creates a new photo uploader.
 //
 // chatID is where to send it, file is a string path to the file,
@@ -95,17 +80,6 @@ func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
 			FileID:      fileID,
 			UseExisting: true,
 		},
-	}
-}
-
-// NewMediaGroupShare shares media group.
-//
-// chatID is where to send it, medias is the media interface
-// already uploaded.
-func NewMediaGroupShare(chatID int64, medias []interface{}) MediaGroupConfig {
-	return MediaGroupConfig{
-		ChatID: chatID,
-		Media:  medias,
 	}
 }
 
@@ -228,6 +202,35 @@ func NewVideoShare(chatID int64, fileID string) VideoConfig {
 	}
 }
 
+// NewAnimationUpload creates a new animation uploader.
+//
+// chatID is where to send it, file is a string path to the file,
+// FileReader, or FileBytes.
+func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
+	return AnimationConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			File:        file,
+			UseExisting: false,
+		},
+	}
+}
+
+// NewAnimationShare shares an existing animation.
+// You may use this to reshare an existing animation without reuploading it.
+//
+// chatID is where to send it, fileID is the ID of the animation
+// already uploaded.
+func NewAnimationShare(chatID int64, fileID string) AnimationConfig {
+	return AnimationConfig{
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			FileID:      fileID,
+			UseExisting: true,
+		},
+	}
+}
+
 // NewVideoNoteUpload creates a new video note uploader.
 //
 // chatID is where to send it, file is a string path to the file,
@@ -285,6 +288,33 @@ func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
 			FileID:      fileID,
 			UseExisting: true,
 		},
+	}
+}
+
+// NewMediaGroup creates a new media group. Files should be an array of
+// two to ten InputMediaPhoto or InputMediaVideo.
+func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
+	return MediaGroupConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		InputMedia: files,
+	}
+}
+
+// NewInputMediaPhoto creates a new InputMediaPhoto.
+func NewInputMediaPhoto(media string) InputMediaPhoto {
+	return InputMediaPhoto{
+		Type:  "photo",
+		Media: media,
+	}
+}
+
+// NewInputMediaVideo creates a new InputMediaVideo.
+func NewInputMediaVideo(media string) InputMediaVideo {
+	return InputMediaVideo{
+		Type:  "video",
+		Media: media,
 	}
 }
 
@@ -531,17 +561,6 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 	}
 }
 
-// NewEditMessageMedia allows you to edit the media of a message.
-func NewEditMessageMedia(chatID int64, messageID int, media interface{}) EditMessageMediaConfig {
-	return EditMessageMediaConfig{
-		BaseEdit: BaseEdit{
-			ChatID:    chatID,
-			MessageID: messageID,
-		},
-		Media: media,
-	}
-}
-
 // NewEditMessageReplyMarkup allows you to edit the inline
 // keyboard markup.
 func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKeyboardMarkup) EditMessageReplyMarkupConfig {
@@ -550,6 +569,48 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 			ChatID:      chatID,
 			MessageID:   messageID,
 			ReplyMarkup: &replyMarkup,
+		},
+	}
+}
+
+// NewEditMessageReplyMedia allows you to edit audio, document, photo, or video messages
+// keyboard markup.
+func NewEditMessageMedia(chatID int64, messageID int, media interface{}) EditMessageMediaConfig {
+	fileName := ""
+	switch media.(type) {
+	case InputMediaPhoto:
+		photo := media.(InputMediaPhoto)
+		fileName = photo.Media
+	case InputMediaVideo:
+		video := media.(InputMediaVideo)
+		fileName = video.Media
+	}
+	return EditMessageMediaConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		Media: media,
+		BaseFile: BaseFile{
+			FileID:      fileName,
+			UseExisting: true,
+		},
+	}
+}
+
+// NewEditMessageReplyMedia allows you to edit audio, document, photo, or video messages
+// keyboard markup.
+func NewEditMessageMediaUpload(chatID int64, messageID int, media interface{}) EditMessageMediaConfig {
+	return EditMessageMediaConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		Media: media,
+		BaseFile: BaseFile{
+			BaseChat:    BaseChat{ChatID: chatID},
+			File:        media,
+			UseExisting: false,
 		},
 	}
 }

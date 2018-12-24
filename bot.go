@@ -26,8 +26,9 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self   User         `json:"-"`
-	Client *http.Client `json:"-"`
+	Self            User         `json:"-"`
+	Client          *http.Client `json:"-"`
+	shutdownChannel chan interface{}
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -43,9 +44,10 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:  token,
-		Client: client,
-		Buffer: 100,
+		Token:           token,
+		Client:          client,
+		Buffer:          100,
+		shutdownChannel: make(chan interface{}),
 	}
 
 	self, err := bot.GetMe()
@@ -193,7 +195,6 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	}
 
 	ms.SetupRequest(req)
-
 	res, err := bot.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
@@ -308,7 +309,6 @@ func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error
 	}
 
 	file := config.getFile()
-
 	resp, err := bot.UploadFile(method, params, config.name(), file)
 	if err != nil {
 		return Message{}, err
@@ -484,6 +484,12 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 
 	go func() {
 		for {
+			select {
+			case <-bot.shutdownChannel:
+				return
+			default:
+			}
+
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
 				log.Println(err)
@@ -505,12 +511,22 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	return ch, nil
 }
 
+// StopReceivingUpdates stops the go routine which receives updates
+func (bot *BotAPI) StopReceivingUpdates() {
+	if bot.Debug {
+		log.Println("Stopping the update receiver routine...")
+	}
+	close(bot.shutdownChannel)
+}
+
 // ListenForWebhook registers a http handler for a webhook.
 func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
+		r.Body.Close()
+
 		var update Update
 		json.Unmarshal(bytes, &update)
 
@@ -948,155 +964,4 @@ func (bot *BotAPI) DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, e
 	bot.debugLog(config.method(), v, nil)
 
 	return bot.MakeRequest(config.method(), v)
-}
-
-// GetStickerSet is used to get a sticker set.
-func (bot *BotAPI) GetStickerSet(name string) (StickerSet, error) {
-	v := url.Values{}
-
-	v.Add("name", name)
-	resp, err := bot.MakeRequest("getStickerSet", v)
-	if err != nil {
-		return StickerSet{}, err
-	}
-
-	var stickerSet StickerSet
-	err = json.Unmarshal(resp.Result, &stickerSet)
-
-	return stickerSet, err
-}
-
-// UploadStickerFile uploads a .png file with a sticker for later use in
-// createNewStickerSet and addStickerToSet methods (can be used multiple times).
-//
-// File should be a string to a file path, a FileBytes struct, or a FileReader
-// struct.
-func (bot *BotAPI) UploadStickerFile(userID int, file interface{}) (APIResponse, File, error) {
-	switch file.(type) {
-	case url.URL:
-		return APIResponse{}, File{}, errors.New(ErrBadFileType)
-	}
-
-	params := make(map[string]string)
-	params["user_id"] = strconv.Itoa(userID)
-
-	resp, err := bot.UploadFile("uploadStickerFile", params, "png_sticker", file)
-	if err != nil {
-		return resp, File{}, err
-	}
-
-	returnFile := File{}
-	err = json.Unmarshal(resp.Result, &returnFile)
-	if err != nil {
-		return resp, File{}, err
-	}
-
-	return resp, returnFile, nil
-}
-
-// CreateNewStickerSet creates a new sticker set owned by a user. The bot will
-// be able to edit the created sticker set.
-func (bot *BotAPI) CreateNewStickerSet(config CreateNewStickerSetConfig) (APIResponse, error) {
-	params := make(map[string]string)
-
-	params["user_id"] = strconv.Itoa(config.UserID)
-	params["name"] = config.Name
-	params["title"] = config.Title
-	params["emojis"] = config.Emojis
-
-	if config.ContainsMasks {
-		params["contains_masks"] = strconv.FormatBool(config.ContainsMasks)
-	}
-
-	if config.MaskPosition != nil {
-		maskPosition, err := json.Marshal(&config.MaskPosition)
-		if err != nil {
-			return APIResponse{}, err
-		}
-
-		params["mask_position"] = string(maskPosition)
-	}
-
-	return bot.UploadFile("createNewStickerSet", params, "png_sticker", config.PNGSticker)
-}
-
-// CreateNewStickerSet creates a new sticker set owned by a user. The bot will
-// be able to edit the created sticker set.
-func (bot *BotAPI) CreateNewStickerSetFileId(config CreateNewStickerSetConfig) (APIResponse, error) {
-	v := url.Values{}
-	v.Add("png_sticker", config.PNGSticker.(string))
-	v.Add("user_id", strconv.Itoa(config.UserID))
-	v.Add("name", config.Name)
-	v.Add("title", config.Title)
-	v.Add("emojis", config.Emojis)
-
-	if config.MaskPosition != nil {
-		maskPosition, err := json.Marshal(&config.MaskPosition)
-		if err != nil {
-			return APIResponse{}, err
-		}
-		v.Add("mask_position", string(maskPosition))
-	}
-	if config.ContainsMasks {
-		v.Add("contains_masks", strconv.FormatBool(config.ContainsMasks))
-	}
-	return bot.MakeRequest("createNewStickerSet", v)
-}
-
-// AddStickerToSet adds a new sticker to a set created by the bot.
-func (bot *BotAPI) AddStickerToSet(config AddStickerToSetConfig) (APIResponse, error) {
-	params := make(map[string]string)
-
-	params["user_id"] = strconv.Itoa(config.UserID)
-	params["name"] = config.Name
-	params["emojis"] = config.Emojis
-
-	if config.MaskPosition != nil {
-		maskPosition, err := json.Marshal(&config.MaskPosition)
-		if err != nil {
-			return APIResponse{}, err
-		}
-
-		params["mask_position"] = string(maskPosition)
-	}
-
-	return bot.UploadFile("addStickerToSet", params, "png_sticker", config.PNGSticker)
-}
-
-// AddStickerToSet adds a new sticker to a set created by the bot.
-func (bot *BotAPI) AddStickerToSetFileId(config AddStickerToSetConfig) (APIResponse, error) {
-
-	v := url.Values{}
-	v.Add("png_sticker", config.PNGSticker.(string))
-	v.Add("user_id", strconv.Itoa(config.UserID))
-	v.Add("name", config.Name)
-	v.Add("emojis", config.Emojis)
-
-	if config.MaskPosition != nil {
-		maskPosition, err := json.Marshal(&config.MaskPosition)
-		if err != nil {
-			return APIResponse{}, err
-		}
-		v.Add("mask_position", string(maskPosition))
-	}
-
-	return bot.MakeRequest("addStickerToSet", v)
-}
-
-// SetStickerPositionInSet moves a sticker in a set created by the bot to a specific position.
-func (bot *BotAPI) SetStickerPositionInSet(config SetStickerPositionInSetConfig) (APIResponse, error) {
-	v, _ := config.values()
-
-	bot.debugLog(config.method(), v, nil)
-
-	return bot.MakeRequest(config.method(), v)
-}
-
-// DeleteStickerFromSet deletes a sticker from a set created by the bot.
-func (bot *BotAPI) DeleteStickerFromSet(sticker string) (APIResponse, error) {
-	v := url.Values{}
-
-	v.Add("sticker", sticker)
-
-	return bot.MakeRequest("deleteStickerFromSet", v)
 }

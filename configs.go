@@ -240,47 +240,6 @@ func (config ForwardConfig) method() string {
 	return "forwardMessage"
 }
 
-// AnimationConfig contains information about a SendAnimation request.
-type AnimationConfig struct {
-	BaseFile
-	Caption string
-}
-
-// Params returns a map[string]string representation of AnimationConfig.
-func (config AnimationConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-	}
-
-	return params, nil
-}
-
-// Values returns a url.Values representation of AnimationConfig.
-func (config AnimationConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
-
-	v.Add(config.name(), config.FileID)
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-	}
-	return v, nil
-}
-
-// name returns the field name for the Animation.
-func (config AnimationConfig) name() string {
-	return "animation"
-}
-
-// method returns Telegram API method name for sending Animation.
-func (config AnimationConfig) method() string {
-	return "sendAnimation"
-}
-
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
@@ -294,10 +253,9 @@ func (config PhotoConfig) params() (map[string]string, error) {
 
 	if config.Caption != "" {
 		params["caption"] = config.Caption
-	}
-
-	if config.ParseMode != "" {
-		params["parse_mode"] = config.ParseMode
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
 	}
 
 	return params, nil
@@ -313,10 +271,11 @@ func (config PhotoConfig) values() (url.Values, error) {
 	v.Add(config.name(), config.FileID)
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
 	}
-	if config.ParseMode != "" {
-		v.Add("parse_mode", config.ParseMode)
-	}
+
 	return v, nil
 }
 
@@ -334,6 +293,7 @@ func (config PhotoConfig) method() string {
 type AudioConfig struct {
 	BaseFile
 	Caption   string
+	ParseMode string
 	Duration  int
 	Performer string
 	Title     string
@@ -359,6 +319,9 @@ func (config AudioConfig) values() (url.Values, error) {
 	}
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
 	}
 
 	return v, nil
@@ -380,6 +343,9 @@ func (config AudioConfig) params() (map[string]string, error) {
 	}
 	if config.Caption != "" {
 		params["caption"] = config.Caption
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
 	}
 
 	return params, nil
@@ -398,7 +364,8 @@ func (config AudioConfig) method() string {
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
-	Caption string
+	Caption   string
+	ParseMode string
 }
 
 // values returns a url.Values representation of DocumentConfig.
@@ -411,6 +378,9 @@ func (config DocumentConfig) values() (url.Values, error) {
 	v.Add(config.name(), config.FileID)
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
 	}
 
 	return v, nil
@@ -422,6 +392,9 @@ func (config DocumentConfig) params() (map[string]string, error) {
 
 	if config.Caption != "" {
 		params["caption"] = config.Caption
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
 	}
 
 	return params, nil
@@ -474,8 +447,9 @@ func (config StickerConfig) method() string {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
-	Duration int
-	Caption  string
+	Duration  int
+	Caption   string
+	ParseMode string
 }
 
 // values returns a url.Values representation of VideoConfig.
@@ -491,6 +465,9 @@ func (config VideoConfig) values() (url.Values, error) {
 	}
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
 	}
 
 	return v, nil
@@ -502,6 +479,9 @@ func (config VideoConfig) params() (map[string]string, error) {
 
 	if config.Caption != "" {
 		params["caption"] = config.Caption
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
 	}
 
 	return params, nil
@@ -515,6 +495,59 @@ func (config VideoConfig) name() string {
 // method returns Telegram API method name for sending Video.
 func (config VideoConfig) method() string {
 	return "sendVideo"
+}
+
+// AnimationConfig contains information about a SendAnimation request.
+type AnimationConfig struct {
+	BaseFile
+	Duration  int
+	Caption   string
+	ParseMode string
+}
+
+// values returns a url.Values representation of AnimationConfig.
+func (config AnimationConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add(config.name(), config.FileID)
+	if config.Duration != 0 {
+		v.Add("duration", strconv.Itoa(config.Duration))
+	}
+	if config.Caption != "" {
+		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
+	}
+
+	return v, nil
+}
+
+// params returns a map[string]string representation of AnimationConfig.
+func (config AnimationConfig) params() (map[string]string, error) {
+	params, _ := config.BaseFile.params()
+
+	if config.Caption != "" {
+		params["caption"] = config.Caption
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
+	}
+
+	return params, nil
+}
+
+// name returns the field name for the Animation.
+func (config AnimationConfig) name() string {
+	return "animation"
+}
+
+// method returns Telegram API method name for sending Animation.
+func (config AnimationConfig) method() string {
+	return "sendAnimation"
 }
 
 // VideoNoteConfig contains information about a SendVideoNote request.
@@ -571,8 +604,9 @@ func (config VideoNoteConfig) method() string {
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
-	Caption  string
-	Duration int
+	Caption   string
+	ParseMode string
+	Duration  int
 }
 
 // values returns a url.Values representation of VoiceConfig.
@@ -588,6 +622,9 @@ func (config VoiceConfig) values() (url.Values, error) {
 	}
 	if config.Caption != "" {
 		v.Add("caption", config.Caption)
+		if config.ParseMode != "" {
+			v.Add("parse_mode", config.ParseMode)
+		}
 	}
 
 	return v, nil
@@ -602,6 +639,9 @@ func (config VoiceConfig) params() (map[string]string, error) {
 	}
 	if config.Caption != "" {
 		params["caption"] = config.Caption
+		if config.ParseMode != "" {
+			params["parse_mode"] = config.ParseMode
+		}
 	}
 
 	return params, nil
@@ -615,6 +655,32 @@ func (config VoiceConfig) name() string {
 // method returns Telegram API method name for sending Voice.
 func (config VoiceConfig) method() string {
 	return "sendVoice"
+}
+
+// MediaGroupConfig contains information about a sendMediaGroup request.
+type MediaGroupConfig struct {
+	BaseChat
+	InputMedia []interface{}
+}
+
+func (config MediaGroupConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	data, err := json.Marshal(config.InputMedia)
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("media", string(data))
+
+	return v, nil
+}
+
+func (config MediaGroupConfig) method() string {
+	return "sendMediaGroup"
 }
 
 // LocationConfig contains information about a SendLocation request.
@@ -832,44 +898,20 @@ func (config EditMessageTextConfig) method() string {
 	return "editMessageText"
 }
 
-// EditMessageMediaConfig allows you to modify the text in a message.
-type EditMessageMediaConfig struct {
-	BaseEdit
-	Media                 interface{} `json:"media"`
-	ParseMode             string
-	DisableWebPagePreview bool
-}
-
-func (config EditMessageMediaConfig) values() (url.Values, error) {
-	v, err := config.BaseEdit.values()
-	if err != nil {
-		return v, err
-	}
-	bytes, err := json.Marshal(config.Media)
-	if err != nil {
-		return v, err
-	}
-	v.Add("media", string(bytes))
-	v.Add("parse_mode", config.ParseMode)
-	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
-
-	return v, nil
-}
-
-func (config EditMessageMediaConfig) method() string {
-	return "editMessageMedia"
-}
-
 // EditMessageCaptionConfig allows you to modify the caption of a message.
 type EditMessageCaptionConfig struct {
 	BaseEdit
-	Caption string
+	Caption   string
+	ParseMode string
 }
 
 func (config EditMessageCaptionConfig) values() (url.Values, error) {
 	v, _ := config.BaseEdit.values()
 
 	v.Add("caption", config.Caption)
+	if config.ParseMode != "" {
+		v.Add("parse_mode", config.ParseMode)
+	}
 
 	return v, nil
 }
@@ -890,6 +932,59 @@ func (config EditMessageReplyMarkupConfig) values() (url.Values, error) {
 
 func (config EditMessageReplyMarkupConfig) method() string {
 	return "editMessageReplyMarkup"
+}
+
+// EditMessageMediaConfig allows you to modify the media
+// of a message.
+type EditMessageMediaConfig struct {
+	BaseFile
+	BaseEdit
+	Media                 interface{} `json:"media"`
+	ParseMode             string
+	DisableWebPagePreview bool
+}
+
+func (config EditMessageMediaConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+	v, err = config.BaseEdit.values()
+	if err != nil {
+		return v, err
+	}
+	if !config.UseExisting {
+		fileName := ""
+		switch mType := config.Media.(type) {
+		case InputMediaPhoto:
+			fileName = mType.Media
+			mType.Media = "attach://" + config.name()
+			config.Media = mType
+		case InputMediaVideo:
+			fileName = mType.Media
+			mType.Media = "attach://" + config.name()
+			config.Media = mType
+		}
+		config.File = fileName
+	}
+
+	bytes, err := json.Marshal(config.Media)
+	if err != nil {
+		return v, err
+	}
+	v.Add("media", string(bytes))
+	v.Add("parse_mode", config.ParseMode)
+	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
+
+	return v, nil
+}
+
+func (config EditMessageMediaConfig) name() string {
+	return "fileName"
+}
+
+func (config EditMessageMediaConfig) method() string {
+	return "editMessageMedia"
 }
 
 // UserProfilePhotosConfig contains information about a
@@ -1219,113 +1314,4 @@ func (config DeleteChatPhotoConfig) values() (url.Values, error) {
 	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 
 	return v, nil
-}
-
-// MediaGroupConfig allows you to send a group of media.
-//
-// Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
-type MediaGroupConfig struct {
-	ChatID          int64
-	ChannelUsername string
-
-	Media               []interface{} `json:"media"`
-	DisableNotification bool
-	ReplyToMessageID    int
-}
-
-func (config MediaGroupConfig) method() string {
-	return "sendMediaGroup"
-}
-
-func (config MediaGroupConfig) values() (url.Values, error) {
-	v := url.Values{}
-
-	if config.ChannelUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
-		v.Add("chat_id", config.ChannelUsername)
-	}
-	bytes, err := json.Marshal(config.Media)
-	if err != nil {
-		return v, err
-	}
-	v.Add("media", string(bytes))
-	if config.DisableNotification {
-		v.Add("disable_notification", strconv.FormatBool(config.DisableNotification))
-	}
-	if config.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(config.ReplyToMessageID))
-	}
-
-	return v, nil
-}
-
-type InputMediaPhoto struct {
-	Type      string `json:"type"`
-	Media     string `json:"media"`
-	Caption   string `json:"caption"`
-	ParseMode string `json:"parse_mode"`
-}
-
-type InputMediaAudio struct {
-	Type      string `json:"type"`
-	Media     string `json:"media"`
-	Thumb     string `json:"thumb,-"`
-	Caption   string `json:"caption,-"`
-	ParseMode string `json:"parse_mode,-"`
-	Duration  int    `json:"duration,-"`
-	Performer string `json:"duration,-"`
-	Title     string `json:"title,-"`
-}
-
-type InputMediaVideo struct {
-	Type              string `json:"type"`
-	Media             string `json:"media"`
-	Caption           string `json:"caption"`
-	ParseMode         string `json:"parse_mode"`
-	Width             int    `json:"width"`
-	Height            int    `json:"height"`
-	Duration          int    `json:"duration"`
-	SupportsStreaming bool   `json:"supports_streaming"`
-}
-
-// CreateNewStickerSetConfig contains information about a CreateNewStickerSet
-// request.
-type CreateNewStickerSetConfig struct {
-	UserID        int         // required
-	Name          string      // required
-	Title         string      // required
-	PNGSticker    interface{} // required
-	Emojis        string      // required
-	ContainsMasks bool
-	MaskPosition  *MaskPosition
-}
-
-// AddStickerToSetConfig contains information about a AddToStickerSet request.
-type AddStickerToSetConfig struct {
-	UserID       int         // required
-	Name         string      // required
-	PNGSticker   interface{} // required
-	Emojis       string      // required
-	MaskPosition *MaskPosition
-}
-
-// SetStickerPositionInSetConfig contains information about a
-// SetStickerPositionInSet request.
-type SetStickerPositionInSetConfig struct {
-	Sticker  string // required
-	Position int64  // required
-}
-
-func (config SetStickerPositionInSetConfig) values() (url.Values, error) {
-	v := url.Values{}
-
-	v.Add("sticker", config.Sticker)
-	v.Add("position", strconv.FormatInt(config.Position, 10))
-
-	return v, nil
-}
-
-func (config SetStickerPositionInSetConfig) method() string {
-	return "setStickerPositionInSet"
 }
