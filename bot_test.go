@@ -517,9 +517,18 @@ func TestSendWithMediaGroup(t *testing.T) {
 		NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
 		NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
 	})
-	_, err := bot.Request(cfg)
+
+	messages, err := bot.SendMediaGroup(cfg)
 	if err != nil {
 		t.Error(err)
+	}
+
+	if messages == nil {
+		t.Error()
+	}
+
+	if len(messages) != 3 {
+		t.Error()
 	}
 }
 

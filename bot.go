@@ -307,6 +307,21 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	return message, err
 }
 
+// SendMediaGroup sends a media group and returns the resulting messages.
+func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
+	params, _ := config.params()
+
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return nil, err
+	}
+
+	var messages []Message
+	err = json.Unmarshal(resp.Result, &messages)
+
+	return messages, err
+}
+
 // GetUserProfilePhotos gets a user's profile photos.
 //
 // It requires UserID.
