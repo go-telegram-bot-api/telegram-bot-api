@@ -25,13 +25,8 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-master
 	Self            User         `json:"-"`
 	Client          *http.Client `json:"-"`
-=======
-	Self   User         `json:"-"`
-	Client *http.Client `json:"-"`
-  master
 	shutdownChannel chan interface{}
 }
 
@@ -48,15 +43,9 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
-master
 		Token:           token,
 		Client:          client,
 		Buffer:          100,
-=======
-		Token:  token,
-		Client: client,
-		Buffer: 100,
-    master
 		shutdownChannel: make(chan interface{}),
 	}
 
@@ -499,11 +488,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 				return
 			default:
 			}
-master
 
-=======
-			
-      master
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
 				log.Println(err)
