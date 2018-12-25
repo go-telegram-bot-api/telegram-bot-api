@@ -1,7 +1,6 @@
 package tgbotapi
 
 import (
-	"log"
 	"net/url"
 )
 
@@ -14,7 +13,7 @@ func NewMessage(chatID int64, text string) MessageConfig {
 			ChatID:           chatID,
 			ReplyToMessageID: 0,
 		},
-		Text: text,
+		Text:                  text,
 		DisableWebPagePreview: false,
 	}
 }

@@ -473,12 +473,9 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-	info, err := bot.GetWebhookInfo()
+	_, err = bot.GetWebhookInfo()
 	if err != nil {
 		t.Error(err)
-	}
-	if info.LastErrorDate != 0 {
-		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
 	}
 	bot.RemoveWebhook()
 }
@@ -516,6 +513,20 @@ func TestUpdatesChan(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 		t.Fail()
+	}
+}
+
+func TestSendWithMediaGroup(t *testing.T) {
+	bot, _ := getBot(t)
+
+	cfg := tgbotapi.NewMediaGroup(ChatID, []interface{}{
+		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
+		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
+		tgbotapi.NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
+	})
+	_, err := bot.Send(cfg)
+	if err != nil {
+		t.Error(err)
 	}
 }
 
