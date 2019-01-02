@@ -39,13 +39,28 @@ type Update struct {
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
 }
 
-// UpdatesChannel is the channel for getting updates.
-type UpdatesChannel <-chan Update
+// UpdatesChannel is the struct that holds a channel for getting updates.
+type UpdatesChannel struct {
+	channel chan Update
+	done    chan struct{}
+}
+
+// Return Update channel
+func (updatesCh UpdatesChannel) Channel() <-chan Update {
+	return updatesCh.channel
+}
+
+// Stop channel feeding by goroutine or http handlers.
+//
+// It may not feed the update channel with all fetched/received Updates.
+func (updatesCh UpdatesChannel) Shutdown() {
+	updatesCh.done <- struct{}{}
+}
 
 // Clear discards all unprocessed incoming updates.
-func (ch UpdatesChannel) Clear() {
-	for len(ch) != 0 {
-		<-ch
+func (updatesCh UpdatesChannel) Clear() {
+	for len(updatesCh.channel) != 0 {
+		<-updatesCh.channel
 	}
 }
 

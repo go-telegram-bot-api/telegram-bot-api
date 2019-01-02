@@ -24,9 +24,8 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self            User         `json:"-"`
-	Client          *http.Client `json:"-"`
-	shutdownChannel chan interface{}
+	Self   User         `json:"-"`
+	Client *http.Client `json:"-"`
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -42,10 +41,9 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:           token,
-		Client:          client,
-		Buffer:          100,
-		shutdownChannel: make(chan interface{}),
+		Token:  token,
+		Client: client,
+		Buffer: 100,
 	}
 
 	self, err := bot.GetMe()
@@ -380,11 +378,12 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 // GetUpdatesChan starts and returns a channel for getting updates.
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
+	done := make(chan struct{})
 
 	go func() {
 		for {
 			select {
-			case <-bot.shutdownChannel:
+			case <-done:
 				return
 			default:
 			}
@@ -401,28 +400,37 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 			for _, update := range updates {
 				if update.UpdateID >= config.Offset {
 					config.Offset = update.UpdateID + 1
-					ch <- update
+
+					select {
+					case ch <- update:
+					case <-done:
+						return
+					}
 				}
 			}
 		}
 	}()
 
-	return ch
-}
-
-// StopReceivingUpdates stops the go routine which receives updates
-func (bot *BotAPI) StopReceivingUpdates() {
-	if bot.Debug {
-		log.Println("Stopping the update receiver routine...")
+	updatesCh := UpdatesChannel{
+		channel: ch,
+		done:    done,
 	}
-	close(bot.shutdownChannel)
+
+	return updatesCh
 }
 
 // ListenForWebhook registers a http handler for a webhook.
 func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
+	done := make(chan struct{})
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+		select {
+		case <-done:
+			return
+		default:
+		}
+
 		bytes, _ := ioutil.ReadAll(r.Body)
 
 		var update Update
@@ -431,7 +439,12 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 		ch <- update
 	})
 
-	return ch
+	updatesCh := UpdatesChannel{
+		channel: ch,
+		done:    done,
+	}
+
+	return updatesCh
 }
 
 // GetChat gets information about a chat.

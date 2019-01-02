@@ -543,7 +543,7 @@ func ExampleNewBotAPI() {
 	time.Sleep(time.Millisecond * 500)
 	updates.Clear()
 
-	for update := range updates {
+	for update := range updates.Channel() {
 		if update.Message == nil {
 			continue
 		}
@@ -585,7 +585,7 @@ func ExampleNewWebhook() {
 	updates := bot.ListenForWebhook("/" + bot.Token)
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
-	for update := range updates {
+	for update := range updates.Channel() {
 		log.Printf("%+v\n", update)
 	}
 }
@@ -603,7 +603,7 @@ func ExampleInlineConfig() {
 
 	updates := bot.GetUpdatesChan(u)
 
-	for update := range updates {
+	for update := range updates.Channel() {
 		if update.InlineQuery == nil { // if no inline query, ignore it
 			continue
 		}
