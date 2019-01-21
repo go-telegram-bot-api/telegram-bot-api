@@ -19,6 +19,47 @@ import (
 	"github.com/technoweenie/multipartstreamer"
 )
 
+
+type Bot interface {
+	MakeRequest(endpoint string, params url.Values) (APIResponse, error)
+	UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error)
+	GetFileDirectURL(fileID string) (string, error)
+	GetMe() (User, error)
+	IsMessageToMe(message Message) bool
+	Send(c Chattable) (Message, error)
+	GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error)
+	GetFile(config FileConfig) (File, error)
+	GetUpdates(config UpdateConfig) ([]Update, error)
+	RemoveWebhook() (APIResponse, error)
+	SetWebhook(config WebhookConfig) (APIResponse, error)
+	GetWebhookInfo() (WebhookInfo, error)
+	GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error)
+	StopReceivingUpdates()
+	ListenForWebhook(pattern string) UpdatesChannel
+	AnswerInlineQuery(config InlineConfig) (APIResponse, error)
+	AnswerCallbackQuery(config CallbackConfig) (APIResponse, error)
+	KickChatMember(config KickChatMemberConfig) (APIResponse, error)
+	LeaveChat(config ChatConfig) (APIResponse, error)
+	GetChat(config ChatConfig) (Chat, error)
+	GetChatAdministrators(config ChatConfig) ([]ChatMember, error)
+	GetChatMembersCount(config ChatConfig) (int, error)
+	GetChatMember(config ChatConfigWithUser) (ChatMember, error)
+	UnbanChatMember(config ChatMemberConfig) (APIResponse, error)
+	RestrictChatMember(config RestrictChatMemberConfig) (APIResponse, error)
+	PromoteChatMember(config PromoteChatMemberConfig) (APIResponse, error)
+	GetGameHighScores(config GetGameHighScoresConfig) ([]GameHighScore, error)
+	AnswerShippingQuery(config ShippingConfig) (APIResponse, error)
+	AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse, error)
+	DeleteMessage(config DeleteMessageConfig) (APIResponse, error)
+	GetInviteLink(config ChatConfig) (string, error)
+	PinChatMessage(config PinChatMessageConfig) (APIResponse, error)
+	UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse, error)
+	SetChatTitle(config SetChatTitleConfig) (APIResponse, error)
+	SetChatDescription(config SetChatDescriptionConfig) (APIResponse, error)
+	SetChatPhoto(config SetChatPhotoConfig) (APIResponse, error)
+	DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, error)
+
+}
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
 	Token  string `json:"token"`
