@@ -604,9 +604,9 @@ type InlineQueryResultGIF struct {
 	Type                string                `json:"type"`    // required
 	ID                  string                `json:"id"`      // required
 	URL                 string                `json:"gif_url"` // required
-	Width               int                   `json:"gif_width"`
-	Height              int                   `json:"gif_height"`
-	Duration            int                   `json:"gif_duration"`
+	Width               int                   `json:"gif_width,omitempty"`
+	Height              int                   `json:"gif_height,omitempty"`
+	Duration            int                   `json:"gif_duration,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
