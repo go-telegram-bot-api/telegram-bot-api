@@ -601,15 +601,15 @@ type InlineQueryResultCachedPhoto struct {
 
 // InlineQueryResultGIF is an inline query response GIF.
 type InlineQueryResultGIF struct {
-	Type                string                `json:"type"`    // required
-	ID                  string                `json:"id"`      // required
-	URL                 string                `json:"gif_url"` // required
+	Type                string                `json:"type"`      // required
+	ID                  string                `json:"id"`        // required
+	URL                 string                `json:"gif_url"`   // required
+	ThumbURL            string                `json:"thumb_url"` // required
 	Width               int                   `json:"gif_width,omitempty"`
 	Height              int                   `json:"gif_height,omitempty"`
 	Duration            int                   `json:"gif_duration,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
+	Title               string                `json:"title,omitempty"`
+	Caption             string                `json:"caption,omitempty"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 }
