@@ -534,12 +534,14 @@ func NewInlineQueryResultCachedVideo(id, videoID, title string) InlineQueryResul
 }
 
 // NewInlineQueryResultAudio creates a new inline query audio.
-func NewInlineQueryResultAudio(id, url, title string) InlineQueryResultAudio {
+func NewInlineQueryResultAudio(id, url, title, performer string, duration int) InlineQueryResultAudio {
 	return InlineQueryResultAudio{
-		Type:  "audio",
-		ID:    id,
-		URL:   url,
-		Title: title,
+		Type:      "audio",
+		ID:        id,
+		URL:       url,
+		Title:     title,
+		Performer: performer,
+		Duration:  duration,
 	}
 }
 
@@ -622,7 +624,7 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 			ChatID:    chatID,
 			MessageID: messageID,
 		},
-		Caption:   caption,
+		Caption: caption,
 	}
 }
 
