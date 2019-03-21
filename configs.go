@@ -2,7 +2,6 @@ package tgbotapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/url"
 	"strconv"
@@ -462,7 +461,6 @@ func (config VideoConfig) values() (url.Values, error) {
 	if err != nil {
 		return v, err
 	}
-	fmt.Println()
 	v.Add(config.name(), config.FileID)
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
@@ -475,6 +473,8 @@ func (config VideoConfig) values() (url.Values, error) {
 	}
 	if config.SupportsStreaming {
 		v.Add("supports_streaming", "true")
+	} else {
+		v.Add("supports_streaming", "false")
 	}
 
 	return v, nil
@@ -489,6 +489,11 @@ func (config VideoConfig) params() (map[string]string, error) {
 		if config.ParseMode != "" {
 			params["parse_mode"] = config.ParseMode
 		}
+	}
+	if config.SupportsStreaming {
+		params["supports_streaming"] = "true"
+	} else {
+		params["supports_streaming"] = "false"
 	}
 
 	return params, nil
