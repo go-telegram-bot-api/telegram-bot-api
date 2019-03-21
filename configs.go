@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/url"
 	"strconv"
@@ -127,7 +128,6 @@ func (file BaseFile) params() (map[string]string, error) {
 		if err != nil {
 			return params, err
 		}
-
 		params["reply_markup"] = string(data)
 	}
 
@@ -297,6 +297,7 @@ type AudioConfig struct {
 	Duration  int
 	Performer string
 	Title     string
+	Thumb     FileReader
 }
 
 // values returns a url.Values representation of AudioConfig.
@@ -366,6 +367,7 @@ type DocumentConfig struct {
 	BaseFile
 	Caption   string
 	ParseMode string
+	Thumb     FileReader
 }
 
 // values returns a url.Values representation of DocumentConfig.
@@ -447,9 +449,11 @@ func (config StickerConfig) method() string {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
-	Duration  int
-	Caption   string
-	ParseMode string
+	Duration          int
+	Caption           string
+	ParseMode         string
+	Thumb             FileReader
+	SupportsStreaming bool
 }
 
 // values returns a url.Values representation of VideoConfig.
@@ -458,7 +462,7 @@ func (config VideoConfig) values() (url.Values, error) {
 	if err != nil {
 		return v, err
 	}
-
+	fmt.Println()
 	v.Add(config.name(), config.FileID)
 	if config.Duration != 0 {
 		v.Add("duration", strconv.Itoa(config.Duration))
@@ -468,6 +472,9 @@ func (config VideoConfig) values() (url.Values, error) {
 		if config.ParseMode != "" {
 			v.Add("parse_mode", config.ParseMode)
 		}
+	}
+	if config.SupportsStreaming {
+		v.Add("supports_streaming", "true")
 	}
 
 	return v, nil

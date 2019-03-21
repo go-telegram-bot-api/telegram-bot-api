@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,8 +26,8 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self   User         `json:"-"`
-	Client *http.Client `json:"-"`
+	Self            User         `json:"-"`
+	Client          *http.Client `json:"-"`
 	shutdownChannel chan interface{}
 }
 
@@ -43,9 +44,9 @@ func NewBotAPI(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:  token,
-		Client: client,
-		Buffer: 100,
+		Token:           token,
+		Client:          client,
+		Buffer:          100,
 		shutdownChannel: make(chan interface{}),
 	}
 
@@ -134,10 +135,85 @@ func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Messa
 // Requires the parameter to hold the file not be in the params.
 // File should be a string to a file path, a FileBytes struct,
 // a FileReader struct, or a url.URL.
-//
-// Note that if your FileReader has a size set to -1, it will read
-// the file into memory to calculate a size.
-func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
+func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}, thumb interface{}) (APIResponse, error) {
+	if thumb != nil {
+		buffer := bytes.Buffer{}
+
+		writer := multipart.NewWriter(&buffer)
+
+		params["thumb"] = "attach://test"
+
+		for k, v := range params {
+			if writerErr := writer.WriteField(k, v); writerErr != nil {
+				return APIResponse{}, writerErr
+			}
+		}
+
+		// Method file
+		f := file.(FileReader)
+		formFile, formFileErr := writer.CreateFormFile(fieldname, f.Name)
+		if formFileErr != nil {
+			return APIResponse{}, formFileErr
+		}
+
+		if _, copyErr := io.Copy(formFile, f.Reader); copyErr != nil {
+			return APIResponse{}, copyErr
+		}
+
+		// Thumb file
+		tf := thumb.(FileReader)
+		formFile1, formFileErr := writer.CreateFormFile("test", tf.Name)
+		if formFileErr != nil {
+			return APIResponse{}, formFileErr
+		}
+
+		if _, copyErr := io.Copy(formFile1, tf.Reader); copyErr != nil {
+			return APIResponse{}, copyErr
+		}
+
+		if err := writer.Close(); err != nil {
+			fmt.Println(err)
+		}
+
+		// http
+		method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+
+		req, err := http.NewRequest("POST", method, &buffer)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+
+		res, err := bot.Client.Do(req)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		defer res.Body.Close()
+
+		bytes, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		if bot.Debug {
+			log.Println(string(bytes))
+		}
+		fmt.Println("bytes -- ", string(bytes))
+		var apiResp APIResponse
+
+		err = json.Unmarshal(bytes, &apiResp)
+		if err != nil {
+			return APIResponse{}, err
+		}
+
+		if !apiResp.Ok {
+			return APIResponse{}, errors.New(apiResp.Description)
+		}
+
+		return apiResp, nil
+	}
+
 	ms := multipartstreamer.New()
 
 	switch f := file.(type) {
@@ -166,10 +242,8 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 		if f.Size != -1 {
 			ms.WriteReader(fieldname, f.Name, f.Size, f.Reader)
-
 			break
 		}
-
 		data, err := ioutil.ReadAll(f.Reader)
 		if err != nil {
 			return APIResponse{}, err
@@ -211,7 +285,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	}
 
 	var apiResp APIResponse
-
+	fmt.Println("bytes1 --- ", string(bytes))
 	err = json.Unmarshal(bytes, &apiResp)
 	if err != nil {
 		return APIResponse{}, err
@@ -267,9 +341,26 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 //
 // It requires the Chattable to send.
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
+	var thumb interface{}
+
+	switch c.(type) {
+	case AudioConfig:
+		if c.(AudioConfig).Thumb.Reader != nil {
+			thumb = c.(AudioConfig).Thumb
+		}
+	case VideoConfig:
+		if c.(VideoConfig).Thumb.Reader != nil {
+			thumb = c.(VideoConfig).Thumb
+		}
+	case DocumentConfig:
+		if c.(DocumentConfig).Thumb.Reader != nil {
+			thumb = c.(DocumentConfig).Thumb
+		}
+	}
+
 	switch c.(type) {
 	case Fileable:
-		return bot.sendFile(c.(Fileable))
+		return bot.sendFile(c.(Fileable), thumb)
 	default:
 		return bot.sendChattable(c)
 	}
@@ -302,15 +393,14 @@ func (bot *BotAPI) sendExisting(method string, config Fileable) (Message, error)
 }
 
 // uploadAndSend will send a Message with a new file to Telegram.
-func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error) {
+func (bot *BotAPI) uploadAndSend(method string, config Fileable, thumb interface{}) (Message, error) {
 	params, err := config.params()
 	if err != nil {
 		return Message{}, err
 	}
 
 	file := config.getFile()
-
-	resp, err := bot.UploadFile(method, params, config.name(), file)
+	resp, err := bot.UploadFile(method, params, config.name(), file, thumb)
 	if err != nil {
 		return Message{}, err
 	}
@@ -319,18 +409,16 @@ func (bot *BotAPI) uploadAndSend(method string, config Fileable) (Message, error
 	json.Unmarshal(resp.Result, &message)
 
 	bot.debugLog(method, nil, message)
-
 	return message, nil
 }
 
 // sendFile determines if the file is using an existing file or uploading
 // a new file, then sends it as needed.
-func (bot *BotAPI) sendFile(config Fileable) (Message, error) {
+func (bot *BotAPI) sendFile(config Fileable, thumb interface{}) (Message, error) {
 	if config.useExistingFile() {
 		return bot.sendExisting(config.method(), config)
 	}
-
-	return bot.uploadAndSend(config.method(), config)
+	return bot.uploadAndSend(config.method(), config, thumb)
 }
 
 // sendChattable sends a Chattable.
@@ -457,7 +545,7 @@ func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
 		params["max_connections"] = strconv.Itoa(config.MaxConnections)
 	}
 
-	resp, err := bot.UploadFile("setWebhook", params, "certificate", config.Certificate)
+	resp, err := bot.UploadFile("setWebhook", params, "certificate", config.Certificate, nil)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -490,7 +578,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 				return
 			default:
 			}
-			
+
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
 				log.Println(err)
@@ -952,7 +1040,7 @@ func (bot *BotAPI) SetChatPhoto(config SetChatPhotoConfig) (APIResponse, error) 
 
 	file := config.getFile()
 
-	return bot.UploadFile(config.method(), params, config.name(), file)
+	return bot.UploadFile(config.method(), params, config.name(), file, nil)
 }
 
 // DeleteChatPhoto delete photo of chat.
