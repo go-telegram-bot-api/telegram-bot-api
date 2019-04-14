@@ -700,3 +700,36 @@ func TestUnpinChatMessage(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestPolls(t *testing.T) {
+	bot, _ := getBot(t)
+
+	poll := NewPoll(SupergroupChatID, "Are polls working?", "Yes", "No")
+
+	msg, err := bot.Send(poll)
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	result, err := bot.StopPoll(NewStopPoll(SupergroupChatID, msg.MessageID))
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	if result.Question != "Are polls working?" {
+		t.Error("Poll question did not match")
+		t.Fail()
+	}
+
+	if !result.IsClosed {
+		t.Error("Poll did not end")
+		t.Fail()
+	}
+
+	if result.Options[0].Text != "Yes" || result.Options[0].VoterCount != 0 || result.Options[1].Text != "No" || result.Options[1].VoterCount != 0 {
+		t.Error("Poll options were incorrect")
+		t.Fail()
+	}
+}

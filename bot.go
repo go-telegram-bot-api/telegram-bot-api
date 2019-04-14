@@ -548,11 +548,29 @@ func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error)
 
 	resp, err := bot.MakeRequest(config.method(), params)
 	if err != nil {
-		return StickerSet{}, nil
+		return StickerSet{}, err
 	}
 
 	var stickers StickerSet
 	err = json.Unmarshal(resp.Result, &stickers)
 
 	return stickers, err
+}
+
+// StopPoll stops a poll and returns the result.
+func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
+	params, err := config.params()
+	if err != nil {
+		return Poll{}, err
+	}
+
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return Poll{}, err
+	}
+
+	var poll Poll
+	err = json.Unmarshal(resp.Result, &poll)
+
+	return poll, err
 }

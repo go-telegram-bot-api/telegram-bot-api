@@ -814,3 +814,24 @@ func NewDeleteChatPhoto(chatID int64, photo interface{}) DeleteChatPhotoConfig {
 		ChatID: chatID,
 	}
 }
+
+// NewPoll allows you to create a new poll.
+func NewPoll(chatID int64, question string, options ...string) SendPollConfig {
+	return SendPollConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Question: question,
+		Options:  options,
+	}
+}
+
+// NewStopPoll allows you to stop a poll.
+func NewStopPoll(chatID int64, messageID int) StopPollConfig {
+	return StopPollConfig{
+		BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+	}
+}

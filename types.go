@@ -37,6 +37,7 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
+	Poll               *Poll               `json:"poll"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -141,6 +142,7 @@ type Message struct {
 	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
 	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
 	ForwardSignature      string             `json:"forward_signature"`       // optional
+	ForwardSenderName     string             `json:"forward_sender_name"`     // optional
 	ForwardDate           int                `json:"forward_date"`            // optional
 	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
 	EditDate              int                `json:"edit_date"`               // optional
@@ -162,6 +164,7 @@ type Message struct {
 	Contact               *Contact           `json:"contact"`                 // optional
 	Location              *Location          `json:"location"`                // optional
 	Venue                 *Venue             `json:"venue"`                   // optional
+	Poll                  *Poll              `json:"poll"`                    // optional
 	NewChatMembers        []User             `json:"new_chat_members"`        // optional
 	LeftChatMember        *User              `json:"left_chat_member"`        // optional
 	NewChatTitle          string             `json:"new_chat_title"`          // optional
@@ -385,6 +388,20 @@ type Venue struct {
 	FoursquareID string   `json:"foursquare_id"` // optional
 }
 
+// PollOption contains information about one answer option in a poll.
+type PollOption struct {
+	Text       string `json:"text"`
+	VoterCount int    `json:"voter_count"`
+}
+
+// Poll contains information about a poll.
+type Poll struct {
+	ID       string       `json:"id"`
+	Question string       `json:"question"`
+	Options  []PollOption `json:"options"`
+	IsClosed bool         `json:"is_closed"`
+}
+
 // UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
 	TotalCount int           `json:"total_count"`
@@ -487,6 +504,7 @@ type ChatMember struct {
 	CanRestrictMembers    bool   `json:"can_restrict_members,omitempty"`      // optional
 	CanPinMessages        bool   `json:"can_pin_messages,omitempty"`          // optional
 	CanPromoteMembers     bool   `json:"can_promote_members,omitempty"`       // optional
+	IsChatMember          bool   `json:"is_member"`                           // optional
 	CanSendMessages       bool   `json:"can_send_messages,omitempty"`         // optional
 	CanSendMediaMessages  bool   `json:"can_send_media_messages,omitempty"`   // optional
 	CanSendOtherMessages  bool   `json:"can_send_other_messages,omitempty"`   // optional

@@ -499,6 +499,29 @@ func (config ContactConfig) method() string {
 	return "sendContact"
 }
 
+// SendPollConfig allows you to send a poll.
+type SendPollConfig struct {
+	BaseChat
+	Question string
+	Options  []string
+}
+
+func (config SendPollConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+
+	params["question"] = config.Question
+	err = params.AddInterface("options", config.Options)
+
+	return params, err
+}
+
+func (SendPollConfig) method() string {
+	return "sendPoll"
+}
+
 // GameConfig allows you to send a game.
 type GameConfig struct {
 	BaseChat
@@ -669,6 +692,19 @@ func (config EditMessageReplyMarkupConfig) params() (Params, error) {
 
 func (config EditMessageReplyMarkupConfig) method() string {
 	return "editMessageReplyMarkup"
+}
+
+// StopPollConfig allows you to stop a poll sent by the bot.
+type StopPollConfig struct {
+	BaseEdit
+}
+
+func (config StopPollConfig) params() (Params, error) {
+	return config.BaseEdit.params()
+}
+
+func (StopPollConfig) method() string {
+	return "stopPoll"
 }
 
 // UserProfilePhotosConfig contains information about a
