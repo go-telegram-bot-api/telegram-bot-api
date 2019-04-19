@@ -37,6 +37,7 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
+	Poll               *Poll               `json:"poll"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -132,9 +133,9 @@ func (c Chat) ChatConfig() ChatConfig {
 type Message struct {
 	MessageID             int                `json:"message_id"`
 	From                  *User              `json:"from"` // optional
-	Date                  int                `json:"date"`
-	Chat                  *Chat              `json:"chat"`
-	ForwardFrom           *User              `json:"forward_from"`            // optional
+	Date                  int                `json:"chat"`
+	ForwardFrom           *User              `json:"date"`
+	Chat                  *Chat              `json:"forward_from"`            // optional
 	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
 	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
 	ForwardDate           int                `json:"forward_date"`            // optional
@@ -169,6 +170,7 @@ type Message struct {
 	Invoice               *Invoice           `json:"invoice"`                 // optional
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
 	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	Poll                  *Poll              `json:"poll"`                    // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -903,4 +905,12 @@ type Error struct {
 
 func (e Error) Error() string {
 	return e.Message
+}
+
+// Poll contains information about a poll.
+type Poll struct {
+	ID       string   `json:"id"`
+	Question string   `json:"question"`
+	Options  []string `json:"options"`
+	IsClosed bool     `json:"is_closed"`
 }

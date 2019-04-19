@@ -1262,3 +1262,76 @@ func (config DeleteChatPhotoConfig) values() (url.Values, error) {
 
 	return v, nil
 }
+
+// SendPollConfig contains information about the poll that will be sent.
+type SendPollConfig struct {
+	ChatID              int64
+	Question            string
+	Options             []string
+	DisableNotification bool
+	ReplyToMessageID    int64
+	ReplyMarkup         interface{}
+}
+
+func (config SendPollConfig) method() string {
+	return "sendPoll"
+}
+
+func (config SendPollConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	options, err := json.Marshal(config.Options)
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("question", config.Question)
+	v.Add("options", string(options))
+
+	if config.DisableNotification != false {
+		v.Add("disable_notification", strconv.FormatBool(config.DisableNotification))
+	}
+	if config.ReplyToMessageID != 0 {
+		v.Add("reply_to_message_id", strconv.FormatInt(config.ReplyToMessageID, 10))
+	}
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
+
+//StopPollConfig contains information about the poll that will be stopped.
+type StopPollConfig struct {
+	ChatID      int64
+	MessageID   int64
+	ReplyMarkup interface{}
+}
+
+func (config StopPollConfig) method() string {
+	return "stopPoll"
+}
+
+func (config StopPollConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("message_id", strconv.FormatInt(config.MessageID, 10))
+
+	if config.ReplyMarkup != nil {
+		data, err := json.Marshal(config.ReplyMarkup)
+		if err != nil {
+			return v, err
+		}
+
+		v.Add("reply_markup", string(data))
+	}
+
+	return v, nil
+}
