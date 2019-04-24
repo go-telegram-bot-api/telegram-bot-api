@@ -100,6 +100,7 @@ type Chat struct {
 	Photo               *ChatPhoto `json:"photo"`
 	Description         string     `json:"description,omitempty"` // optional
 	InviteLink          string     `json:"invite_link,omitempty"` // optional
+	PinnedMessage       *Message   `json:"pinned_message"`        // optional
 }
 
 // IsPrivate returns if the Chat is a private conversation.
