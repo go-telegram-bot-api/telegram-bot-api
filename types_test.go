@@ -191,6 +191,86 @@ func TestChatIsSuperGroup(t *testing.T) {
 	}
 }
 
+func TestMessageEntityIsMention(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "mention"}
+
+	if !entity.IsMention() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsHashtag(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "hashtag"}
+
+	if !entity.IsHashtag() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsBotCommand(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "bot_command"}
+
+	if !entity.IsCommand() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsUrl(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "url"}
+
+	if !entity.IsUrl() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsEmail(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "email"}
+
+	if !entity.IsEmail() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsBold(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "bold"}
+
+	if !entity.IsBold() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsItalic(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "italic"}
+
+	if !entity.IsItalic() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsCode(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "code"}
+
+	if !entity.IsCode() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsPre(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "pre"}
+
+	if !entity.IsPre() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsTextLink(t *testing.T) {
+	entity := tgbotapi.MessageEntity{Type: "text_link"}
+
+	if !entity.IsTextLink() {
+		t.Fail()
+	}
+}
+
 func TestFileLink(t *testing.T) {
 	file := tgbotapi.File{FilePath: "test/test.txt"}
 

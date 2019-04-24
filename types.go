@@ -184,7 +184,7 @@ func (m *Message) IsCommand() bool {
 	}
 
 	entity := (*m.Entities)[0]
-	return entity.Offset == 0 && entity.Type == "bot_command"
+	return entity.Offset == 0 && entity.IsCommand()
 }
 
 // Command checks if the message was a command and if it was, returns the
@@ -250,12 +250,62 @@ type MessageEntity struct {
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
-func (entity MessageEntity) ParseURL() (*url.URL, error) {
-	if entity.URL == "" {
+func (e MessageEntity) ParseURL() (*url.URL, error) {
+	if e.URL == "" {
 		return nil, errors.New(ErrBadURL)
 	}
 
-	return url.Parse(entity.URL)
+	return url.Parse(e.URL)
+}
+
+// IsMention returns true if the type of the message entity is "mention" (@username).
+func (e MessageEntity) IsMention() bool {
+	return e.Type == "mention"
+}
+
+// IsHashtag returns true if the type of the message entity is "hashtag".
+func (e MessageEntity) IsHashtag() bool {
+	return e.Type == "hashtag"
+}
+
+// IsCommand returns true if the type of the message entity is "bot_command".
+func (e MessageEntity) IsCommand() bool {
+	return e.Type == "bot_command"
+}
+
+// IsUrl returns true if the type of the message entity is "url".
+func (e MessageEntity) IsUrl() bool {
+	return e.Type == "url"
+}
+
+// IsEmail returns true if the type of the message entity is "email".
+func (e MessageEntity) IsEmail() bool {
+	return e.Type == "email"
+}
+
+// IsBold returns true if the type of the message entity is "bold" (bold text).
+func (e MessageEntity) IsBold() bool {
+	return e.Type == "bold"
+}
+
+// IsItalic returns true if the type of the message entity is "italic" (italic text).
+func (e MessageEntity) IsItalic() bool {
+	return e.Type == "italic"
+}
+
+// IsCode returns true if the type of the message entity is "code" (monowidth string).
+func (e MessageEntity) IsCode() bool {
+	return e.Type == "code"
+}
+
+// IsPre returns true if the type of the message entity is "pre" (monowidth block).
+func (e MessageEntity) IsPre() bool {
+	return e.Type == "pre"
+}
+
+// IsTextLink returns true if the type of the message entity is "text_link" (clickable text URL).
+func (e MessageEntity) IsTextLink() bool {
+	return e.Type == "text_link"
 }
 
 // PhotoSize contains information about photos.
