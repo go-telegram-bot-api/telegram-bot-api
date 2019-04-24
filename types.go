@@ -142,6 +142,7 @@ type Message struct {
 	EditDate              int                `json:"edit_date"`               // optional
 	Text                  string             `json:"text"`                    // optional
 	Entities              *[]MessageEntity   `json:"entities"`                // optional
+	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
 	Audio                 *Audio             `json:"audio"`                   // optional
 	Document              *Document          `json:"document"`                // optional
 	Animation             *ChatAnimation     `json:"animation"`               // optional
