@@ -134,52 +134,53 @@ func (c Chat) ChatConfig() ChatConfig {
 // Message is returned by almost every request, and contains data about
 // almost anything.
 type Message struct {
-	MessageID             int                `json:"message_id"`
-	From                  *User              `json:"from"` // optional
-	Date                  int                `json:"date"`
-	Chat                  *Chat              `json:"chat"`
-	ForwardFrom           *User              `json:"forward_from"`            // optional
-	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
-	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
-	ForwardSignature      string             `json:"forward_signature"`       // optional
-	ForwardSenderName     string             `json:"forward_sender_name"`     // optional
-	ForwardDate           int                `json:"forward_date"`            // optional
-	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
-	EditDate              int                `json:"edit_date"`               // optional
-	MediaGroupID          string             `json:"media_group_id"`          // optional
-	AuthorSignature       string             `json:"author_signature"`        // optional
-	Text                  string             `json:"text"`                    // optional
-	Entities              []MessageEntity    `json:"entities"`                // optional
-	CaptionEntities       []MessageEntity    `json:"caption_entities"`        // optional
-	Audio                 *Audio             `json:"audio"`                   // optional
-	Document              *Document          `json:"document"`                // optional
-	Animation             *ChatAnimation     `json:"animation"`               // optional
-	Game                  *Game              `json:"game"`                    // optional
-	Photo                 []PhotoSize        `json:"photo"`                   // optional
-	Sticker               *Sticker           `json:"sticker"`                 // optional
-	Video                 *Video             `json:"video"`                   // optional
-	VideoNote             *VideoNote         `json:"video_note"`              // optional
-	Voice                 *Voice             `json:"voice"`                   // optional
-	Caption               string             `json:"caption"`                 // optional
-	Contact               *Contact           `json:"contact"`                 // optional
-	Location              *Location          `json:"location"`                // optional
-	Venue                 *Venue             `json:"venue"`                   // optional
-	Poll                  *Poll              `json:"poll"`                    // optional
-	NewChatMembers        []User             `json:"new_chat_members"`        // optional
-	LeftChatMember        *User              `json:"left_chat_member"`        // optional
-	NewChatTitle          string             `json:"new_chat_title"`          // optional
-	NewChatPhoto          []PhotoSize        `json:"new_chat_photo"`          // optional
-	DeleteChatPhoto       bool               `json:"delete_chat_photo"`       // optional
-	GroupChatCreated      bool               `json:"group_chat_created"`      // optional
-	SuperGroupChatCreated bool               `json:"supergroup_chat_created"` // optional
-	ChannelChatCreated    bool               `json:"channel_chat_created"`    // optional
-	MigrateToChatID       int64              `json:"migrate_to_chat_id"`      // optional
-	MigrateFromChatID     int64              `json:"migrate_from_chat_id"`    // optional
-	PinnedMessage         *Message           `json:"pinned_message"`          // optional
-	Invoice               *Invoice           `json:"invoice"`                 // optional
-	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
-	ConnectedWebsite      string             `json:"connected_website"`       // optional
-	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	MessageID             int                   `json:"message_id"`
+	From                  *User                 `json:"from"` // optional
+	Date                  int                   `json:"date"`
+	Chat                  *Chat                 `json:"chat"`
+	ForwardFrom           *User                 `json:"forward_from"`            // optional
+	ForwardFromChat       *Chat                 `json:"forward_from_chat"`       // optional
+	ForwardFromMessageID  int                   `json:"forward_from_message_id"` // optional
+	ForwardSignature      string                `json:"forward_signature"`       // optional
+	ForwardSenderName     string                `json:"forward_sender_name"`     // optional
+	ForwardDate           int                   `json:"forward_date"`            // optional
+	ReplyToMessage        *Message              `json:"reply_to_message"`        // optional
+	EditDate              int                   `json:"edit_date"`               // optional
+	MediaGroupID          string                `json:"media_group_id"`          // optional
+	AuthorSignature       string                `json:"author_signature"`        // optional
+	Text                  string                `json:"text"`                    // optional
+	Entities              []MessageEntity       `json:"entities"`                // optional
+	CaptionEntities       []MessageEntity       `json:"caption_entities"`        // optional
+	Audio                 *Audio                `json:"audio"`                   // optional
+	Document              *Document             `json:"document"`                // optional
+	Animation             *ChatAnimation        `json:"animation"`               // optional
+	Game                  *Game                 `json:"game"`                    // optional
+	Photo                 []PhotoSize           `json:"photo"`                   // optional
+	Sticker               *Sticker              `json:"sticker"`                 // optional
+	Video                 *Video                `json:"video"`                   // optional
+	VideoNote             *VideoNote            `json:"video_note"`              // optional
+	Voice                 *Voice                `json:"voice"`                   // optional
+	Caption               string                `json:"caption"`                 // optional
+	Contact               *Contact              `json:"contact"`                 // optional
+	Location              *Location             `json:"location"`                // optional
+	Venue                 *Venue                `json:"venue"`                   // optional
+	Poll                  *Poll                 `json:"poll"`                    // optional
+	NewChatMembers        []User                `json:"new_chat_members"`        // optional
+	LeftChatMember        *User                 `json:"left_chat_member"`        // optional
+	NewChatTitle          string                `json:"new_chat_title"`          // optional
+	NewChatPhoto          []PhotoSize           `json:"new_chat_photo"`          // optional
+	DeleteChatPhoto       bool                  `json:"delete_chat_photo"`       // optional
+	GroupChatCreated      bool                  `json:"group_chat_created"`      // optional
+	SuperGroupChatCreated bool                  `json:"supergroup_chat_created"` // optional
+	ChannelChatCreated    bool                  `json:"channel_chat_created"`    // optional
+	MigrateToChatID       int64                 `json:"migrate_to_chat_id"`      // optional
+	MigrateFromChatID     int64                 `json:"migrate_from_chat_id"`    // optional
+	PinnedMessage         *Message              `json:"pinned_message"`          // optional
+	Invoice               *Invoice              `json:"invoice"`                 // optional
+	SuccessfulPayment     *SuccessfulPayment    `json:"successful_payment"`      // optional
+	ConnectedWebsite      string                `json:"connected_website"`       // optional
+	PassportData          *PassportData         `json:"passport_data,omitempty"` // optional
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup"`            // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -464,11 +465,20 @@ type InlineKeyboardMarkup struct {
 type InlineKeyboardButton struct {
 	Text                         string        `json:"text"`
 	URL                          *string       `json:"url,omitempty"`                              // optional
+	LoginURL                     *LoginURL     `json:"login_url,omitempty"`                        // optional
 	CallbackData                 *string       `json:"callback_data,omitempty"`                    // optional
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
 	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
 	Pay                          bool          `json:"pay,omitempty"`                              // optional
+}
+
+// LoginURL is the parameters for the login inline keyboard button type.
+type LoginURL struct {
+	URL                string `json:"url"`
+	ForwardText        string `json:"forward_text"`
+	BotUsername        string `json:"bot_username"`
+	RequestWriteAccess bool   `json:"request_write_access"`
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
