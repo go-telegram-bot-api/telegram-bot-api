@@ -615,6 +615,18 @@ func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTex
 	}
 }
 
+// NewEditMessageTextAndMarkup allows you to edit the text and replymarkup of a message.
+func NewEditMessageTextAndMarkup(chatID int64, messageID int, text string, replyMarkup InlineKeyboardMarkup) EditMessageTextConfig {
+	return EditMessageTextConfig{
+		BaseEdit: BaseEdit{
+			ChatID:      chatID,
+			MessageID:   messageID,
+			ReplyMarkup: &replyMarkup,
+		},
+		Text: text,
+	}
+}
+
 // NewEditMessageCaption allows you to edit the caption of a message.
 func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMessageCaptionConfig {
 	return EditMessageCaptionConfig{
@@ -622,7 +634,7 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 			ChatID:    chatID,
 			MessageID: messageID,
 		},
-		Caption:   caption,
+		Caption: caption,
 	}
 }
 
