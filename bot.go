@@ -438,7 +438,7 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 
 // RemoveWebhook unsets the webhook.
 func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
-	return bot.MakeRequest("setWebhook", url.Values{})
+	return bot.MakeRequest("deleteWebhook", url.Values{})
 }
 
 // SetWebhook sets a webhook.
