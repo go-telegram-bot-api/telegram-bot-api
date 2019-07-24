@@ -338,6 +338,27 @@ func NewLocation(chatID int64, latitude float64, longitude float64) LocationConf
 		},
 		Latitude:  latitude,
 		Longitude: longitude,
+		LivePeriod: 0,
+	}
+}
+
+func NewEditLiveLocation(chatId int64, messageId int, latitude float64, longitude float64) EditLiveLocationConfig{
+	return EditLiveLocationConfig{
+		BaseEdit: BaseEdit{
+			ChatID: chatId,
+			MessageID:messageId,
+		},
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
+func NewStopLiveLocation(chatId int64, messageId int) StopLiveLocationConfig{
+	return StopLiveLocationConfig{
+		BaseEdit: BaseEdit{
+			ChatID: chatId,
+			MessageID:messageId,
+		},
 	}
 }
 

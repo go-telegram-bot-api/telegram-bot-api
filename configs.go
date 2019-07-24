@@ -688,6 +688,7 @@ type LocationConfig struct {
 	BaseChat
 	Latitude  float64 // required
 	Longitude float64 // required
+	LivePeriod int64 //between 60 and 86400
 }
 
 // values returns a url.Values representation of LocationConfig.
@@ -699,13 +700,58 @@ func (config LocationConfig) values() (url.Values, error) {
 
 	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
 	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
-
+	if config.LivePeriod > 0{
+		v.Add("live_period", strconv.FormatInt(config.LivePeriod, 10))
+	}
 	return v, nil
 }
 
 // method returns Telegram API method name for sending Location.
 func (config LocationConfig) method() string {
 	return "sendLocation"
+}
+
+type EditLiveLocationConfig struct {
+	BaseEdit
+	Latitude     float64 // required
+	Longitude    float64 // required
+}
+
+// values returns a url.Values representation of EditLiveLocationConfig.
+func (config EditLiveLocationConfig) values() (url.Values, error) {
+	v, err := config.BaseEdit.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
+	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
+
+	return v, nil
+}
+
+// method returns Telegram API method name for updating live Location.
+func (config EditLiveLocationConfig) method() string {
+	return "editMessageLiveLocation"
+}
+
+type StopLiveLocationConfig struct {
+	BaseEdit
+}
+
+// values returns a url.Values representation of StopLiveLocationConfig.
+func (config StopLiveLocationConfig) values() (url.Values, error) {
+	v, err := config.BaseEdit.values()
+	if err != nil {
+		return v, err
+	}
+
+	return v, nil
+}
+
+// method returns Telegram API method name for stopping live location.
+func (config StopLiveLocationConfig) method() string {
+	return "stopMessageLiveLocation"
 }
 
 // VenueConfig contains information about a SendVenue request.
