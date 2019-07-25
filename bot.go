@@ -25,9 +25,11 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self   User         `json:"-"`
-	Client *http.Client `json:"-"`
+	Self            User         `json:"-"`
+	Client          *http.Client `json:"-"`
 	shutdownChannel chan interface{}
+
+	apiEndpoint string
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -59,11 +61,12 @@ func NewBotAPIWithDebug(token string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram.
 func CreateNewBotAPI(token string, client *http.Client, debug bool) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:  token,
-		Client: client,
-		Buffer: 100,
+		Token:           token,
+		Client:          client,
+		Buffer:          100,
 		shutdownChannel: make(chan interface{}),
 		Debug: debug,
+		apiEndpoint: APIEndpoint,
 	}
 
 	self, err := bot.GetMe()
@@ -76,9 +79,13 @@ func CreateNewBotAPI(token string, client *http.Client, debug bool) (*BotAPI, er
 	return bot, nil
 }
 
+func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
+	b.apiEndpoint = apiEndpoint
+}
+
 // MakeRequest makes a request to a specific endpoint with our token.
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
 	resp, err := bot.Client.PostForm(method, params)
 	if err != nil {
@@ -101,7 +108,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 		if apiResp.Parameters != nil {
 			parameters = *apiResp.Parameters
 		}
-		return apiResp, Error{apiResp.Description, parameters}
+		return apiResp, Error{Code: apiResp.ErrorCode, Message: apiResp.Description, ResponseParameters: parameters}
 	}
 
 	return apiResp, nil
@@ -203,7 +210,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		return APIResponse{}, errors.New(ErrBadFileType)
 	}
 
-	method := fmt.Sprintf(APIEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
 	req, err := http.NewRequest("POST", method, nil)
 	if err != nil {
@@ -507,7 +514,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 				return
 			default:
 			}
-			
+
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
 				log.Println(err)
@@ -543,6 +550,7 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
+		r.Body.Close()
 
 		var update Update
 		json.Unmarshal(bytes, &update)
