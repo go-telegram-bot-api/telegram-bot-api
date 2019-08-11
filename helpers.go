@@ -761,6 +761,13 @@ func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
 	}
 }
 
+// NewOneTimeReplyKeyboard creates a new one time keyboard using NewReplyKeyboard()
+func NewOneTimeReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
+  markup := NewReplyKeyboard(rows...)
+  markup.OneTimeKeyboard = true
+  return markup
+}
+
 // NewInlineKeyboardButtonData creates an inline keyboard button with text
 // and data for a callback.
 func NewInlineKeyboardButtonData(text, data string) InlineKeyboardButton {
