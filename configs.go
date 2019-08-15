@@ -160,7 +160,7 @@ type BaseEdit struct {
 	ChannelUsername string
 	MessageID       int
 	InlineMessageID string
-	ReplyMarkup     *InlineKeyboardMarkup
+	ReplyMarkup     interface{}
 }
 
 func (edit BaseEdit) values() (url.Values, error) {
