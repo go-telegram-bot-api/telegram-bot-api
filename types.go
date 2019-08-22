@@ -473,11 +473,20 @@ type InlineKeyboardMarkup struct {
 type InlineKeyboardButton struct {
 	Text                         string        `json:"text"`
 	URL                          *string       `json:"url,omitempty"`                              // optional
+	LoginUrl                     *LoginUrl     `json:"url,omitempty"`                              // optional
 	CallbackData                 *string       `json:"callback_data,omitempty"`                    // optional
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
 	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
 	Pay                          bool          `json:"pay,omitempty"`                              // optional
+}
+
+//LoginUrl
+type LoginUrl struct {
+	URL                string  `json:"url"`
+	ForwardText        *string `json:"forward_text,omitempty"`
+	BotUsername        *string `json:"bot_username,omitempty"`
+	RequestWriteAccess *bool   `json:"request_write_access,omitempty"`
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
