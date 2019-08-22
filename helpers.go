@@ -622,7 +622,7 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 			ChatID:    chatID,
 			MessageID: messageID,
 		},
-		Caption:   caption,
+		Caption: caption,
 	}
 }
 
@@ -710,6 +710,15 @@ func NewInlineKeyboardButtonData(text, data string) InlineKeyboardButton {
 	return InlineKeyboardButton{
 		Text:         text,
 		CallbackData: &data,
+	}
+}
+
+// NewInlineKeyboardButtonLoginURL creates an inline keyboard button with text
+// which goes to a Login URL.
+func NewInlineKeyboardButtonLoginURL(text string, loginUrl LoginUrl) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text:     text,
+		LoginUrl: &loginUrl,
 	}
 }
 
