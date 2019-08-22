@@ -473,7 +473,7 @@ type InlineKeyboardMarkup struct {
 type InlineKeyboardButton struct {
 	Text                         string        `json:"text"`
 	URL                          *string       `json:"url,omitempty"`                              // optional
-	LoginUrl                     *LoginUrl     `json:"url,omitempty"`                              // optional
+	LoginUrl                     *LoginUrl     `json:"login_url,omitempty"`                        // optional
 	CallbackData                 *string       `json:"callback_data,omitempty"`                    // optional
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
