@@ -11,6 +11,7 @@ import (
 const (
 	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
 	ChatID                  = 76918703
+	Channel                 = "@nightghost_test"
 	SupergroupChatID        = -1001120141283
 	ReplyToMessageID        = 35
 	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
@@ -145,6 +146,51 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 	msg := NewPhotoUpload(ChatID, "tests/image.jpg")
 	msg.ReplyToMessageID = ReplyToMessageID
 
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendNewPhotoToChannel(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := NewPhotoUploadToChannel(Channel, "tests/image.jpg")
+	msg.Caption = "Test"
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendNewPhotoToChannelFileBytes(t *testing.T) {
+	bot, _ := getBot(t)
+
+	data, _ := ioutil.ReadFile("tests/image.jpg")
+	b := FileBytes{Name: "image.jpg", Bytes: data}
+
+	msg := NewPhotoUploadToChannel(Channel, b)
+	msg.Caption = "Test"
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendNewPhotoToChannelFileReader(t *testing.T) {
+	bot, _ := getBot(t)
+
+	f, _ := os.Open("tests/image.jpg")
+	reader := FileReader{Name: "image.jpg", Reader: f, Size: -1}
+
+	msg := NewPhotoUploadToChannel(Channel, reader)
+	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
 	if err != nil {
