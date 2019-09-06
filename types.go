@@ -476,9 +476,9 @@ type InlineKeyboardButton struct {
 // LoginURL is the parameters for the login inline keyboard button type.
 type LoginURL struct {
 	URL                string `json:"url"`
-	ForwardText        string `json:"forward_text"`
-	BotUsername        string `json:"bot_username"`
-	RequestWriteAccess bool   `json:"request_write_access"`
+	ForwardText        string `json:"forward_text,omitempty"`
+	BotUsername        string `json:"bot_username,omitempty"`
+	RequestWriteAccess bool   `json:"request_write_access,omitempty"`
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
