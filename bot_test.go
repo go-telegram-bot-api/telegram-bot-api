@@ -599,6 +599,35 @@ func ExampleNewWebhook() {
 	}
 }
 
+func ExampleWebhookHandler() {
+	bot, err := NewBotAPI("MyAwesomeBotToken")
+	if err != nil {
+		panic(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	_, err = bot.Request(NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	if err != nil {
+		panic(err)
+	}
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		panic(err)
+	}
+	if info.LastErrorDate != 0 {
+		log.Printf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
+
+	http.HandleFunc("/"+bot.Token, func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%+v\n", bot.HandleUpdate(w, r))
+	})
+
+	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+}
+
 func ExampleInlineConfig() {
 	bot, err := NewBotAPI("MyAwesomeBotToken") // create new bot
 	if err != nil {

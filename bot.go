@@ -451,16 +451,21 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		bytes, _ := ioutil.ReadAll(r.Body)
-		r.Body.Close()
-
-		var update Update
-		json.Unmarshal(bytes, &update)
-
-		ch <- update
+		ch <- bot.HandleUpdate(w, r)
 	})
 
 	return ch
+}
+
+// HandleUpdate parses and returns update received via webhook
+func (bot *BotAPI) HandleUpdate(res http.ResponseWriter, req *http.Request) Update {
+	bytes, _ := ioutil.ReadAll(req.Body)
+	req.Body.Close()
+
+	var update Update
+	json.Unmarshal(bytes, &update)
+
+	return update
 }
 
 // WriteToHTTPResponse writes the request to the HTTP ResponseWriter.
