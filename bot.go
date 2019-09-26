@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -32,25 +31,40 @@ type BotAPI struct {
 	apiEndpoint string
 }
 
+//const (
+//	// APIEndpoint is the endpoint for all API methods,
+//	// with formatting for Sprintf.
+//	// FileEndpoint is the endpoint for downloading a file from Telegram.
+//	FileEndpoint = "https://api.telegram.org/file/bot%s/%s"
+//)
+
 // NewBotAPI creates a new BotAPI instance.
 //
 // It requires a token, provided by @BotFather on Telegram.
-func NewBotAPI(token string, api string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, api, &http.Client{})
+func NewBotAPI(token string) (*BotAPI, error) {
+	return NewBotAPIWith(token, "https://api.telegram.org", &http.Client{})
 }
 
-// NewBotAPIWithClient creates a new BotAPI instance
-// and allows you to pass a http.Client.
+// NewBotAPIWith creates a new BotAPI instance
+// with custom Telegram Endpoint
 //
 // It requires a token, provided by @BotFather on Telegram.
-func NewBotAPIWithClient(token string, api string, client *http.Client) (*BotAPI, error) {
+func NewBotAPIWithEndpoint(token string, apiEndpoint string) (*BotAPI, error) {
+	return NewBotAPIWith(token, apiEndpoint, &http.Client{})
+}
+
+// NewBotAPIWith creates a new BotAPI instance
+// with custom http.Client and Telegram Endpoint
+//
+// It requires a token, provided by @BotFather on Telegram.
+func NewBotAPIWith(token string, apiEndpoint string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:           token,
 		Client:          client,
 		Buffer:          100,
 		shutdownChannel: make(chan interface{}),
 
-		apiEndpoint: api,
+		apiEndpoint: apiEndpoint,
 	}
 
 	self, err := bot.GetMe()
@@ -67,11 +81,24 @@ func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
 	b.apiEndpoint = apiEndpoint
 }
 
-// MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
-	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
-	resp, err := bot.Client.PostForm(method, params)
+// Link returns a full path to send Bot request.
+//
+// It requires the Bot method string.
+func (bot *BotAPI) buildUrl(method string) string {
+	var b strings.Builder
+	b.WriteString(bot.apiEndpoint)
+	b.WriteString("/bot")
+	b.WriteString(bot.Token)
+	b.WriteString("/")
+	b.WriteString(method)
+	return b.String()
+}
+
+// MakeRequest makes a request to a specific endpoint with our token.
+func (bot *BotAPI) MakeRequest(method string, params url.Values) (APIResponse, error) {
+
+	resp, err := bot.Client.PostForm(bot.buildUrl(method), params)
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -84,7 +111,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 
 	if bot.Debug {
-		log.Printf("%s resp: %s", endpoint, bytes)
+		log.Printf("%s resp: %s", method, bytes)
 	}
 
 	if !apiResp.Ok {
@@ -145,7 +172,7 @@ func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Messa
 //
 // Note that if your FileReader has a size set to -1, it will read
 // the file into memory to calculate a size.
-func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
+func (bot *BotAPI) UploadFile(method string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
 	ms := multipartstreamer.New()
 
 	switch f := file.(type) {
@@ -194,9 +221,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 		return APIResponse{}, errors.New(ErrBadFileType)
 	}
 
-	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
-
-	req, err := http.NewRequest("POST", method, nil)
+	req, err := http.NewRequest("POST", bot.buildUrl(method), nil)
 	if err != nil {
 		return APIResponse{}, err
 	}
