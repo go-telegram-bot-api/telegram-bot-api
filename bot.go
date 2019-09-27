@@ -31,13 +31,6 @@ type BotAPI struct {
 	apiEndpoint string
 }
 
-//const (
-//	// APIEndpoint is the endpoint for all API methods,
-//	// with formatting for Sprintf.
-//	// FileEndpoint is the endpoint for downloading a file from Telegram.
-//	FileEndpoint = "https://api.telegram.org/file/bot%s/%s"
-//)
-
 // NewBotAPI creates a new BotAPI instance.
 //
 // It requires a token, provided by @BotFather on Telegram.
@@ -82,7 +75,7 @@ func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
 }
 
 
-// Link returns a full path to send Bot request.
+// buildUrl returns a full path to send Bot request.
 //
 // It requires the Bot method string.
 func (bot *BotAPI) buildUrl(method string) string {
