@@ -178,6 +178,9 @@ func (edit BaseEdit) values() (url.Values, error) {
 	}
 
 	if edit.ReplyMarkup != nil {
+		if len(edit.ReplyMarkup.InlineKeyboard) == 0 {
+			edit.ReplyMarkup.InlineKeyboard = make([][]InlineKeyboardButton, 0)
+		}
 		data, err := json.Marshal(edit.ReplyMarkup)
 		if err != nil {
 			return v, err
