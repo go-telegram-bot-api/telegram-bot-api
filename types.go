@@ -173,6 +173,7 @@ type Message struct {
 	PassportData          *PassportData         `json:"passport_data,omitempty"`     // optional
 	ConnectedWebsite      *string               `json:"connected_website,omitempty"` // optional
 	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`      // optional
+	AuthorSignature       string                `json:"author_signature,omitempty"`  // optional
 }
 
 // Time converts the message timestamp into a Time.
