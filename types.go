@@ -578,10 +578,10 @@ type WebhookInfo struct {
 
 // LoginURL contains fields that allows user to login to webpage
 type LoginURL struct {
-	URL               string  `json:"url"`
-	ForwardText       *string `json:"forward_text,omitempty"`
-	BotUsername       *string `json:"bot_username,omitempty"`
-	RequestWriteAcces *bool   `json:"request_write_access,omitempty"`
+	URL                string  `json:"url"`
+	ForwardText        *string `json:"forward_text,omitempty"`
+	BotUsername        *string `json:"bot_username,omitempty"`
+	RequestWriteAccess *bool   `json:"request_write_access,omitempty"`
 }
 
 // IsSet returns true if a webhook is currently set.

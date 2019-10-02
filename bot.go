@@ -108,7 +108,7 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 		return
 	}
 
-	// if debug, read reponse body
+	// if debug, read response body
 	data, err := ioutil.ReadAll(responseBody)
 	if err != nil {
 		return

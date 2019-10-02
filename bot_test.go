@@ -37,7 +37,7 @@ func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
 	return bot, err
 }
 
-func TestNewBotAPI_notoken(t *testing.T) {
+func TestNewBotAPI_NoToken(t *testing.T) {
 	_, err := tgbotapi.NewBotAPI("")
 
 	if err == nil {
@@ -506,9 +506,9 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 func TestUpdatesChan(t *testing.T) {
 	bot, _ := getBot(t)
 
-	var ucfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
-	ucfg.Timeout = 60
-	_, err := bot.GetUpdatesChan(ucfg)
+	var cfg tgbotapi.UpdateConfig = tgbotapi.NewUpdate(0)
+	cfg.Timeout = 60
+	_, err := bot.GetUpdatesChan(cfg)
 
 	if err != nil {
 		t.Error(err)
