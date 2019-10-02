@@ -27,12 +27,12 @@ const (
 
 func getBot(t *testing.T) (*tgbotapi.BotAPI, error) {
 	bot, err := tgbotapi.NewBotAPI(TestToken)
-	bot.Debug = true
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
+		t.FailNow()
 	}
+	bot.Debug = true
 
 	return bot, err
 }
