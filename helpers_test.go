@@ -1,4 +1,4 @@
-package tgbotapi_test
+package got_test
 
 import (
 	"testing"

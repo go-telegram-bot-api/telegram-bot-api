@@ -1,4 +1,4 @@
-package tgbotapi
+package got
 
 import (
 	"net/url"
@@ -622,7 +622,7 @@ func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMess
 			ChatID:    chatID,
 			MessageID: messageID,
 		},
-		Caption:   caption,
+		Caption: caption,
 	}
 }
 
