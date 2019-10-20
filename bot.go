@@ -19,6 +19,8 @@ import (
 	"github.com/technoweenie/multipartstreamer"
 )
 
+const offsetRefreshDuration = 6 * 24 * time.Hour
+
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
 	Token  string `json:"token"`
@@ -492,6 +494,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	ch := make(chan Update, bot.Buffer)
 
 	go func() {
+		lastUpdateTime := time.Now()
 		for {
 			select {
 			case <-bot.shutdownChannel:
@@ -506,6 +509,16 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 				time.Sleep(time.Second * 3)
 
 				continue
+			}
+
+			if len(updates) > 0 {
+				lastUpdateTime = time.Now()
+			}
+
+			if time.Now().Sub(lastUpdateTime) > offsetRefreshDuration {
+				log.Printf("Offset was rejected from %d to 0", config.Offset)
+				lastUpdateTime = time.Now()
+				config.Offset = 0
 			}
 
 			for _, update := range updates {
