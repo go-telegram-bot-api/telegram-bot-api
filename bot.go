@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	_ "log"
 	"net/http"
 	"net/url"
 	"os"
@@ -492,26 +493,26 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	ch := make(chan Update, bot.Buffer)
 
 	go func() {
+		ticker := time.NewTicker(config.Interval)
 		for {
 			select {
 			case <-bot.shutdownChannel:
 				return
-			default:
-			}
+			case <-ticker.C:
+				updates, err := bot.GetUpdates(config)
+				if err != nil {
+					log.Println(err)
+					log.Println("Failed to get updates, retrying in 3 seconds...")
+					time.Sleep(time.Second * 3)
 
-			updates, err := bot.GetUpdates(config)
-			if err != nil {
-				log.Println(err)
-				log.Println("Failed to get updates, retrying in 3 seconds...")
-				time.Sleep(time.Second * 3)
+					continue
+				}
 
-				continue
-			}
-
-			for _, update := range updates {
-				if update.UpdateID >= config.Offset {
-					config.Offset = update.UpdateID + 1
-					ch <- update
+				for _, update := range updates {
+					if update.UpdateID >= config.Offset {
+						config.Offset = update.UpdateID + 1
+						ch <- update
+					}
 				}
 			}
 		}

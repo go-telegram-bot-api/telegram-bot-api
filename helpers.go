@@ -1,6 +1,7 @@
 package got
 
 import (
+	_ "log"
 	"net/url"
 )
 
@@ -382,9 +383,10 @@ func NewUserProfilePhotos(userID int) UserProfilePhotosConfig {
 // You likely want to set this to the last Update ID plus 1.
 func NewUpdate(offset int) UpdateConfig {
 	return UpdateConfig{
-		Offset:  offset,
-		Limit:   0,
-		Timeout: 0,
+		Offset:   offset,
+		Limit:    0,
+		Timeout:  0,
+		Interval: UpdateDefaultInterval,
 	}
 }
 
