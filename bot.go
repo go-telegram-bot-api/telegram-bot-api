@@ -533,11 +533,33 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		bytes, _ := ioutil.ReadAll(r.Body)
+		if r.Method != http.MethodPost {
+			errMsg, _ := json.Marshal(map[string]string{"error": "Wrong HTTP method, required POST"})
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(errMsg)
+			return
+		}
+
+		bytes, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(errMsg)
+			return
+		}
 		r.Body.Close()
 
 		var update Update
-		json.Unmarshal(bytes, &update)
+		err = json.Unmarshal(bytes, &update)
+		if err != nil {
+			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(errMsg)
+			return
+		}
 
 		ch <- update
 	})
