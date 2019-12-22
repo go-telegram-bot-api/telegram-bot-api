@@ -634,6 +634,7 @@ type InlineQueryResultPhoto struct {
 	Title               string                `json:"title"`
 	Description         string                `json:"description"`
 	Caption             string                `json:"caption"`
+	ParseMode           string                `json:"parse_mode"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 }
@@ -662,6 +663,7 @@ type InlineQueryResultGIF struct {
 	Duration            int                   `json:"gif_duration,omitempty"`
 	Title               string                `json:"title,omitempty"`
 	Caption             string                `json:"caption,omitempty"`
+	ParseMode           string                `json:"parse_mode"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 }
@@ -689,6 +691,7 @@ type InlineQueryResultMPEG4GIF struct {
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
+	ParseMode           string                `json:"parse_mode"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 }
@@ -715,6 +718,7 @@ type InlineQueryResultVideo struct {
 	ThumbURL            string                `json:"thumb_url"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
+	ParseMode           string                `json:"parse_mode"`
 	Width               int                   `json:"video_width"`
 	Height              int                   `json:"video_height"`
 	Duration            int                   `json:"video_duration"`
@@ -743,6 +747,7 @@ type InlineQueryResultAudio struct {
 	URL                 string                `json:"audio_url"` // required
 	Title               string                `json:"title"`     // required
 	Caption             string                `json:"caption"`
+	ParseMode           string                `json:"parse_mode"`
 	Performer           string                `json:"performer"`
 	Duration            int                   `json:"audio_duration"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
@@ -767,6 +772,7 @@ type InlineQueryResultVoice struct {
 	URL                 string                `json:"voice_url"` // required
 	Title               string                `json:"title"`     // required
 	Caption             string                `json:"caption"`
+	ParseMode           string                `json:"parse_mode"`
 	Duration            int                   `json:"voice_duration"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
@@ -793,6 +799,7 @@ type InlineQueryResultDocument struct {
 	URL                 string                `json:"document_url"` // required
 	MimeType            string                `json:"mime_type"`    // required
 	Description         string                `json:"description"`
+	ParseMode           string                `json:"parse_mode"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`
