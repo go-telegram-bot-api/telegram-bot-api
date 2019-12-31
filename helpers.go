@@ -29,7 +29,8 @@ func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 // NewMessageToChannel creates a new Message that is sent to a channel
 // by username.
 //
-// username is the username of the channel, text is the message text.
+// username is the username of the channel, text is the message text,
+// and the username should be in the form of `@username`.
 func NewMessageToChannel(username string, text string) MessageConfig {
 	return MessageConfig{
 		BaseChat: BaseChat{
