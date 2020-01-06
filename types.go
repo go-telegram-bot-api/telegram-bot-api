@@ -827,6 +827,23 @@ type InlineQueryResultLocation struct {
 	ThumbHeight         int                   `json:"thumb_height"`
 }
 
+// InlineQueryResultVenue is an inline query response venue.
+type InlineQueryResultVenue struct {
+	Type                string                `json:"type"`      // required
+	ID                  string                `json:"id"`        // required
+	Latitude            float64               `json:"latitude"`  // required
+	Longitude           float64               `json:"longitude"` // required
+	Title               string                `json:"title"`     // required
+	Address             string                `json:"address"`   // required
+	FoursquareID        string                `json:"foursquare_id"`
+	FoursquareType      string                `json:"foursquare_type"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	ThumbURL            string                `json:"thumb_url"`
+	ThumbWidth          int                   `json:"thumb_width"`
+	ThumbHeight         int                   `json:"thumb_height"`
+}
+
 // InlineQueryResultGame is an inline query response game.
 type InlineQueryResultGame struct {
 	Type          string                `json:"type"`
