@@ -37,13 +37,6 @@ func (p Params) AddBool(key string, value bool) {
 	}
 }
 
-// AddNonNilBool adds the value of a bool pointer if not nil.
-func (p Params) AddNonNilBool(key string, value *bool) {
-	if value != nil {
-		p[key] = strconv.FormatBool(*value)
-	}
-}
-
 // AddNonZeroFloat adds a floating point value that is not zero.
 func (p Params) AddNonZeroFloat(key string, value float64) {
 	if value != 0 {
@@ -76,14 +69,17 @@ func (p Params) AddFirstValid(key string, args ...interface{}) error {
 		case int:
 			if v != 0 {
 				p[key] = strconv.Itoa(v)
+				return nil
 			}
 		case int64:
 			if v != 0 {
 				p[key] = strconv.FormatInt(v, 10)
+				return nil
 			}
 		case string:
 			if v != "" {
 				p[key] = v
+				return nil
 			}
 		case nil:
 		default:
@@ -93,6 +89,7 @@ func (p Params) AddFirstValid(key string, args ...interface{}) error {
 			}
 
 			p[key] = string(b)
+			return nil
 		}
 	}
 

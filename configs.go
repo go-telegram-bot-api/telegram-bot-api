@@ -34,8 +34,9 @@ const (
 
 // Constant values for ParseMode in MessageConfig
 const (
-	ModeMarkdown = "Markdown"
-	ModeHTML     = "HTML"
+	ModeMarkdown   = "Markdown"
+	ModeMarkdownV2 = "MarkdownV2"
+	ModeHTML       = "HTML"
 )
 
 // Library errors
@@ -939,11 +940,8 @@ func (config KickChatMemberConfig) params() (Params, error) {
 // RestrictChatMemberConfig contains fields to restrict members of chat
 type RestrictChatMemberConfig struct {
 	ChatMemberConfig
-	UntilDate             int64
-	CanSendMessages       *bool
-	CanSendMediaMessages  *bool
-	CanSendOtherMessages  *bool
-	CanAddWebPagePreviews *bool
+	UntilDate   int64
+	Permissions *ChatPermissions
 }
 
 func (config RestrictChatMemberConfig) method() string {
@@ -956,10 +954,9 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero("user_id", config.UserID)
 
-	params.AddNonNilBool("can_send_messages", config.CanSendMessages)
-	params.AddNonNilBool("can_send_media_messages", config.CanSendMediaMessages)
-	params.AddNonNilBool("can_send_other_messages", config.CanSendOtherMessages)
-	params.AddNonNilBool("can_add_web_page_previews", config.CanAddWebPagePreviews)
+	if err := params.AddInterface("permissions", config.Permissions); err != nil {
+		return params, err
+	}
 	params.AddNonZero64("until_date", config.UntilDate)
 
 	return params, nil
@@ -968,14 +965,14 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 // PromoteChatMemberConfig contains fields to promote members of chat
 type PromoteChatMemberConfig struct {
 	ChatMemberConfig
-	CanChangeInfo      *bool
-	CanPostMessages    *bool
-	CanEditMessages    *bool
-	CanDeleteMessages  *bool
-	CanInviteUsers     *bool
-	CanRestrictMembers *bool
-	CanPinMessages     *bool
-	CanPromoteMembers  *bool
+	CanChangeInfo      bool
+	CanPostMessages    bool
+	CanEditMessages    bool
+	CanDeleteMessages  bool
+	CanInviteUsers     bool
+	CanRestrictMembers bool
+	CanPinMessages     bool
+	CanPromoteMembers  bool
 }
 
 func (config PromoteChatMemberConfig) method() string {
@@ -988,14 +985,35 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero("user_id", config.UserID)
 
-	params.AddNonNilBool("can_change_info", config.CanChangeInfo)
-	params.AddNonNilBool("can_post_messages", config.CanPostMessages)
-	params.AddNonNilBool("can_edit_messages", config.CanEditMessages)
-	params.AddNonNilBool("can_delete_messages", config.CanDeleteMessages)
-	params.AddNonNilBool("can_invite_users", config.CanInviteUsers)
-	params.AddNonNilBool("can_restrict_members", config.CanRestrictMembers)
-	params.AddNonNilBool("can_pin_messages", config.CanPinMessages)
-	params.AddNonNilBool("can_promote_members", config.CanPromoteMembers)
+	params.AddBool("can_change_info", config.CanChangeInfo)
+	params.AddBool("can_post_messages", config.CanPostMessages)
+	params.AddBool("can_edit_messages", config.CanEditMessages)
+	params.AddBool("can_delete_messages", config.CanDeleteMessages)
+	params.AddBool("can_invite_users", config.CanInviteUsers)
+	params.AddBool("can_restrict_members", config.CanRestrictMembers)
+	params.AddBool("can_pin_messages", config.CanPinMessages)
+	params.AddBool("can_promote_members", config.CanPromoteMembers)
+
+	return params, nil
+}
+
+// SetChatAdministratorCustomTitle sets the title of an administrative user
+// promoted by the bot for a chat.
+type SetChatAdministratorCustomTitle struct {
+	ChatMemberConfig
+	CustomTitle string
+}
+
+func (SetChatAdministratorCustomTitle) method() string {
+	return "setChatAdministratorCustomTitle"
+}
+
+func (config SetChatAdministratorCustomTitle) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonEmpty("custom_title", config.CustomTitle)
 
 	return params, nil
 }
@@ -1039,6 +1057,27 @@ type ChatAdministratorsConfig struct {
 
 func (ChatAdministratorsConfig) method() string {
 	return "getChatAdministrators"
+}
+
+// SetChatPermissionsConfig allows you to set default permissions for the
+// members in a group. The bot must be an administrator and have rights to
+// restrict members.
+type SetChatPermissionsConfig struct {
+	ChatConfig
+	Permissions *ChatPermissions
+}
+
+func (SetChatPermissionsConfig) method() string {
+	return "setChatPermissions"
+}
+
+func (config SetChatPermissionsConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddInterface("permissions", config.Permissions)
+
+	return params, nil
 }
 
 // ChatInviteLinkConfig contains information about getting a chat link.
