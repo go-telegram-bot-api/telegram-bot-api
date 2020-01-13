@@ -501,7 +501,9 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
+	if info.MaxConnections == 0 {
+		t.Errorf("wanted max connections to be greater than 0")
+	}
 	if info.LastErrorDate != 0 {
 		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}

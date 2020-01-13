@@ -687,8 +687,9 @@ type WebhookInfo struct {
 	URL                  string `json:"url"`
 	HasCustomCertificate bool   `json:"has_custom_certificate"`
 	PendingUpdateCount   int    `json:"pending_update_count"`
-	LastErrorDate        int    `json:"last_error_date,omitempty"`    // optional
-	LastErrorMessage     string `json:"last_error_message,omitempty"` // optional
+	LastErrorDate        int    `json:"last_error_date"`    // optional
+	LastErrorMessage     string `json:"last_error_message"` // optional
+	MaxConnections       int    `json:"max_connections"`
 }
 
 // IsSet returns true if a webhook is currently set.
