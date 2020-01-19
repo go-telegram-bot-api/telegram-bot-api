@@ -338,13 +338,14 @@ type Document struct {
 
 // Sticker contains information about a sticker.
 type Sticker struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	Emoji     string     `json:"emoji"`     // optional
-	FileSize  int        `json:"file_size"` // optional
-	SetName   string     `json:"set_name"`  // optional
+	FileID     string     `json:"file_id"`
+	Width      int        `json:"width"`
+	Height     int        `json:"height"`
+	Thumbnail  *PhotoSize `json:"thumb"`       // optional
+	Emoji      string     `json:"emoji"`       // optional
+	FileSize   int        `json:"file_size"`   // optional
+	SetName    string     `json:"set_name"`    // optional
+	IsAnimated bool       `json:"is_animated"` // optional
 }
 
 // ChatAnimation contains information about an animation.
@@ -831,6 +832,23 @@ type InlineQueryResultLocation struct {
 	Latitude            float64               `json:"latitude"`  // required
 	Longitude           float64               `json:"longitude"` // required
 	Title               string                `json:"title"`     // required
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	ThumbURL            string                `json:"thumb_url"`
+	ThumbWidth          int                   `json:"thumb_width"`
+	ThumbHeight         int                   `json:"thumb_height"`
+}
+
+// InlineQueryResultVenue is an inline query response venue.
+type InlineQueryResultVenue struct {
+	Type                string                `json:"type"`      // required
+	ID                  string                `json:"id"`        // required
+	Latitude            float64               `json:"latitude"`  // required
+	Longitude           float64               `json:"longitude"` // required
+	Title               string                `json:"title"`     // required
+	Address             string                `json:"address"`   // required
+	FoursquareID        string                `json:"foursquare_id"`
+	FoursquareType      string                `json:"foursquare_type"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`

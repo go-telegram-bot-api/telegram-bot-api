@@ -614,6 +614,18 @@ func NewInlineQueryResultLocation(id, title string, latitude, longitude float64)
 	}
 }
 
+// NewInlineQueryResultVenue creates a new inline query venue.
+func NewInlineQueryResultVenue(id, title, address string, latitude, longitude float64) InlineQueryResultVenue {
+	return InlineQueryResultVenue{
+		Type:      "venue",
+		ID:        id,
+		Title:     title,
+		Address:   address,
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
 // NewEditMessageText allows you to edit the text of a message.
 func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTextConfig {
 	return EditMessageTextConfig{
