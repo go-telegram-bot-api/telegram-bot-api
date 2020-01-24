@@ -338,14 +338,15 @@ type Document struct {
 
 // Sticker contains information about a sticker.
 type Sticker struct {
-	FileID     string     `json:"file_id"`
-	Width      int        `json:"width"`
-	Height     int        `json:"height"`
-	Thumbnail  *PhotoSize `json:"thumb"`       // optional
-	Emoji      string     `json:"emoji"`       // optional
-	FileSize   int        `json:"file_size"`   // optional
-	SetName    string     `json:"set_name"`    // optional
-	IsAnimated bool       `json:"is_animated"` // optional
+	FileUniqueID string     `json:"file_unique_id"`
+	FileID       string     `json:"file_id"`
+	Width        int        `json:"width"`
+	Height       int        `json:"height"`
+	Thumbnail    *PhotoSize `json:"thumb"`       // optional
+	Emoji        string     `json:"emoji"`       // optional
+	FileSize     int        `json:"file_size"`   // optional
+	SetName      string     `json:"set_name"`    // optional
+	IsAnimated   bool       `json:"is_animated"` // optional
 }
 
 // ChatAnimation contains information about an animation.
