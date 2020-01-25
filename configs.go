@@ -525,7 +525,7 @@ func (config SendPollConfig) params() (Params, error) {
 	params.AddNonEmpty("type", config.Type)
 	params["allows_multiple_answers"] = strconv.FormatBool(config.AllowsMultipleAnswers)
 	params["correct_option_id"] = strconv.FormatInt(config.CorrectOptionID, 10)
-	params["is_closed"] = strconv.FormatBool(config.IsClosed)
+	params.AddBool("is_closed", config.IsClosed)
 
 	return params, err
 }
