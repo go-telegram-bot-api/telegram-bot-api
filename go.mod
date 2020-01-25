@@ -1,4 +1,4 @@
-module github.com/shitpostingio/telegram-bot-api
+module github.com/go-telegram-bot-api/telegram-bot-api
 
 go 1.13
 
