@@ -3,6 +3,7 @@ package tgbotapi
 import (
 	"io"
 	"net/url"
+	"strconv"
 )
 
 // Telegram constants
@@ -503,8 +504,13 @@ func (config ContactConfig) method() string {
 // SendPollConfig allows you to send a poll.
 type SendPollConfig struct {
 	BaseChat
-	Question string
-	Options  []string
+	Question              string
+	Options               []string
+	IsAnonymous           bool
+	Type                  string
+	AllowsMultipleAnswers bool
+	CorrectOptionID       int64
+	IsClosed              bool
 }
 
 func (config SendPollConfig) params() (Params, error) {
@@ -515,6 +521,11 @@ func (config SendPollConfig) params() (Params, error) {
 
 	params["question"] = config.Question
 	err = params.AddInterface("options", config.Options)
+	params["is_anonymous"] = strconv.FormatBool(config.IsAnonymous)
+	params.AddNonEmpty("type", config.Type)
+	params["allows_multiple_answers"] = strconv.FormatBool(config.AllowsMultipleAnswers)
+	params["correct_option_id"] = strconv.FormatInt(config.CorrectOptionID, 10)
+	params["is_closed"] = strconv.FormatBool(config.IsClosed)
 
 	return params, err
 }

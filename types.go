@@ -38,6 +38,7 @@ type Update struct {
 	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
 	Poll               *Poll               `json:"poll"`
+	PollAnswer         *PollAnswer         `json:"poll_answer"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -52,12 +53,15 @@ func (ch UpdatesChannel) Clear() {
 
 // User is a user on Telegram.
 type User struct {
-	ID           int    `json:"id"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`     // optional
-	UserName     string `json:"username"`      // optional
-	LanguageCode string `json:"language_code"` // optional
-	IsBot        bool   `json:"is_bot"`        // optional
+	ID                      int    `json:"id"`
+	FirstName               string `json:"first_name"`
+	LastName                string `json:"last_name"`                   // optional
+	UserName                string `json:"username"`                    // optional
+	LanguageCode            string `json:"language_code"`               // optional
+	IsBot                   bool   `json:"is_bot"`                      // optional
+	CanJoinGroups           bool   `json:"can_join_groups"`             // optional
+	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages"` // optional
+	SupportsInlineQueries   bool   `json:"supports_inline_queries"`     // optional
 }
 
 // String displays a simple text version of a user.
@@ -271,11 +275,12 @@ func (m *Message) CommandArguments() string {
 
 // MessageEntity contains information about data in a Message.
 type MessageEntity struct {
-	Type   string `json:"type"`
-	Offset int    `json:"offset"`
-	Length int    `json:"length"`
-	URL    string `json:"url"`  // optional
-	User   *User  `json:"user"` // optional
+	Type     string `json:"type"`
+	Offset   int    `json:"offset"`
+	Length   int    `json:"length"`
+	URL      string `json:"url"`      // optional
+	User     *User  `json:"user"`     // optional
+	Language string `json:"language"` // optional
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
@@ -420,12 +425,23 @@ type PollOption struct {
 	VoterCount int    `json:"voter_count"`
 }
 
+// PollAnswer represents an answer of a user in a non-anonymous poll.
+type PollAnswer struct {
+	PollID    string `json:"poll_id"`
+	User      User   `json:"user"`
+	OptionIDs []int  `json:"option_ids"`
+}
+
 // Poll contains information about a poll.
 type Poll struct {
-	ID       string       `json:"id"`
-	Question string       `json:"question"`
-	Options  []PollOption `json:"options"`
-	IsClosed bool         `json:"is_closed"`
+	ID                    string       `json:"id"`
+	Question              string       `json:"question"`
+	Options               []PollOption `json:"options"`
+	IsClosed              bool         `json:"is_closed"`
+	IsAnonymous           bool         `json:"is_anonymous"`
+	Type                  string       `json:"type"`
+	AllowsMultipleAnswers bool         `json:"allows_multiple_answers"`
+	CorrectOptionID       int          `json:"correct_option_id"` // optional
 }
 
 // UserProfilePhotos contains a set of user profile photos.
@@ -459,9 +475,16 @@ type ReplyKeyboardMarkup struct {
 
 // KeyboardButton is a button within a custom keyboard.
 type KeyboardButton struct {
-	Text            string `json:"text"`
-	RequestContact  bool   `json:"request_contact"`
-	RequestLocation bool   `json:"request_location"`
+	Text            string                 `json:"text"`
+	RequestContact  bool                   `json:"request_contact"`
+	RequestLocation bool                   `json:"request_location"`
+	RequestPoll     KeyboardButtonPollType `json:"request_poll"`
+}
+
+// KeyboardButtonPollType represents type of a poll, which is allowed to
+// be created and sent when the corresponding button is pressed.
+type KeyboardButtonPollType struct {
+	Type string `json:"type"`
 }
 
 // ReplyKeyboardHide allows the Bot to hide a custom keyboard.
