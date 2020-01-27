@@ -821,8 +821,9 @@ func NewPoll(chatID int64, question string, options ...string) SendPollConfig {
 		BaseChat: BaseChat{
 			ChatID: chatID,
 		},
-		Question: question,
-		Options:  options,
+		Question:    question,
+		Options:     options,
+		IsAnonymous: true, // This is Telegram's default.
 	}
 }
 
