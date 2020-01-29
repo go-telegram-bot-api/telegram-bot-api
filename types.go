@@ -353,14 +353,15 @@ type MaskPosition struct {
 
 // ChatAnimation contains information about an animation.
 type ChatAnimation struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Duration  int        `json:"duration"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	FileName  string     `json:"file_name"` // optional
-	MimeType  string     `json:"mime_type"` // optional
-	FileSize  int        `json:"file_size"` // optional
+	FileID       string     `json:"file_id"`
+	FileUniqueID string     `json:"file_unique_id"`
+	Width        int        `json:"width"`
+	Height       int        `json:"height"`
+	Duration     int        `json:"duration"`
+	Thumbnail    *PhotoSize `json:"thumb"`     // optional
+	FileName     string     `json:"file_name"` // optional
+	MimeType     string     `json:"mime_type"` // optional
+	FileSize     int        `json:"file_size"` // optional
 }
 
 // Video contains information about a video.
