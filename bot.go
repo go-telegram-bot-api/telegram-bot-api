@@ -974,3 +974,22 @@ func (bot *BotAPI) DeleteChatPhoto(config DeleteChatPhotoConfig) (APIResponse, e
 
 	return bot.MakeRequest(config.method(), v)
 }
+
+// GetStickerSet get a sticker set.
+func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error) {
+	v, err := config.values()
+	if err != nil {
+		return StickerSet{}, err
+	}
+	bot.debugLog(config.method(), v, nil)
+	res, err := bot.MakeRequest(config.method(), v)
+	if err != nil {
+		return StickerSet{}, err
+	}
+	stickerSet := StickerSet{}
+	err = json.Unmarshal(res.Result, &stickerSet)
+	if err != nil {
+		return StickerSet{}, err
+	}
+	return stickerSet, nil
+}

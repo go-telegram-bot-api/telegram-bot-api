@@ -348,6 +348,14 @@ type Sticker struct {
 	IsAnimated bool       `json:"is_animated"` // optional
 }
 
+type StickerSet struct {
+	Name          string    `json:"name"`
+	Title         string    `json:"title"`
+	IsAnimated    bool      `json:"is_animated"`
+	ContainsMasks bool      `json:"contains_masks"`
+	Stickers      []Sticker `json:"stickers"`
+}
+
 // ChatAnimation contains information about an animation.
 type ChatAnimation struct {
 	FileID    string     `json:"file_id"`
