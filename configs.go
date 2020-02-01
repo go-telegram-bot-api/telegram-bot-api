@@ -1047,7 +1047,7 @@ type ChatPermissions struct {
 
 // SetChatPermissionsConfig contains fields to restrict members of chat
 type SetChatPermissionsConfig struct {
-	ChatConfigWithUser
+	ChatConfig
 	Permissions *ChatPermissions
 }
 

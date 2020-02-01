@@ -788,7 +788,7 @@ func (bot *BotAPI) SetChatPermissions(config SetChatPermissionsConfig) (APIRespo
 	} else {
 		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 	}
-	v.Add("user_id", strconv.Itoa(config.UserID))
+	v.Add("user_id",  strconv.FormatInt(config.ChatID, 10))
 
 	if config.Permissions.CanSendMessages != nil {
 		v.Add("can_send_messages", strconv.FormatBool(*config.Permissions.CanSendMessages))
