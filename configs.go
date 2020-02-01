@@ -1034,10 +1034,7 @@ type PromoteChatMemberConfig struct {
 	CanPinMessages     *bool
 	CanPromoteMembers  *bool
 }
-
-// SetChatPermissionsConfig contains fields to restrict members of chat
-type SetChatPermissionsConfig struct {
-	ChatConfigWithUser
+type ChatPermissions struct {
 	CanSendMessages       *bool
 	CanSendMediaMessages  *bool
 	CanSendPolls          *bool
@@ -1046,6 +1043,12 @@ type SetChatPermissionsConfig struct {
 	CanChangeInfo         *bool
 	CanInviteUsers        *bool
 	CanPinMessages        *bool
+}
+
+// SetChatPermissionsConfig contains fields to restrict members of chat
+type SetChatPermissionsConfig struct {
+	ChatConfigWithUser
+	Permissions *ChatPermissions
 }
 
 // ChatConfig contains information about getting information on a chat.

@@ -790,29 +790,29 @@ func (bot *BotAPI) SetChatPermissions(config SetChatPermissionsConfig) (APIRespo
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
 
-	if config.CanSendMessages != nil {
-		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
+	if config.Permissions.CanSendMessages != nil {
+		v.Add("can_send_messages", strconv.FormatBool(*config.Permissions.CanSendMessages))
 	}
-	if config.CanSendMediaMessages != nil {
-		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
+	if config.Permissions.CanSendMediaMessages != nil {
+		v.Add("can_send_media_messages", strconv.FormatBool(*config.Permissions.CanSendMediaMessages))
 	}
-	if config.CanSendPolls != nil {
-		v.Add("can_send_polls", strconv.FormatBool(*config.CanSendPolls))
+	if config.Permissions.CanSendPolls != nil {
+		v.Add("can_send_polls", strconv.FormatBool(*config.Permissions.CanSendPolls))
 	}
-	if config.CanSendOtherMessages != nil {
-		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
+	if config.Permissions.CanSendOtherMessages != nil {
+		v.Add("can_send_other_messages", strconv.FormatBool(*config.Permissions.CanSendOtherMessages))
 	}
-	if config.CanAddWebPagePreviews != nil {
-		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
+	if config.Permissions.CanAddWebPagePreviews != nil {
+		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.Permissions.CanAddWebPagePreviews))
 	}
-	if config.CanChangeInfo != nil {
-		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
+	if config.Permissions.CanChangeInfo != nil {
+		v.Add("can_change_info", strconv.FormatBool(*config.Permissions.CanChangeInfo))
 	}
-	if config.CanInviteUsers != nil {
-		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
+	if config.Permissions.CanInviteUsers != nil {
+		v.Add("can_invite_users", strconv.FormatBool(*config.Permissions.CanInviteUsers))
 	}
-	if config.CanPinMessages != nil {
-		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
+	if config.Permissions.CanPinMessages != nil {
+		v.Add("can_pin_messages", strconv.FormatBool(*config.Permissions.CanPinMessages))
 	}
 
 	bot.debugLog("setChatPermissions", v, nil)
