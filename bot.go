@@ -788,31 +788,10 @@ func (bot *BotAPI) SetChatPermissions(config SetChatPermissionsConfig) (APIRespo
 	} else {
 		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 	}
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 
-	if config.Permissions.CanSendMessages != nil {
-		v.Add("can_send_messages", strconv.FormatBool(*config.Permissions.CanSendMessages))
-	}
-	if config.Permissions.CanSendMediaMessages != nil {
-		v.Add("can_send_media_messages", strconv.FormatBool(*config.Permissions.CanSendMediaMessages))
-	}
-	if config.Permissions.CanSendPolls != nil {
-		v.Add("can_send_polls", strconv.FormatBool(*config.Permissions.CanSendPolls))
-	}
-	if config.Permissions.CanSendOtherMessages != nil {
-		v.Add("can_send_other_messages", strconv.FormatBool(*config.Permissions.CanSendOtherMessages))
-	}
-	if config.Permissions.CanAddWebPagePreviews != nil {
-		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.Permissions.CanAddWebPagePreviews))
-	}
-	if config.Permissions.CanChangeInfo != nil {
-		v.Add("can_change_info", strconv.FormatBool(*config.Permissions.CanChangeInfo))
-	}
-	if config.Permissions.CanInviteUsers != nil {
-		v.Add("can_invite_users", strconv.FormatBool(*config.Permissions.CanInviteUsers))
-	}
-	if config.Permissions.CanPinMessages != nil {
-		v.Add("can_pin_messages", strconv.FormatBool(*config.Permissions.CanPinMessages))
+	if config.Permissions != nil {
+		data, _ := json.Marshal(config.Permissions)
+		v.Add("permissions", string(data))
 	}
 
 	bot.debugLog("setChatPermissions", v, nil)
