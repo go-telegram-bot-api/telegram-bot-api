@@ -776,6 +776,50 @@ func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIRespo
 	return bot.MakeRequest("restrictChatMember", v)
 }
 
+// SetChatPermissionsConfig to restrict a user in a supergroup. The bot must be an
+//administrator in the supergroup for this to work and must have the
+//appropriate admin rights. Pass True for all boolean parameters to lift
+//restrictions from a user. Returns True on success.
+func (bot *BotAPI) SetChatPermissions(config SetChatPermissionsConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.CanSendMessages != nil {
+		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
+	}
+	if config.CanSendMediaMessages != nil {
+		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
+	}
+	if config.CanSendPolls != nil {
+		v.Add("can_send_polls", strconv.FormatBool(*config.CanSendPolls))
+	}
+	if config.CanSendOtherMessages != nil {
+		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
+	}
+	if config.CanAddWebPagePreviews != nil {
+		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
+	}
+	if config.CanChangeInfo != nil {
+		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
+	}
+	if config.CanInviteUsers != nil {
+		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
+	}
+	if config.CanPinMessages != nil {
+		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
+	}
+
+	bot.debugLog("setChatPermissions", v, nil)
+
+	return bot.MakeRequest("setChatPermissions", v)
+}
+
 // PromoteChatMember add admin rights to user
 func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
