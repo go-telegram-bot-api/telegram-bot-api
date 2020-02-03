@@ -74,7 +74,6 @@ func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
 	b.apiEndpoint = apiEndpoint
 }
 
-
 // buildUrl returns a full path to send Bot request.
 //
 // It requires the Bot method string.
@@ -519,9 +518,11 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
-				log.Println(err)
-				log.Println("Failed to get updates, retrying in 3 seconds...")
-				time.Sleep(time.Second * 3)
+				if bot.Debug {
+					log.Println(err)
+					log.Println("Failed to get updates, retrying in 2 seconds...")
+				}
+				time.Sleep(time.Second * 2)
 
 				continue
 			}
