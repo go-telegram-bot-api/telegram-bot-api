@@ -294,26 +294,58 @@ func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
 // two to ten InputMediaPhoto or InputMediaVideo.
 func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 	return MediaGroupConfig{
-		BaseChat: BaseChat{
-			ChatID: chatID,
-		},
-		InputMedia: files,
+		ChatID: chatID,
+		Media:  files,
 	}
 }
 
 // NewInputMediaPhoto creates a new InputMediaPhoto.
 func NewInputMediaPhoto(media string) InputMediaPhoto {
 	return InputMediaPhoto{
-		Type:  "photo",
-		Media: media,
+		BaseInputMedia{
+			Type:  "photo",
+			Media: media,
+		},
 	}
 }
 
 // NewInputMediaVideo creates a new InputMediaVideo.
 func NewInputMediaVideo(media string) InputMediaVideo {
 	return InputMediaVideo{
-		Type:  "video",
-		Media: media,
+		BaseInputMedia: BaseInputMedia{
+			Type:  "video",
+			Media: media,
+		},
+	}
+}
+
+// NewInputMediaAnimation creates a new InputMediaAnimation.
+func NewInputMediaAnimation(media string) InputMediaAnimation {
+	return InputMediaAnimation{
+		BaseInputMedia: BaseInputMedia{
+			Type:  "animation",
+			Media: media,
+		},
+	}
+}
+
+// NewInputMediaAudio creates a new InputMediaAudio.
+func NewInputMediaAudio(media string) InputMediaAudio {
+	return InputMediaAudio{
+		BaseInputMedia: BaseInputMedia{
+			Type:  "audio",
+			Media: media,
+		},
+	}
+}
+
+// NewInputMediaDocument creates a new InputMediaDocument.
+func NewInputMediaDocument(media string) InputMediaDocument {
+	return InputMediaDocument{
+		BaseInputMedia: BaseInputMedia{
+			Type:  "document",
+			Media: media,
+		},
 	}
 }
 
@@ -783,7 +815,7 @@ func NewCallbackWithAlert(id, text string) CallbackConfig {
 }
 
 // NewInvoice creates a new Invoice request to the user.
-func NewInvoice(chatID int64, title, description, payload, providerToken, startParameter, currency string, prices *[]LabeledPrice) InvoiceConfig {
+func NewInvoice(chatID int64, title, description, payload, providerToken, startParameter, currency string, prices []LabeledPrice) InvoiceConfig {
 	return InvoiceConfig{
 		BaseChat:       BaseChat{ChatID: chatID},
 		Title:          title,
@@ -822,6 +854,63 @@ func NewSetChatPhotoShare(chatID int64, fileID string) SetChatPhotoConfig {
 			BaseChat:    BaseChat{ChatID: chatID},
 			FileID:      fileID,
 			UseExisting: true,
+		},
+	}
+}
+
+// NewChatTitle allows you to update the title of a chat.
+func NewChatTitle(chatID int64, title string) SetChatTitleConfig {
+	return SetChatTitleConfig{
+		ChatID: chatID,
+		Title:  title,
+	}
+}
+
+// NewChatDescription allows you to update the description of a chat.
+func NewChatDescription(chatID int64, description string) SetChatDescriptionConfig {
+	return SetChatDescriptionConfig{
+		ChatID:      chatID,
+		Description: description,
+	}
+}
+
+// NewChatPhoto allows you to update the photo for a chat.
+func NewChatPhoto(chatID int64, photo interface{}) SetChatPhotoConfig {
+	return SetChatPhotoConfig{
+		BaseFile: BaseFile{
+			BaseChat: BaseChat{
+				ChatID: chatID,
+			},
+			File: photo,
+		},
+	}
+}
+
+// NewDeleteChatPhoto allows you to delete the photo for a chat.
+func NewDeleteChatPhoto(chatID int64, photo interface{}) DeleteChatPhotoConfig {
+	return DeleteChatPhotoConfig{
+		ChatID: chatID,
+	}
+}
+
+// NewPoll allows you to create a new poll.
+func NewPoll(chatID int64, question string, options ...string) SendPollConfig {
+	return SendPollConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Question:    question,
+		Options:     options,
+		IsAnonymous: true, // This is Telegram's default.
+	}
+}
+
+// NewStopPoll allows you to stop a poll.
+func NewStopPoll(chatID int64, messageID int) StopPollConfig {
+	return StopPollConfig{
+		BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
 		},
 	}
 }

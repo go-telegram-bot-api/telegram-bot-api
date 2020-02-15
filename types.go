@@ -37,6 +37,8 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
+	Poll               *Poll               `json:"poll"`
+	PollAnswer         *PollAnswer         `json:"poll_answer"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -51,12 +53,15 @@ func (ch UpdatesChannel) Clear() {
 
 // User is a user on Telegram.
 type User struct {
-	ID           int    `json:"id"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`     // optional
-	UserName     string `json:"username"`      // optional
-	LanguageCode string `json:"language_code"` // optional
-	IsBot        bool   `json:"is_bot"`        // optional
+	ID                      int    `json:"id"`
+	FirstName               string `json:"first_name"`
+	LastName                string `json:"last_name"`                   // optional
+	UserName                string `json:"username"`                    // optional
+	LanguageCode            string `json:"language_code"`               // optional
+	IsBot                   bool   `json:"is_bot"`                      // optional
+	CanJoinGroups           bool   `json:"can_join_groups"`             // optional
+	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages"` // optional
+	SupportsInlineQueries   bool   `json:"supports_inline_queries"`     // optional
 }
 
 // String displays a simple text version of a user.
@@ -84,23 +89,42 @@ type GroupChat struct {
 
 // ChatPhoto represents a chat photo.
 type ChatPhoto struct {
-	SmallFileID string `json:"small_file_id"`
-	BigFileID   string `json:"big_file_id"`
+	SmallFileID       string `json:"small_file_id"`
+	SmallFileUniqueID string `json:"small_file_unique_id"`
+	BigFileID         string `json:"big_file_id"`
+	BigFileUniqueID   string `json:"big_file_unique_id"`
+}
+
+// ChatPermissions describes actions that a non-administrator user is
+// allowed to take in a chat. All fields are optional.
+type ChatPermissions struct {
+	CanSendMessages       bool `json:"can_send_messages"`
+	CanSendMediaMessages  bool `json:"can_send_media_messages"`
+	CanSendPolls          bool `json:"can_send_polls"`
+	CanSendOtherMessages  bool `json:"can_send_other_messages"`
+	CanAddWebPagePreviews bool `json:"can_add_web_page_previews"`
+	CanChangeInfo         bool `json:"can_change_info"`
+	CanInviteUsers        bool `json:"can_invite_users"`
+	CanPinMessages        bool `json:"can_pin_messages"`
 }
 
 // Chat contains information about the place a message was sent.
 type Chat struct {
-	ID                  int64      `json:"id"`
-	Type                string     `json:"type"`
-	Title               string     `json:"title"`                          // optional
-	UserName            string     `json:"username"`                       // optional
-	FirstName           string     `json:"first_name"`                     // optional
-	LastName            string     `json:"last_name"`                      // optional
-	AllMembersAreAdmins bool       `json:"all_members_are_administrators"` // optional
-	Photo               *ChatPhoto `json:"photo"`
-	Description         string     `json:"description,omitempty"` // optional
-	InviteLink          string     `json:"invite_link,omitempty"` // optional
-	PinnedMessage       *Message   `json:"pinned_message"`        // optional
+	ID                  int64            `json:"id"`
+	Type                string           `json:"type"`
+	Title               string           `json:"title"`                          // optional
+	UserName            string           `json:"username"`                       // optional
+	FirstName           string           `json:"first_name"`                     // optional
+	LastName            string           `json:"last_name"`                      // optional
+	AllMembersAreAdmins bool             `json:"all_members_are_administrators"` // deprecated, optional
+	Photo               *ChatPhoto       `json:"photo"`                          // optional
+	Description         string           `json:"description,omitempty"`          // optional
+	InviteLink          string           `json:"invite_link,omitempty"`          // optional
+	PinnedMessage       *Message         `json:"pinned_message"`                 // optional
+	Permissions         *ChatPermissions `json:"permissions"`                    // optional
+	SlowModeDelay       int              `json:"slow_mode_delay"`                // optional
+	StickerSetName      string           `json:"sticker_set_name"`               // optional
+	CanSetStickerSet    bool             `json:"can_set_sticker_set"`            // optional
 }
 
 // IsPrivate returns if the Chat is a private conversation.
@@ -131,46 +155,53 @@ func (c Chat) ChatConfig() ChatConfig {
 // Message is returned by almost every request, and contains data about
 // almost anything.
 type Message struct {
-	MessageID             int                `json:"message_id"`
-	From                  *User              `json:"from"` // optional
-	Date                  int                `json:"date"`
-	Chat                  *Chat              `json:"chat"`
-	ForwardFrom           *User              `json:"forward_from"`            // optional
-	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
-	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
-	ForwardDate           int                `json:"forward_date"`            // optional
-	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
-	EditDate              int                `json:"edit_date"`               // optional
-	Text                  string             `json:"text"`                    // optional
-	Entities              *[]MessageEntity   `json:"entities"`                // optional
-	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
-	Audio                 *Audio             `json:"audio"`                   // optional
-	Document              *Document          `json:"document"`                // optional
-	Animation             *ChatAnimation     `json:"animation"`               // optional
-	Game                  *Game              `json:"game"`                    // optional
-	Photo                 *[]PhotoSize       `json:"photo"`                   // optional
-	Sticker               *Sticker           `json:"sticker"`                 // optional
-	Video                 *Video             `json:"video"`                   // optional
-	VideoNote             *VideoNote         `json:"video_note"`              // optional
-	Voice                 *Voice             `json:"voice"`                   // optional
-	Caption               string             `json:"caption"`                 // optional
-	Contact               *Contact           `json:"contact"`                 // optional
-	Location              *Location          `json:"location"`                // optional
-	Venue                 *Venue             `json:"venue"`                   // optional
-	NewChatMembers        *[]User            `json:"new_chat_members"`        // optional
-	LeftChatMember        *User              `json:"left_chat_member"`        // optional
-	NewChatTitle          string             `json:"new_chat_title"`          // optional
-	NewChatPhoto          *[]PhotoSize       `json:"new_chat_photo"`          // optional
-	DeleteChatPhoto       bool               `json:"delete_chat_photo"`       // optional
-	GroupChatCreated      bool               `json:"group_chat_created"`      // optional
-	SuperGroupChatCreated bool               `json:"supergroup_chat_created"` // optional
-	ChannelChatCreated    bool               `json:"channel_chat_created"`    // optional
-	MigrateToChatID       int64              `json:"migrate_to_chat_id"`      // optional
-	MigrateFromChatID     int64              `json:"migrate_from_chat_id"`    // optional
-	PinnedMessage         *Message           `json:"pinned_message"`          // optional
-	Invoice               *Invoice           `json:"invoice"`                 // optional
-	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
-	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	MessageID             int                   `json:"message_id"`
+	From                  *User                 `json:"from"` // optional
+	Date                  int                   `json:"date"`
+	Chat                  *Chat                 `json:"chat"`
+	ForwardFrom           *User                 `json:"forward_from"`            // optional
+	ForwardFromChat       *Chat                 `json:"forward_from_chat"`       // optional
+	ForwardFromMessageID  int                   `json:"forward_from_message_id"` // optional
+	ForwardSignature      string                `json:"forward_signature"`       // optional
+	ForwardSenderName     string                `json:"forward_sender_name"`     // optional
+	ForwardDate           int                   `json:"forward_date"`            // optional
+	ReplyToMessage        *Message              `json:"reply_to_message"`        // optional
+	EditDate              int                   `json:"edit_date"`               // optional
+	MediaGroupID          string                `json:"media_group_id"`          // optional
+	AuthorSignature       string                `json:"author_signature"`        // optional
+	Text                  string                `json:"text"`                    // optional
+	Entities              []MessageEntity       `json:"entities"`                // optional
+	CaptionEntities       []MessageEntity       `json:"caption_entities"`        // optional
+	Audio                 *Audio                `json:"audio"`                   // optional
+	Document              *Document             `json:"document"`                // optional
+	Animation             *ChatAnimation        `json:"animation"`               // optional
+	Game                  *Game                 `json:"game"`                    // optional
+	Photo                 []PhotoSize           `json:"photo"`                   // optional
+	Sticker               *Sticker              `json:"sticker"`                 // optional
+	Video                 *Video                `json:"video"`                   // optional
+	VideoNote             *VideoNote            `json:"video_note"`              // optional
+	Voice                 *Voice                `json:"voice"`                   // optional
+	Caption               string                `json:"caption"`                 // optional
+	Contact               *Contact              `json:"contact"`                 // optional
+	Location              *Location             `json:"location"`                // optional
+	Venue                 *Venue                `json:"venue"`                   // optional
+	Poll                  *Poll                 `json:"poll"`                    // optional
+	NewChatMembers        []User                `json:"new_chat_members"`        // optional
+	LeftChatMember        *User                 `json:"left_chat_member"`        // optional
+	NewChatTitle          string                `json:"new_chat_title"`          // optional
+	NewChatPhoto          []PhotoSize           `json:"new_chat_photo"`          // optional
+	DeleteChatPhoto       bool                  `json:"delete_chat_photo"`       // optional
+	GroupChatCreated      bool                  `json:"group_chat_created"`      // optional
+	SuperGroupChatCreated bool                  `json:"supergroup_chat_created"` // optional
+	ChannelChatCreated    bool                  `json:"channel_chat_created"`    // optional
+	MigrateToChatID       int64                 `json:"migrate_to_chat_id"`      // optional
+	MigrateFromChatID     int64                 `json:"migrate_from_chat_id"`    // optional
+	PinnedMessage         *Message              `json:"pinned_message"`          // optional
+	Invoice               *Invoice              `json:"invoice"`                 // optional
+	SuccessfulPayment     *SuccessfulPayment    `json:"successful_payment"`      // optional
+	ConnectedWebsite      string                `json:"connected_website"`       // optional
+	PassportData          *PassportData         `json:"passport_data,omitempty"` // optional
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup"`            // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -180,11 +211,11 @@ func (m *Message) Time() time.Time {
 
 // IsCommand returns true if message starts with a "bot_command" entity.
 func (m *Message) IsCommand() bool {
-	if m.Entities == nil || len(*m.Entities) == 0 {
+	if m.Entities == nil || len(m.Entities) == 0 {
 		return false
 	}
 
-	entity := (*m.Entities)[0]
+	entity := m.Entities[0]
 	return entity.Offset == 0 && entity.IsCommand()
 }
 
@@ -214,7 +245,7 @@ func (m *Message) CommandWithAt() string {
 	}
 
 	// IsCommand() checks that the message begins with a bot_command entity
-	entity := (*m.Entities)[0]
+	entity := m.Entities[0]
 	return m.Text[1:entity.Length]
 }
 
@@ -233,7 +264,8 @@ func (m *Message) CommandArguments() string {
 	}
 
 	// IsCommand() checks that the message begins with a bot_command entity
-	entity := (*m.Entities)[0]
+	entity := m.Entities[0]
+
 	if len(m.Text) == entity.Length {
 		return "" // The command makes up the whole message
 	}
@@ -243,11 +275,12 @@ func (m *Message) CommandArguments() string {
 
 // MessageEntity contains information about data in a Message.
 type MessageEntity struct {
-	Type   string `json:"type"`
-	Offset int    `json:"offset"`
-	Length int    `json:"length"`
-	URL    string `json:"url"`  // optional
-	User   *User  `json:"user"` // optional
+	Type     string `json:"type"`
+	Offset   int    `json:"offset"`
+	Length   int    `json:"length"`
+	URL      string `json:"url"`      // optional
+	User     *User  `json:"user"`     // optional
+	Language string `json:"language"` // optional
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
@@ -311,41 +344,61 @@ func (e MessageEntity) IsTextLink() bool {
 
 // PhotoSize contains information about photos.
 type PhotoSize struct {
-	FileID   string `json:"file_id"`
-	Width    int    `json:"width"`
-	Height   int    `json:"height"`
-	FileSize int    `json:"file_size"` // optional
+	FileID       string `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
+	Width        int    `json:"width"`
+	Height       int    `json:"height"`
+	FileSize     int    `json:"file_size"` // optional
 }
 
 // Audio contains information about audio.
 type Audio struct {
-	FileID    string `json:"file_id"`
-	Duration  int    `json:"duration"`
-	Performer string `json:"performer"` // optional
-	Title     string `json:"title"`     // optional
-	MimeType  string `json:"mime_type"` // optional
-	FileSize  int    `json:"file_size"` // optional
+	FileID       string `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
+	Duration     int    `json:"duration"`
+	Performer    string `json:"performer"` // optional
+	Title        string `json:"title"`     // optional
+	MimeType     string `json:"mime_type"` // optional
+	FileSize     int    `json:"file_size"` // optional
 }
 
 // Document contains information about a document.
 type Document struct {
-	FileID    string     `json:"file_id"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	FileName  string     `json:"file_name"` // optional
-	MimeType  string     `json:"mime_type"` // optional
-	FileSize  int        `json:"file_size"` // optional
+	FileID       string     `json:"file_id"`
+	FileUniqueID string     `json:"file_unique_id"`
+	Thumbnail    *PhotoSize `json:"thumb"`     // optional
+	FileName     string     `json:"file_name"` // optional
+	MimeType     string     `json:"mime_type"` // optional
+	FileSize     int        `json:"file_size"` // optional
 }
 
 // Sticker contains information about a sticker.
 type Sticker struct {
-	FileID     string     `json:"file_id"`
-	Width      int        `json:"width"`
-	Height     int        `json:"height"`
-	Thumbnail  *PhotoSize `json:"thumb"`       // optional
-	Emoji      string     `json:"emoji"`       // optional
-	FileSize   int        `json:"file_size"`   // optional
-	SetName    string     `json:"set_name"`    // optional
-	IsAnimated bool       `json:"is_animated"` // optional
+	FileID       string       `json:"file_id"`
+	FileUniqueID string       `json:"file_unique_id"`
+	Width        int          `json:"width"`
+	Height       int          `json:"height"`
+	IsAnimated   bool         `json:"is_animated"`
+	Thumbnail    *PhotoSize   `json:"thumb"`         // optional
+	Emoji        string       `json:"emoji"`         // optional
+	SetName      string       `json:"set_name"`      // optional
+	MaskPosition MaskPosition `json:"mask_position"` //optional
+	FileSize     int          `json:"file_size"`     // optional
+}
+
+// MaskPosition is the position of a mask.
+type MaskPosition struct {
+	Point     string     `json:"point"`
+	XShift    float32    `json:"x_shift"`
+	YShift    float32    `json:"y_shift"`
+	Scale     float32    `json:"scale"`
+	FileID    string     `json:"file_id"`
+	Width     int        `json:"width"`
+	Height    int        `json:"height"`
+	Thumbnail *PhotoSize `json:"thumb"`     // optional
+	Emoji     string     `json:"emoji"`     // optional
+	FileSize  int        `json:"file_size"` // optional
+	SetName   string     `json:"set_name"`  // optional
 }
 
 // ChatAnimation contains information about an animation.
@@ -362,30 +415,33 @@ type ChatAnimation struct {
 
 // Video contains information about a video.
 type Video struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Duration  int        `json:"duration"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	MimeType  string     `json:"mime_type"` // optional
-	FileSize  int        `json:"file_size"` // optional
+	FileID       string     `json:"file_id"`
+	FileUniqueID string     `json:"file_unique_id"`
+	Width        int        `json:"width"`
+	Height       int        `json:"height"`
+	Duration     int        `json:"duration"`
+	Thumbnail    *PhotoSize `json:"thumb"`     // optional
+	MimeType     string     `json:"mime_type"` // optional
+	FileSize     int        `json:"file_size"` // optional
 }
 
 // VideoNote contains information about a video.
 type VideoNote struct {
-	FileID    string     `json:"file_id"`
-	Length    int        `json:"length"`
-	Duration  int        `json:"duration"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	FileSize  int        `json:"file_size"` // optional
+	FileID       string     `json:"file_id"`
+	FileUniqueID string     `json:"file_unique_id"`
+	Length       int        `json:"length"`
+	Duration     int        `json:"duration"`
+	Thumbnail    *PhotoSize `json:"thumb"`     // optional
+	FileSize     int        `json:"file_size"` // optional
 }
 
 // Voice contains information about a voice.
 type Voice struct {
-	FileID   string `json:"file_id"`
-	Duration int    `json:"duration"`
-	MimeType string `json:"mime_type"` // optional
-	FileSize int    `json:"file_size"` // optional
+	FileID       string `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
+	Duration     int    `json:"duration"`
+	MimeType     string `json:"mime_type"` // optional
+	FileSize     int    `json:"file_size"` // optional
 }
 
 // Contact contains information about a contact.
@@ -396,6 +452,7 @@ type Contact struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"` // optional
 	UserID      int    `json:"user_id"`   // optional
+	VCard       string `json:"vcard"`     // optional
 }
 
 // Location contains information about a place.
@@ -412,6 +469,31 @@ type Venue struct {
 	FoursquareID string   `json:"foursquare_id"` // optional
 }
 
+// PollOption contains information about one answer option in a poll.
+type PollOption struct {
+	Text       string `json:"text"`
+	VoterCount int    `json:"voter_count"`
+}
+
+// PollAnswer represents an answer of a user in a non-anonymous poll.
+type PollAnswer struct {
+	PollID    string `json:"poll_id"`
+	User      User   `json:"user"`
+	OptionIDs []int  `json:"option_ids"`
+}
+
+// Poll contains information about a poll.
+type Poll struct {
+	ID                    string       `json:"id"`
+	Question              string       `json:"question"`
+	Options               []PollOption `json:"options"`
+	IsClosed              bool         `json:"is_closed"`
+	IsAnonymous           bool         `json:"is_anonymous"`
+	Type                  string       `json:"type"`
+	AllowsMultipleAnswers bool         `json:"allows_multiple_answers"`
+	CorrectOptionID       int          `json:"correct_option_id"` // optional
+}
+
 // UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
 	TotalCount int           `json:"total_count"`
@@ -420,9 +502,10 @@ type UserProfilePhotos struct {
 
 // File contains information about a file to download from Telegram.
 type File struct {
-	FileID   string `json:"file_id"`
-	FileSize int    `json:"file_size"` // optional
-	FilePath string `json:"file_path"` // optional
+	FileID       string `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
+	FileSize     int    `json:"file_size"` // optional
+	FilePath     string `json:"file_path"` // optional
 }
 
 // Link returns a full path to the download URL for a File.
@@ -442,9 +525,16 @@ type ReplyKeyboardMarkup struct {
 
 // KeyboardButton is a button within a custom keyboard.
 type KeyboardButton struct {
-	Text            string `json:"text"`
-	RequestContact  bool   `json:"request_contact"`
-	RequestLocation bool   `json:"request_location"`
+	Text            string                 `json:"text"`
+	RequestContact  bool                   `json:"request_contact"`
+	RequestLocation bool                   `json:"request_location"`
+	RequestPoll     KeyboardButtonPollType `json:"request_poll"`
+}
+
+// KeyboardButtonPollType represents type of a poll, which is allowed to
+// be created and sent when the corresponding button is pressed.
+type KeyboardButtonPollType struct {
+	Type string `json:"type"`
 }
 
 // ReplyKeyboardHide allows the Bot to hide a custom keyboard.
@@ -474,11 +564,20 @@ type InlineKeyboardMarkup struct {
 type InlineKeyboardButton struct {
 	Text                         string        `json:"text"`
 	URL                          *string       `json:"url,omitempty"`                              // optional
+	LoginURL                     *LoginURL     `json:"login_url,omitempty"`                        // optional
 	CallbackData                 *string       `json:"callback_data,omitempty"`                    // optional
 	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
 	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
 	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
 	Pay                          bool          `json:"pay,omitempty"`                              // optional
+}
+
+// LoginURL is the parameters for the login inline keyboard button type.
+type LoginURL struct {
+	URL                string `json:"url"`
+	ForwardText        string `json:"forward_text"`
+	BotUsername        string `json:"bot_username"`
+	RequestWriteAccess bool   `json:"request_write_access"`
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
@@ -504,18 +603,21 @@ type ForceReply struct {
 type ChatMember struct {
 	User                  *User  `json:"user"`
 	Status                string `json:"status"`
+	CustomTitle           string `json:"custom_title"`                        // optional
 	UntilDate             int64  `json:"until_date,omitempty"`                // optional
 	CanBeEdited           bool   `json:"can_be_edited,omitempty"`             // optional
-	CanChangeInfo         bool   `json:"can_change_info,omitempty"`           // optional
 	CanPostMessages       bool   `json:"can_post_messages,omitempty"`         // optional
 	CanEditMessages       bool   `json:"can_edit_messages,omitempty"`         // optional
 	CanDeleteMessages     bool   `json:"can_delete_messages,omitempty"`       // optional
-	CanInviteUsers        bool   `json:"can_invite_users,omitempty"`          // optional
 	CanRestrictMembers    bool   `json:"can_restrict_members,omitempty"`      // optional
-	CanPinMessages        bool   `json:"can_pin_messages,omitempty"`          // optional
 	CanPromoteMembers     bool   `json:"can_promote_members,omitempty"`       // optional
+	CanChangeInfo         bool   `json:"can_change_info,omitempty"`           // optional
+	CanInviteUsers        bool   `json:"can_invite_users,omitempty"`          // optional
+	CanPinMessages        bool   `json:"can_pin_messages,omitempty"`          // optional
+	IsChatMember          bool   `json:"is_member"`                           // optional
 	CanSendMessages       bool   `json:"can_send_messages,omitempty"`         // optional
 	CanSendMediaMessages  bool   `json:"can_send_media_messages,omitempty"`   // optional
+	CanSendPolls          bool   `json:"can_send_polls,omitempty"`            // optional
 	CanSendOtherMessages  bool   `json:"can_send_other_messages,omitempty"`   // optional
 	CanAddWebPagePreviews bool   `json:"can_add_web_page_previews,omitempty"` // optional
 }
@@ -547,11 +649,12 @@ type Game struct {
 
 // Animation is a GIF animation demonstrating the game.
 type Animation struct {
-	FileID   string    `json:"file_id"`
-	Thumb    PhotoSize `json:"thumb"`
-	FileName string    `json:"file_name"`
-	MimeType string    `json:"mime_type"`
-	FileSize int       `json:"file_size"`
+	FileID       string    `json:"file_id"`
+	FileUniqueID string    `json:"file_unique_id"`
+	Thumb        PhotoSize `json:"thumb"`
+	FileName     string    `json:"file_name"`
+	MimeType     string    `json:"mime_type"`
+	FileSize     int       `json:"file_size"`
 }
 
 // GameHighScore is a user's score and position on the leaderboard.
@@ -576,27 +679,6 @@ type WebhookInfo struct {
 // IsSet returns true if a webhook is currently set.
 func (info WebhookInfo) IsSet() bool {
 	return info.URL != ""
-}
-
-// InputMediaPhoto contains a photo for displaying as part of a media group.
-type InputMediaPhoto struct {
-	Type      string `json:"type"`
-	Media     string `json:"media"`
-	Caption   string `json:"caption"`
-	ParseMode string `json:"parse_mode"`
-}
-
-// InputMediaVideo contains a video for displaying as part of a media group.
-type InputMediaVideo struct {
-	Type  string `json:"type"`
-	Media string `json:"media"`
-	// thumb intentionally missing as it is not currently compatible
-	Caption           string `json:"caption"`
-	ParseMode         string `json:"parse_mode"`
-	Width             int    `json:"width"`
-	Height            int    `json:"height"`
-	Duration          int    `json:"duration"`
-	SupportsStreaming bool   `json:"supports_streaming"`
 }
 
 // InlineQuery is a Query from Telegram for an inline request.
@@ -816,11 +898,27 @@ type InlineQueryResultCachedDocument struct {
 
 // InlineQueryResultLocation is an inline query response location.
 type InlineQueryResultLocation struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	Latitude            float64               `json:"latitude"`  // required
-	Longitude           float64               `json:"longitude"` // required
-	Title               string                `json:"title"`     // required
+	Type                string                `json:"type"`        // required
+	ID                  string                `json:"id"`          // required
+	Latitude            float64               `json:"latitude"`    // required
+	Longitude           float64               `json:"longitude"`   // required
+	LivePeriod          int                   `json:"live_period"` // optional
+	Title               string                `json:"title"`       // required
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	ThumbURL            string                `json:"thumb_url"`
+	ThumbWidth          int                   `json:"thumb_width"`
+	ThumbHeight         int                   `json:"thumb_height"`
+}
+
+// InlineQueryResultContact is an inline query response contact.
+type InlineQueryResultContact struct {
+	Type                string                `json:"type"`         // required
+	ID                  string                `json:"id"`           // required
+	PhoneNumber         string                `json:"phone_number"` // required
+	FirstName           string                `json:"first_name"`   // required
+	LastName            string                `json:"last_name"`
+	VCard               string                `json:"vcard"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`
@@ -893,6 +991,7 @@ type InputContactMessageContent struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
+	VCard       string `json:"vcard"`
 }
 
 // Invoice contains basic information about an invoice.
@@ -930,9 +1029,9 @@ type OrderInfo struct {
 
 // ShippingOption represents one shipping option.
 type ShippingOption struct {
-	ID     string          `json:"id"`
-	Title  string          `json:"title"`
-	Prices *[]LabeledPrice `json:"prices"`
+	ID     string         `json:"id"`
+	Title  string         `json:"title"`
+	Prices []LabeledPrice `json:"prices"`
 }
 
 // SuccessfulPayment contains basic information about a successful payment.
@@ -965,6 +1064,58 @@ type PreCheckoutQuery struct {
 	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
 }
 
+// StickerSet is a collection of stickers.
+type StickerSet struct {
+	Name          string    `json:"name"`
+	Title         string    `json:"title"`
+	IsAnimated    bool      `json:"is_animated"`
+	ContainsMasks bool      `json:"contains_masks"`
+	Stickers      []Sticker `json:"stickers"`
+}
+
+// BaseInputMedia is a base type for the InputMedia types.
+type BaseInputMedia struct {
+	Type      string `json:"type"`
+	Media     string `json:"media"`
+	Caption   string `json:"caption"`
+	ParseMode string `json:"parse_mode"`
+}
+
+// InputMediaPhoto is a photo to send as part of a media group.
+type InputMediaPhoto struct {
+	BaseInputMedia
+}
+
+// InputMediaVideo is a video to send as part of a media group.
+type InputMediaVideo struct {
+	BaseInputMedia
+	Width             int  `json:"width"`
+	Height            int  `json:"height"`
+	Duration          int  `json:"duration"`
+	SupportsStreaming bool `json:"supports_streaming"`
+}
+
+// InputMediaAnimation is an animation to send as part of a media group.
+type InputMediaAnimation struct {
+	BaseInputMedia
+	Width    int `json:"width"`
+	Height   int `json:"height"`
+	Duration int `json:"duration"`
+}
+
+// InputMediaAudio is a audio to send as part of a media group.
+type InputMediaAudio struct {
+	BaseInputMedia
+	Duration  int    `json:"duration"`
+	Performer string `json:"performer"`
+	Title     string `json:"title"`
+}
+
+// InputMediaDocument is a audio to send as part of a media group.
+type InputMediaDocument struct {
+	BaseInputMedia
+}
+
 // Error is an error containing extra information returned by the Telegram API.
 type Error struct {
 	Code    int
@@ -972,6 +1123,7 @@ type Error struct {
 	ResponseParameters
 }
 
+// Error message string.
 func (e Error) Error() string {
 	return e.Message
 }
