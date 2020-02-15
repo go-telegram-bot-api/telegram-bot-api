@@ -190,7 +190,7 @@ func TestChatIsSuperGroup(t *testing.T) {
 }
 
 func TestMessageEntityIsMention(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "mention"}
+	entity := MessageEntity{Type: "mention"}
 
 	if !entity.IsMention() {
 		t.Fail()
@@ -198,7 +198,7 @@ func TestMessageEntityIsMention(t *testing.T) {
 }
 
 func TestMessageEntityIsHashtag(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "hashtag"}
+	entity := MessageEntity{Type: "hashtag"}
 
 	if !entity.IsHashtag() {
 		t.Fail()
@@ -206,7 +206,7 @@ func TestMessageEntityIsHashtag(t *testing.T) {
 }
 
 func TestMessageEntityIsBotCommand(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "bot_command"}
+	entity := MessageEntity{Type: "bot_command"}
 
 	if !entity.IsCommand() {
 		t.Fail()
@@ -214,7 +214,7 @@ func TestMessageEntityIsBotCommand(t *testing.T) {
 }
 
 func TestMessageEntityIsUrl(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "url"}
+	entity := MessageEntity{Type: "url"}
 
 	if !entity.IsUrl() {
 		t.Fail()
@@ -222,7 +222,7 @@ func TestMessageEntityIsUrl(t *testing.T) {
 }
 
 func TestMessageEntityIsEmail(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "email"}
+	entity := MessageEntity{Type: "email"}
 
 	if !entity.IsEmail() {
 		t.Fail()
@@ -230,7 +230,7 @@ func TestMessageEntityIsEmail(t *testing.T) {
 }
 
 func TestMessageEntityIsBold(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "bold"}
+	entity := MessageEntity{Type: "bold"}
 
 	if !entity.IsBold() {
 		t.Fail()
@@ -238,7 +238,7 @@ func TestMessageEntityIsBold(t *testing.T) {
 }
 
 func TestMessageEntityIsItalic(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "italic"}
+	entity := MessageEntity{Type: "italic"}
 
 	if !entity.IsItalic() {
 		t.Fail()
@@ -246,7 +246,7 @@ func TestMessageEntityIsItalic(t *testing.T) {
 }
 
 func TestMessageEntityIsCode(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "code"}
+	entity := MessageEntity{Type: "code"}
 
 	if !entity.IsCode() {
 		t.Fail()
@@ -254,7 +254,7 @@ func TestMessageEntityIsCode(t *testing.T) {
 }
 
 func TestMessageEntityIsPre(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "pre"}
+	entity := MessageEntity{Type: "pre"}
 
 	if !entity.IsPre() {
 		t.Fail()
@@ -262,7 +262,7 @@ func TestMessageEntityIsPre(t *testing.T) {
 }
 
 func TestMessageEntityIsTextLink(t *testing.T) {
-	entity := tgbotapi.MessageEntity{Type: "text_link"}
+	entity := MessageEntity{Type: "text_link"}
 
 	if !entity.IsTextLink() {
 		t.Fail()
