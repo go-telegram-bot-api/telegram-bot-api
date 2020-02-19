@@ -196,10 +196,10 @@ func (bot *BotAPI) UploadFile(endpoint string, params Params, fieldname string, 
 		buf := bytes.NewBuffer(data)
 
 		ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
-	case url.URL:
-		params[fieldname] = f.String()
-
-		ms.WriteFields(params)
+	//case url.URL:
+	//	params[fieldname] = f.String()
+	//
+	//	ms.WriteFields(params)
 	default:
 		return APIResponse{}, errors.New(ErrBadFileType)
 	}
@@ -295,8 +295,13 @@ func (bot *BotAPI) Request(c Chattable) (APIResponse, error) {
 		if t.useExistingFile() {
 			return bot.MakeRequest(t.method(), params)
 		}
-
-		return bot.UploadFile(t.method(), params, t.name(), t.getFile())
+		switch f := t.getFile().(type){
+		case url.URL:
+			params[t.name()] = f.String()
+			return bot.MakeRequest(c.method(), params)
+		default:
+			return bot.UploadFile(t.method(), params, t.name(), f)
+		}
 	default:
 		return bot.MakeRequest(c.method(), params)
 	}

@@ -297,7 +297,7 @@ type VideoConfig struct {
 }
 
 func (config VideoConfig) params() (Params, error) {
-	params, err := config.BaseChat.params()
+	params, err := config.BaseFile.params()
 
 	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
