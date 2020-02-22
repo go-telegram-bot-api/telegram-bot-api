@@ -495,6 +495,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 		for {
 			select {
 			case <-bot.shutdownChannel:
+				close(ch)
 				return
 			default:
 			}
