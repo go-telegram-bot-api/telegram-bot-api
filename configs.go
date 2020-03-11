@@ -1,7 +1,6 @@
 package tgbotapi
 
 import (
-	"encoding/json"
 	"io"
 	"net/url"
 	"strconv"
@@ -36,8 +35,9 @@ const (
 
 // Constant values for ParseMode in MessageConfig
 const (
-	ModeMarkdown = "Markdown"
-	ModeHTML     = "HTML"
+	ModeMarkdown   = "Markdown"
+	ModeMarkdownV2 = "MarkdownV2"
+	ModeHTML       = "HTML"
 )
 
 // Library errors
@@ -49,14 +49,13 @@ const (
 
 // Chattable is any config type that can be sent.
 type Chattable interface {
-	values() (url.Values, error)
+	params() (Params, error)
 	method() string
 }
 
 // Fileable is any config type that can be sent that includes a file.
 type Fileable interface {
 	Chattable
-	params() (map[string]string, error)
 	name() string
 	getFile() interface{}
 	useExistingFile() bool
@@ -71,31 +70,16 @@ type BaseChat struct {
 	DisableNotification bool
 }
 
-// values returns url.Values representation of BaseChat
-func (chat *BaseChat) values() (url.Values, error) {
-	v := url.Values{}
-	if chat.ChannelUsername != "" {
-		v.Add("chat_id", chat.ChannelUsername)
-	} else {
-		v.Add("chat_id", strconv.FormatInt(chat.ChatID, 10))
-	}
+func (chat *BaseChat) params() (Params, error) {
+	params := make(Params)
 
-	if chat.ReplyToMessageID != 0 {
-		v.Add("reply_to_message_id", strconv.Itoa(chat.ReplyToMessageID))
-	}
+	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
+	params.AddBool("disable_notification", chat.DisableNotification)
 
-	if chat.ReplyMarkup != nil {
-		data, err := json.Marshal(chat.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
+	err := params.AddInterface("reply_markup", chat.ReplyMarkup)
 
-		v.Add("reply_markup", string(data))
-	}
-
-	v.Add("disable_notification", strconv.FormatBool(chat.DisableNotification))
-
-	return v, nil
+	return params, err
 }
 
 // BaseFile is a base type for all file config types.
@@ -108,48 +92,19 @@ type BaseFile struct {
 	FileSize    int
 }
 
-// params returns a map[string]string representation of BaseFile.
-func (file BaseFile) params() (map[string]string, error) {
-	params := make(map[string]string)
+func (file BaseFile) params() (Params, error) {
+	params, err := file.BaseChat.params()
 
-	if file.ChannelUsername != "" {
-		params["chat_id"] = file.ChannelUsername
-	} else {
-		params["chat_id"] = strconv.FormatInt(file.ChatID, 10)
-	}
+	params.AddNonEmpty("mime_type", file.MimeType)
+	params.AddNonZero("file_size", file.FileSize)
 
-	if file.ReplyToMessageID != 0 {
-		params["reply_to_message_id"] = strconv.Itoa(file.ReplyToMessageID)
-	}
-
-	if file.ReplyMarkup != nil {
-		data, err := json.Marshal(file.ReplyMarkup)
-		if err != nil {
-			return params, err
-		}
-
-		params["reply_markup"] = string(data)
-	}
-
-	if file.MimeType != "" {
-		params["mime_type"] = file.MimeType
-	}
-
-	if file.FileSize > 0 {
-		params["file_size"] = strconv.Itoa(file.FileSize)
-	}
-
-	params["disable_notification"] = strconv.FormatBool(file.DisableNotification)
-
-	return params, nil
+	return params, err
 }
 
-// getFile returns the file.
 func (file BaseFile) getFile() interface{} {
 	return file.File
 }
 
-// useExistingFile returns if the BaseFile has already been uploaded.
 func (file BaseFile) useExistingFile() bool {
 	return file.UseExisting
 }
@@ -163,29 +118,19 @@ type BaseEdit struct {
 	ReplyMarkup     *InlineKeyboardMarkup
 }
 
-func (edit BaseEdit) values() (url.Values, error) {
-	v := url.Values{}
+func (edit BaseEdit) params() (Params, error) {
+	params := make(Params)
 
-	if edit.InlineMessageID == "" {
-		if edit.ChannelUsername != "" {
-			v.Add("chat_id", edit.ChannelUsername)
-		} else {
-			v.Add("chat_id", strconv.FormatInt(edit.ChatID, 10))
-		}
-		v.Add("message_id", strconv.Itoa(edit.MessageID))
+	if edit.InlineMessageID != "" {
+		params["inline_message_id"] = edit.InlineMessageID
 	} else {
-		v.Add("inline_message_id", edit.InlineMessageID)
+		params.AddFirstValid("chat_id", edit.ChatID, edit.ChannelUsername)
+		params.AddNonZero("message_id", edit.MessageID)
 	}
 
-	if edit.ReplyMarkup != nil {
-		data, err := json.Marshal(edit.ReplyMarkup)
-		if err != nil {
-			return v, err
-		}
-		v.Add("reply_markup", string(data))
-	}
+	err := params.AddInterface("reply_markup", edit.ReplyMarkup)
 
-	return v, nil
+	return params, err
 }
 
 // MessageConfig contains information about a SendMessage request.
@@ -196,22 +141,19 @@ type MessageConfig struct {
 	DisableWebPagePreview bool
 }
 
-// values returns a url.Values representation of MessageConfig.
-func (config MessageConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
+func (config MessageConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
-	}
-	v.Add("text", config.Text)
-	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
-	if config.ParseMode != "" {
-		v.Add("parse_mode", config.ParseMode)
+		return params, err
 	}
 
-	return v, nil
+	params.AddNonEmpty("text", config.Text)
+	params.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
+
+	return params, nil
 }
 
-// method returns Telegram API method name for sending Message.
 func (config MessageConfig) method() string {
 	return "sendMessage"
 }
@@ -224,18 +166,18 @@ type ForwardConfig struct {
 	MessageID           int // required
 }
 
-// values returns a url.Values representation of ForwardConfig.
-func (config ForwardConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
+func (config ForwardConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
+		return params, err
 	}
-	v.Add("from_chat_id", strconv.FormatInt(config.FromChatID, 10))
-	v.Add("message_id", strconv.Itoa(config.MessageID))
-	return v, nil
+
+	params.AddNonZero64("from_chat_id", config.FromChatID)
+	params.AddNonZero("message_id", config.MessageID)
+
+	return params, nil
 }
 
-// method returns Telegram API method name for sending Forward.
 func (config ForwardConfig) method() string {
 	return "forwardMessage"
 }
@@ -247,44 +189,20 @@ type PhotoConfig struct {
 	ParseMode string
 }
 
-// Params returns a map[string]string representation of PhotoConfig.
-func (config PhotoConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
+func (config PhotoConfig) params() (Params, error) {
+	params, err := config.BaseFile.params()
 
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-		if config.ParseMode != "" {
-			params["parse_mode"] = config.ParseMode
-		}
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return params, nil
+	return params, err
 }
 
-// Values returns a url.Values representation of PhotoConfig.
-func (config PhotoConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
-
-	v.Add(config.name(), config.FileID)
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-		if config.ParseMode != "" {
-			v.Add("parse_mode", config.ParseMode)
-		}
-	}
-
-	return v, nil
-}
-
-// name returns the field name for the Photo.
 func (config PhotoConfig) name() string {
 	return "photo"
 }
 
-// method returns Telegram API method name for sending Photo.
 func (config PhotoConfig) method() string {
 	return "sendPhoto"
 }
@@ -299,64 +217,26 @@ type AudioConfig struct {
 	Title     string
 }
 
-// values returns a url.Values representation of AudioConfig.
-func (config AudioConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
+func (config AudioConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
+		return params, err
 	}
 
-	v.Add(config.name(), config.FileID)
-	if config.Duration != 0 {
-		v.Add("duration", strconv.Itoa(config.Duration))
-	}
-
-	if config.Performer != "" {
-		v.Add("performer", config.Performer)
-	}
-	if config.Title != "" {
-		v.Add("title", config.Title)
-	}
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-		if config.ParseMode != "" {
-			v.Add("parse_mode", config.ParseMode)
-		}
-	}
-
-	return v, nil
-}
-
-// params returns a map[string]string representation of AudioConfig.
-func (config AudioConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Duration != 0 {
-		params["duration"] = strconv.Itoa(config.Duration)
-	}
-
-	if config.Performer != "" {
-		params["performer"] = config.Performer
-	}
-	if config.Title != "" {
-		params["title"] = config.Title
-	}
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-		if config.ParseMode != "" {
-			params["parse_mode"] = config.ParseMode
-		}
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("performer", config.Performer)
+	params.AddNonEmpty("title", config.Title)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
 	return params, nil
 }
 
-// name returns the field name for the Audio.
 func (config AudioConfig) name() string {
 	return "audio"
 }
 
-// method returns Telegram API method name for sending Audio.
 func (config AudioConfig) method() string {
 	return "sendAudio"
 }
@@ -368,44 +248,20 @@ type DocumentConfig struct {
 	ParseMode string
 }
 
-// values returns a url.Values representation of DocumentConfig.
-func (config DocumentConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config DocumentConfig) params() (Params, error) {
+	params, err := config.BaseFile.params()
 
-	v.Add(config.name(), config.FileID)
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-		if config.ParseMode != "" {
-			v.Add("parse_mode", config.ParseMode)
-		}
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, nil
+	return params, err
 }
 
-// params returns a map[string]string representation of DocumentConfig.
-func (config DocumentConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-		if config.ParseMode != "" {
-			params["parse_mode"] = config.ParseMode
-		}
-	}
-
-	return params, nil
-}
-
-// name returns the field name for the Document.
 func (config DocumentConfig) name() string {
 	return "document"
 }
 
-// method returns Telegram API method name for sending Document.
 func (config DocumentConfig) method() string {
 	return "sendDocument"
 }
@@ -415,31 +271,18 @@ type StickerConfig struct {
 	BaseFile
 }
 
-// values returns a url.Values representation of StickerConfig.
-func (config StickerConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config StickerConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add(config.name(), config.FileID)
+	params.AddNonEmpty(config.name(), config.FileID)
 
-	return v, nil
+	return params, err
 }
 
-// params returns a map[string]string representation of StickerConfig.
-func (config StickerConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	return params, nil
-}
-
-// name returns the field name for the Sticker.
 func (config StickerConfig) name() string {
 	return "sticker"
 }
 
-// method returns Telegram API method name for sending Sticker.
 func (config StickerConfig) method() string {
 	return "sendSticker"
 }
@@ -447,52 +290,28 @@ func (config StickerConfig) method() string {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
-	Duration  int
-	Caption   string
-	ParseMode string
+	Duration          int
+	Caption           string
+	ParseMode         string
+	SupportsStreaming bool
 }
 
-// values returns a url.Values representation of VideoConfig.
-func (config VideoConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config VideoConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add(config.name(), config.FileID)
-	if config.Duration != 0 {
-		v.Add("duration", strconv.Itoa(config.Duration))
-	}
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-		if config.ParseMode != "" {
-			v.Add("parse_mode", config.ParseMode)
-		}
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddBool("supports_streaming", config.SupportsStreaming)
 
-	return v, nil
+	return params, err
 }
 
-// params returns a map[string]string representation of VideoConfig.
-func (config VideoConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-		if config.ParseMode != "" {
-			params["parse_mode"] = config.ParseMode
-		}
-	}
-
-	return params, nil
-}
-
-// name returns the field name for the Video.
 func (config VideoConfig) name() string {
 	return "video"
 }
 
-// method returns Telegram API method name for sending Video.
 func (config VideoConfig) method() string {
 	return "sendVideo"
 }
@@ -505,47 +324,21 @@ type AnimationConfig struct {
 	ParseMode string
 }
 
-// values returns a url.Values representation of AnimationConfig.
-func (config AnimationConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config AnimationConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add(config.name(), config.FileID)
-	if config.Duration != 0 {
-		v.Add("duration", strconv.Itoa(config.Duration))
-	}
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-		if config.ParseMode != "" {
-			v.Add("parse_mode", config.ParseMode)
-		}
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, nil
+	return params, err
 }
 
-// params returns a map[string]string representation of AnimationConfig.
-func (config AnimationConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-		if config.ParseMode != "" {
-			params["parse_mode"] = config.ParseMode
-		}
-	}
-
-	return params, nil
-}
-
-// name returns the field name for the Animation.
 func (config AnimationConfig) name() string {
 	return "animation"
 }
 
-// method returns Telegram API method name for sending Animation.
 func (config AnimationConfig) method() string {
 	return "sendAnimation"
 }
@@ -557,46 +350,20 @@ type VideoNoteConfig struct {
 	Length   int
 }
 
-// values returns a url.Values representation of VideoNoteConfig.
-func (config VideoNoteConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config VideoNoteConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add(config.name(), config.FileID)
-	if config.Duration != 0 {
-		v.Add("duration", strconv.Itoa(config.Duration))
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonZero("length", config.Length)
 
-	// Telegram API seems to have a bug, if no length is provided or it is 0, it will send an error response
-	if config.Length != 0 {
-		v.Add("length", strconv.Itoa(config.Length))
-	}
-
-	return v, nil
+	return params, err
 }
 
-// params returns a map[string]string representation of VideoNoteConfig.
-func (config VideoNoteConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Length != 0 {
-		params["length"] = strconv.Itoa(config.Length)
-	}
-	if config.Duration != 0 {
-		params["duration"] = strconv.Itoa(config.Duration)
-	}
-
-	return params, nil
-}
-
-// name returns the field name for the VideoNote.
 func (config VideoNoteConfig) name() string {
 	return "video_note"
 }
 
-// method returns Telegram API method name for sending VideoNote.
 func (config VideoNoteConfig) method() string {
 	return "sendVideoNote"
 }
@@ -609,103 +376,78 @@ type VoiceConfig struct {
 	Duration  int
 }
 
-// values returns a url.Values representation of VoiceConfig.
-func (config VoiceConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config VoiceConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add(config.name(), config.FileID)
-	if config.Duration != 0 {
-		v.Add("duration", strconv.Itoa(config.Duration))
-	}
-	if config.Caption != "" {
-		v.Add("caption", config.Caption)
-		if config.ParseMode != "" {
-			v.Add("parse_mode", config.ParseMode)
-		}
-	}
+	params.AddNonEmpty(config.name(), config.FileID)
+	params.AddNonZero("duration", config.Duration)
+	params.AddNonEmpty("caption", config.Caption)
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, nil
+	return params, err
 }
 
-// params returns a map[string]string representation of VoiceConfig.
-func (config VoiceConfig) params() (map[string]string, error) {
-	params, _ := config.BaseFile.params()
-
-	if config.Duration != 0 {
-		params["duration"] = strconv.Itoa(config.Duration)
-	}
-	if config.Caption != "" {
-		params["caption"] = config.Caption
-		if config.ParseMode != "" {
-			params["parse_mode"] = config.ParseMode
-		}
-	}
-
-	return params, nil
-}
-
-// name returns the field name for the Voice.
 func (config VoiceConfig) name() string {
 	return "voice"
 }
 
-// method returns Telegram API method name for sending Voice.
 func (config VoiceConfig) method() string {
 	return "sendVoice"
-}
-
-// MediaGroupConfig contains information about a sendMediaGroup request.
-type MediaGroupConfig struct {
-	BaseChat
-	InputMedia []interface{}
-}
-
-func (config MediaGroupConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
-
-	data, err := json.Marshal(config.InputMedia)
-	if err != nil {
-		return v, err
-	}
-
-	v.Add("media", string(data))
-
-	return v, nil
-}
-
-func (config MediaGroupConfig) method() string {
-	return "sendMediaGroup"
 }
 
 // LocationConfig contains information about a SendLocation request.
 type LocationConfig struct {
 	BaseChat
+	Latitude   float64 // required
+	Longitude  float64 // required
+	LivePeriod int     // optional
+}
+
+func (config LocationConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+
+	params.AddNonZeroFloat("latitude", config.Latitude)
+	params.AddNonZeroFloat("longitude", config.Longitude)
+	params.AddNonZero("live_period", config.LivePeriod)
+
+	return params, err
+}
+
+func (config LocationConfig) method() string {
+	return "sendLocation"
+}
+
+// EditMessageLiveLocationConfig allows you to update a live location.
+type EditMessageLiveLocationConfig struct {
+	BaseEdit
 	Latitude  float64 // required
 	Longitude float64 // required
 }
 
-// values returns a url.Values representation of LocationConfig.
-func (config LocationConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config EditMessageLiveLocationConfig) params() (Params, error) {
+	params, err := config.BaseEdit.params()
 
-	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
-	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
+	params.AddNonZeroFloat("latitude", config.Latitude)
+	params.AddNonZeroFloat("longitude", config.Longitude)
 
-	return v, nil
+	return params, err
 }
 
-// method returns Telegram API method name for sending Location.
-func (config LocationConfig) method() string {
-	return "sendLocation"
+func (config EditMessageLiveLocationConfig) method() string {
+	return "editMessageLiveLocation"
+}
+
+// StopMessageLiveLocationConfig stops updating a live location.
+type StopMessageLiveLocationConfig struct {
+	BaseEdit
+}
+
+func (config StopMessageLiveLocationConfig) params() (Params, error) {
+	return config.BaseEdit.params()
+}
+
+func (config StopMessageLiveLocationConfig) method() string {
+	return "stopMessageLiveLocation"
 }
 
 // VenueConfig contains information about a SendVenue request.
@@ -718,21 +460,16 @@ type VenueConfig struct {
 	FoursquareID string
 }
 
-func (config VenueConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config VenueConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add("latitude", strconv.FormatFloat(config.Latitude, 'f', 6, 64))
-	v.Add("longitude", strconv.FormatFloat(config.Longitude, 'f', 6, 64))
-	v.Add("title", config.Title)
-	v.Add("address", config.Address)
-	if config.FoursquareID != "" {
-		v.Add("foursquare_id", config.FoursquareID)
-	}
+	params.AddNonZeroFloat("latitude", config.Latitude)
+	params.AddNonZeroFloat("longitude", config.Longitude)
+	params["title"] = config.Title
+	params["address"] = config.Address
+	params.AddNonEmpty("foursquare_id", config.FoursquareID)
 
-	return v, nil
+	return params, err
 }
 
 func (config VenueConfig) method() string {
@@ -745,23 +482,56 @@ type ContactConfig struct {
 	PhoneNumber string
 	FirstName   string
 	LastName    string
+	VCard       string
 }
 
-func (config ContactConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config ContactConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add("phone_number", config.PhoneNumber)
-	v.Add("first_name", config.FirstName)
-	v.Add("last_name", config.LastName)
+	params["phone_number"] = config.PhoneNumber
+	params["first_name"] = config.FirstName
 
-	return v, nil
+	params.AddNonEmpty("last_name", config.LastName)
+	params.AddNonEmpty("vcard", config.VCard)
+
+	return params, err
 }
 
 func (config ContactConfig) method() string {
 	return "sendContact"
+}
+
+// SendPollConfig allows you to send a poll.
+type SendPollConfig struct {
+	BaseChat
+	Question              string
+	Options               []string
+	IsAnonymous           bool
+	Type                  string
+	AllowsMultipleAnswers bool
+	CorrectOptionID       int64
+	IsClosed              bool
+}
+
+func (config SendPollConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+
+	params["question"] = config.Question
+	err = params.AddInterface("options", config.Options)
+	params["is_anonymous"] = strconv.FormatBool(config.IsAnonymous)
+	params.AddNonEmpty("type", config.Type)
+	params["allows_multiple_answers"] = strconv.FormatBool(config.AllowsMultipleAnswers)
+	params["correct_option_id"] = strconv.FormatInt(config.CorrectOptionID, 10)
+	params.AddBool("is_closed", config.IsClosed)
+
+	return params, err
+}
+
+func (SendPollConfig) method() string {
+	return "sendPoll"
 }
 
 // GameConfig allows you to send a game.
@@ -770,15 +540,12 @@ type GameConfig struct {
 	GameShortName string
 }
 
-func (config GameConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
+func (config GameConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 
-	v.Add("game_short_name", config.GameShortName)
+	params["game_short_name"] = config.GameShortName
 
-	return v, nil
+	return params, err
 }
 
 func (config GameConfig) method() string {
@@ -797,24 +564,21 @@ type SetGameScoreConfig struct {
 	InlineMessageID    string
 }
 
-func (config SetGameScoreConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config SetGameScoreConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("user_id", strconv.Itoa(config.UserID))
-	v.Add("score", strconv.Itoa(config.Score))
-	if config.InlineMessageID == "" {
-		if config.ChannelUsername == "" {
-			v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-		} else {
-			v.Add("chat_id", config.ChannelUsername)
-		}
-		v.Add("message_id", strconv.Itoa(config.MessageID))
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero("scrore", config.Score)
+	params.AddBool("disable_edit_message", config.DisableEditMessage)
+
+	if config.InlineMessageID != "" {
+		params["inline_message_id"] = config.InlineMessageID
 	} else {
-		v.Add("inline_message_id", config.InlineMessageID)
+		params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+		params.AddNonZero("message_id", config.MessageID)
 	}
-	v.Add("disable_edit_message", strconv.FormatBool(config.DisableEditMessage))
 
-	return v, nil
+	return params, nil
 }
 
 func (config SetGameScoreConfig) method() string {
@@ -830,22 +594,19 @@ type GetGameHighScoresConfig struct {
 	InlineMessageID string
 }
 
-func (config GetGameHighScoresConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config GetGameHighScoresConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("user_id", strconv.Itoa(config.UserID))
-	if config.InlineMessageID == "" {
-		if config.ChannelUsername == "" {
-			v.Add("chat_id", strconv.Itoa(config.ChatID))
-		} else {
-			v.Add("chat_id", config.ChannelUsername)
-		}
-		v.Add("message_id", strconv.Itoa(config.MessageID))
+	params.AddNonZero("user_id", config.UserID)
+
+	if config.InlineMessageID != "" {
+		params["inline_message_id"] = config.InlineMessageID
 	} else {
-		v.Add("inline_message_id", config.InlineMessageID)
+		params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+		params.AddNonZero("message_id", config.MessageID)
 	}
 
-	return v, nil
+	return params, nil
 }
 
 func (config GetGameHighScoresConfig) method() string {
@@ -858,17 +619,14 @@ type ChatActionConfig struct {
 	Action string // required
 }
 
-// values returns a url.Values representation of ChatActionConfig.
-func (config ChatActionConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
-	if err != nil {
-		return v, err
-	}
-	v.Add("action", config.Action)
-	return v, nil
+func (config ChatActionConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+
+	params["action"] = config.Action
+
+	return params, err
 }
 
-// method returns Telegram API method name for sending ChatAction.
 func (config ChatActionConfig) method() string {
 	return "sendChatAction"
 }
@@ -881,17 +639,14 @@ type EditMessageTextConfig struct {
 	DisableWebPagePreview bool
 }
 
-func (config EditMessageTextConfig) values() (url.Values, error) {
-	v, err := config.BaseEdit.values()
-	if err != nil {
-		return v, err
-	}
+func (config EditMessageTextConfig) params() (Params, error) {
+	params, err := config.BaseEdit.params()
 
-	v.Add("text", config.Text)
-	v.Add("parse_mode", config.ParseMode)
-	v.Add("disable_web_page_preview", strconv.FormatBool(config.DisableWebPagePreview))
+	params["text"] = config.Text
+	params.AddNonEmpty("parse_mode", config.ParseMode)
+	params.AddBool("disable_web_page_preview", config.DisableWebPagePreview)
 
-	return v, nil
+	return params, err
 }
 
 func (config EditMessageTextConfig) method() string {
@@ -905,19 +660,36 @@ type EditMessageCaptionConfig struct {
 	ParseMode string
 }
 
-func (config EditMessageCaptionConfig) values() (url.Values, error) {
-	v, _ := config.BaseEdit.values()
+func (config EditMessageCaptionConfig) params() (Params, error) {
+	params, err := config.BaseEdit.params()
 
-	v.Add("caption", config.Caption)
-	if config.ParseMode != "" {
-		v.Add("parse_mode", config.ParseMode)
-	}
+	params["caption"] = config.Caption
+	params.AddNonEmpty("parse_mode", config.ParseMode)
 
-	return v, nil
+	return params, err
 }
 
 func (config EditMessageCaptionConfig) method() string {
 	return "editMessageCaption"
+}
+
+// EditMessageMediaConfig contains information about editing a message's media.
+type EditMessageMediaConfig struct {
+	BaseEdit
+
+	Media interface{}
+}
+
+func (EditMessageMediaConfig) method() string {
+	return "editMessageMedia"
+}
+
+func (config EditMessageMediaConfig) params() (Params, error) {
+	params, err := config.BaseEdit.params()
+
+	params.AddInterface("media", config.Media)
+
+	return params, err
 }
 
 // EditMessageReplyMarkupConfig allows you to modify the reply markup
@@ -926,12 +698,25 @@ type EditMessageReplyMarkupConfig struct {
 	BaseEdit
 }
 
-func (config EditMessageReplyMarkupConfig) values() (url.Values, error) {
-	return config.BaseEdit.values()
+func (config EditMessageReplyMarkupConfig) params() (Params, error) {
+	return config.BaseEdit.params()
 }
 
 func (config EditMessageReplyMarkupConfig) method() string {
 	return "editMessageReplyMarkup"
+}
+
+// StopPollConfig allows you to stop a poll sent by the bot.
+type StopPollConfig struct {
+	BaseEdit
+}
+
+func (config StopPollConfig) params() (Params, error) {
+	return config.BaseEdit.params()
+}
+
+func (StopPollConfig) method() string {
+	return "stopPoll"
 }
 
 // UserProfilePhotosConfig contains information about a
@@ -942,9 +727,35 @@ type UserProfilePhotosConfig struct {
 	Limit  int
 }
 
+func (UserProfilePhotosConfig) method() string {
+	return "getUserProfilePhotos"
+}
+
+func (config UserProfilePhotosConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero("offset", config.Offset)
+	params.AddNonZero("limit", config.Limit)
+
+	return params, nil
+}
+
 // FileConfig has information about a file hosted on Telegram.
 type FileConfig struct {
 	FileID string
+}
+
+func (FileConfig) method() string {
+	return "getFile"
+}
+
+func (config FileConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["file_id"] = config.FileID
+
+	return params, nil
 }
 
 // UpdateConfig contains information about a GetUpdates request.
@@ -954,11 +765,67 @@ type UpdateConfig struct {
 	Timeout int
 }
 
+func (UpdateConfig) method() string {
+	return "getUpdates"
+}
+
+func (config UpdateConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonZero("offset", config.Offset)
+	params.AddNonZero("limit", config.Limit)
+	params.AddNonZero("timeout", config.Timeout)
+
+	return params, nil
+}
+
 // WebhookConfig contains information about a SetWebhook request.
 type WebhookConfig struct {
 	URL            *url.URL
 	Certificate    interface{}
 	MaxConnections int
+	AllowedUpdates []string
+}
+
+func (config WebhookConfig) method() string {
+	return "setWebhook"
+}
+
+func (config WebhookConfig) params() (Params, error) {
+	params := make(Params)
+
+	if config.URL != nil {
+		params["url"] = config.URL.String()
+	}
+
+	params.AddNonZero("max_connections", config.MaxConnections)
+	params.AddInterface("allowed_updates", config.AllowedUpdates)
+
+	return params, nil
+}
+
+func (config WebhookConfig) name() string {
+	return "certificate"
+}
+
+func (config WebhookConfig) getFile() interface{} {
+	return config.Certificate
+}
+
+func (config WebhookConfig) useExistingFile() bool {
+	return config.URL != nil
+}
+
+// RemoveWebhookConfig is a helper to remove a webhook.
+type RemoveWebhookConfig struct {
+}
+
+func (config RemoveWebhookConfig) method() string {
+	return "setWebhook"
+}
+
+func (config RemoveWebhookConfig) params() (Params, error) {
+	return nil, nil
 }
 
 // FileBytes contains information about a set of bytes to upload
@@ -988,6 +855,27 @@ type InlineConfig struct {
 	SwitchPMParameter string        `json:"switch_pm_parameter"`
 }
 
+func (config InlineConfig) method() string {
+	return "answerInlineQuery"
+}
+
+func (config InlineConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["inline_query_id"] = config.InlineQueryID
+	params.AddNonZero("cache_time", config.CacheTime)
+	params.AddBool("is_personal", config.IsPersonal)
+	params.AddNonEmpty("next_offset", config.NextOffset)
+	params.AddNonEmpty("switch_pm_text", config.SwitchPMText)
+	params.AddNonEmpty("switch_pm_parameter", config.SwitchPMParameter)
+
+	if err := params.AddInterface("results", config.Results); err != nil {
+		return params, err
+	}
+
+	return params, nil
+}
+
 // CallbackConfig contains information on making a CallbackQuery response.
 type CallbackConfig struct {
 	CallbackQueryID string `json:"callback_query_id"`
@@ -995,6 +883,22 @@ type CallbackConfig struct {
 	ShowAlert       bool   `json:"show_alert"`
 	URL             string `json:"url"`
 	CacheTime       int    `json:"cache_time"`
+}
+
+func (config CallbackConfig) method() string {
+	return "answerCallbackQuery"
+}
+
+func (config CallbackConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["callback_query_id"] = config.CallbackQueryID
+	params.AddNonEmpty("text", config.Text)
+	params.AddBool("show_alert", config.ShowAlert)
+	params.AddNonEmpty("url", config.URL)
+	params.AddNonZero("cache_time", config.CacheTime)
+
+	return params, nil
 }
 
 // ChatMemberConfig contains information about a user in a chat for use
@@ -1006,33 +910,123 @@ type ChatMemberConfig struct {
 	UserID             int
 }
 
+// UnbanChatMemberConfig allows you to unban a user.
+type UnbanChatMemberConfig struct {
+	ChatMemberConfig
+}
+
+func (config UnbanChatMemberConfig) method() string {
+	return "unbanChatMember"
+}
+
+func (config UnbanChatMemberConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
+
+	return params, nil
+}
+
 // KickChatMemberConfig contains extra fields to kick user
 type KickChatMemberConfig struct {
 	ChatMemberConfig
 	UntilDate int64
 }
 
+func (config KickChatMemberConfig) method() string {
+	return "kickChatMember"
+}
+
+func (config KickChatMemberConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("until_date", config.UntilDate)
+
+	return params, nil
+}
+
 // RestrictChatMemberConfig contains fields to restrict members of chat
 type RestrictChatMemberConfig struct {
 	ChatMemberConfig
-	UntilDate             int64
-	CanSendMessages       *bool
-	CanSendMediaMessages  *bool
-	CanSendOtherMessages  *bool
-	CanAddWebPagePreviews *bool
+	UntilDate   int64
+	Permissions *ChatPermissions
+}
+
+func (config RestrictChatMemberConfig) method() string {
+	return "restrictChatMember"
+}
+
+func (config RestrictChatMemberConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
+
+	if err := params.AddInterface("permissions", config.Permissions); err != nil {
+		return params, err
+	}
+	params.AddNonZero64("until_date", config.UntilDate)
+
+	return params, nil
 }
 
 // PromoteChatMemberConfig contains fields to promote members of chat
 type PromoteChatMemberConfig struct {
 	ChatMemberConfig
-	CanChangeInfo      *bool
-	CanPostMessages    *bool
-	CanEditMessages    *bool
-	CanDeleteMessages  *bool
-	CanInviteUsers     *bool
-	CanRestrictMembers *bool
-	CanPinMessages     *bool
-	CanPromoteMembers  *bool
+	CanChangeInfo      bool
+	CanPostMessages    bool
+	CanEditMessages    bool
+	CanDeleteMessages  bool
+	CanInviteUsers     bool
+	CanRestrictMembers bool
+	CanPinMessages     bool
+	CanPromoteMembers  bool
+}
+
+func (config PromoteChatMemberConfig) method() string {
+	return "promoteChatMember"
+}
+
+func (config PromoteChatMemberConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
+
+	params.AddBool("can_change_info", config.CanChangeInfo)
+	params.AddBool("can_post_messages", config.CanPostMessages)
+	params.AddBool("can_edit_messages", config.CanEditMessages)
+	params.AddBool("can_delete_messages", config.CanDeleteMessages)
+	params.AddBool("can_invite_users", config.CanInviteUsers)
+	params.AddBool("can_restrict_members", config.CanRestrictMembers)
+	params.AddBool("can_pin_messages", config.CanPinMessages)
+	params.AddBool("can_promote_members", config.CanPromoteMembers)
+
+	return params, nil
+}
+
+// SetChatAdministratorCustomTitle sets the title of an administrative user
+// promoted by the bot for a chat.
+type SetChatAdministratorCustomTitle struct {
+	ChatMemberConfig
+	CustomTitle string
+}
+
+func (SetChatAdministratorCustomTitle) method() string {
+	return "setChatAdministratorCustomTitle"
+}
+
+func (config SetChatAdministratorCustomTitle) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	params.AddNonZero("user_id", config.UserID)
+	params.AddNonEmpty("custom_title", config.CustomTitle)
+
+	return params, nil
 }
 
 // ChatConfig contains information about getting information on a chat.
@@ -1041,80 +1035,179 @@ type ChatConfig struct {
 	SuperGroupUsername string
 }
 
-// ChatConfigWithUser contains information about getting information on
-// a specific user within a chat.
+func (config ChatConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
+// ChatInfoConfig contains information about getting chat information.
+type ChatInfoConfig struct {
+	ChatConfig
+}
+
+func (ChatInfoConfig) method() string {
+	return "getChat"
+}
+
+// ChatMemberCountConfig contains information about getting the number of users in a chat.
+type ChatMemberCountConfig struct {
+	ChatConfig
+}
+
+func (ChatMemberCountConfig) method() string {
+	return "getChatMembersCount"
+}
+
+// ChatAdministratorsConfig contains information about getting chat administrators.
+type ChatAdministratorsConfig struct {
+	ChatConfig
+}
+
+func (ChatAdministratorsConfig) method() string {
+	return "getChatAdministrators"
+}
+
+// SetChatPermissionsConfig allows you to set default permissions for the
+// members in a group. The bot must be an administrator and have rights to
+// restrict members.
+type SetChatPermissionsConfig struct {
+	ChatConfig
+	Permissions *ChatPermissions
+}
+
+func (SetChatPermissionsConfig) method() string {
+	return "setChatPermissions"
+}
+
+func (config SetChatPermissionsConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddInterface("permissions", config.Permissions)
+
+	return params, nil
+}
+
+// ChatInviteLinkConfig contains information about getting a chat link.
+//
+// Note that generating a new link will revoke any previous links.
+type ChatInviteLinkConfig struct {
+	ChatConfig
+}
+
+func (ChatInviteLinkConfig) method() string {
+	return "exportChatInviteLink"
+}
+
+func (config ChatInviteLinkConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
+// LeaveChatConfig allows you to leave a chat.
+type LeaveChatConfig struct {
+	ChatID          int64
+	ChannelUsername string
+}
+
+func (config LeaveChatConfig) method() string {
+	return "leaveChat"
+}
+
+func (config LeaveChatConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+
+	return params, nil
+}
+
+// ChatConfigWithUser contains information about a chat and a user.
 type ChatConfigWithUser struct {
 	ChatID             int64
 	SuperGroupUsername string
 	UserID             int
 }
 
+func (config ChatConfigWithUser) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("user_id", config.UserID)
+
+	return params, nil
+}
+
+// GetChatMemberConfig is information about getting a specific member in a chat.
+type GetChatMemberConfig struct {
+	ChatConfigWithUser
+}
+
+func (GetChatMemberConfig) method() string {
+	return "getChatMember"
+}
+
 // InvoiceConfig contains information for sendInvoice request.
 type InvoiceConfig struct {
 	BaseChat
-	Title               string          // required
-	Description         string          // required
-	Payload             string          // required
-	ProviderToken       string          // required
-	StartParameter      string          // required
-	Currency            string          // required
-	Prices              *[]LabeledPrice // required
-	PhotoURL            string
-	PhotoSize           int
-	PhotoWidth          int
-	PhotoHeight         int
-	NeedName            bool
-	NeedPhoneNumber     bool
-	NeedEmail           bool
-	NeedShippingAddress bool
-	IsFlexible          bool
+	Title                     string         // required
+	Description               string         // required
+	Payload                   string         // required
+	ProviderToken             string         // required
+	StartParameter            string         // required
+	Currency                  string         // required
+	Prices                    []LabeledPrice // required
+	ProviderData              string
+	PhotoURL                  string
+	PhotoSize                 int
+	PhotoWidth                int
+	PhotoHeight               int
+	NeedName                  bool
+	NeedPhoneNumber           bool
+	NeedEmail                 bool
+	NeedShippingAddress       bool
+	SendPhoneNumberToProvider bool
+	SendEmailToProvider       bool
+	IsFlexible                bool
 }
 
-func (config InvoiceConfig) values() (url.Values, error) {
-	v, err := config.BaseChat.values()
+func (config InvoiceConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
 	if err != nil {
-		return v, err
-	}
-	v.Add("title", config.Title)
-	v.Add("description", config.Description)
-	v.Add("payload", config.Payload)
-	v.Add("provider_token", config.ProviderToken)
-	v.Add("start_parameter", config.StartParameter)
-	v.Add("currency", config.Currency)
-	data, err := json.Marshal(config.Prices)
-	if err != nil {
-		return v, err
-	}
-	v.Add("prices", string(data))
-	if config.PhotoURL != "" {
-		v.Add("photo_url", config.PhotoURL)
-	}
-	if config.PhotoSize != 0 {
-		v.Add("photo_size", strconv.Itoa(config.PhotoSize))
-	}
-	if config.PhotoWidth != 0 {
-		v.Add("photo_width", strconv.Itoa(config.PhotoWidth))
-	}
-	if config.PhotoHeight != 0 {
-		v.Add("photo_height", strconv.Itoa(config.PhotoHeight))
-	}
-	if config.NeedName != false {
-		v.Add("need_name", strconv.FormatBool(config.NeedName))
-	}
-	if config.NeedPhoneNumber != false {
-		v.Add("need_phone_number", strconv.FormatBool(config.NeedPhoneNumber))
-	}
-	if config.NeedEmail != false {
-		v.Add("need_email", strconv.FormatBool(config.NeedEmail))
-	}
-	if config.NeedShippingAddress != false {
-		v.Add("need_shipping_address", strconv.FormatBool(config.NeedShippingAddress))
-	}
-	if config.IsFlexible != false {
-		v.Add("is_flexible", strconv.FormatBool(config.IsFlexible))
+		return params, err
 	}
 
-	return v, nil
+	params["title"] = config.Title
+	params["description"] = config.Description
+	params["payload"] = config.Payload
+	params["provider_token"] = config.ProviderToken
+	params["start_parameter"] = config.StartParameter
+	params["currency"] = config.Currency
+
+	if err = params.AddInterface("prices", config.Prices); err != nil {
+		return params, err
+	}
+
+	params.AddNonEmpty("provider_data", config.ProviderData)
+	params.AddNonEmpty("photo_url", config.PhotoURL)
+	params.AddNonZero("photo_size", config.PhotoSize)
+	params.AddNonZero("photo_width", config.PhotoWidth)
+	params.AddNonZero("photo_height", config.PhotoHeight)
+	params.AddBool("need_name", config.NeedName)
+	params.AddBool("need_phone_number", config.NeedPhoneNumber)
+	params.AddBool("need_email", config.NeedEmail)
+	params.AddBool("need_shipping_address", config.NeedShippingAddress)
+	params.AddBool("is_flexible", config.IsFlexible)
+	params.AddBool("send_phone_number_to_provider", config.SendPhoneNumberToProvider)
+	params.AddBool("send_email_to_provider", config.SendEmailToProvider)
+
+	return params, nil
 }
 
 func (config InvoiceConfig) method() string {
@@ -1125,7 +1218,7 @@ func (config InvoiceConfig) method() string {
 type ShippingConfig struct {
 	ShippingQueryID string // required
 	OK              bool   // required
-	ShippingOptions *[]ShippingOption
+	ShippingOptions []ShippingOption
 	ErrorMessage    string
 }
 
@@ -1146,18 +1239,19 @@ func (config DeleteMessageConfig) method() string {
 	return "deleteMessage"
 }
 
-func (config DeleteMessageConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config DeleteMessageConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	v.Add("message_id", strconv.Itoa(config.MessageID))
+	params.AddNonZero64("chat_id", config.ChatID)
+	params.AddNonZero("message_id", config.MessageID)
 
-	return v, nil
+	return params, nil
 }
 
 // PinChatMessageConfig contains information of a message in a chat to pin.
 type PinChatMessageConfig struct {
 	ChatID              int64
+	ChannelUsername     string
 	MessageID           int
 	DisableNotification bool
 }
@@ -1166,55 +1260,99 @@ func (config PinChatMessageConfig) method() string {
 	return "pinChatMessage"
 }
 
-func (config PinChatMessageConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config PinChatMessageConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	v.Add("message_id", strconv.Itoa(config.MessageID))
-	v.Add("disable_notification", strconv.FormatBool(config.DisableNotification))
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddNonZero("message_id", config.MessageID)
+	params.AddBool("disable_notification", config.DisableNotification)
 
-	return v, nil
+	return params, nil
 }
 
 // UnpinChatMessageConfig contains information of chat to unpin.
 type UnpinChatMessageConfig struct {
-	ChatID int64
+	ChatID          int64
+	ChannelUsername string
 }
 
 func (config UnpinChatMessageConfig) method() string {
 	return "unpinChatMessage"
 }
 
-func (config UnpinChatMessageConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config UnpinChatMessageConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
-	return v, nil
+	return params, nil
 }
 
-// SetChatTitleConfig contains information for change chat title.
+// SetChatPhotoConfig allows you to set a group, supergroup, or channel's photo.
+type SetChatPhotoConfig struct {
+	BaseFile
+}
+
+func (config SetChatPhotoConfig) method() string {
+	return "setChatPhoto"
+}
+
+func (config SetChatPhotoConfig) name() string {
+	return "photo"
+}
+
+func (config SetChatPhotoConfig) getFile() interface{} {
+	return config.File
+}
+
+func (config SetChatPhotoConfig) useExistingFile() bool {
+	return config.UseExisting
+}
+
+// DeleteChatPhotoConfig allows you to delete a group, supergroup, or channel's photo.
+type DeleteChatPhotoConfig struct {
+	ChatID          int64
+	ChannelUsername string
+}
+
+func (config DeleteChatPhotoConfig) method() string {
+	return "deleteChatPhoto"
+}
+
+func (config DeleteChatPhotoConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+
+	return params, nil
+}
+
+// SetChatTitleConfig allows you to set the title of something other than a private chat.
 type SetChatTitleConfig struct {
-	ChatID int64
-	Title  string
+	ChatID          int64
+	ChannelUsername string
+
+	Title string
 }
 
 func (config SetChatTitleConfig) method() string {
 	return "setChatTitle"
 }
 
-func (config SetChatTitleConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config SetChatTitleConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	v.Add("title", config.Title)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params["title"] = config.Title
 
-	return v, nil
+	return params, nil
 }
 
-// SetChatDescriptionConfig contains information for change chat description.
+// SetChatDescriptionConfig allows you to set the description of a supergroup or channel.
 type SetChatDescriptionConfig struct {
-	ChatID      int64
+	ChatID          int64
+	ChannelUsername string
+
 	Description string
 }
 
@@ -1222,43 +1360,252 @@ func (config SetChatDescriptionConfig) method() string {
 	return "setChatDescription"
 }
 
-func (config SetChatDescriptionConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config SetChatDescriptionConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	v.Add("description", config.Description)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params["description"] = config.Description
 
-	return v, nil
+	return params, nil
 }
 
-// SetChatPhotoConfig contains information for change chat photo
-type SetChatPhotoConfig struct {
-	BaseFile
+// GetStickerSetConfig allows you to get the stickers in a set.
+type GetStickerSetConfig struct {
+	Name string
 }
 
-// name returns the field name for the Photo.
-func (config SetChatPhotoConfig) name() string {
-	return "photo"
+func (config GetStickerSetConfig) method() string {
+	return "getStickerSet"
 }
 
-// method returns Telegram API method name for sending Photo.
-func (config SetChatPhotoConfig) method() string {
-	return "setChatPhoto"
+func (config GetStickerSetConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["name"] = config.Name
+
+	return params, nil
 }
 
-// DeleteChatPhotoConfig contains information for delete chat photo.
-type DeleteChatPhotoConfig struct {
-	ChatID int64
+// UploadStickerConfig allows you to upload a sticker for use in a set later.
+type UploadStickerConfig struct {
+	UserID     int64
+	PNGSticker interface{}
 }
 
-func (config DeleteChatPhotoConfig) method() string {
-	return "deleteChatPhoto"
+func (config UploadStickerConfig) method() string {
+	return "uploadStickerFile"
 }
 
-func (config DeleteChatPhotoConfig) values() (url.Values, error) {
-	v := url.Values{}
+func (config UploadStickerConfig) params() (Params, error) {
+	params := make(Params)
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	params.AddNonZero64("user_id", config.UserID)
 
-	return v, nil
+	return params, nil
+}
+
+func (config UploadStickerConfig) name() string {
+	return "png_sticker"
+}
+
+func (config UploadStickerConfig) getFile() interface{} {
+	return config.PNGSticker
+}
+
+func (config UploadStickerConfig) useExistingFile() bool {
+	return false
+}
+
+// NewStickerSetConfig allows creating a new sticker set.
+type NewStickerSetConfig struct {
+	UserID        int64
+	Name          string
+	Title         string
+	PNGSticker    interface{}
+	Emojis        string
+	ContainsMasks bool
+	MaskPosition  *MaskPosition
+}
+
+func (config NewStickerSetConfig) method() string {
+	return "createNewStickerSet"
+}
+
+func (config NewStickerSetConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonZero64("user_id", config.UserID)
+	params["name"] = config.Name
+	params["title"] = config.Title
+
+	if sticker, ok := config.PNGSticker.(string); ok {
+		params[config.name()] = sticker
+	}
+
+	params["emojis"] = config.Emojis
+
+	params.AddBool("contains_masks", config.ContainsMasks)
+
+	err := params.AddInterface("mask_position", config.MaskPosition)
+
+	return params, err
+}
+
+func (config NewStickerSetConfig) getFile() interface{} {
+	return config.PNGSticker
+}
+
+func (config NewStickerSetConfig) name() string {
+	return "png_sticker"
+}
+
+func (config NewStickerSetConfig) useExistingFile() bool {
+	_, ok := config.PNGSticker.(string)
+
+	return ok
+}
+
+// AddStickerConfig allows you to add a sticker to a set.
+type AddStickerConfig struct {
+	UserID       int64
+	Name         string
+	PNGSticker   interface{}
+	Emojis       string
+	MaskPosition *MaskPosition
+}
+
+func (config AddStickerConfig) method() string {
+	return "addStickerToSet"
+}
+
+func (config AddStickerConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonZero64("user_id", config.UserID)
+	params["name"] = config.Name
+	params["emojis"] = config.Emojis
+
+	if sticker, ok := config.PNGSticker.(string); ok {
+		params[config.name()] = sticker
+	}
+
+	err := params.AddInterface("mask_position", config.MaskPosition)
+
+	return params, err
+}
+
+func (config AddStickerConfig) name() string {
+	return "png_sticker"
+}
+
+func (config AddStickerConfig) getFile() interface{} {
+	return config.PNGSticker
+}
+
+func (config AddStickerConfig) useExistingFile() bool {
+	return false
+}
+
+// SetStickerPositionConfig allows you to change the position of a sticker in a set.
+type SetStickerPositionConfig struct {
+	Sticker  string
+	Position int
+}
+
+func (config SetStickerPositionConfig) method() string {
+	return "setStickerPositionInSet"
+}
+
+func (config SetStickerPositionConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["sticker"] = config.Sticker
+	params.AddNonZero("position", config.Position)
+
+	return params, nil
+}
+
+// DeleteStickerConfig allows you to delete a sticker from a set.
+type DeleteStickerConfig struct {
+	Sticker string
+}
+
+func (config DeleteStickerConfig) method() string {
+	return "deleteStickerFromSet"
+}
+
+func (config DeleteStickerConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["sticker"] = config.Sticker
+
+	return params, nil
+}
+
+// SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
+type SetChatStickerSetConfig struct {
+	ChatID             int64
+	SuperGroupUsername string
+
+	StickerSetName string
+}
+
+func (config SetChatStickerSetConfig) method() string {
+	return "setChatStickerSet"
+}
+
+func (config SetChatStickerSetConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params["sticker_set_name"] = config.StickerSetName
+
+	return params, nil
+}
+
+// DeleteChatStickerSetConfig allows you to remove a supergroup's sticker set.
+type DeleteChatStickerSetConfig struct {
+	ChatID             int64
+	SuperGroupUsername string
+}
+
+func (config DeleteChatStickerSetConfig) method() string {
+	return "deleteChatStickerSet"
+}
+
+func (config DeleteChatStickerSetConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
+// MediaGroupConfig allows you to send a group of media.
+//
+// Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
+type MediaGroupConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	Media               []interface{}
+	DisableNotification bool
+	ReplyToMessageID    int
+}
+
+func (config MediaGroupConfig) method() string {
+	return "sendMediaGroup"
+}
+
+func (config MediaGroupConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	if err := params.AddInterface("media", config.Media); err != nil {
+		return params, nil
+	}
+	params.AddBool("disable_notification", config.DisableNotification)
+	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
+
+	return params, nil
 }

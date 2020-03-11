@@ -61,6 +61,8 @@ type (
 		// Unique identifier for this file
 		FileID string `json:"file_id"`
 
+		FileUniqueID string `json:"file_unique_id"`
+
 		// File size
 		FileSize int `json:"file_size"`
 

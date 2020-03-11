@@ -1,47 +1,46 @@
-package tgbotapi_test
+package tgbotapi
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"testing"
 )
 
 func TestNewInlineQueryResultArticle(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultArticle("id", "title", "message")
+	result := NewInlineQueryResultArticle("id", "title", "message")
 
 	if result.Type != "article" ||
 		result.ID != "id" ||
 		result.Title != "title" ||
-		result.InputMessageContent.(tgbotapi.InputTextMessageContent).Text != "message" {
+		result.InputMessageContent.(InputTextMessageContent).Text != "message" {
 		t.Fail()
 	}
 }
 
 func TestNewInlineQueryResultArticleMarkdown(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultArticleMarkdown("id", "title", "*message*")
+	result := NewInlineQueryResultArticleMarkdown("id", "title", "*message*")
 
 	if result.Type != "article" ||
 		result.ID != "id" ||
 		result.Title != "title" ||
-		result.InputMessageContent.(tgbotapi.InputTextMessageContent).Text != "*message*" ||
-		result.InputMessageContent.(tgbotapi.InputTextMessageContent).ParseMode != "Markdown" {
+		result.InputMessageContent.(InputTextMessageContent).Text != "*message*" ||
+		result.InputMessageContent.(InputTextMessageContent).ParseMode != "Markdown" {
 		t.Fail()
 	}
 }
 
 func TestNewInlineQueryResultArticleHTML(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultArticleHTML("id", "title", "<b>message</b>")
+	result := NewInlineQueryResultArticleHTML("id", "title", "<b>message</b>")
 
 	if result.Type != "article" ||
 		result.ID != "id" ||
 		result.Title != "title" ||
-		result.InputMessageContent.(tgbotapi.InputTextMessageContent).Text != "<b>message</b>" ||
-		result.InputMessageContent.(tgbotapi.InputTextMessageContent).ParseMode != "HTML" {
+		result.InputMessageContent.(InputTextMessageContent).Text != "<b>message</b>" ||
+		result.InputMessageContent.(InputTextMessageContent).ParseMode != "HTML" {
 		t.Fail()
 	}
 }
 
 func TestNewInlineQueryResultGIF(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultGIF("id", "google.com")
+	result := NewInlineQueryResultGIF("id", "google.com")
 
 	if result.Type != "gif" ||
 		result.ID != "id" ||
@@ -51,7 +50,7 @@ func TestNewInlineQueryResultGIF(t *testing.T) {
 }
 
 func TestNewInlineQueryResultMPEG4GIF(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultMPEG4GIF("id", "google.com")
+	result := NewInlineQueryResultMPEG4GIF("id", "google.com")
 
 	if result.Type != "mpeg4_gif" ||
 		result.ID != "id" ||
@@ -61,7 +60,7 @@ func TestNewInlineQueryResultMPEG4GIF(t *testing.T) {
 }
 
 func TestNewInlineQueryResultPhoto(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultPhoto("id", "google.com")
+	result := NewInlineQueryResultPhoto("id", "google.com")
 
 	if result.Type != "photo" ||
 		result.ID != "id" ||
@@ -71,7 +70,7 @@ func TestNewInlineQueryResultPhoto(t *testing.T) {
 }
 
 func TestNewInlineQueryResultPhotoWithThumb(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultPhotoWithThumb("id", "google.com", "thumb.com")
+	result := NewInlineQueryResultPhotoWithThumb("id", "google.com", "thumb.com")
 
 	if result.Type != "photo" ||
 		result.ID != "id" ||
@@ -82,7 +81,7 @@ func TestNewInlineQueryResultPhotoWithThumb(t *testing.T) {
 }
 
 func TestNewInlineQueryResultVideo(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultVideo("id", "google.com")
+	result := NewInlineQueryResultVideo("id", "google.com")
 
 	if result.Type != "video" ||
 		result.ID != "id" ||
@@ -92,7 +91,7 @@ func TestNewInlineQueryResultVideo(t *testing.T) {
 }
 
 func TestNewInlineQueryResultAudio(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultAudio("id", "google.com", "title")
+	result := NewInlineQueryResultAudio("id", "google.com", "title")
 
 	if result.Type != "audio" ||
 		result.ID != "id" ||
@@ -103,7 +102,7 @@ func TestNewInlineQueryResultAudio(t *testing.T) {
 }
 
 func TestNewInlineQueryResultVoice(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultVoice("id", "google.com", "title")
+	result := NewInlineQueryResultVoice("id", "google.com", "title")
 
 	if result.Type != "voice" ||
 		result.ID != "id" ||
@@ -114,7 +113,7 @@ func TestNewInlineQueryResultVoice(t *testing.T) {
 }
 
 func TestNewInlineQueryResultDocument(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultDocument("id", "google.com", "title", "mime/type")
+	result := NewInlineQueryResultDocument("id", "google.com", "title", "mime/type")
 
 	if result.Type != "document" ||
 		result.ID != "id" ||
@@ -126,7 +125,7 @@ func TestNewInlineQueryResultDocument(t *testing.T) {
 }
 
 func TestNewInlineQueryResultLocation(t *testing.T) {
-	result := tgbotapi.NewInlineQueryResultLocation("id", "name", 40, 50)
+	result := NewInlineQueryResultLocation("id", "name", 40, 50)
 
 	if result.Type != "location" ||
 		result.ID != "id" ||
@@ -138,7 +137,7 @@ func TestNewInlineQueryResultLocation(t *testing.T) {
 }
 
 func TestNewEditMessageText(t *testing.T) {
-	edit := tgbotapi.NewEditMessageText(ChatID, ReplyToMessageID, "new text")
+	edit := NewEditMessageText(ChatID, ReplyToMessageID, "new text")
 
 	if edit.Text != "new text" ||
 		edit.BaseEdit.ChatID != ChatID ||
@@ -148,7 +147,7 @@ func TestNewEditMessageText(t *testing.T) {
 }
 
 func TestNewEditMessageCaption(t *testing.T) {
-	edit := tgbotapi.NewEditMessageCaption(ChatID, ReplyToMessageID, "new caption")
+	edit := NewEditMessageCaption(ChatID, ReplyToMessageID, "new caption")
 
 	if edit.Caption != "new caption" ||
 		edit.BaseEdit.ChatID != ChatID ||
@@ -158,15 +157,15 @@ func TestNewEditMessageCaption(t *testing.T) {
 }
 
 func TestNewEditMessageReplyMarkup(t *testing.T) {
-	markup := tgbotapi.InlineKeyboardMarkup{
-		InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
-			[]tgbotapi.InlineKeyboardButton{
-				tgbotapi.InlineKeyboardButton{Text: "test"},
+	markup := InlineKeyboardMarkup{
+		InlineKeyboard: [][]InlineKeyboardButton{
+			[]InlineKeyboardButton{
+				InlineKeyboardButton{Text: "test"},
 			},
 		},
 	}
 
-	edit := tgbotapi.NewEditMessageReplyMarkup(ChatID, ReplyToMessageID, markup)
+	edit := NewEditMessageReplyMarkup(ChatID, ReplyToMessageID, markup)
 
 	if edit.ReplyMarkup.InlineKeyboard[0][0].Text != "test" ||
 		edit.BaseEdit.ChatID != ChatID ||
