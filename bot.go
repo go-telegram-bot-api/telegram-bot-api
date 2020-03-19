@@ -459,6 +459,32 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	return ch
 }
 
+// WriteToHTTPResponse writes the request to the HTTP ResponseWriter.
+//
+// It doesn't support uploading files.
+//
+// See https://core.telegram.org/bots/api#making-requests-when-getting-updates
+// for details.
+func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
+	params, err := c.params()
+	if err != nil {
+		return err
+	}
+
+	if t, ok := c.(Fileable); ok {
+		if !t.useExistingFile() {
+			return errors.New("Can't use HTTP Response to upload files.")
+		}
+	}
+
+	values := buildParams(params)
+	values.Set("method", c.method())
+
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	_, err = w.Write([]byte(values.Encode()))
+	return err
+}
+
 // GetChat gets information about a chat.
 func (bot *BotAPI) GetChat(config ChatInfoConfig) (Chat, error) {
 	params, _ := config.params()
