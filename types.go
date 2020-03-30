@@ -186,6 +186,7 @@ type Message struct {
 	Location              *Location             `json:"location"`                // optional
 	Venue                 *Venue                `json:"venue"`                   // optional
 	Poll                  *Poll                 `json:"poll"`                    // optional
+	Dice                  *Dice                 `json:"dice"`                    // optional
 	NewChatMembers        []User                `json:"new_chat_members"`        // optional
 	LeftChatMember        *User                 `json:"left_chat_member"`        // optional
 	NewChatTitle          string                `json:"new_chat_title"`          // optional
@@ -493,6 +494,11 @@ type Poll struct {
 	Type                  string       `json:"type"`
 	AllowsMultipleAnswers bool         `json:"allows_multiple_answers"`
 	CorrectOptionID       int          `json:"correct_option_id"` // optional
+}
+
+// Dice represents a single dice value.
+type Dice struct {
+	Value int `json:"value"`
 }
 
 // UserProfilePhotos contains a set of user profile photos.
@@ -1067,11 +1073,18 @@ type PreCheckoutQuery struct {
 
 // StickerSet is a collection of stickers.
 type StickerSet struct {
-	Name          string    `json:"name"`
-	Title         string    `json:"title"`
-	IsAnimated    bool      `json:"is_animated"`
-	ContainsMasks bool      `json:"contains_masks"`
-	Stickers      []Sticker `json:"stickers"`
+	Name          string     `json:"name"`
+	Title         string     `json:"title"`
+	IsAnimated    bool       `json:"is_animated"`
+	ContainsMasks bool       `json:"contains_masks"`
+	Stickers      []Sticker  `json:"stickers"`
+	Thumb         *PhotoSize `json:"thumb"`
+}
+
+// BotCommand represents Telegram's understanding of a command.
+type BotCommand struct {
+	Command     string `json:"command"`
+	Description string `json:"description"`
 }
 
 // BaseInputMedia is a base type for the InputMedia types.

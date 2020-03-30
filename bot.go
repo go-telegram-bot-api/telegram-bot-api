@@ -62,8 +62,9 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	return bot, nil
 }
 
-func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
-	b.apiEndpoint = apiEndpoint
+// SetAPIEndpoint changes the Telegram Bot API endpoint used by the instance.
+func (bot *BotAPI) SetAPIEndpoint(apiEndpoint string) {
+	bot.apiEndpoint = apiEndpoint
 }
 
 func buildParams(in Params) (out url.Values) {
@@ -473,7 +474,7 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 
 	if t, ok := c.(Fileable); ok {
 		if !t.useExistingFile() {
-			return errors.New("Can't use HTTP Response to upload files.")
+			return errors.New("unable to use http response to upload files")
 		}
 	}
 
@@ -609,4 +610,24 @@ func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
 	err = json.Unmarshal(resp.Result, &poll)
 
 	return poll, err
+}
+
+// GetMyCommands gets the currently registered commands.
+func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
+	config := GetMyCommandsConfig{}
+
+	params, err := config.params()
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return nil, err
+	}
+
+	var commands []BotCommand
+	err = json.Unmarshal(resp.Result, &commands)
+
+	return commands, err
 }

@@ -733,3 +733,44 @@ func TestPolls(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSendDice(t *testing.T) {
+	bot, _ := getBot(t)
+
+	dice := NewSendDice(ChatID)
+
+	msg, err := bot.Send(dice)
+	if err != nil {
+		t.Error("Unable to send dice roll")
+	}
+
+	if msg.Dice == nil {
+		t.Error("Dice roll was not received")
+	}
+}
+
+func TestSetCommands(t *testing.T) {
+	bot, _ := getBot(t)
+
+	setCommands := NewSetMyCommands(BotCommand{
+		Command:     "test",
+		Description: "a test command",
+	})
+
+	if _, err := bot.Request(setCommands); err != nil {
+		t.Error("Unable to set commands")
+	}
+
+	commands, err := bot.GetMyCommands()
+	if err != nil {
+		t.Error("Unable to get commands")
+	}
+
+	if len(commands) != 1 {
+		t.Error("Incorrect number of commands returned")
+	}
+
+	if commands[0].Command != "test" || commands[0].Description != "a test command" {
+		t.Error("Commands were incorrectly set")
+	}
+}

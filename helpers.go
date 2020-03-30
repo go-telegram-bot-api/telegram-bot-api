@@ -509,7 +509,7 @@ func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 	}
 }
 
-// NewInlineQueryResultCachedPhoto create a new inline query with cached photo.
+// NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached photo.
 func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GifID string) InlineQueryResultCachedMpeg4Gif {
 	return InlineQueryResultCachedMpeg4Gif{
 		Type:   "mpeg4_gif",
@@ -913,4 +913,18 @@ func NewStopPoll(chatID int64, messageID int) StopPollConfig {
 			MessageID: messageID,
 		},
 	}
+}
+
+// NewSendDice allows you to send a random dice roll.
+func NewSendDice(chatID int64) DiceConfig {
+	return DiceConfig{
+		BaseChat{
+			ChatID: chatID,
+		},
+	}
+}
+
+// NewSetMyCommands allows you to set the registered commands.
+func NewSetMyCommands(commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{commands: commands}
 }

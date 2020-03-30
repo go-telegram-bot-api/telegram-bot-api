@@ -1417,11 +1417,14 @@ func (config UploadStickerConfig) useExistingFile() bool {
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
+//
+// You must set either PNGSticker or TGSSticker.
 type NewStickerSetConfig struct {
 	UserID        int64
 	Name          string
 	Title         string
 	PNGSticker    interface{}
+	TGSSticker    interface{}
 	Emojis        string
 	ContainsMasks bool
 	MaskPosition  *MaskPosition
@@ -1439,6 +1442,8 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params["title"] = config.Title
 
 	if sticker, ok := config.PNGSticker.(string); ok {
+		params[config.name()] = sticker
+	} else if sticker, ok := config.TGSSticker.(string); ok {
 		params[config.name()] = sticker
 	}
 
@@ -1460,9 +1465,17 @@ func (config NewStickerSetConfig) name() string {
 }
 
 func (config NewStickerSetConfig) useExistingFile() bool {
-	_, ok := config.PNGSticker.(string)
+	if config.PNGSticker != nil {
+		_, ok := config.PNGSticker.(string)
+		return ok
+	}
 
-	return ok
+	if config.TGSSticker != nil {
+		_, ok := config.TGSSticker.(string)
+		return ok
+	}
+
+	panic("NewStickerSetConfig had nil PNGSticker and TGSSticker")
 }
 
 // AddStickerConfig allows you to add a sticker to a set.
@@ -1470,6 +1483,7 @@ type AddStickerConfig struct {
 	UserID       int64
 	Name         string
 	PNGSticker   interface{}
+	TGSSticker   interface{}
 	Emojis       string
 	MaskPosition *MaskPosition
 }
@@ -1486,6 +1500,8 @@ func (config AddStickerConfig) params() (Params, error) {
 	params["emojis"] = config.Emojis
 
 	if sticker, ok := config.PNGSticker.(string); ok {
+		params[config.name()] = sticker
+	} else if sticker, ok := config.TGSSticker.(string); ok {
 		params[config.name()] = sticker
 	}
 
@@ -1540,6 +1556,43 @@ func (config DeleteStickerConfig) params() (Params, error) {
 	params["sticker"] = config.Sticker
 
 	return params, nil
+}
+
+// SetStickerSetThumbConfig allows you to set the thumbnail for a sticker set.
+type SetStickerSetThumbConfig struct {
+	Name   string
+	UserID int
+	Thumb  interface{}
+}
+
+func (config SetStickerSetThumbConfig) method() string {
+	return "setStickerSetThumb"
+}
+
+func (config SetStickerSetThumbConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["name"] = config.Name
+	params.AddNonZero("user_id", config.UserID)
+
+	if thumb, ok := config.Thumb.(string); ok {
+		params["thumb"] = thumb
+	}
+
+	return params, nil
+}
+
+func (config SetStickerSetThumbConfig) name() string {
+	return "thumb"
+}
+
+func (config SetStickerSetThumbConfig) getFile() interface{} {
+	return config.Thumb
+}
+
+func (config SetStickerSetThumbConfig) useExistingFile() bool {
+	_, ok := config.Thumb.(string)
+	return ok
 }
 
 // SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
@@ -1608,4 +1661,45 @@ func (config MediaGroupConfig) params() (Params, error) {
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
 	return params, nil
+}
+
+// DiceConfig allows you to send a random dice roll to Telegram.
+type DiceConfig struct {
+	BaseChat
+}
+
+func (config DiceConfig) method() string {
+	return "sendDice"
+}
+
+func (config DiceConfig) params() (Params, error) {
+	return config.BaseChat.params()
+}
+
+// GetMyCommandsConfig gets a list of the currently registered commands.
+type GetMyCommandsConfig struct{}
+
+func (config GetMyCommandsConfig) method() string {
+	return "getMyCommands"
+}
+
+func (config GetMyCommandsConfig) params() (Params, error) {
+	return make(Params), nil
+}
+
+// SetMyCommandsConfig sets a list of commands the bot understands.
+type SetMyCommandsConfig struct {
+	commands []BotCommand
+}
+
+func (config SetMyCommandsConfig) method() string {
+	return "setMyCommands"
+}
+
+func (config SetMyCommandsConfig) params() (Params, error) {
+	params := make(Params)
+
+	err := params.AddInterface("commands", config.commands)
+
+	return params, err
 }
