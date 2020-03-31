@@ -18,6 +18,30 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewDice creates a new DiceConfig.
+//
+// chatID is where to send it
+func NewDice(chatID int64) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+	}
+}
+
+// NewDiceWithEmoji creates a new DiceConfig.
+//
+// chatID is where to send it
+// emoji is type of the Dice
+func NewDiceWithEmoji(chatID int64, emoji string) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Emoji: emoji,
+	}
+}
+
 // NewDeleteMessage creates a request to delete a message.
 func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	return DeleteMessageConfig{
@@ -491,7 +515,7 @@ func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 	}
 }
 
-// NewInlineQueryResultCachedPhoto create a new inline query with cached photo.
+// NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached MPEG4 GIF.
 func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GifID string) InlineQueryResultCachedMpeg4Gif {
 	return InlineQueryResultCachedMpeg4Gif{
 		Type:   "mpeg4_gif",

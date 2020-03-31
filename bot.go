@@ -75,8 +75,9 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HttpClient) (*BotAPI,
 	return bot, nil
 }
 
-func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
-	b.apiEndpoint = apiEndpoint
+// SetAPIEndpoint add telegram apiEndpont to Bot
+func (bot *BotAPI) SetAPIEndpoint(apiEndpoint string) {
+	bot.apiEndpoint = apiEndpoint
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
