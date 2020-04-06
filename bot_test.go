@@ -28,7 +28,6 @@ func getBot(t *testing.T) (*BotAPI, error) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	return bot, err
@@ -39,7 +38,6 @@ func TestNewBotAPI_notoken(t *testing.T) {
 
 	if err == nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -52,7 +50,6 @@ func TestGetUpdates(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -65,7 +62,6 @@ func TestSendWithMessage(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -78,7 +74,6 @@ func TestSendWithMessageReply(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -90,7 +85,6 @@ func TestSendWithMessageForward(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -103,7 +97,6 @@ func TestSendWithNewPhoto(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -119,7 +112,6 @@ func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -135,7 +127,6 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -149,7 +140,6 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -162,7 +152,6 @@ func TestSendWithExistingPhoto(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -174,7 +163,6 @@ func TestSendWithNewDocument(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -186,7 +174,6 @@ func TestSendWithExistingDocument(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -203,7 +190,6 @@ func TestSendWithNewAudio(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -219,7 +205,6 @@ func TestSendWithExistingAudio(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -232,7 +217,6 @@ func TestSendWithNewVoice(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -245,7 +229,6 @@ func TestSendWithExistingVoice(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -256,7 +239,6 @@ func TestSendWithContact(t *testing.T) {
 
 	if _, err := bot.Send(contact); err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -267,7 +249,6 @@ func TestSendWithLocation(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -278,7 +259,6 @@ func TestSendWithVenue(t *testing.T) {
 
 	if _, err := bot.Send(venue); err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -293,7 +273,6 @@ func TestSendWithNewVideo(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -308,7 +287,6 @@ func TestSendWithExistingVideo(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -322,7 +300,6 @@ func TestSendWithNewVideoNote(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -336,7 +313,6 @@ func TestSendWithExistingVideoNote(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -349,7 +325,6 @@ func TestSendWithNewSticker(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -362,7 +337,6 @@ func TestSendWithExistingSticker(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -378,7 +352,6 @@ func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -395,7 +368,6 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -410,7 +382,6 @@ func TestGetFile(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -421,7 +392,6 @@ func TestSendChatConfig(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -431,7 +401,6 @@ func TestSendEditMessage(t *testing.T) {
 	msg, err := bot.Send(NewMessage(ChatID, "Testing editing."))
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	edit := EditMessageTextConfig{
@@ -445,7 +414,6 @@ func TestSendEditMessage(t *testing.T) {
 	_, err = bot.Send(edit)
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -455,7 +423,6 @@ func TestGetUserProfilePhotos(t *testing.T) {
 	_, err := bot.GetUserProfilePhotos(NewUserProfilePhotos(ChatID))
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -470,7 +437,6 @@ func TestSetWebhookWithCert(t *testing.T) {
 	_, err := bot.Request(wh)
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	_, err = bot.GetWebhookInfo()
@@ -493,7 +459,6 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	_, err := bot.Request(wh)
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	info, err := bot.GetWebhookInfo()
@@ -648,7 +613,6 @@ func TestDeleteMessage(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -668,7 +632,6 @@ func TestPinChatMessage(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -688,7 +651,6 @@ func TestUnpinChatMessage(t *testing.T) {
 
 	if _, err := bot.Request(pinChatMessageConfig); err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	unpinChatMessageConfig := UnpinChatMessageConfig{
@@ -697,7 +659,6 @@ func TestUnpinChatMessage(t *testing.T) {
 
 	if _, err := bot.Request(unpinChatMessageConfig); err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -709,28 +670,23 @@ func TestPolls(t *testing.T) {
 	msg, err := bot.Send(poll)
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	result, err := bot.StopPoll(NewStopPoll(SupergroupChatID, msg.MessageID))
 	if err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 
 	if result.Question != "Are polls working?" {
 		t.Error("Poll question did not match")
-		t.Fail()
 	}
 
 	if !result.IsClosed {
 		t.Error("Poll did not end")
-		t.Fail()
 	}
 
 	if result.Options[0].Text != "Yes" || result.Options[0].VoterCount != 0 || result.Options[1].Text != "No" || result.Options[1].VoterCount != 0 {
 		t.Error("Poll options were incorrect")
-		t.Fail()
 	}
 }
 
