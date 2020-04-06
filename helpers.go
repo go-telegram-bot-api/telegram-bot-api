@@ -393,7 +393,10 @@ func NewUpdate(offset int) UpdateConfig {
 //
 // link is the url parsable link you wish to get the updates.
 func NewWebhook(link string) WebhookConfig {
-	u, _ := url.Parse(link)
+	u, err := url.Parse(link)
+	if err != nil {
+		return WebhookConfig{}
+	}
 
 	return WebhookConfig{
 		URL: u,
@@ -405,7 +408,10 @@ func NewWebhook(link string) WebhookConfig {
 // link is the url you wish to get webhooks,
 // file contains a string to a file, FileReader, or FileBytes.
 func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
-	u, _ := url.Parse(link)
+	u, err := url.Parse(link)
+	if err != nil {
+		return WebhookConfig{}
+	}
 
 	return WebhookConfig{
 		URL:         u,

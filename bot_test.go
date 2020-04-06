@@ -468,16 +468,21 @@ func TestSetWebhookWithCert(t *testing.T) {
 	bot.RemoveWebhook()
 
 	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
-	_, err := bot.SetWebhook(wh)
-	if err != nil {
-		t.Error(err)
-		t.Fail()
+	if wh.URL == nil {
+		t.Error("URL Parse Error: Invalid port after host")
+	} else {
+		_, err := bot.SetWebhook(wh)
+		if err != nil {
+			t.Error(err)
+			t.Fail()
+		}
+
+		_, err = bot.GetWebhookInfo()
+		if err != nil {
+			t.Error(err)
+		}
+		bot.RemoveWebhook()
 	}
-	_, err = bot.GetWebhookInfo()
-	if err != nil {
-		t.Error(err)
-	}
-	bot.RemoveWebhook()
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -486,21 +491,26 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	time.Sleep(time.Second * 2)
 
 	bot.RemoveWebhook()
-
 	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
-	_, err := bot.SetWebhook(wh)
-	if err != nil {
-		t.Error(err)
+	if wh.URL == nil {
+		t.Error("URL Parse Error: Invalid port after host")
 		t.Fail()
+	} else {
+		_, err := bot.SetWebhook(wh)
+		if err != nil {
+			t.Error(err)
+			t.Fail()
+		}
+
+		info, err := bot.GetWebhookInfo()
+		if err != nil {
+			t.Error(err)
+		}
+		if info.LastErrorDate != 0 {
+			t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
+		}
+		bot.RemoveWebhook()
 	}
-	info, err := bot.GetWebhookInfo()
-	if err != nil {
-		t.Error(err)
-	}
-	if info.LastErrorDate != 0 {
-		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
-	}
-	bot.RemoveWebhook()
 }
 
 func TestUpdatesChan(t *testing.T) {
