@@ -469,7 +469,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	wh := tgbotapi.NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
 	if wh.URL == nil {
-		t.Error("URL Parse Error: Invalid port after host")
+		t.Error("URL Parse Error")
 	} else {
 		_, err := bot.SetWebhook(wh)
 		if err != nil {
@@ -493,8 +493,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	bot.RemoveWebhook()
 	wh := tgbotapi.NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 	if wh.URL == nil {
-		t.Error("URL Parse Error: Invalid port after host")
-		t.Fail()
+		t.Error("URL Parse Error")
 	} else {
 		_, err := bot.SetWebhook(wh)
 		if err != nil {
