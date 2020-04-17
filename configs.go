@@ -934,6 +934,45 @@ func (config EditMessageReplyMarkupConfig) method() string {
 	return "editMessageReplyMarkup"
 }
 
+func (input InputMediaPhoto) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("type", input.Type)
+
+	v.Add("media", input.Media)
+
+	v.Add("caption", input.Caption)
+
+	if input.ParseMode != "" {
+		v.Add("parse_mode", input.ParseMode)
+	}
+
+	return v, nil
+}
+
+// EditMessageMediaConfig allows you to modify the edit animation, audio, document, photo, or video messages
+type EditMessageMediaConfig struct {
+	BaseEdit
+	InputMedia InputMediaPhoto
+}
+
+func (config EditMessageMediaConfig) values() (url.Values, error) {
+	v, _ := config.BaseEdit.values()
+
+	data, err := json.Marshal(config.InputMedia)
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("media", string(data))
+
+	return v, nil
+}
+
+func (config EditMessageMediaConfig) method() string {
+	return "editMessageMedia"
+}
+
 // UserProfilePhotosConfig contains information about a
 // GetUserProfilePhotos request.
 type UserProfilePhotosConfig struct {

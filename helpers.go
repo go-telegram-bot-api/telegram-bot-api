@@ -651,6 +651,22 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 	}
 }
 
+// NewEditMessageMedia allows you to edit the photo media
+// TODO
+// [ ] Support other media types as well
+func NewEditMessageMedia(chatID int64, messageID int, fileID string) EditMessageMediaConfig {
+	return EditMessageMediaConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		InputMedia: InputMediaPhoto{
+			Media: fileID,
+			Type:  "photo",
+		},
+	}
+}
+
 // NewHideKeyboard hides the keyboard, with the option for being selective
 // or hiding for everyone.
 func NewHideKeyboard(selective bool) ReplyKeyboardHide {
