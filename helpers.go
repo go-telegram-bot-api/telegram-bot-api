@@ -918,9 +918,10 @@ func NewStopPoll(chatID int64, messageID int) StopPollConfig {
 // NewSendDice allows you to send a random dice roll.
 func NewSendDice(chatID int64) DiceConfig {
 	return DiceConfig{
-		BaseChat{
+		BaseChat: BaseChat{
 			ChatID: chatID,
 		},
+		Emoji: "",
 	}
 }
 

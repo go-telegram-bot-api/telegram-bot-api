@@ -486,19 +486,24 @@ type PollAnswer struct {
 
 // Poll contains information about a poll.
 type Poll struct {
-	ID                    string       `json:"id"`
-	Question              string       `json:"question"`
-	Options               []PollOption `json:"options"`
-	IsClosed              bool         `json:"is_closed"`
-	IsAnonymous           bool         `json:"is_anonymous"`
-	Type                  string       `json:"type"`
-	AllowsMultipleAnswers bool         `json:"allows_multiple_answers"`
-	CorrectOptionID       int          `json:"correct_option_id"` // optional
+	ID                    string          `json:"id"`
+	Question              string          `json:"question"`
+	Options               []PollOption    `json:"options"`
+	IsClosed              bool            `json:"is_closed"`
+	IsAnonymous           bool            `json:"is_anonymous"`
+	Type                  string          `json:"type"`
+	AllowsMultipleAnswers bool            `json:"allows_multiple_answers"`
+	CorrectOptionID       int             `json:"correct_option_id"`    // optional
+	Explanation           string          `json:"explanation"`          // optional
+	ExplanationEntities   []MessageEntity `json:"explanation_entities"` // optional
+	OpenPeriod            int             `json:"open_period"`          // optional
+	CloseDate             int             `json:"close_date"`           // optional
 }
 
 // Dice represents a single dice value.
 type Dice struct {
-	Value int `json:"value"`
+	Emoji string `json:"emoji"`
+	Value int    `json:"value"`
 }
 
 // UserProfilePhotos contains a set of user profile photos.
@@ -532,10 +537,10 @@ type ReplyKeyboardMarkup struct {
 
 // KeyboardButton is a button within a custom keyboard.
 type KeyboardButton struct {
-	Text            string                 `json:"text"`
-	RequestContact  bool                   `json:"request_contact"`
-	RequestLocation bool                   `json:"request_location"`
-	RequestPoll     KeyboardButtonPollType `json:"request_poll"`
+	Text            string                  `json:"text"`
+	RequestContact  bool                    `json:"request_contact"`
+	RequestLocation bool                    `json:"request_location"`
+	RequestPoll     *KeyboardButtonPollType `json:"request_poll,omitempty"`
 }
 
 // KeyboardButtonPollType represents type of a poll, which is allowed to

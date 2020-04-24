@@ -510,6 +510,10 @@ type SendPollConfig struct {
 	Type                  string
 	AllowsMultipleAnswers bool
 	CorrectOptionID       int64
+	Explanation           string
+	ExplanationParseMode  string
+	OpenPeriod            int
+	CloseDate             int
 	IsClosed              bool
 }
 
@@ -526,6 +530,10 @@ func (config SendPollConfig) params() (Params, error) {
 	params["allows_multiple_answers"] = strconv.FormatBool(config.AllowsMultipleAnswers)
 	params["correct_option_id"] = strconv.FormatInt(config.CorrectOptionID, 10)
 	params.AddBool("is_closed", config.IsClosed)
+	params.AddNonEmpty("explanation", config.Explanation)
+	params.AddNonEmpty("explanation_parse_mode", config.ExplanationParseMode)
+	params.AddNonZero("open_period", config.OpenPeriod)
+	params.AddNonZero("close_date", config.CloseDate)
 
 	return params, err
 }
@@ -1666,6 +1674,8 @@ func (config MediaGroupConfig) params() (Params, error) {
 // DiceConfig allows you to send a random dice roll to Telegram.
 type DiceConfig struct {
 	BaseChat
+
+	Emoji string
 }
 
 func (config DiceConfig) method() string {
@@ -1673,7 +1683,14 @@ func (config DiceConfig) method() string {
 }
 
 func (config DiceConfig) params() (Params, error) {
-	return config.BaseChat.params()
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+
+	params.AddNonEmpty("emoji", config.Emoji)
+
+	return params, err
 }
 
 // GetMyCommandsConfig gets a list of the currently registered commands.
