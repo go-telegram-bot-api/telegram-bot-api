@@ -13,32 +13,32 @@ import (
 // stored raw.
 type APIResponse struct {
 	Ok          bool                `json:"ok"`
-	Result      json.RawMessage     `json:"result"`
-	ErrorCode   int                 `json:"error_code"`
-	Description string              `json:"description"`
-	Parameters  *ResponseParameters `json:"parameters"`
+	Result      json.RawMessage     `json:"result,omitempty"`
+	ErrorCode   int                 `json:"error_code,omitempty"`
+	Description string              `json:"description,omitempty"`
+	Parameters  *ResponseParameters `json:"parameters,omitempty"`
 }
 
 // ResponseParameters are various errors that can be returned in APIResponse.
 type ResponseParameters struct {
-	MigrateToChatID int64 `json:"migrate_to_chat_id"` // optional
-	RetryAfter      int   `json:"retry_after"`        // optional
+	MigrateToChatID int64 `json:"migrate_to_chat_id,omitempty"` // optional
+	RetryAfter      int   `json:"retry_after,omitempty"`        // optional
 }
 
 // Update is an update response, from GetUpdates.
 type Update struct {
 	UpdateID           int                 `json:"update_id"`
-	Message            *Message            `json:"message"`
-	EditedMessage      *Message            `json:"edited_message"`
-	ChannelPost        *Message            `json:"channel_post"`
-	EditedChannelPost  *Message            `json:"edited_channel_post"`
-	InlineQuery        *InlineQuery        `json:"inline_query"`
-	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result"`
-	CallbackQuery      *CallbackQuery      `json:"callback_query"`
-	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
-	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
-	Poll               *Poll               `json:"poll"`
-	PollAnswer         *PollAnswer         `json:"poll_answer"`
+	Message            *Message            `json:"message,omitempty"`
+	EditedMessage      *Message            `json:"edited_message,omitempty"`
+	ChannelPost        *Message            `json:"channel_post,omitempty"`
+	EditedChannelPost  *Message            `json:"edited_channel_post,omitempty"`
+	InlineQuery        *InlineQuery        `json:"inline_query,omitempty"`
+	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result,omitempty"`
+	CallbackQuery      *CallbackQuery      `json:"callback_query,omitempty"`
+	ShippingQuery      *ShippingQuery      `json:"shipping_query,omitempty"`
+	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query,omitempty"`
+	Poll               *Poll               `json:"poll,omitempty"`
+	PollAnswer         *PollAnswer         `json:"poll_answer,omitempty"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -55,13 +55,13 @@ func (ch UpdatesChannel) Clear() {
 type User struct {
 	ID                      int    `json:"id"`
 	FirstName               string `json:"first_name"`
-	LastName                string `json:"last_name"`                   // optional
-	UserName                string `json:"username"`                    // optional
-	LanguageCode            string `json:"language_code"`               // optional
-	IsBot                   bool   `json:"is_bot"`                      // optional
-	CanJoinGroups           bool   `json:"can_join_groups"`             // optional
-	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages"` // optional
-	SupportsInlineQueries   bool   `json:"supports_inline_queries"`     // optional
+	LastName                string `json:"last_name,omitempty"`                   // optional
+	UserName                string `json:"username,omitempty"`                    // optional
+	LanguageCode            string `json:"language_code,omitempty"`               // optional
+	IsBot                   bool   `json:"is_bot,omitempty"`                      // optional
+	CanJoinGroups           bool   `json:"can_join_groups,omitempty"`             // optional
+	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages,omitempty"` // optional
+	SupportsInlineQueries   bool   `json:"supports_inline_queries,omitempty"`     // optional
 }
 
 // String displays a simple text version of a user.
@@ -112,19 +112,19 @@ type ChatPermissions struct {
 type Chat struct {
 	ID                  int64            `json:"id"`
 	Type                string           `json:"type"`
-	Title               string           `json:"title"`                          // optional
-	UserName            string           `json:"username"`                       // optional
-	FirstName           string           `json:"first_name"`                     // optional
-	LastName            string           `json:"last_name"`                      // optional
-	AllMembersAreAdmins bool             `json:"all_members_are_administrators"` // deprecated, optional
-	Photo               *ChatPhoto       `json:"photo"`                          // optional
-	Description         string           `json:"description,omitempty"`          // optional
-	InviteLink          string           `json:"invite_link,omitempty"`          // optional
-	PinnedMessage       *Message         `json:"pinned_message"`                 // optional
-	Permissions         *ChatPermissions `json:"permissions"`                    // optional
-	SlowModeDelay       int              `json:"slow_mode_delay"`                // optional
-	StickerSetName      string           `json:"sticker_set_name"`               // optional
-	CanSetStickerSet    bool             `json:"can_set_sticker_set"`            // optional
+	Title               string           `json:"title,omitempty"`                          // optional
+	UserName            string           `json:"username,omitempty"`                       // optional
+	FirstName           string           `json:"first_name,omitempty"`                     // optional
+	LastName            string           `json:"last_name,omitempty"`                      // optional
+	AllMembersAreAdmins bool             `json:"all_members_are_administrators,omitempty"` // deprecated, optional
+	Photo               *ChatPhoto       `json:"photo,omitempty"`                          // optional
+	Description         string           `json:"description,omitempty"`                    // optional
+	InviteLink          string           `json:"invite_link,omitempty"`                    // optional
+	PinnedMessage       *Message         `json:"pinned_message,omitempty"`                 // optional
+	Permissions         *ChatPermissions `json:"permissions,omitempty"`                    // optional
+	SlowModeDelay       int              `json:"slow_mode_delay,omitempty"`                // optional
+	StickerSetName      string           `json:"sticker_set_name,omitempty"`               // optional
+	CanSetStickerSet    bool             `json:"can_set_sticker_set,omitempty"`            // optional
 }
 
 // IsPrivate returns if the Chat is a private conversation.
@@ -156,53 +156,53 @@ func (c Chat) ChatConfig() ChatConfig {
 // almost anything.
 type Message struct {
 	MessageID             int                   `json:"message_id"`
-	From                  *User                 `json:"from"` // optional
+	From                  *User                 `json:"from,omitempty"` // optional
 	Date                  int                   `json:"date"`
 	Chat                  *Chat                 `json:"chat"`
-	ForwardFrom           *User                 `json:"forward_from"`            // optional
-	ForwardFromChat       *Chat                 `json:"forward_from_chat"`       // optional
-	ForwardFromMessageID  int                   `json:"forward_from_message_id"` // optional
-	ForwardSignature      string                `json:"forward_signature"`       // optional
-	ForwardSenderName     string                `json:"forward_sender_name"`     // optional
-	ForwardDate           int                   `json:"forward_date"`            // optional
-	ReplyToMessage        *Message              `json:"reply_to_message"`        // optional
-	EditDate              int                   `json:"edit_date"`               // optional
-	MediaGroupID          string                `json:"media_group_id"`          // optional
-	AuthorSignature       string                `json:"author_signature"`        // optional
-	Text                  string                `json:"text"`                    // optional
-	Entities              []MessageEntity       `json:"entities"`                // optional
-	CaptionEntities       []MessageEntity       `json:"caption_entities"`        // optional
-	Audio                 *Audio                `json:"audio"`                   // optional
-	Document              *Document             `json:"document"`                // optional
-	Animation             *ChatAnimation        `json:"animation"`               // optional
-	Game                  *Game                 `json:"game"`                    // optional
-	Photo                 []PhotoSize           `json:"photo"`                   // optional
-	Sticker               *Sticker              `json:"sticker"`                 // optional
-	Video                 *Video                `json:"video"`                   // optional
-	VideoNote             *VideoNote            `json:"video_note"`              // optional
-	Voice                 *Voice                `json:"voice"`                   // optional
-	Caption               string                `json:"caption"`                 // optional
-	Contact               *Contact              `json:"contact"`                 // optional
-	Location              *Location             `json:"location"`                // optional
-	Venue                 *Venue                `json:"venue"`                   // optional
-	Poll                  *Poll                 `json:"poll"`                    // optional
-	Dice                  *Dice                 `json:"dice"`                    // optional
-	NewChatMembers        []User                `json:"new_chat_members"`        // optional
-	LeftChatMember        *User                 `json:"left_chat_member"`        // optional
-	NewChatTitle          string                `json:"new_chat_title"`          // optional
-	NewChatPhoto          []PhotoSize           `json:"new_chat_photo"`          // optional
-	DeleteChatPhoto       bool                  `json:"delete_chat_photo"`       // optional
-	GroupChatCreated      bool                  `json:"group_chat_created"`      // optional
-	SuperGroupChatCreated bool                  `json:"supergroup_chat_created"` // optional
-	ChannelChatCreated    bool                  `json:"channel_chat_created"`    // optional
-	MigrateToChatID       int64                 `json:"migrate_to_chat_id"`      // optional
-	MigrateFromChatID     int64                 `json:"migrate_from_chat_id"`    // optional
-	PinnedMessage         *Message              `json:"pinned_message"`          // optional
-	Invoice               *Invoice              `json:"invoice"`                 // optional
-	SuccessfulPayment     *SuccessfulPayment    `json:"successful_payment"`      // optional
-	ConnectedWebsite      string                `json:"connected_website"`       // optional
-	PassportData          *PassportData         `json:"passport_data,omitempty"` // optional
-	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup"`            // optional
+	ForwardFrom           *User                 `json:"forward_from,omitempty"`            // optional
+	ForwardFromChat       *Chat                 `json:"forward_from_chat,omitempty"`       // optional
+	ForwardFromMessageID  int                   `json:"forward_from_message_id,omitempty"` // optional
+	ForwardSignature      string                `json:"forward_signature,omitempty"`       // optional
+	ForwardSenderName     string                `json:"forward_sender_name,omitempty"`     // optional
+	ForwardDate           int                   `json:"forward_date,omitempty"`            // optional
+	ReplyToMessage        *Message              `json:"reply_to_message,omitempty"`        // optional
+	EditDate              int                   `json:"edit_date,omitempty"`               // optional
+	MediaGroupID          string                `json:"media_group_id,omitempty"`          // optional
+	AuthorSignature       string                `json:"author_signature,omitempty"`        // optional
+	Text                  string                `json:"text,omitempty"`                    // optional
+	Entities              []MessageEntity       `json:"entities,omitempty"`                // optional
+	CaptionEntities       []MessageEntity       `json:"caption_entities,omitempty"`        // optional
+	Audio                 *Audio                `json:"audio,omitempty"`                   // optional
+	Document              *Document             `json:"document,omitempty"`                // optional
+	Animation             *ChatAnimation        `json:"animation,omitempty"`               // optional
+	Game                  *Game                 `json:"game,omitempty"`                    // optional
+	Photo                 []PhotoSize           `json:"photo,omitempty"`                   // optional
+	Sticker               *Sticker              `json:"sticker,omitempty"`                 // optional
+	Video                 *Video                `json:"video,omitempty"`                   // optional
+	VideoNote             *VideoNote            `json:"video_note,omitempty"`              // optional
+	Voice                 *Voice                `json:"voice,omitempty"`                   // optional
+	Caption               string                `json:"caption,omitempty"`                 // optional
+	Contact               *Contact              `json:"contact,omitempty"`                 // optional
+	Location              *Location             `json:"location,omitempty"`                // optional
+	Venue                 *Venue                `json:"venue,omitempty"`                   // optional
+	Poll                  *Poll                 `json:"poll,omitempty"`                    // optional
+	Dice                  *Dice                 `json:"dice,omitempty"`                    // optional
+	NewChatMembers        []User                `json:"new_chat_members,omitempty"`        // optional
+	LeftChatMember        *User                 `json:"left_chat_member,omitempty"`        // optional
+	NewChatTitle          string                `json:"new_chat_title,omitempty"`          // optional
+	NewChatPhoto          []PhotoSize           `json:"new_chat_photo,omitempty"`          // optional
+	DeleteChatPhoto       bool                  `json:"delete_chat_photo,omitempty"`       // optional
+	GroupChatCreated      bool                  `json:"group_chat_created,omitempty"`      // optional
+	SuperGroupChatCreated bool                  `json:"supergroup_chat_created,omitempty"` // optional
+	ChannelChatCreated    bool                  `json:"channel_chat_created,omitempty"`    // optional
+	MigrateToChatID       int64                 `json:"migrate_to_chat_id,omitempty"`      // optional
+	MigrateFromChatID     int64                 `json:"migrate_from_chat_id,omitempty"`    // optional
+	PinnedMessage         *Message              `json:"pinned_message,omitempty"`          // optional
+	Invoice               *Invoice              `json:"invoice,omitempty"`                 // optional
+	SuccessfulPayment     *SuccessfulPayment    `json:"successful_payment,omitempty"`      // optional
+	ConnectedWebsite      string                `json:"connected_website,omitempty"`       // optional
+	PassportData          *PassportData         `json:"passport_data,omitempty"`           // optional
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`            // optional
 }
 
 // Time converts the message timestamp into a Time.
@@ -279,9 +279,9 @@ type MessageEntity struct {
 	Type     string `json:"type"`
 	Offset   int    `json:"offset"`
 	Length   int    `json:"length"`
-	URL      string `json:"url"`      // optional
-	User     *User  `json:"user"`     // optional
-	Language string `json:"language"` // optional
+	URL      string `json:"url,omitempty"`      // optional
+	User     *User  `json:"user,omitempty"`     // optional
+	Language string `json:"language,omitempty"` // optional
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
@@ -349,7 +349,7 @@ type PhotoSize struct {
 	FileUniqueID string `json:"file_unique_id"`
 	Width        int    `json:"width"`
 	Height       int    `json:"height"`
-	FileSize     int    `json:"file_size"` // optional
+	FileSize     int    `json:"file_size,omitempty"` // optional
 }
 
 // Audio contains information about audio.
@@ -357,20 +357,20 @@ type Audio struct {
 	FileID       string `json:"file_id"`
 	FileUniqueID string `json:"file_unique_id"`
 	Duration     int    `json:"duration"`
-	Performer    string `json:"performer"` // optional
-	Title        string `json:"title"`     // optional
-	MimeType     string `json:"mime_type"` // optional
-	FileSize     int    `json:"file_size"` // optional
+	Performer    string `json:"performer,omitempty"` // optional
+	Title        string `json:"title,omitempty"`     // optional
+	MimeType     string `json:"mime_type,omitempty"` // optional
+	FileSize     int    `json:"file_size,omitempty"` // optional
 }
 
 // Document contains information about a document.
 type Document struct {
 	FileID       string     `json:"file_id"`
 	FileUniqueID string     `json:"file_unique_id"`
-	Thumbnail    *PhotoSize `json:"thumb"`     // optional
-	FileName     string     `json:"file_name"` // optional
-	MimeType     string     `json:"mime_type"` // optional
-	FileSize     int        `json:"file_size"` // optional
+	Thumbnail    *PhotoSize `json:"thumb,omitempty"`     // optional
+	FileName     string     `json:"file_name,omitempty"` // optional
+	MimeType     string     `json:"mime_type,omitempty"` // optional
+	FileSize     int        `json:"file_size,omitempty"` // optional
 }
 
 // Sticker contains information about a sticker.
@@ -380,11 +380,11 @@ type Sticker struct {
 	Width        int          `json:"width"`
 	Height       int          `json:"height"`
 	IsAnimated   bool         `json:"is_animated"`
-	Thumbnail    *PhotoSize   `json:"thumb"`         // optional
-	Emoji        string       `json:"emoji"`         // optional
-	SetName      string       `json:"set_name"`      // optional
-	MaskPosition MaskPosition `json:"mask_position"` //optional
-	FileSize     int          `json:"file_size"`     // optional
+	Thumbnail    *PhotoSize   `json:"thumb,omitempty"`         // optional
+	Emoji        string       `json:"emoji,omitempty"`         // optional
+	SetName      string       `json:"set_name,omitempty"`      // optional
+	MaskPosition MaskPosition `json:"mask_position,omitempty"` //optional
+	FileSize     int          `json:"file_size,omitempty"`     // optional
 }
 
 // MaskPosition is the position of a mask.
@@ -396,10 +396,10 @@ type MaskPosition struct {
 	FileID    string     `json:"file_id"`
 	Width     int        `json:"width"`
 	Height    int        `json:"height"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	Emoji     string     `json:"emoji"`     // optional
-	FileSize  int        `json:"file_size"` // optional
-	SetName   string     `json:"set_name"`  // optional
+	Thumbnail *PhotoSize `json:"thumb,omitempty"`     // optional
+	Emoji     string     `json:"emoji,omitempty"`     // optional
+	FileSize  int        `json:"file_size,omitempty"` // optional
+	SetName   string     `json:"set_name,omitempty"`  // optional
 }
 
 // ChatAnimation contains information about an animation.
@@ -409,10 +409,10 @@ type ChatAnimation struct {
 	Width        int        `json:"width"`
 	Height       int        `json:"height"`
 	Duration     int        `json:"duration"`
-	Thumbnail    *PhotoSize `json:"thumb"`     // optional
-	FileName     string     `json:"file_name"` // optional
-	MimeType     string     `json:"mime_type"` // optional
-	FileSize     int        `json:"file_size"` // optional
+	Thumbnail    *PhotoSize `json:"thumb,omitempty"`     // optional
+	FileName     string     `json:"file_name,omitempty"` // optional
+	MimeType     string     `json:"mime_type,omitempty"` // optional
+	FileSize     int        `json:"file_size,omitempty"` // optional
 }
 
 // Video contains information about a video.
@@ -422,9 +422,9 @@ type Video struct {
 	Width        int        `json:"width"`
 	Height       int        `json:"height"`
 	Duration     int        `json:"duration"`
-	Thumbnail    *PhotoSize `json:"thumb"`     // optional
-	MimeType     string     `json:"mime_type"` // optional
-	FileSize     int        `json:"file_size"` // optional
+	Thumbnail    *PhotoSize `json:"thumb,omitempty"`     // optional
+	MimeType     string     `json:"mime_type,omitempty"` // optional
+	FileSize     int        `json:"file_size,omitempty"` // optional
 }
 
 // VideoNote contains information about a video.
@@ -433,8 +433,8 @@ type VideoNote struct {
 	FileUniqueID string     `json:"file_unique_id"`
 	Length       int        `json:"length"`
 	Duration     int        `json:"duration"`
-	Thumbnail    *PhotoSize `json:"thumb"`     // optional
-	FileSize     int        `json:"file_size"` // optional
+	Thumbnail    *PhotoSize `json:"thumb,omitempty"`     // optional
+	FileSize     int        `json:"file_size,omitempty"` // optional
 }
 
 // Voice contains information about a voice.
@@ -442,8 +442,8 @@ type Voice struct {
 	FileID       string `json:"file_id"`
 	FileUniqueID string `json:"file_unique_id"`
 	Duration     int    `json:"duration"`
-	MimeType     string `json:"mime_type"` // optional
-	FileSize     int    `json:"file_size"` // optional
+	MimeType     string `json:"mime_type,omitempty"` // optional
+	FileSize     int    `json:"file_size,omitempty"` // optional
 }
 
 // Contact contains information about a contact.
@@ -452,9 +452,9 @@ type Voice struct {
 type Contact struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"` // optional
-	UserID      int    `json:"user_id"`   // optional
-	VCard       string `json:"vcard"`     // optional
+	LastName    string `json:"last_name,omitempty"` // optional
+	UserID      int    `json:"user_id,omitempty"`   // optional
+	VCard       string `json:"vcard,omitempty"`     // optional
 }
 
 // Location contains information about a place.
@@ -468,7 +468,7 @@ type Venue struct {
 	Location     Location `json:"location"`
 	Title        string   `json:"title"`
 	Address      string   `json:"address"`
-	FoursquareID string   `json:"foursquare_id"` // optional
+	FoursquareID string   `json:"foursquare_id,omitempty"` // optional
 }
 
 // PollOption contains information about one answer option in a poll.
@@ -493,11 +493,11 @@ type Poll struct {
 	IsAnonymous           bool            `json:"is_anonymous"`
 	Type                  string          `json:"type"`
 	AllowsMultipleAnswers bool            `json:"allows_multiple_answers"`
-	CorrectOptionID       int             `json:"correct_option_id"`    // optional
-	Explanation           string          `json:"explanation"`          // optional
-	ExplanationEntities   []MessageEntity `json:"explanation_entities"` // optional
-	OpenPeriod            int             `json:"open_period"`          // optional
-	CloseDate             int             `json:"close_date"`           // optional
+	CorrectOptionID       int             `json:"correct_option_id,omitempty"`    // optional
+	Explanation           string          `json:"explanation,omitempty"`          // optional
+	ExplanationEntities   []MessageEntity `json:"explanation_entities,omitempty"` // optional
+	OpenPeriod            int             `json:"open_period,omitempty"`          // optional
+	CloseDate             int             `json:"close_date,omitempty"`           // optional
 }
 
 // Dice represents a single dice value.
@@ -516,8 +516,8 @@ type UserProfilePhotos struct {
 type File struct {
 	FileID       string `json:"file_id"`
 	FileUniqueID string `json:"file_unique_id"`
-	FileSize     int    `json:"file_size"` // optional
-	FilePath     string `json:"file_path"` // optional
+	FileSize     int    `json:"file_size,omitempty"` // optional
+	FilePath     string `json:"file_path,omitempty"` // optional
 }
 
 // Link returns a full path to the download URL for a File.
@@ -530,9 +530,9 @@ func (f *File) Link(token string) string {
 // ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
 type ReplyKeyboardMarkup struct {
 	Keyboard        [][]KeyboardButton `json:"keyboard"`
-	ResizeKeyboard  bool               `json:"resize_keyboard"`   // optional
-	OneTimeKeyboard bool               `json:"one_time_keyboard"` // optional
-	Selective       bool               `json:"selective"`         // optional
+	ResizeKeyboard  bool               `json:"resize_keyboard,omitempty"`   // optional
+	OneTimeKeyboard bool               `json:"one_time_keyboard,omitempty"` // optional
+	Selective       bool               `json:"selective,omitempty"`         // optional
 }
 
 // KeyboardButton is a button within a custom keyboard.
@@ -552,7 +552,7 @@ type KeyboardButtonPollType struct {
 // ReplyKeyboardHide allows the Bot to hide a custom keyboard.
 type ReplyKeyboardHide struct {
 	HideKeyboard bool `json:"hide_keyboard"`
-	Selective    bool `json:"selective"` // optional
+	Selective    bool `json:"selective,omitempty"` // optional
 }
 
 // ReplyKeyboardRemove allows the Bot to hide a custom keyboard.
@@ -597,11 +597,11 @@ type LoginURL struct {
 type CallbackQuery struct {
 	ID              string   `json:"id"`
 	From            *User    `json:"from"`
-	Message         *Message `json:"message"`           // optional
-	InlineMessageID string   `json:"inline_message_id"` // optional
+	Message         *Message `json:"message,omitempty"`           // optional
+	InlineMessageID string   `json:"inline_message_id,omitempty"` // optional
 	ChatInstance    string   `json:"chat_instance"`
-	Data            string   `json:"data"`            // optional
-	GameShortName   string   `json:"game_short_name"` // optional
+	Data            string   `json:"data,omitempty"`            // optional
+	GameShortName   string   `json:"game_short_name,omitempty"` // optional
 }
 
 // ForceReply allows the Bot to have users directly reply to it without
@@ -615,7 +615,7 @@ type ForceReply struct {
 type ChatMember struct {
 	User                  *User  `json:"user"`
 	Status                string `json:"status"`
-	CustomTitle           string `json:"custom_title"`                        // optional
+	CustomTitle           string `json:"custom_title,omitempty"`              // optional
 	UntilDate             int64  `json:"until_date,omitempty"`                // optional
 	CanBeEdited           bool   `json:"can_be_edited,omitempty"`             // optional
 	CanPostMessages       bool   `json:"can_post_messages,omitempty"`         // optional
@@ -626,7 +626,7 @@ type ChatMember struct {
 	CanChangeInfo         bool   `json:"can_change_info,omitempty"`           // optional
 	CanInviteUsers        bool   `json:"can_invite_users,omitempty"`          // optional
 	CanPinMessages        bool   `json:"can_pin_messages,omitempty"`          // optional
-	IsChatMember          bool   `json:"is_member"`                           // optional
+	IsChatMember          bool   `json:"is_member,omitempty"`                 // optional
 	CanSendMessages       bool   `json:"can_send_messages,omitempty"`         // optional
 	CanSendMediaMessages  bool   `json:"can_send_media_messages,omitempty"`   // optional
 	CanSendPolls          bool   `json:"can_send_polls,omitempty"`            // optional
@@ -684,8 +684,8 @@ type WebhookInfo struct {
 	URL                  string `json:"url"`
 	HasCustomCertificate bool   `json:"has_custom_certificate"`
 	PendingUpdateCount   int    `json:"pending_update_count"`
-	LastErrorDate        int    `json:"last_error_date"`    // optional
-	LastErrorMessage     string `json:"last_error_message"` // optional
+	LastErrorDate        int    `json:"last_error_date,omitempty"`    // optional
+	LastErrorMessage     string `json:"last_error_message,omitempty"` // optional
 }
 
 // IsSet returns true if a webhook is currently set.
@@ -697,7 +697,7 @@ func (info WebhookInfo) IsSet() bool {
 type InlineQuery struct {
 	ID       string    `json:"id"`
 	From     *User     `json:"from"`
-	Location *Location `json:"location"` // optional
+	Location *Location `json:"location,omitempty"` // optional
 	Query    string    `json:"query"`
 	Offset   string    `json:"offset"`
 }
