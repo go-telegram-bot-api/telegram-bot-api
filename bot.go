@@ -19,14 +19,18 @@ import (
 	"github.com/technoweenie/multipartstreamer"
 )
 
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
 	Token  string `json:"token"`
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self            User         `json:"-"`
-	Client          *http.Client `json:"-"`
+	Self            User       `json:"-"`
+	Client          HttpClient `json:"-"`
 	shutdownChannel chan interface{}
 
 	apiEndpoint string
@@ -51,7 +55,7 @@ func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
 // and allows you to pass a http.Client.
 //
 // It requires a token, provided by @BotFather on Telegram and API endpoint.
-func NewBotAPIWithClient(token, apiEndpoint string, client *http.Client) (*BotAPI, error) {
+func NewBotAPIWithClient(token, apiEndpoint string, client HttpClient) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:           token,
 		Client:          client,
@@ -79,7 +83,13 @@ func (b *BotAPI) SetAPIEndpoint(apiEndpoint string) {
 func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
 	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
-	resp, err := bot.Client.PostForm(method, params)
+	req, err := http.NewRequest("POST", method, strings.NewReader(params.Encode()))
+	if err != nil {
+		return APIResponse{}, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := bot.Client.Do(req)
 	if err != nil {
 		return APIResponse{}, err
 	}
