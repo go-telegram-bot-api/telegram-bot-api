@@ -64,6 +64,9 @@ type User struct {
 // It is normally a user's username, but falls back to a first/last
 // name as available.
 func (u *User) String() string {
+	if u == nil {
+		return ""
+	}
 	if u.UserName != "" {
 		return u.UserName
 	}
