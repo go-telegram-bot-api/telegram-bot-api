@@ -425,10 +425,15 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // GetUpdates fetches updates.
 // If a WebHook is set, this will not return any data!
 //
-// Offset, Limit, and Timeout are optional.
+// Offset, Limit, Timeout and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
+//
+// Create the config object with NewUpdateWithFilter to be able to choose
+// which kind of updates you want.
+// You may get a short sequence of unfiltered updates becase the server
+// doesn't discard updates queued before setting the filter.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	v := url.Values{}
 	if config.Offset != 0 {
@@ -439,6 +444,9 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	}
 	if config.Timeout > 0 {
 		v.Add("timeout", strconv.Itoa(config.Timeout))
+	}
+	if allowed := config.allowedUpdates; len(allowed) > 0 {
+		v.Add("allowed_updates", allowed)
 	}
 
 	resp, err := bot.MakeRequest("getUpdates", v)
