@@ -1,6 +1,7 @@
 package tgbotapi_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -56,6 +57,65 @@ func TestGetUpdates(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 		t.Fail()
+	}
+}
+
+func TestGetUpdatesWithFilter(t *testing.T) {
+	filters := []struct {
+		Types []tgbotapi.UpdateType
+		Valid bool
+	}{
+		{Types: []tgbotapi.UpdateType{}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_All}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_Default}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_Message}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_EditedMessage}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_ChannelPost}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_EditedChannelPost}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_InlineQuery}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_ChosenInlineResult}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_CallbackQuery}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_ShippingQuery}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_PreCheckoutQuery}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_Poll}, Valid: true},
+		{Types: []tgbotapi.UpdateType{tgbotapi.UpdateType_PollAnswer}, Valid: true},
+		{Types: []tgbotapi.UpdateType{
+			tgbotapi.UpdateType_Message,
+			tgbotapi.UpdateType_EditedMessage,
+		}, Valid: true},
+		{Types: []tgbotapi.UpdateType{1111}, Valid: false},
+		{Types: []tgbotapi.UpdateType{
+			tgbotapi.UpdateType_All,
+			tgbotapi.UpdateType_EditedMessage,
+		}, Valid: false},
+		{Types: []tgbotapi.UpdateType{
+			tgbotapi.UpdateType_Default,
+			tgbotapi.UpdateType_EditedMessage,
+		}, Valid: false},
+	}
+	bot, _ := getBot(t)
+
+	for i, f := range filters {
+		u, err := tgbotapi.NewUpdateWithFilter(0, f.Types...)
+		if !f.Valid {
+			if err == nil {
+				t.Error(fmt.Errorf("%d should err", i))
+				t.Fail()
+			}
+			continue
+		}
+
+		if err != nil {
+			t.Error(err)
+			t.Fail()
+		}
+
+		_, err = bot.GetUpdates(u)
+
+		if err != nil {
+			t.Error(err)
+			t.Fail()
+		}
 	}
 }
 

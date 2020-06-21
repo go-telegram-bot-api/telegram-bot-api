@@ -1,6 +1,8 @@
 package tgbotapi
 
 import (
+	"encoding/json"
+	"errors"
 	"net/url"
 )
 
@@ -387,6 +389,74 @@ func NewUpdate(offset int) UpdateConfig {
 		Limit:   0,
 		Timeout: 0,
 	}
+}
+
+var updateTypes map[UpdateType]string = map[UpdateType]string{
+	UpdateType_Message:            "message",
+	UpdateType_EditedMessage:      "edited_message",
+	UpdateType_ChannelPost:        "channel_post",
+	UpdateType_EditedChannelPost:  "edited_channel_post",
+	UpdateType_InlineQuery:        "inline_query",
+	UpdateType_ChosenInlineResult: "chosen_inline_result",
+	UpdateType_CallbackQuery:      "callback_query",
+	UpdateType_ShippingQuery:      "shipping_query",
+	UpdateType_PreCheckoutQuery:   "pre_checkout_query",
+	UpdateType_Poll:               "poll",
+	UpdateType_PollAnswer:         "poll_answer",
+}
+
+// NewUpdateWithFilter gets updates of requested types since the last offset.
+//
+// offset is the last Update ID to include.
+// You likely want to set this to the last Update ID plus 1.
+//
+// allowed is the list of expected update types.
+// An empty list or a list of 1 element of value UpdateType_Default uses the
+// default list, which is the last one used.
+// If no list was ever set, all updates are received.
+// A list of 1 element of value UpdateType_All requests updates of all types.
+// A list of at least 1 element and values matching any of the constants
+// UpdateType_* other than the previously mentioned makes the request return
+// only those types.
+// Any other case returns an error and an empty config.
+// There may be a short sequence of updates not matching the filter just after
+// setting it because already queued up updates aren't omitted, so the user
+// should still filter unintereseting updates. The feature mostlye aims to
+// optimize bandwidth.
+func NewUpdateWithFilter(offset int, allowed ...UpdateType) (UpdateConfig, error) {
+	cfg := UpdateConfig{
+		Offset:  offset,
+		Limit:   0,
+		Timeout: 0,
+	}
+
+	if len(allowed) == 0 {
+		cfg.allowedUpdates = ""
+		return cfg, nil
+	}
+	if len(allowed) == 1 {
+		if allowed[0] == UpdateType_Default {
+			cfg.allowedUpdates = ""
+			return cfg, nil
+		}
+		if allowed[0] == UpdateType_All {
+			cfg.allowedUpdates = "[]"
+			return cfg, nil
+		}
+	}
+
+	allowedNames := make([]string, len(allowed))
+	for i := range allowed {
+		allowedName, ok := updateTypes[allowed[i]]
+		if !ok {
+			return UpdateConfig{}, errors.New("invalid allowed types")
+		}
+		allowedNames[i] = allowedName
+	}
+	allowedEncoded, _ := json.Marshal(allowedNames)
+	cfg.allowedUpdates = string(allowedEncoded)
+
+	return cfg, nil
 }
 
 // NewWebhook creates a new webhook.

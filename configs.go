@@ -47,6 +47,25 @@ const (
 	ErrBadURL      = "bad or empty url"
 )
 
+// Constants for update types for server-side filtering
+const (
+	UpdateType_Default = iota
+	UpdateType_All
+	UpdateType_Message
+	UpdateType_EditedMessage
+	UpdateType_ChannelPost
+	UpdateType_EditedChannelPost
+	UpdateType_InlineQuery
+	UpdateType_ChosenInlineResult
+	UpdateType_CallbackQuery
+	UpdateType_ShippingQuery
+	UpdateType_PreCheckoutQuery
+	UpdateType_Poll
+	UpdateType_PollAnswer
+)
+
+type UpdateType int
+
 // Chattable is any config type that can be sent.
 type Chattable interface {
 	values() (url.Values, error)
@@ -949,9 +968,10 @@ type FileConfig struct {
 
 // UpdateConfig contains information about a GetUpdates request.
 type UpdateConfig struct {
-	Offset  int
-	Limit   int
-	Timeout int
+	Offset         int
+	Limit          int
+	Timeout        int
+	allowedUpdates string
 }
 
 // WebhookConfig contains information about a SetWebhook request.

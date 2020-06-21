@@ -425,10 +425,18 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // GetUpdates fetches updates.
 // If a WebHook is set, this will not return any data!
 //
-// Offset, Limit, and Timeout are optional.
+// Offset, Limit, Timeout and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
+// Set AllowedUpdates to a slice containing any number of the constants
+// declared as UpdateType_* to request the server to only send those types
+// of updates.
+// Set to an empty slice to request all updates regardless of type, and to
+// nil (the default) to keep the last configuration.
+// Unacknowledged updates that were already queued will still be sent, so
+// you should still check the type. This optimization aims for bandwidth,
+// not local code.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	v := url.Values{}
 	if config.Offset != 0 {
@@ -439,6 +447,9 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	}
 	if config.Timeout > 0 {
 		v.Add("timeout", strconv.Itoa(config.Timeout))
+	}
+	if allowed := config.allowedUpdates; len(allowed) > 0 {
+		v.Add("allowed_updates", allowed)
 	}
 
 	resp, err := bot.MakeRequest("getUpdates", v)
