@@ -881,7 +881,7 @@ func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse
 	v.Add("pre_checkout_query_id", config.PreCheckoutQueryID)
 	v.Add("ok", strconv.FormatBool(config.OK))
 	if config.OK != true {
-		v.Add("error", config.ErrorMessage)
+		v.Add("error_message", config.ErrorMessage)
 	}
 
 	bot.debugLog("answerPreCheckoutQuery", v, nil)
