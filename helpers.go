@@ -469,6 +469,19 @@ func NewInlineQueryResultArticleMarkdown(id, title, messageText string) InlineQu
 	}
 }
 
+// NewInlineQueryResultArticleMarkdownV2 creates a new inline query article with MarkdownV2 parsing.
+func NewInlineQueryResultArticleMarkdownV2(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text:      messageText,
+			ParseMode: "MarkdownV2",
+		},
+	}
+}
+
 // NewInlineQueryResultArticleHTML creates a new inline query article with HTML parsing.
 func NewInlineQueryResultArticleHTML(id, title, messageText string) InlineQueryResultArticle {
 	return InlineQueryResultArticle{
