@@ -1241,8 +1241,9 @@ type PreCheckoutConfig struct {
 
 // DeleteMessageConfig contains information of a message in a chat to delete.
 type DeleteMessageConfig struct {
-	ChatID    int64
-	MessageID int
+	ChannelUsername string
+	ChatID          int64
+	MessageID       int
 }
 
 func (config DeleteMessageConfig) method() string {
@@ -1252,7 +1253,7 @@ func (config DeleteMessageConfig) method() string {
 func (config DeleteMessageConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddNonZero64("chat_id", config.ChatID)
+	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddNonZero("message_id", config.MessageID)
 
 	return params, nil
