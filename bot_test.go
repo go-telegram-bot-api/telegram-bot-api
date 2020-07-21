@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -402,6 +402,32 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 	}
 }
 
+func TestSendWithDice(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewDice(ChatID)
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+}
+
+func TestSendWithDiceWithEmoji(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewDiceWithEmoji(ChatID, "🏀")
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+}
+
 func TestGetFile(t *testing.T) {
 	bot, _ := getBot(t)
 
@@ -497,6 +523,9 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	if info.MaxConnections == 0 {
+		t.Errorf("Expected maximum connections to be greater than 0")
+	}
 	if info.LastErrorDate != 0 {
 		t.Errorf("[Telegram callback failed]%s", info.LastErrorMessage)
 	}
@@ -591,6 +620,40 @@ func ExampleNewWebhook() {
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
+}
+
+func ExampleWebhookHandler() {
+	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if info.LastErrorDate != 0 {
+		log.Printf("[Telegram callback failed]%s", info.LastErrorMessage)
+	}
+
+	http.HandleFunc("/"+bot.Token, func(w http.ResponseWriter, r *http.Request) {
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			log.Printf("%+v\n", err.Error())
+		} else {
+			log.Printf("%+v\n", *update)
+		}
+	})
+
+	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 }
 
 func ExampleAnswerInlineQuery() {

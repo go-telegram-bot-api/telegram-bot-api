@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api?status.svg)](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api)
 [![Travis](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api.svg)](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api)
 
-All methods are fairly self explanatory, and reading the godoc page should
+All methods are fairly self explanatory, and reading the [godoc](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api) page should
 explain everything. If something isn't clear, open an issue or submit
 a pull request.
 

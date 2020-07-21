@@ -64,6 +64,9 @@ type User struct {
 // It is normally a user's username, but falls back to a first/last
 // name as available.
 func (u *User) String() string {
+	if u == nil {
+		return ""
+	}
 	if u.UserName != "" {
 		return u.UserName
 	}
@@ -338,13 +341,24 @@ type Document struct {
 
 // Sticker contains information about a sticker.
 type Sticker struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	Emoji     string     `json:"emoji"`     // optional
-	FileSize  int        `json:"file_size"` // optional
-	SetName   string     `json:"set_name"`  // optional
+	FileUniqueID string     `json:"file_unique_id"`
+	FileID       string     `json:"file_id"`
+	Width        int        `json:"width"`
+	Height       int        `json:"height"`
+	Thumbnail    *PhotoSize `json:"thumb"`       // optional
+	Emoji        string     `json:"emoji"`       // optional
+	FileSize     int        `json:"file_size"`   // optional
+	SetName      string     `json:"set_name"`    // optional
+	IsAnimated   bool       `json:"is_animated"` // optional
+}
+
+// StickerSet contains information about an sticker set.
+type StickerSet struct {
+	Name          string    `json:"name"`
+	Title         string    `json:"title"`
+	IsAnimated    bool      `json:"is_animated"`
+	ContainsMasks bool      `json:"contains_masks"`
+	Stickers      []Sticker `json:"stickers"`
 }
 
 // ChatAnimation contains information about an animation.
@@ -570,6 +584,7 @@ type WebhookInfo struct {
 	PendingUpdateCount   int    `json:"pending_update_count"`
 	LastErrorDate        int    `json:"last_error_date"`    // optional
 	LastErrorMessage     string `json:"last_error_message"` // optional
+	MaxConnections       int    `json:"max_connections"`    // optional
 }
 
 // IsSet returns true if a webhook is currently set.
@@ -634,6 +649,7 @@ type InlineQueryResultPhoto struct {
 	Title               string                `json:"title"`
 	Description         string                `json:"description"`
 	Caption             string                `json:"caption"`
+	ParseMode           string                `json:"parse_mode"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 }
@@ -736,6 +752,17 @@ type InlineQueryResultCachedVideo struct {
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 }
 
+// InlineQueryResultCachedSticker is an inline query response with cached sticker.
+type InlineQueryResultCachedSticker struct {
+	Type                string                `json:"type"`            // required
+	ID                  string                `json:"id"`              // required
+	StickerID           string                `json:"sticker_file_id"` // required
+	Title               string                `json:"title"`           // required
+	ParseMode           string                `json:"parse_mode"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+}
+
 // InlineQueryResultAudio is an inline query response audio.
 type InlineQueryResultAudio struct {
 	Type                string                `json:"type"`      // required
@@ -820,6 +847,23 @@ type InlineQueryResultLocation struct {
 	Latitude            float64               `json:"latitude"`  // required
 	Longitude           float64               `json:"longitude"` // required
 	Title               string                `json:"title"`     // required
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	ThumbURL            string                `json:"thumb_url"`
+	ThumbWidth          int                   `json:"thumb_width"`
+	ThumbHeight         int                   `json:"thumb_height"`
+}
+
+// InlineQueryResultVenue is an inline query response venue.
+type InlineQueryResultVenue struct {
+	Type                string                `json:"type"`      // required
+	ID                  string                `json:"id"`        // required
+	Latitude            float64               `json:"latitude"`  // required
+	Longitude           float64               `json:"longitude"` // required
+	Title               string                `json:"title"`     // required
+	Address             string                `json:"address"`   // required
+	FoursquareID        string                `json:"foursquare_id"`
+	FoursquareType      string                `json:"foursquare_type"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
 	ThumbURL            string                `json:"thumb_url"`

@@ -36,8 +36,9 @@ const (
 
 // Constant values for ParseMode in MessageConfig
 const (
-	ModeMarkdown = "Markdown"
-	ModeHTML     = "HTML"
+	ModeMarkdown   = "Markdown"
+	ModeMarkdownV2 = "MarkdownV2"
+	ModeHTML       = "HTML"
 )
 
 // Library errors
@@ -1138,8 +1139,9 @@ type PreCheckoutConfig struct {
 
 // DeleteMessageConfig contains information of a message in a chat to delete.
 type DeleteMessageConfig struct {
-	ChatID    int64
-	MessageID int
+	ChannelUsername string
+	ChatID          int64
+	MessageID       int
 }
 
 func (config DeleteMessageConfig) method() string {
@@ -1149,7 +1151,12 @@ func (config DeleteMessageConfig) method() string {
 func (config DeleteMessageConfig) values() (url.Values, error) {
 	v := url.Values{}
 
-	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	if config.ChannelUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.ChannelUsername)
+	}
+
 	v.Add("message_id", strconv.Itoa(config.MessageID))
 
 	return v, nil
@@ -1261,4 +1268,46 @@ func (config DeleteChatPhotoConfig) values() (url.Values, error) {
 	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 
 	return v, nil
+}
+
+// GetStickerSetConfig contains information for get sticker set.
+type GetStickerSetConfig struct {
+	Name string
+}
+
+func (config GetStickerSetConfig) method() string {
+	return "getStickerSet"
+}
+
+func (config GetStickerSetConfig) values() (url.Values, error) {
+	v := url.Values{}
+	v.Add("name", config.Name)
+	return v, nil
+}
+
+// DiceConfig contains information about a sendDice request.
+type DiceConfig struct {
+	BaseChat
+	// Emoji on which the dice throw animation is based.
+	// Currently, must be one of “🎲”, “🎯”, or “🏀”.
+	// Dice can have values 1-6 for “🎲” and “🎯”, and values 1-5 for “🏀”.
+	// Defaults to “🎲”
+	Emoji string
+}
+
+// values returns a url.Values representation of DiceConfig.
+func (config DiceConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+	if config.Emoji != "" {
+		v.Add("emoji", config.Emoji)
+	}
+	return v, nil
+}
+
+// method returns Telegram API method name for sending Dice.
+func (config DiceConfig) method() string {
+	return "sendDice"
 }
