@@ -689,7 +689,7 @@ type WebhookInfo struct {
 	PendingUpdateCount   int    `json:"pending_update_count"`
 	LastErrorDate        int    `json:"last_error_date"`    // optional
 	LastErrorMessage     string `json:"last_error_message"` // optional
-	MaxConnections       int    `json:"max_connections"`
+	MaxConnections       int    `json:"max_connections"`    // optional
 }
 
 // IsSet returns true if a webhook is currently set.
