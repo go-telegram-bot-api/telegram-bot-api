@@ -352,6 +352,7 @@ type Sticker struct {
 	IsAnimated   bool       `json:"is_animated"` // optional
 }
 
+// StickerSet contains information about an sticker set.
 type StickerSet struct {
 	Name          string    `json:"name"`
 	Title         string    `json:"title"`

@@ -1284,3 +1284,30 @@ func (config GetStickerSetConfig) values() (url.Values, error) {
 	v.Add("name", config.Name)
 	return v, nil
 }
+
+// DiceConfig contains information about a sendDice request.
+type DiceConfig struct {
+	BaseChat
+	// Emoji on which the dice throw animation is based.
+	// Currently, must be one of “🎲”, “🎯”, or “🏀”.
+	// Dice can have values 1-6 for “🎲” and “🎯”, and values 1-5 for “🏀”.
+	// Defaults to “🎲”
+	Emoji string
+}
+
+// values returns a url.Values representation of DiceConfig.
+func (config DiceConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+	if config.Emoji != "" {
+		v.Add("emoji", config.Emoji)
+	}
+	return v, nil
+}
+
+// method returns Telegram API method name for sending Dice.
+func (config DiceConfig) method() string {
+	return "sendDice"
+}

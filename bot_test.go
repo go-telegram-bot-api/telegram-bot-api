@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -400,6 +400,32 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
+}
+
+func TestSendWithDice(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewDice(ChatID)
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+}
+
+func TestSendWithDiceWithEmoji(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := tgbotapi.NewDiceWithEmoji(ChatID, "🏀")
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
 }
 
 func TestGetFile(t *testing.T) {
