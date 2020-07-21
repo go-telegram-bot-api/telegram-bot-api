@@ -571,6 +571,16 @@ func NewInlineQueryResultCachedVideo(id, videoID, title string) InlineQueryResul
 	}
 }
 
+// NewInlineQueryResultCachedSticker create a new inline query with cached sticker.
+func NewInlineQueryResultCachedSticker(id, stickerID, title string) InlineQueryResultCachedSticker {
+	return InlineQueryResultCachedSticker{
+		Type:      "sticker",
+		ID:        id,
+		StickerID: stickerID,
+		Title:     title,
+	}
+}
+
 // NewInlineQueryResultAudio creates a new inline query audio.
 func NewInlineQueryResultAudio(id, url, title string) InlineQueryResultAudio {
 	return InlineQueryResultAudio{
