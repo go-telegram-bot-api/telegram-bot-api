@@ -216,7 +216,7 @@ func TestMessageEntityIsBotCommand(t *testing.T) {
 func TestMessageEntityIsUrl(t *testing.T) {
 	entity := MessageEntity{Type: "url"}
 
-	if !entity.IsUrl() {
+	if !entity.IsURL() {
 		t.Fail()
 	}
 }

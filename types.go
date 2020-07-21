@@ -311,8 +311,8 @@ func (e MessageEntity) IsCommand() bool {
 	return e.Type == "bot_command"
 }
 
-// IsUrl returns true if the type of the message entity is "url".
-func (e MessageEntity) IsUrl() bool {
+// IsURL returns true if the type of the message entity is "url".
+func (e MessageEntity) IsURL() bool {
 	return e.Type == "url"
 }
 
