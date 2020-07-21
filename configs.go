@@ -17,14 +17,16 @@ const (
 
 // Constant values for ChatActions
 const (
-	ChatTyping         = "typing"
-	ChatUploadPhoto    = "upload_photo"
-	ChatRecordVideo    = "record_video"
-	ChatUploadVideo    = "upload_video"
-	ChatRecordAudio    = "record_audio"
-	ChatUploadAudio    = "upload_audio"
-	ChatUploadDocument = "upload_document"
-	ChatFindLocation   = "find_location"
+	ChatTyping          = "typing"
+	ChatUploadPhoto     = "upload_photo"
+	ChatRecordVideo     = "record_video"
+	ChatUploadVideo     = "upload_video"
+	ChatRecordAudio     = "record_audio"
+	ChatUploadAudio     = "upload_audio"
+	ChatUploadDocument  = "upload_document"
+	ChatFindLocation    = "find_location"
+	ChatRecordVideoNote = "record_video_note"
+	ChatUploadVideoNote = "upload_video_note"
 )
 
 // API errors
