@@ -916,12 +916,30 @@ func NewStopPoll(chatID int64, messageID int) StopPollConfig {
 }
 
 // NewSendDice allows you to send a random dice roll.
+//
+// Deprecated: Use NewDice instead.
 func NewSendDice(chatID int64) DiceConfig {
+	return NewDice(chatID)
+}
+
+// NewDice allows you to send a random dice roll.
+func NewDice(chatID int64) DiceConfig {
 	return DiceConfig{
 		BaseChat: BaseChat{
 			ChatID: chatID,
 		},
-		Emoji: "",
+	}
+}
+
+// NewDiceWithEmoji allows you to send a random roll of one of many types.
+//
+// Emoji may be 🎲 (1-6), 🎯 (1-6), or 🏀 (1-5).
+func NewDiceWithEmoji(chatID int64, emoji string) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Emoji: emoji,
 	}
 }
 
