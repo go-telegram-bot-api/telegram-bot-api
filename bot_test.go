@@ -11,8 +11,7 @@ import (
 const (
 	TestToken               = "153667468:AAHlSHlMqSt1f_uFmVRJbm5gntu2HI4WW8I"
 	ChatID                  = 76918703
-	ChannelBot              = "903278594:AAHmLoQncKOMKz2A644-cIK1Sb0VwfnOpGQ"
-	Channel                 = "@nightghost_test"
+	Channel                 = "@tgbotapitest"
 	SupergroupChatID        = -1001120141283
 	ReplyToMessageID        = 35
 	ExistingPhotoFileID     = "AgADAgADw6cxG4zHKAkr42N7RwEN3IFShCoABHQwXEtVks4EH2wBAAEC"
@@ -156,7 +155,7 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 }
 
 func TestSendNewPhotoToChannel(t *testing.T) {
-	bot, _ := NewBotAPI(ChannelBot)
+	bot, _ := getBot(t)
 
 	msg := NewPhotoUploadToChannel(Channel, "tests/image.jpg")
 	msg.Caption = "Test"
@@ -169,7 +168,7 @@ func TestSendNewPhotoToChannel(t *testing.T) {
 }
 
 func TestSendNewPhotoToChannelFileBytes(t *testing.T) {
-	bot, _ := NewBotAPI(ChannelBot)
+	bot, _ := getBot(t)
 
 	data, _ := ioutil.ReadFile("tests/image.jpg")
 	b := FileBytes{Name: "image.jpg", Bytes: data}
@@ -185,7 +184,7 @@ func TestSendNewPhotoToChannelFileBytes(t *testing.T) {
 }
 
 func TestSendNewPhotoToChannelFileReader(t *testing.T) {
-	bot, _ := NewBotAPI(ChannelBot)
+	bot, _ := getBot(t)
 
 	f, _ := os.Open("tests/image.jpg")
 	reader := FileReader{Name: "image.jpg", Reader: f, Size: -1}
