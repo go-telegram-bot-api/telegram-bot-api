@@ -704,7 +704,7 @@ func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
 	}
 }
 
-// NewOneTimeReplyKeyboard creates a new one time keyboard using NewReplyKeyboard()
+// NewOneTimeReplyKeyboard creates a new one time keyboard.
 func NewOneTimeReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
   markup := NewReplyKeyboard(rows...)
   markup.OneTimeKeyboard = true
