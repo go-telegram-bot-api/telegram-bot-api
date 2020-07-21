@@ -245,7 +245,11 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	}
 
 	if !apiResp.Ok {
-		return APIResponse{}, errors.New(apiResp.Description)
+		parameters := ResponseParameters{}
+		if apiResp.Parameters != nil {
+			parameters = *apiResp.Parameters
+		}
+		return apiResp, Error{Code: apiResp.ErrorCode, Message: apiResp.Description, ResponseParameters: parameters}
 	}
 
 	return apiResp, nil
@@ -765,9 +769,9 @@ func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error)
 }
 
 // RestrictChatMember to restrict a user in a supergroup. The bot must be an
-//administrator in the supergroup for this to work and must have the
-//appropriate admin rights. Pass True for all boolean parameters to lift
-//restrictions from a user. Returns True on success.
+// administrator in the supergroup for this to work and must have the
+// appropriate admin rights. Pass True for all boolean parameters to lift
+// restrictions from a user. Returns True on success.
 func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
 
