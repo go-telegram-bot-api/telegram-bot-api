@@ -67,6 +67,24 @@ func NewPhotoUpload(chatID int64, file interface{}) PhotoConfig {
 	}
 }
 
+// NewPhotoUploadToChannel creates a new photo uploader to send a photo to a channel.
+//
+// username is the username of the channel, file is a string path to the file,
+// FileReader, or FileBytes.
+//
+// Note that you must send animated GIFs as a document.
+func NewPhotoUploadToChannel(username string, file interface{}) PhotoConfig {
+	return PhotoConfig{
+		BaseFile: BaseFile{
+			BaseChat: BaseChat{
+				ChannelUsername: username,
+			},
+			File:        file,
+			UseExisting: false,
+		},
+	}
+}
+
 // NewPhotoShare shares an existing photo.
 // You may use this to reshare an existing photo without reuploading it.
 //
