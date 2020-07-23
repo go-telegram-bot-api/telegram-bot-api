@@ -1679,6 +1679,8 @@ func (config MediaGroupConfig) params() (Params, error) {
 }
 
 // DiceConfig allows you to send a random dice roll to Telegram.
+//
+// Emoji may be one of the following: 🎲 (1-6), 🎯 (1-6), 🏀 (1-5).
 type DiceConfig struct {
 	BaseChat
 

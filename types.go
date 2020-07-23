@@ -169,6 +169,7 @@ type Message struct {
 	ForwardSenderName     string                `json:"forward_sender_name,omitempty"`     // optional
 	ForwardDate           int                   `json:"forward_date,omitempty"`            // optional
 	ReplyToMessage        *Message              `json:"reply_to_message,omitempty"`        // optional
+	ViaBot                *User                 `json:"via_bot"`                           // optional
 	EditDate              int                   `json:"edit_date,omitempty"`               // optional
 	MediaGroupID          string                `json:"media_group_id,omitempty"`          // optional
 	AuthorSignature       string                `json:"author_signature,omitempty"`        // optional
@@ -756,6 +757,7 @@ type InlineQueryResultGIF struct {
 	ID                  string                `json:"id"`        // required
 	URL                 string                `json:"gif_url"`   // required
 	ThumbURL            string                `json:"thumb_url"` // required
+	ThumbMimeType       string                `json:"thumb_mime_type"`
 	Width               int                   `json:"gif_width,omitempty"`
 	Height              int                   `json:"gif_height,omitempty"`
 	Duration            int                   `json:"gif_duration,omitempty"`
@@ -786,6 +788,7 @@ type InlineQueryResultMPEG4GIF struct {
 	Height              int                   `json:"mpeg4_height"`
 	Duration            int                   `json:"mpeg4_duration"`
 	ThumbURL            string                `json:"thumb_url"`
+	ThumbMimeType       string                `json:"thumb_mime_type"`
 	Title               string                `json:"title"`
 	Caption             string                `json:"caption"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
