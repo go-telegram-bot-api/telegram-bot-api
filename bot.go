@@ -160,7 +160,8 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 
 		for field, value := range params {
 			if err := m.WriteField(field, value); err != nil {
-				panic(err)
+				w.CloseWithError(err)
+				return
 			}
 		}
 
@@ -169,20 +170,23 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 			case string:
 				fileHandle, err := os.Open(f)
 				if err != nil {
-					panic(err)
+					w.CloseWithError(err)
+					return
 				}
 				defer fileHandle.Close()
 
 				part, err := m.CreateFormFile(file.Name, fileHandle.Name())
 				if err != nil {
-					panic(err)
+					w.CloseWithError(err)
+					return
 				}
 
 				io.Copy(part, fileHandle)
 			case FileBytes:
 				part, err := m.CreateFormFile(file.Name, f.Name)
 				if err != nil {
-					panic(err)
+					w.CloseWithError(err)
+					return
 				}
 
 				buf := bytes.NewBuffer(f.Bytes)
@@ -190,7 +194,8 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 			case FileReader:
 				part, err := m.CreateFormFile(file.Name, f.Name)
 				if err != nil {
-					panic(err)
+					w.CloseWithError(err)
+					return
 				}
 
 				if f.Size != -1 {
@@ -198,7 +203,8 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 				} else {
 					data, err := ioutil.ReadAll(f.Reader)
 					if err != nil {
-						panic(err)
+						w.CloseWithError(err)
+						return
 					}
 
 					buf := bytes.NewBuffer(data)
@@ -207,15 +213,18 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 			case FileURL:
 				val := string(f)
 				if err := m.WriteField(file.Name, val); err != nil {
-					panic(err)
+					w.CloseWithError(err)
+					return
 				}
 			case FileID:
 				val := string(f)
 				if err := m.WriteField(file.Name, val); err != nil {
-					panic(err)
+					w.CloseWithError(err)
+					return
 				}
 			default:
-				panic(errors.New(ErrBadFileType))
+				w.CloseWithError(errors.New(ErrBadFileType))
+				return
 			}
 		}
 	}()
