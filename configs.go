@@ -768,21 +768,23 @@ type EditMessageMediaConfig struct {
 	Media interface{}
 }
 
-func (config EditMessageMediaConfig) files() []RequestFile {
-	return []RequestFile{
-		{
-			Name: "media",
-			File: config.Media,
-		},
-	}
-}
-
 func (EditMessageMediaConfig) method() string {
 	return "editMessageMedia"
 }
 
 func (config EditMessageMediaConfig) params() (Params, error) {
-	return config.BaseEdit.params()
+	params, err := config.BaseEdit.params()
+	if err != nil {
+		return params, err
+	}
+
+	err = params.AddInterface("media", prepareInputMediaParam(config.Media, 0))
+
+	return params, err
+}
+
+func (config EditMessageMediaConfig) files() []RequestFile {
+	return prepareInputMediaFile(config.Media, 0)
 }
 
 // EditMessageReplyMarkupConfig allows you to modify the reply markup
@@ -892,9 +894,9 @@ func (config WebhookConfig) params() (Params, error) {
 	}
 
 	params.AddNonZero("max_connections", config.MaxConnections)
-	params.AddInterface("allowed_updates", config.AllowedUpdates)
+	err := params.AddInterface("allowed_updates", config.AllowedUpdates)
 
-	return params, nil
+	return params, err
 }
 
 func (config WebhookConfig) name() string {
@@ -1177,9 +1179,9 @@ func (config SetChatPermissionsConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
-	params.AddInterface("permissions", config.Permissions)
+	err := params.AddInterface("permissions", config.Permissions)
 
-	return params, nil
+	return params, err
 }
 
 // ChatInviteLinkConfig contains information about getting a chat link.
@@ -1492,12 +1494,10 @@ func (config UploadStickerConfig) params() (Params, error) {
 }
 
 func (config UploadStickerConfig) files() []RequestFile {
-	return []RequestFile{
-		{
-			Name: "png_sticker",
-			File: config.PNGSticker,
-		},
-	}
+	return []RequestFile{{
+		Name: "png_sticker",
+		File: config.PNGSticker,
+	}}
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
@@ -1715,56 +1715,13 @@ func (config MediaGroupConfig) params() (Params, error) {
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
-	newMedia := make([]interface{}, len(config.Media))
-	copy(newMedia, config.Media)
+	err := params.AddInterface("media", prepareInputMediaForParams(config.Media))
 
-	for idx, media := range config.Media {
-		switch m := media.(type) {
-		case InputMediaPhoto:
-			switch m.Media.(type) {
-			case string, FileBytes, FileReader:
-				m.Media = fmt.Sprintf("attach://file-%d", idx)
-				newMedia[idx] = m
-			}
-		case InputMediaVideo:
-			switch m.Media.(type) {
-			case string, FileBytes, FileReader:
-				m.Media = fmt.Sprintf("attach://file-%d", idx)
-				newMedia[idx] = m
-			}
-		}
-	}
-
-	params.AddInterface("media", newMedia)
-
-	return params, nil
+	return params, err
 }
 
 func (config MediaGroupConfig) files() []RequestFile {
-	files := []RequestFile{}
-
-	for idx, media := range config.Media {
-		switch m := media.(type) {
-		case InputMediaPhoto:
-			switch f := m.Media.(type) {
-			case string, FileBytes, FileReader:
-				files = append(files, RequestFile{
-					Name: fmt.Sprintf("file-%d", idx),
-					File: f,
-				})
-			}
-		case InputMediaVideo:
-			switch f := m.Media.(type) {
-			case string, FileBytes, FileReader:
-				files = append(files, RequestFile{
-					Name: fmt.Sprintf("file-%d", idx),
-					File: f,
-				})
-			}
-		}
-	}
-
-	return files
+	return prepareInputMediaForFiles(config.Media)
 }
 
 // DiceConfig allows you to send a random dice roll to Telegram.
@@ -1817,4 +1774,116 @@ func (config SetMyCommandsConfig) params() (Params, error) {
 	err := params.AddInterface("commands", config.commands)
 
 	return params, err
+}
+
+// prepareInputMediaParam evaluates a single InputMedia and determines if it
+// needs to be modified for a successful upload. If it returns nil, then the
+// value does not need to be included in the params. Otherwise, it will return
+// the same type as was originally provided.
+//
+// The idx is used to calculate the file field name. If you only have a single
+// file, 0 may be used. It is formatted into "attach://file-%d" for the primary
+// media and "attach://file-%d-thumb" for thumbnails.
+//
+// It is expected to be used in conjunction with prepareInputMediaFile.
+func prepareInputMediaParam(inputMedia interface{}, idx int) interface{} {
+	switch m := inputMedia.(type) {
+	case InputMediaPhoto:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
+
+		return m
+	case InputMediaVideo:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
+
+		switch m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		}
+
+		return m
+	}
+
+	return nil
+}
+
+// prepareInputMediaFile generates an array of RequestFile to provide for
+// Fileable's files method. It returns an array as a single InputMedia may have
+// multiple files, for the primary media and a thumbnail.
+//
+// The idx parameter is used to generate file field names. It uses the names
+// "file-%d" for the main file and "file-%d-thumb" for the thumbnail.
+//
+// It is expected to be used in conjunction with prepareInputMediaParam.
+func prepareInputMediaFile(inputMedia interface{}, idx int) []RequestFile {
+	files := []RequestFile{}
+
+	switch m := inputMedia.(type) {
+	case InputMediaPhoto:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+	case InputMediaVideo:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+
+		switch f := m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d-thumb", idx),
+				File: f,
+			})
+		}
+	}
+
+	return files
+}
+
+// prepareInputMediaForParams calls prepareInputMediaParam for each item
+// provided and returns a new array with the correct params for a request.
+//
+// It is expected that files will get data from the associated function,
+// prepareInputMediaForFiles.
+func prepareInputMediaForParams(inputMedia []interface{}) []interface{} {
+	newMedia := make([]interface{}, len(inputMedia))
+	copy(newMedia, inputMedia)
+
+	for idx, media := range inputMedia {
+		if param := prepareInputMediaParam(media, idx); param != nil {
+			newMedia[idx] = param
+		}
+	}
+
+	return newMedia
+}
+
+// prepareInputMediaForFiles calls prepareInputMediaFile for each item
+// provided and returns a new array with the correct files for a request.
+//
+// It is expected that params will get data from the associated function,
+// prepareInputMediaForParams.
+func prepareInputMediaForFiles(inputMedia []interface{}) []RequestFile {
+	files := []RequestFile{}
+
+	for idx, media := range inputMedia {
+		if file := prepareInputMediaFile(media, idx); file != nil {
+			files = append(files, file...)
+		}
+	}
+
+	return files
 }

@@ -817,3 +817,49 @@ func TestSetCommands(t *testing.T) {
 		t.Error("Commands were incorrectly set")
 	}
 }
+
+func TestEditMessageMedia(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := NewPhoto(ChatID, "tests/image.jpg")
+	msg.Caption = "Test"
+	m, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	edit := EditMessageMediaConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    ChatID,
+			MessageID: m.MessageID,
+		},
+		Media: NewInputMediaVideo("tests/video.mp4"),
+	}
+
+	_, err = bot.Request(edit)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestPrepareInputMediaForParams(t *testing.T) {
+	media := []interface{}{
+		NewInputMediaPhoto("tests/image.jpg"),
+		NewInputMediaVideo(FileID("test")),
+	}
+
+	prepared := prepareInputMediaForParams(media)
+
+	if media[0].(InputMediaPhoto).Media != "tests/image.jpg" {
+		t.Error("Original media was changed")
+	}
+
+	if prepared[0].(InputMediaPhoto).Media != "attach://file-0" {
+		t.Error("New media was not replaced")
+	}
+
+	if prepared[1].(InputMediaVideo).Media != FileID("test") {
+		t.Error("Passthrough value was not the same")
+	}
+}

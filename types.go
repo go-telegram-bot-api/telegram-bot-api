@@ -1126,6 +1126,7 @@ type InputMediaPhoto struct {
 // InputMediaVideo is a video to send as part of a media group.
 type InputMediaVideo struct {
 	BaseInputMedia
+	Thumb             interface{}
 	Width             int  `json:"width,omitempty"`
 	Height            int  `json:"height,omitempty"`
 	Duration          int  `json:"duration,omitempty"`
