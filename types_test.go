@@ -348,4 +348,5 @@ var (
 	_ Fileable = (*UploadStickerConfig)(nil)
 	_ Fileable = (*NewStickerSetConfig)(nil)
 	_ Fileable = (*AddStickerConfig)(nil)
+	_ Fileable = (*MediaGroupConfig)(nil)
 )

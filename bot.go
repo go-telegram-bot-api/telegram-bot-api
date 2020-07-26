@@ -377,51 +377,7 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 
 // SendMediaGroup sends a media group and returns the resulting messages.
 func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
-	filesToUpload := []RequestFile{}
-
-	newMedia := []interface{}{}
-
-	for idx, media := range config.Media {
-		switch m := media.(type) {
-		case InputMediaPhoto:
-			switch f := m.Media.(type) {
-			case string, FileBytes, FileReader:
-				m.Media = fmt.Sprintf("attach://file-%d", idx)
-				newMedia = append(newMedia, m)
-
-				filesToUpload = append(filesToUpload, RequestFile{
-					Name: fmt.Sprintf("file-%d", idx),
-					File: f,
-				})
-			default:
-				newMedia = append(newMedia, m)
-			}
-		case InputMediaVideo:
-			switch f := m.Media.(type) {
-			case string, FileBytes, FileReader:
-				m.Media = fmt.Sprintf("attach://file-%d", idx)
-				newMedia = append(newMedia, m)
-
-				filesToUpload = append(filesToUpload, RequestFile{
-					Name: fmt.Sprintf("file-%d", idx),
-					File: f,
-				})
-			default:
-				newMedia = append(newMedia, m)
-			}
-		default:
-			return nil, errors.New(ErrBadFileType)
-		}
-	}
-
-	params, err := config.params()
-	if err != nil {
-		return nil, err
-	}
-
-	params.AddInterface("media", newMedia)
-
-	resp, err := bot.UploadFiles(config.method(), params, filesToUpload)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return nil, err
 	}

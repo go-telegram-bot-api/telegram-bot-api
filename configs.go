@@ -1,6 +1,7 @@
 package tgbotapi
 
 import (
+	"fmt"
 	"io"
 	"net/url"
 	"strconv"
@@ -1694,9 +1695,6 @@ func (config DeleteChatStickerSetConfig) params() (Params, error) {
 // MediaGroupConfig allows you to send a group of media.
 //
 // Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
-//
-// Due to additional processing required, this config is not Chattable or
-// Fileable. It must be uploaded with SendMediaGroup.
 type MediaGroupConfig struct {
 	ChatID          int64
 	ChannelUsername string
@@ -1717,7 +1715,56 @@ func (config MediaGroupConfig) params() (Params, error) {
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
+	newMedia := make([]interface{}, len(config.Media))
+	copy(newMedia, config.Media)
+
+	for idx, media := range config.Media {
+		switch m := media.(type) {
+		case InputMediaPhoto:
+			switch m.Media.(type) {
+			case string, FileBytes, FileReader:
+				m.Media = fmt.Sprintf("attach://file-%d", idx)
+				newMedia[idx] = m
+			}
+		case InputMediaVideo:
+			switch m.Media.(type) {
+			case string, FileBytes, FileReader:
+				m.Media = fmt.Sprintf("attach://file-%d", idx)
+				newMedia[idx] = m
+			}
+		}
+	}
+
+	params.AddInterface("media", newMedia)
+
 	return params, nil
+}
+
+func (config MediaGroupConfig) files() []RequestFile {
+	files := []RequestFile{}
+
+	for idx, media := range config.Media {
+		switch m := media.(type) {
+		case InputMediaPhoto:
+			switch f := m.Media.(type) {
+			case string, FileBytes, FileReader:
+				files = append(files, RequestFile{
+					Name: fmt.Sprintf("file-%d", idx),
+					File: f,
+				})
+			}
+		case InputMediaVideo:
+			switch f := m.Media.(type) {
+			case string, FileBytes, FileReader:
+				files = append(files, RequestFile{
+					Name: fmt.Sprintf("file-%d", idx),
+					File: f,
+				})
+			}
+		}
+	}
+
+	return files
 }
 
 // DiceConfig allows you to send a random dice roll to Telegram.
