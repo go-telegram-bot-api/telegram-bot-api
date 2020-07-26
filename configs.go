@@ -94,34 +94,11 @@ func (chat *BaseChat) params() (Params, error) {
 // BaseFile is a base type for all file config types.
 type BaseFile struct {
 	BaseChat
-	Files    []RequestFile
-	MimeType string
-	FileSize int
-}
-
-// AddFile specifies a file for a Telegram request.
-func (file *BaseFile) AddFile(name string, f interface{}) {
-	if file.Files == nil {
-		file.Files = make([]RequestFile, 0, 1)
-	}
-
-	file.Files = append(file.Files, RequestFile{
-		Name: name,
-		File: f,
-	})
+	File interface{}
 }
 
 func (file BaseFile) params() (Params, error) {
-	params, err := file.BaseChat.params()
-
-	params.AddNonEmpty("mime_type", file.MimeType)
-	params.AddNonZero("file_size", file.FileSize)
-
-	return params, err
-}
-
-func (file BaseFile) files() []RequestFile {
-	return file.Files
+	return file.BaseChat.params()
 }
 
 // BaseEdit is base type of all chat edits.
@@ -200,6 +177,7 @@ func (config ForwardConfig) method() string {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
+	Thumb     interface{}
 	Caption   string
 	ParseMode string
 }
@@ -213,17 +191,30 @@ func (config PhotoConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config PhotoConfig) name() string {
-	return "photo"
-}
-
 func (config PhotoConfig) method() string {
 	return "sendPhoto"
+}
+
+func (config PhotoConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "photo",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	BaseFile
+	Thumb     interface{}
 	Caption   string
 	ParseMode string
 	Duration  int
@@ -246,17 +237,30 @@ func (config AudioConfig) params() (Params, error) {
 	return params, nil
 }
 
-func (config AudioConfig) name() string {
-	return "audio"
-}
-
 func (config AudioConfig) method() string {
 	return "sendAudio"
+}
+
+func (config AudioConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "audio",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
+	Thumb     interface{}
 	Caption   string
 	ParseMode string
 }
@@ -270,12 +274,24 @@ func (config DocumentConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config DocumentConfig) name() string {
-	return "document"
-}
-
 func (config DocumentConfig) method() string {
 	return "sendDocument"
+}
+
+func (config DocumentConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "document",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // StickerConfig contains information about a SendSticker request.
@@ -287,17 +303,21 @@ func (config StickerConfig) params() (Params, error) {
 	return config.BaseChat.params()
 }
 
-func (config StickerConfig) name() string {
-	return "sticker"
-}
-
 func (config StickerConfig) method() string {
 	return "sendSticker"
+}
+
+func (config StickerConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "sticker",
+		File: config.File,
+	}}
 }
 
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
+	Thumb             interface{}
 	Duration          int
 	Caption           string
 	ParseMode         string
@@ -315,18 +335,31 @@ func (config VideoConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config VideoConfig) name() string {
-	return "video"
-}
-
 func (config VideoConfig) method() string {
 	return "sendVideo"
+}
+
+func (config VideoConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "video",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // AnimationConfig contains information about a SendAnimation request.
 type AnimationConfig struct {
 	BaseFile
 	Duration  int
+	Thumb     interface{}
 	Caption   string
 	ParseMode string
 }
@@ -349,9 +382,26 @@ func (config AnimationConfig) method() string {
 	return "sendAnimation"
 }
 
+func (config AnimationConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "animation",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
+}
+
 // VideoNoteConfig contains information about a SendVideoNote request.
 type VideoNoteConfig struct {
 	BaseFile
+	Thumb    interface{}
 	Duration int
 	Length   int
 }
@@ -365,17 +415,30 @@ func (config VideoNoteConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config VideoNoteConfig) name() string {
-	return "video_note"
-}
-
 func (config VideoNoteConfig) method() string {
 	return "sendVideoNote"
+}
+
+func (config VideoNoteConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "video_note",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
+	Thumb     interface{}
 	Caption   string
 	ParseMode string
 	Duration  int
@@ -391,12 +454,24 @@ func (config VoiceConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config VoiceConfig) name() string {
-	return "voice"
-}
-
 func (config VoiceConfig) method() string {
 	return "sendVoice"
+}
+
+func (config VoiceConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "voice",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // LocationConfig contains information about a SendLocation request.
@@ -1313,8 +1388,11 @@ func (config SetChatPhotoConfig) method() string {
 	return "setChatPhoto"
 }
 
-func (config SetChatPhotoConfig) name() string {
-	return "photo"
+func (config SetChatPhotoConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "photo",
+		File: config.File,
+	}}
 }
 
 // DeleteChatPhotoConfig allows you to delete a group, supergroup, or channel's photo.

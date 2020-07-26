@@ -216,7 +216,7 @@ func TestSendWithNewDocumentAndThumb(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewDocument(ChatID, "tests/voice.ogg")
-	msg.AddFile("thumb", "tests/image.jpg")
+	msg.Thumb = "tests/image.jpg"
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -242,8 +242,6 @@ func TestSendWithNewAudio(t *testing.T) {
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
-	msg.MimeType = "audio/mpeg"
-	msg.FileSize = 688
 	_, err := bot.Send(msg)
 
 	if err != nil {

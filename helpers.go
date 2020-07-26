@@ -55,97 +55,76 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 //
 // Note that you must send animated GIFs as a document.
 func NewPhoto(chatID int64, file interface{}) PhotoConfig {
-	config := PhotoConfig{
+	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewPhotoToChannel creates a new photo uploader to send a photo to a channel.
 //
 // Note that you must send animated GIFs as a document.
 func NewPhotoToChannel(username string, file interface{}) PhotoConfig {
-	config := PhotoConfig{
+	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{
 				ChannelUsername: username,
 			},
+			File: file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewAudio creates a new sendAudio request.
 func NewAudio(chatID int64, file interface{}) AudioConfig {
-	config := AudioConfig{
+	return AudioConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewDocument creates a new sendDocument request.
 func NewDocument(chatID int64, file interface{}) DocumentConfig {
-	config := DocumentConfig{
+	return DocumentConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewSticker creates a new sendSticker request.
 func NewSticker(chatID int64, file interface{}) StickerConfig {
-	config := StickerConfig{
+	return StickerConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewVideo creates a new sendVideo request.
 func NewVideo(chatID int64, file interface{}) VideoConfig {
-	config := VideoConfig{
+	return VideoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewAnimation creates a new sendAnimation request.
 func NewAnimation(chatID int64, file interface{}) AnimationConfig {
-	config := AnimationConfig{
+	return AnimationConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewVideoNote creates a new sendVideoNote request.
@@ -153,29 +132,23 @@ func NewAnimation(chatID int64, file interface{}) AnimationConfig {
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
 func NewVideoNote(chatID int64, length int, file interface{}) VideoNoteConfig {
-	config := VideoNoteConfig{
+	return VideoNoteConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 		Length: length,
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewVoice creates a new sendVoice request.
 func NewVoice(chatID int64, file interface{}) VoiceConfig {
-	config := VoiceConfig{
+	return VoiceConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
-
-	config.AddFile(config.name(), file)
-
-	return config
 }
 
 // NewMediaGroup creates a new media group. Files should be an array of
@@ -763,17 +736,14 @@ func NewChatDescription(chatID int64, description string) SetChatDescriptionConf
 
 // NewChatPhoto allows you to update the photo for a chat.
 func NewChatPhoto(chatID int64, photo interface{}) SetChatPhotoConfig {
-	config := SetChatPhotoConfig{
+	return SetChatPhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{
 				ChatID: chatID,
 			},
+			File: photo,
 		},
 	}
-
-	config.AddFile(config.name(), photo)
-
-	return config
 }
 
 // NewDeleteChatPhoto allows you to delete the photo for a chat.
