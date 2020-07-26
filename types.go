@@ -1112,10 +1112,10 @@ type BotCommand struct {
 
 // BaseInputMedia is a base type for the InputMedia types.
 type BaseInputMedia struct {
-	Type      string `json:"type"`
-	Media     string `json:"media"`
-	Caption   string `json:"caption"`
-	ParseMode string `json:"parse_mode"`
+	Type      string      `json:"type"`
+	Media     interface{} `json:"media"`
+	Caption   string      `json:"caption,omitempty"`
+	ParseMode string      `json:"parse_mode,omitempty"`
 }
 
 // InputMediaPhoto is a photo to send as part of a media group.
@@ -1126,10 +1126,10 @@ type InputMediaPhoto struct {
 // InputMediaVideo is a video to send as part of a media group.
 type InputMediaVideo struct {
 	BaseInputMedia
-	Width             int  `json:"width"`
-	Height            int  `json:"height"`
-	Duration          int  `json:"duration"`
-	SupportsStreaming bool `json:"supports_streaming"`
+	Width             int  `json:"width,omitempty"`
+	Height            int  `json:"height,omitempty"`
+	Duration          int  `json:"duration,omitempty"`
+	SupportsStreaming bool `json:"supports_streaming,omitempty"`
 }
 
 // InputMediaAnimation is an animation to send as part of a media group.

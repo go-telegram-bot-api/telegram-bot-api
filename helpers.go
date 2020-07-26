@@ -51,261 +51,131 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
-// NewPhotoUpload creates a new photo uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
+// NewPhoto creates a new sendPhoto request.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhotoUpload(chatID int64, file interface{}) PhotoConfig {
-	return PhotoConfig{
+func NewPhoto(chatID int64, file interface{}) PhotoConfig {
+	config := PhotoConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewPhotoUploadToChannel creates a new photo uploader to send a photo to a channel.
-//
-// username is the username of the channel, file is a string path to the file,
-// FileReader, or FileBytes.
+// NewPhotoToChannel creates a new photo uploader to send a photo to a channel.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhotoUploadToChannel(username string, file interface{}) PhotoConfig {
-	return PhotoConfig{
+func NewPhotoToChannel(username string, file interface{}) PhotoConfig {
+	config := PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{
 				ChannelUsername: username,
 			},
-			File:        file,
-			UseExisting: false,
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewPhotoShare shares an existing photo.
-// You may use this to reshare an existing photo without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the file
-// already uploaded.
-func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
-	return PhotoConfig{
+// NewAudio creates a new sendAudio request.
+func NewAudio(chatID int64, file interface{}) AudioConfig {
+	config := AudioConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewAudioUpload creates a new audio uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewAudioUpload(chatID int64, file interface{}) AudioConfig {
-	return AudioConfig{
+// NewDocument creates a new sendDocument request.
+func NewDocument(chatID int64, file interface{}) DocumentConfig {
+	config := DocumentConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewAudioShare shares an existing audio file.
-// You may use this to reshare an existing audio file without
-// reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the audio
-// already uploaded.
-func NewAudioShare(chatID int64, fileID string) AudioConfig {
-	return AudioConfig{
+// NewSticker creates a new sendSticker request.
+func NewSticker(chatID int64, file interface{}) StickerConfig {
+	config := StickerConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewDocumentUpload creates a new document uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewDocumentUpload(chatID int64, file interface{}) DocumentConfig {
-	return DocumentConfig{
+// NewVideo creates a new sendVideo request.
+func NewVideo(chatID int64, file interface{}) VideoConfig {
+	config := VideoConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewDocumentShare shares an existing document.
-// You may use this to reshare an existing document without
-// reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the document
-// already uploaded.
-func NewDocumentShare(chatID int64, fileID string) DocumentConfig {
-	return DocumentConfig{
+// NewAnimation creates a new sendAnimation request.
+func NewAnimation(chatID int64, file interface{}) AnimationConfig {
+	config := AnimationConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewStickerUpload creates a new sticker uploader.
+// NewVideoNote creates a new sendVideoNote request.
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewStickerUpload(chatID int64, file interface{}) StickerConfig {
-	return StickerConfig{
+func NewVideoNote(chatID int64, length int, file interface{}) VideoNoteConfig {
+	config := VideoNoteConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewStickerShare shares an existing sticker.
-// You may use this to reshare an existing sticker without
-// reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the sticker
-// already uploaded.
-func NewStickerShare(chatID int64, fileID string) StickerConfig {
-	return StickerConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewVideoUpload creates a new video uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewVideoUpload(chatID int64, file interface{}) VideoConfig {
-	return VideoConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewVideoShare shares an existing video.
-// You may use this to reshare an existing video without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video
-// already uploaded.
-func NewVideoShare(chatID int64, fileID string) VideoConfig {
-	return VideoConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewAnimationUpload creates a new animation uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
-	return AnimationConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewAnimationShare shares an existing animation.
-// You may use this to reshare an existing animation without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the animation
-// already uploaded.
-func NewAnimationShare(chatID int64, fileID string) AnimationConfig {
-	return AnimationConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewVideoNoteUpload creates a new video note uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewVideoNoteUpload(chatID int64, length int, file interface{}) VideoNoteConfig {
-	return VideoNoteConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
 		Length: length,
 	}
+
+	config.AddFile(config.name(), file)
+
+	return config
 }
 
-// NewVideoNoteShare shares an existing video.
-// You may use this to reshare an existing video without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video
-// already uploaded.
-func NewVideoNoteShare(chatID int64, length int, fileID string) VideoNoteConfig {
-	return VideoNoteConfig{
+// NewVoice creates a new sendVoice request.
+func NewVoice(chatID int64, file interface{}) VoiceConfig {
+	config := VoiceConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{ChatID: chatID},
 		},
-		Length: length,
 	}
-}
 
-// NewVoiceUpload creates a new voice uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewVoiceUpload(chatID int64, file interface{}) VoiceConfig {
-	return VoiceConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
+	config.AddFile(config.name(), file)
 
-// NewVoiceShare shares an existing voice.
-// You may use this to reshare an existing voice without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video
-// already uploaded.
-func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
-	return VoiceConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
+	return config
 }
 
 // NewMediaGroup creates a new media group. Files should be an array of
@@ -318,7 +188,7 @@ func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 }
 
 // NewInputMediaPhoto creates a new InputMediaPhoto.
-func NewInputMediaPhoto(media string) InputMediaPhoto {
+func NewInputMediaPhoto(media interface{}) InputMediaPhoto {
 	return InputMediaPhoto{
 		BaseInputMedia{
 			Type:  "photo",
@@ -328,7 +198,7 @@ func NewInputMediaPhoto(media string) InputMediaPhoto {
 }
 
 // NewInputMediaVideo creates a new InputMediaVideo.
-func NewInputMediaVideo(media string) InputMediaVideo {
+func NewInputMediaVideo(media interface{}) InputMediaVideo {
 	return InputMediaVideo{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "video",
@@ -338,7 +208,7 @@ func NewInputMediaVideo(media string) InputMediaVideo {
 }
 
 // NewInputMediaAnimation creates a new InputMediaAnimation.
-func NewInputMediaAnimation(media string) InputMediaAnimation {
+func NewInputMediaAnimation(media interface{}) InputMediaAnimation {
 	return InputMediaAnimation{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "animation",
@@ -348,7 +218,7 @@ func NewInputMediaAnimation(media string) InputMediaAnimation {
 }
 
 // NewInputMediaAudio creates a new InputMediaAudio.
-func NewInputMediaAudio(media string) InputMediaAudio {
+func NewInputMediaAudio(media interface{}) InputMediaAudio {
 	return InputMediaAudio{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "audio",
@@ -875,37 +745,6 @@ func NewInvoice(chatID int64, title, description, payload, providerToken, startP
 		Prices:         prices}
 }
 
-// NewSetChatPhotoUpload creates a new chat photo uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-//
-// Note that you must send animated GIFs as a document.
-func NewSetChatPhotoUpload(chatID int64, file interface{}) SetChatPhotoConfig {
-	return SetChatPhotoConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewSetChatPhotoShare shares an existing photo.
-// You may use this to reshare an existing photo without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the file
-// already uploaded.
-func NewSetChatPhotoShare(chatID int64, fileID string) SetChatPhotoConfig {
-	return SetChatPhotoConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
 // NewChatTitle allows you to update the title of a chat.
 func NewChatTitle(chatID int64, title string) SetChatTitleConfig {
 	return SetChatTitleConfig{
@@ -924,14 +763,17 @@ func NewChatDescription(chatID int64, description string) SetChatDescriptionConf
 
 // NewChatPhoto allows you to update the photo for a chat.
 func NewChatPhoto(chatID int64, photo interface{}) SetChatPhotoConfig {
-	return SetChatPhotoConfig{
+	config := SetChatPhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{
 				ChatID: chatID,
 			},
-			File: photo,
 		},
 	}
+
+	config.AddFile(config.name(), photo)
+
+	return config
 }
 
 // NewDeleteChatPhoto allows you to delete the photo for a chat.

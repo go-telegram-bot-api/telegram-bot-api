@@ -55,12 +55,19 @@ type Chattable interface {
 	method() string
 }
 
+// RequestFile represents a file associated with a request. May involve
+// uploading a file, or passing an existing ID.
+type RequestFile struct {
+	// The multipart upload field name.
+	Name string
+	// The file to upload.
+	File interface{}
+}
+
 // Fileable is any config type that can be sent that includes a file.
 type Fileable interface {
 	Chattable
-	name() string
-	getFile() interface{}
-	useExistingFile() bool
+	files() []RequestFile
 }
 
 // BaseChat is base type for all chat config types.
@@ -87,11 +94,21 @@ func (chat *BaseChat) params() (Params, error) {
 // BaseFile is a base type for all file config types.
 type BaseFile struct {
 	BaseChat
-	File        interface{}
-	FileID      string
-	UseExisting bool
-	MimeType    string
-	FileSize    int
+	Files    []RequestFile
+	MimeType string
+	FileSize int
+}
+
+// AddFile specifies a file for a Telegram request.
+func (file *BaseFile) AddFile(name string, f interface{}) {
+	if file.Files == nil {
+		file.Files = make([]RequestFile, 0, 1)
+	}
+
+	file.Files = append(file.Files, RequestFile{
+		Name: name,
+		File: f,
+	})
 }
 
 func (file BaseFile) params() (Params, error) {
@@ -103,12 +120,8 @@ func (file BaseFile) params() (Params, error) {
 	return params, err
 }
 
-func (file BaseFile) getFile() interface{} {
-	return file.File
-}
-
-func (file BaseFile) useExistingFile() bool {
-	return file.UseExisting
+func (file BaseFile) files() []RequestFile {
+	return file.Files
 }
 
 // BaseEdit is base type of all chat edits.
@@ -194,7 +207,6 @@ type PhotoConfig struct {
 func (config PhotoConfig) params() (Params, error) {
 	params, err := config.BaseFile.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 
@@ -225,7 +237,6 @@ func (config AudioConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("performer", config.Performer)
 	params.AddNonEmpty("title", config.Title)
@@ -253,7 +264,6 @@ type DocumentConfig struct {
 func (config DocumentConfig) params() (Params, error) {
 	params, err := config.BaseFile.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 
@@ -274,11 +284,7 @@ type StickerConfig struct {
 }
 
 func (config StickerConfig) params() (Params, error) {
-	params, err := config.BaseChat.params()
-
-	params.AddNonEmpty(config.name(), config.FileID)
-
-	return params, err
+	return config.BaseChat.params()
 }
 
 func (config StickerConfig) name() string {
@@ -301,7 +307,6 @@ type VideoConfig struct {
 func (config VideoConfig) params() (Params, error) {
 	params, err := config.BaseChat.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -329,7 +334,6 @@ type AnimationConfig struct {
 func (config AnimationConfig) params() (Params, error) {
 	params, err := config.BaseChat.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -355,7 +359,6 @@ type VideoNoteConfig struct {
 func (config VideoNoteConfig) params() (Params, error) {
 	params, err := config.BaseChat.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonZero("length", config.Length)
 
@@ -381,7 +384,6 @@ type VoiceConfig struct {
 func (config VoiceConfig) params() (Params, error) {
 	params, err := config.BaseChat.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -683,11 +685,20 @@ func (config EditMessageCaptionConfig) method() string {
 	return "editMessageCaption"
 }
 
-// EditMessageMediaConfig contains information about editing a message's media.
+// EditMessageMediaConfig allows you to make an editMessageMedia request.
 type EditMessageMediaConfig struct {
 	BaseEdit
 
 	Media interface{}
+}
+
+func (config EditMessageMediaConfig) files() []RequestFile {
+	return []RequestFile{
+		{
+			Name: "media",
+			File: config.Media,
+		},
+	}
 }
 
 func (EditMessageMediaConfig) method() string {
@@ -695,11 +706,7 @@ func (EditMessageMediaConfig) method() string {
 }
 
 func (config EditMessageMediaConfig) params() (Params, error) {
-	params, err := config.BaseEdit.params()
-
-	params.AddInterface("media", config.Media)
-
-	return params, err
+	return config.BaseEdit.params()
 }
 
 // EditMessageReplyMarkupConfig allows you to modify the reply markup
@@ -818,14 +825,6 @@ func (config WebhookConfig) name() string {
 	return "certificate"
 }
 
-func (config WebhookConfig) getFile() interface{} {
-	return config.Certificate
-}
-
-func (config WebhookConfig) useExistingFile() bool {
-	return config.URL != nil
-}
-
 // RemoveWebhookConfig is a helper to remove a webhook.
 type RemoveWebhookConfig struct {
 }
@@ -853,6 +852,12 @@ type FileReader struct {
 	Reader io.Reader
 	Size   int64
 }
+
+// FileURL is a URL to use as a file for a request.
+type FileURL string
+
+// FileID is an ID of a file already uploaded to Telegram.
+type FileID string
 
 // InlineConfig contains information on making an InlineQuery response.
 type InlineConfig struct {
@@ -1312,14 +1317,6 @@ func (config SetChatPhotoConfig) name() string {
 	return "photo"
 }
 
-func (config SetChatPhotoConfig) getFile() interface{} {
-	return config.File
-}
-
-func (config SetChatPhotoConfig) useExistingFile() bool {
-	return config.UseExisting
-}
-
 // DeleteChatPhotoConfig allows you to delete a group, supergroup, or channel's photo.
 type DeleteChatPhotoConfig struct {
 	ChatID          int64
@@ -1415,18 +1412,13 @@ func (config UploadStickerConfig) params() (Params, error) {
 	return params, nil
 }
 
-func (config UploadStickerConfig) name() string {
-	return "png_sticker"
-}
-
-func (config UploadStickerConfig) getFile() interface{} {
-	return config.PNGSticker
-}
-
-func (config UploadStickerConfig) useExistingFile() bool {
-	_, ok := config.PNGSticker.(string)
-
-	return ok
+func (config UploadStickerConfig) files() []RequestFile {
+	return []RequestFile{
+		{
+			Name: "png_sticker",
+			File: config.PNGSticker,
+		},
+	}
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
@@ -1454,12 +1446,6 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params["name"] = config.Name
 	params["title"] = config.Title
 
-	if sticker, ok := config.PNGSticker.(string); ok {
-		params[config.name()] = sticker
-	} else if sticker, ok := config.TGSSticker.(string); ok {
-		params[config.name()] = sticker
-	}
-
 	params["emojis"] = config.Emojis
 
 	params.AddBool("contains_masks", config.ContainsMasks)
@@ -1469,26 +1455,18 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config NewStickerSetConfig) getFile() interface{} {
-	return config.PNGSticker
-}
-
-func (config NewStickerSetConfig) name() string {
-	return "png_sticker"
-}
-
-func (config NewStickerSetConfig) useExistingFile() bool {
+func (config NewStickerSetConfig) files() []RequestFile {
 	if config.PNGSticker != nil {
-		_, ok := config.PNGSticker.(string)
-		return ok
+		return []RequestFile{{
+			Name: "png_sticker",
+			File: config.PNGSticker,
+		}}
 	}
 
-	if config.TGSSticker != nil {
-		_, ok := config.TGSSticker.(string)
-		return ok
-	}
-
-	panic("NewStickerSetConfig had nil PNGSticker and TGSSticker")
+	return []RequestFile{{
+		Name: "tgs_sticker",
+		File: config.TGSSticker,
+	}}
 }
 
 // AddStickerConfig allows you to add a sticker to a set.
@@ -1512,29 +1490,24 @@ func (config AddStickerConfig) params() (Params, error) {
 	params["name"] = config.Name
 	params["emojis"] = config.Emojis
 
-	if sticker, ok := config.PNGSticker.(string); ok {
-		params[config.name()] = sticker
-	} else if sticker, ok := config.TGSSticker.(string); ok {
-		params[config.name()] = sticker
-	}
-
 	err := params.AddInterface("mask_position", config.MaskPosition)
 
 	return params, err
 }
 
-func (config AddStickerConfig) name() string {
-	return "png_sticker"
-}
+func (config AddStickerConfig) files() []RequestFile {
+	if config.PNGSticker != nil {
+		return []RequestFile{{
+			Name: "png_sticker",
+			File: config.PNGSticker,
+		}}
+	}
 
-func (config AddStickerConfig) getFile() interface{} {
-	return config.PNGSticker
-}
+	return []RequestFile{{
+		Name: "tgs_sticker",
+		File: config.TGSSticker,
+	}}
 
-func (config AddStickerConfig) useExistingFile() bool {
-	_, ok := config.PNGSticker.(string)
-
-	return ok
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
@@ -1601,15 +1574,6 @@ func (config SetStickerSetThumbConfig) name() string {
 	return "thumb"
 }
 
-func (config SetStickerSetThumbConfig) getFile() interface{} {
-	return config.Thumb
-}
-
-func (config SetStickerSetThumbConfig) useExistingFile() bool {
-	_, ok := config.Thumb.(string)
-	return ok
-}
-
 // SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
 type SetChatStickerSetConfig struct {
 	ChatID             int64
@@ -1652,6 +1616,9 @@ func (config DeleteChatStickerSetConfig) params() (Params, error) {
 // MediaGroupConfig allows you to send a group of media.
 //
 // Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
+//
+// Due to additional processing required, this config is not Chattable or
+// Fileable. It must be uploaded with SendMediaGroup.
 type MediaGroupConfig struct {
 	ChatID          int64
 	ChannelUsername string
@@ -1669,9 +1636,6 @@ func (config MediaGroupConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-	if err := params.AddInterface("media", config.Media); err != nil {
-		return params, nil
-	}
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 

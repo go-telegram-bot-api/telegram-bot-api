@@ -9,13 +9,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/technoweenie/multipartstreamer"
 )
 
 // BotAPI allows you to interact with the Telegram Bot API.
@@ -82,7 +81,7 @@ func buildParams(in Params) (out url.Values) {
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params Params) (APIResponse, error) {
+func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
 	if bot.Debug {
 		log.Printf("Endpoint: %s, params: %v\n", endpoint, params)
 	}
@@ -93,14 +92,14 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (APIResponse, err
 
 	resp, err := bot.Client.PostForm(method, values)
 	if err != nil {
-		return APIResponse{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var apiResp APIResponse
 	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
 	if err != nil {
-		return apiResp, err
+		return &apiResp, err
 	}
 
 	if bot.Debug {
@@ -114,14 +113,14 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (APIResponse, err
 			parameters = *apiResp.Parameters
 		}
 
-		return apiResp, Error{
+		return &apiResp, &Error{
 			Code:               apiResp.ErrorCode,
 			Message:            apiResp.Description,
 			ResponseParameters: parameters,
 		}
 	}
 
-	return apiResp, nil
+	return &apiResp, nil
 }
 
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
@@ -148,86 +147,102 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 	return data, nil
 }
 
-// UploadFile makes a request to the API with a file.
-//
-// Requires the parameter to hold the file not be in the params.
-// File should be a string to a file path, a FileBytes struct,
-// a FileReader struct, or a url.URL.
-//
-// Note that if your FileReader has a size set to -1, it will read
-// the file into memory to calculate a size.
-func (bot *BotAPI) UploadFile(endpoint string, params Params, fieldname string, file interface{}) (APIResponse, error) {
-	ms := multipartstreamer.New()
+// UploadFiles makes a request to the API with files.
+func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
+	r, w := io.Pipe()
+	m := multipart.NewWriter(w)
 
-	switch f := file.(type) {
-	case string:
-		ms.WriteFields(params)
+	// This code modified from the very helpful @HirbodBehnam
+	// https://github.com/go-telegram-bot-api/telegram-bot-api/issues/354#issuecomment-663856473
+	go func() {
+		defer w.Close()
+		defer m.Close()
 
-		fileHandle, err := os.Open(f)
-		if err != nil {
-			return APIResponse{}, err
-		}
-		defer fileHandle.Close()
-
-		fi, err := os.Stat(f)
-		if err != nil {
-			return APIResponse{}, err
+		for field, value := range params {
+			if err := m.WriteField(field, value); err != nil {
+				panic(err)
+			}
 		}
 
-		ms.WriteReader(fieldname, fileHandle.Name(), fi.Size(), fileHandle)
-	case FileBytes:
-		ms.WriteFields(params)
+		for _, file := range files {
+			switch f := file.File.(type) {
+			case string:
+				fileHandle, err := os.Open(f)
+				if err != nil {
+					panic(err)
+				}
+				defer fileHandle.Close()
 
-		buf := bytes.NewBuffer(f.Bytes)
-		ms.WriteReader(fieldname, f.Name, int64(len(f.Bytes)), buf)
-	case FileReader:
-		ms.WriteFields(params)
+				part, err := m.CreateFormFile(file.Name, fileHandle.Name())
+				if err != nil {
+					panic(err)
+				}
 
-		if f.Size != -1 {
-			ms.WriteReader(fieldname, f.Name, f.Size, f.Reader)
+				io.Copy(part, fileHandle)
+			case FileBytes:
+				part, err := m.CreateFormFile(file.Name, f.Name)
+				if err != nil {
+					panic(err)
+				}
 
-			break
+				buf := bytes.NewBuffer(f.Bytes)
+				io.Copy(part, buf)
+			case FileReader:
+				part, err := m.CreateFormFile(file.Name, f.Name)
+				if err != nil {
+					panic(err)
+				}
+
+				if f.Size != -1 {
+					io.Copy(part, f.Reader)
+				} else {
+					data, err := ioutil.ReadAll(f.Reader)
+					if err != nil {
+						panic(err)
+					}
+
+					buf := bytes.NewBuffer(data)
+					io.Copy(part, buf)
+				}
+			case FileURL:
+				val := string(f)
+				if err := m.WriteField(file.Name, val); err != nil {
+					panic(err)
+				}
+			case FileID:
+				val := string(f)
+				if err := m.WriteField(file.Name, val); err != nil {
+					panic(err)
+				}
+			default:
+				panic(errors.New(ErrBadFileType))
+			}
 		}
-
-		data, err := ioutil.ReadAll(f.Reader)
-		if err != nil {
-			return APIResponse{}, err
-		}
-
-		buf := bytes.NewBuffer(data)
-
-		ms.WriteReader(fieldname, f.Name, int64(len(data)), buf)
-	case url.URL:
-		params[fieldname] = f.String()
-
-		ms.WriteFields(params)
-	default:
-		return APIResponse{}, errors.New(ErrBadFileType)
-	}
+	}()
 
 	if bot.Debug {
-		log.Printf("Endpoint: %s, fieldname: %s, params: %v, file: %T\n", endpoint, fieldname, params, file)
+		log.Printf("Endpoint: %s, params: %v, with %d files\n", endpoint, params, len(files))
 	}
 
 	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
-	req, err := http.NewRequest("POST", method, nil)
+	req, err := http.NewRequest("POST", method, r)
 	if err != nil {
-		return APIResponse{}, err
+		return nil, err
 	}
 
-	ms.SetupRequest(req)
+	req.Header.Set("Content-Type", m.FormDataContentType())
 
 	resp, err := bot.Client.Do(req)
 	if err != nil {
-		return APIResponse{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var apiResp APIResponse
 	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
 	if err != nil {
-		return apiResp, err
+		return &apiResp, err
 	}
 
 	if bot.Debug {
@@ -241,13 +256,13 @@ func (bot *BotAPI) UploadFile(endpoint string, params Params, fieldname string, 
 			parameters = *apiResp.Parameters
 		}
 
-		return apiResp, Error{
+		return &apiResp, &Error{
 			Message:            apiResp.Description,
 			ResponseParameters: parameters,
 		}
 	}
 
-	return apiResp, nil
+	return &apiResp, nil
 }
 
 // GetFileDirectURL returns direct URL to file
@@ -287,23 +302,54 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 	return strings.Contains(message.Text, "@"+bot.Self.UserName)
 }
 
+func hasFilesNeedingUpload(files []RequestFile) bool {
+	for _, file := range files {
+		switch file.File.(type) {
+		case string, FileBytes, FileReader:
+			return true
+		}
+	}
+
+	return false
+}
+
 // Request sends a Chattable to Telegram, and returns the APIResponse.
-func (bot *BotAPI) Request(c Chattable) (APIResponse, error) {
+func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 	params, err := c.params()
 	if err != nil {
-		return APIResponse{}, err
+		return nil, err
 	}
 
-	switch t := c.(type) {
-	case Fileable:
-		if t.useExistingFile() {
-			return bot.MakeRequest(t.method(), params)
+	if t, ok := c.(Fileable); ok {
+		files := t.files()
+
+		// If we have files that need to be uploaded, we should delegate the
+		// request to UploadFile.
+		if hasFilesNeedingUpload(files) {
+			return bot.UploadFiles(t.method(), params, files)
 		}
 
-		return bot.UploadFile(t.method(), params, t.name(), t.getFile())
-	default:
-		return bot.MakeRequest(c.method(), params)
+		// However, if there are no files to be uploaded, there's likely things
+		// that need to be turned into params instead.
+		for _, file := range files {
+			var s string
+
+			switch f := file.File.(type) {
+			case string:
+				s = f
+			case FileID:
+				s = string(f)
+			case FileURL:
+				s = string(f)
+			default:
+				return nil, errors.New(ErrBadFileType)
+			}
+
+			params[file.Name] = s
+		}
 	}
+
+	return bot.MakeRequest(c.method(), params)
 }
 
 // Send will send a Chattable item to Telegram and provides the
@@ -322,9 +368,51 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 
 // SendMediaGroup sends a media group and returns the resulting messages.
 func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
-	params, _ := config.params()
+	filesToUpload := []RequestFile{}
 
-	resp, err := bot.MakeRequest(config.method(), params)
+	newMedia := []interface{}{}
+
+	for idx, media := range config.Media {
+		switch m := media.(type) {
+		case InputMediaPhoto:
+			switch f := m.Media.(type) {
+			case string, FileBytes, FileReader:
+				m.Media = fmt.Sprintf("attach://file-%d", idx)
+				newMedia = append(newMedia, m)
+
+				filesToUpload = append(filesToUpload, RequestFile{
+					Name: fmt.Sprintf("file-%d", idx),
+					File: f,
+				})
+			default:
+				newMedia = append(newMedia, m)
+			}
+		case InputMediaVideo:
+			switch f := m.Media.(type) {
+			case string, FileBytes, FileReader:
+				m.Media = fmt.Sprintf("attach://file-%d", idx)
+				newMedia = append(newMedia, m)
+
+				filesToUpload = append(filesToUpload, RequestFile{
+					Name: fmt.Sprintf("file-%d", idx),
+					File: f,
+				})
+			default:
+				newMedia = append(newMedia, m)
+			}
+		default:
+			return nil, errors.New(ErrBadFileType)
+		}
+	}
+
+	params, err := config.params()
+	if err != nil {
+		return nil, err
+	}
+
+	params.AddInterface("media", newMedia)
+
+	resp, err := bot.UploadFiles(config.method(), params, filesToUpload)
 	if err != nil {
 		return nil, err
 	}
@@ -340,9 +428,7 @@ func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
 // It requires UserID.
 // Offset and Limit are optional.
 func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return UserProfilePhotos{}, err
 	}
@@ -357,9 +443,7 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 //
 // Requires FileID.
 func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return File{}, err
 	}
@@ -378,9 +462,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return []Update{}, err
 	}
@@ -481,7 +563,7 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 	}
 
 	if t, ok := c.(Fileable); ok {
-		if !t.useExistingFile() {
+		if hasFilesNeedingUpload(t.files()) {
 			return errors.New("unable to use http response to upload files")
 		}
 	}
@@ -496,9 +578,7 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 
 // GetChat gets information about a chat.
 func (bot *BotAPI) GetChat(config ChatInfoConfig) (Chat, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return Chat{}, err
 	}
@@ -514,9 +594,7 @@ func (bot *BotAPI) GetChat(config ChatInfoConfig) (Chat, error) {
 // If none have been appointed, only the creator will be returned.
 // Bots are not shown, even if they are an administrator.
 func (bot *BotAPI) GetChatAdministrators(config ChatAdministratorsConfig) ([]ChatMember, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return []ChatMember{}, err
 	}
@@ -529,9 +607,7 @@ func (bot *BotAPI) GetChatAdministrators(config ChatAdministratorsConfig) ([]Cha
 
 // GetChatMembersCount gets the number of users in a chat.
 func (bot *BotAPI) GetChatMembersCount(config ChatMemberCountConfig) (int, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return -1, err
 	}
@@ -544,9 +620,7 @@ func (bot *BotAPI) GetChatMembersCount(config ChatMemberCountConfig) (int, error
 
 // GetChatMember gets a specific chat member.
 func (bot *BotAPI) GetChatMember(config GetChatMemberConfig) (ChatMember, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return ChatMember{}, err
 	}
@@ -559,9 +633,7 @@ func (bot *BotAPI) GetChatMember(config GetChatMemberConfig) (ChatMember, error)
 
 // GetGameHighScores allows you to get the high scores for a game.
 func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHighScore, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return []GameHighScore{}, err
 	}
@@ -574,9 +646,7 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 
 // GetInviteLink get InviteLink for a chat
 func (bot *BotAPI) GetInviteLink(config ChatInviteLinkConfig) (string, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return "", err
 	}
@@ -589,9 +659,7 @@ func (bot *BotAPI) GetInviteLink(config ChatInviteLinkConfig) (string, error) {
 
 // GetStickerSet returns a StickerSet.
 func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error) {
-	params, _ := config.params()
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return StickerSet{}, err
 	}
@@ -604,12 +672,7 @@ func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error)
 
 // StopPoll stops a poll and returns the result.
 func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
-	params, err := config.params()
-	if err != nil {
-		return Poll{}, err
-	}
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return Poll{}, err
 	}
@@ -624,12 +687,7 @@ func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
 func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
 	config := GetMyCommandsConfig{}
 
-	params, err := config.params()
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := bot.MakeRequest(config.method(), params)
+	resp, err := bot.Request(config)
 	if err != nil {
 		return nil, err
 	}
