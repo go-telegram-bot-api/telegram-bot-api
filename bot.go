@@ -198,18 +198,7 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 					return
 				}
 
-				if f.Size != -1 {
-					io.Copy(part, f.Reader)
-				} else {
-					data, err := ioutil.ReadAll(f.Reader)
-					if err != nil {
-						w.CloseWithError(err)
-						return
-					}
-
-					buf := bytes.NewBuffer(data)
-					io.Copy(part, buf)
-				}
+				io.Copy(part, f.Reader)
 			case FileURL:
 				val := string(f)
 				if err := m.WriteField(file.Name, val); err != nil {

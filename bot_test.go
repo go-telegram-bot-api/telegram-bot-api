@@ -120,7 +120,7 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 	bot, _ := getBot(t)
 
 	f, _ := os.Open("tests/image.jpg")
-	reader := FileReader{Name: "image.jpg", Reader: f, Size: -1}
+	reader := FileReader{Name: "image.jpg", Reader: f}
 
 	msg := NewPhoto(ChatID, reader)
 	msg.Caption = "Test"
@@ -177,7 +177,7 @@ func TestSendNewPhotoToChannelFileReader(t *testing.T) {
 	bot, _ := getBot(t)
 
 	f, _ := os.Open("tests/image.jpg")
-	reader := FileReader{Name: "image.jpg", Reader: f, Size: -1}
+	reader := FileReader{Name: "image.jpg", Reader: f}
 
 	msg := NewPhotoToChannel(Channel, reader)
 	msg.Caption = "Test"

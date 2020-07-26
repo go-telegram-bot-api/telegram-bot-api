@@ -349,4 +349,6 @@ var (
 	_ Fileable = (*NewStickerSetConfig)(nil)
 	_ Fileable = (*AddStickerConfig)(nil)
 	_ Fileable = (*MediaGroupConfig)(nil)
+	_ Fileable = (*WebhookConfig)(nil)
+	_ Fileable = (*SetStickerSetThumbConfig)(nil)
 )

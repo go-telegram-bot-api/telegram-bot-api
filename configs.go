@@ -375,10 +375,6 @@ func (config AnimationConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config AnimationConfig) name() string {
-	return "animation"
-}
-
 func (config AnimationConfig) method() string {
 	return "sendAnimation"
 }
@@ -899,8 +895,15 @@ func (config WebhookConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config WebhookConfig) name() string {
-	return "certificate"
+func (config WebhookConfig) files() []RequestFile {
+	if config.Certificate != nil {
+		return []RequestFile{{
+			Name: "certificate",
+			File: config.Certificate,
+		}}
+	}
+
+	return nil
 }
 
 // RemoveWebhookConfig is a helper to remove a webhook.
@@ -923,12 +926,9 @@ type FileBytes struct {
 }
 
 // FileReader contains information about a reader to upload as a File.
-// If Size is -1, it will read the entire Reader into memory to
-// calculate a Size.
 type FileReader struct {
 	Name   string
 	Reader io.Reader
-	Size   int64
 }
 
 // FileURL is a URL to use as a file for a request.
@@ -1642,15 +1642,14 @@ func (config SetStickerSetThumbConfig) params() (Params, error) {
 	params["name"] = config.Name
 	params.AddNonZero("user_id", config.UserID)
 
-	if thumb, ok := config.Thumb.(string); ok {
-		params["thumb"] = thumb
-	}
-
 	return params, nil
 }
 
-func (config SetStickerSetThumbConfig) name() string {
-	return "thumb"
+func (config SetStickerSetThumbConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "thumb",
+		File: config.Thumb,
+	}}
 }
 
 // SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
