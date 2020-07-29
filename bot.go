@@ -557,21 +557,35 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		ch <- bot.HandleUpdate(w, r)
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(errMsg)
+			return
+		}
+
+		ch <- *update
 	})
 
 	return ch
 }
 
 // HandleUpdate parses and returns update received via webhook
-func (bot *BotAPI) HandleUpdate(res http.ResponseWriter, req *http.Request) Update {
-  bytes, _ := ioutil.ReadAll(req.Body)
-  req.Body.Close()
+func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
+	if r.Method != http.MethodPost {
+		err := errors.New("wrong HTTP method required POST")
+		return nil, err
+	}
 
-  var update Update
-  json.Unmarshal(bytes, &update)
+	var update Update
+	err := json.NewDecoder(r.Body).Decode(&update)
+	if err != nil {
+		return nil, err
+	}
 
-  return update
+	return &update, nil
 }
 
 // AnswerInlineQuery sends a response to an inline query.

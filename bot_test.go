@@ -644,8 +644,13 @@ func ExampleWebhookHandler() {
 		log.Printf("[Telegram callback failed]%s", info.LastErrorMessage)
 	}
 
-	http.HandleFunc("/" + bot.Token, func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%+v\n", bot.HandleUpdate(w, r))
+	http.HandleFunc("/"+bot.Token, func(w http.ResponseWriter, r *http.Request) {
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			log.Printf("%+v\n", err.Error())
+		} else {
+			log.Printf("%+v\n", *update)
+		}
 	})
 
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
