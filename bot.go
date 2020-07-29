@@ -579,17 +579,8 @@ func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
 		return nil, err
 	}
 
-	payload, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := r.Body.Close(); err != nil {
-		return nil, err
-	}
-
 	var update Update
-	err = json.Unmarshal(payload, &update)
+	err := json.NewDecoder(r.Body).Decode(&update)
 	if err != nil {
 		return nil, err
 	}
