@@ -517,6 +517,7 @@ type ForceReply struct {
 type ChatMember struct {
 	User                  *User  `json:"user"`
 	Status                string `json:"status"`
+	CustomTitle           string `json:"custom_title,omitempty"`              // optional
 	UntilDate             int64  `json:"until_date,omitempty"`                // optional
 	CanBeEdited           bool   `json:"can_be_edited,omitempty"`             // optional
 	CanChangeInfo         bool   `json:"can_change_info,omitempty"`           // optional
