@@ -143,7 +143,10 @@ type Message struct {
 	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
 	ForwardDate           int                `json:"forward_date"`            // optional
 	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
+	ViaBot                *User              `json:"via_bot"`                 // optional
 	EditDate              int                `json:"edit_date"`               // optional
+	MediaGroupID          string             `json:"media_group_id"`          // optional
+	AuthorSignature       string             `json:"author_signature"`        // optional
 	Text                  string             `json:"text"`                    // optional
 	Entities              *[]MessageEntity   `json:"entities"`                // optional
 	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
