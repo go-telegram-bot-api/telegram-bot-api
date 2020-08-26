@@ -18,6 +18,21 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewPoll creates a new Poll.
+//
+// chatID is where to send it, question is the poll title,
+// options – list of options.
+func NewPoll(chatID int64, question string, options []string) PollConfig {
+	return PollConfig{
+		BaseChat: BaseChat{
+			ChatID:           chatID,
+			ReplyToMessageID: 0,
+		},
+		Question: question,
+		Options:  options,
+	}
+}
+
 // NewDice creates a new DiceConfig.
 //
 // chatID is where to send it

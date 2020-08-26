@@ -229,6 +229,40 @@ func (config MessageConfig) method() string {
 	return "sendMessage"
 }
 
+// PollConfig contains information about a SendPoll request.
+type PollConfig struct {
+	BaseChat
+	Question              string
+	Options               []string
+	Anonymous             bool
+	AllowsMultipleAnswers bool
+}
+
+// values returns a url.Values representation of PollConfig.
+func (config PollConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+	v.Add("question", config.Question)
+
+	options, err := json.Marshal(config.Options)
+
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("options", string(options))
+	v.Add("is_anonymous", strconv.FormatBool(config.Anonymous))
+	v.Add("allows_multiple_answers", strconv.FormatBool(config.AllowsMultipleAnswers))
+	return v, nil
+}
+
+// method returns Telegram API method name for sending Poll.
+func (config PollConfig) method() string {
+	return "sendPoll"
+}
+
 // ForwardConfig contains information about a ForwardMessage request.
 type ForwardConfig struct {
 	BaseChat
