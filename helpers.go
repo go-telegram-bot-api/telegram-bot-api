@@ -33,6 +33,20 @@ func NewPoll(chatID int64, question string, options []string) PollConfig {
 	}
 }
 
+// NewStopPoll closes poll for further voting.
+//
+// chatID is where to send it, messageID is an identifier of message
+// containing poll.
+func NewStopPoll(chatID int64, messageID int64) StopPollConfig {
+	return StopPollConfig{
+		BaseChat: BaseChat{
+			ChatID:           chatID,
+			ReplyToMessageID: 0,
+		},
+		MessageID: messageID,
+	}
+}
+
 // NewDice creates a new DiceConfig.
 //
 // chatID is where to send it
