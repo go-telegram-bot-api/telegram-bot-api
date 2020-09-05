@@ -442,7 +442,10 @@ func TestSendWithPoll(t *testing.T) {
 func TestSendWithStopPoll(t *testing.T) {
 	bot, _ := getBot(t)
 
-	stopPoll := tgbotapi.NewStopPoll(ChatID, 59401)
+	poll := tgbotapi.NewPoll(ChatID, "question", []string{"yes", "no"})
+	pollDetails, _ := bot.Send(poll)
+
+	stopPoll := tgbotapi.NewStopPoll(ChatID, int64(pollDetails.MessageID))
 	_, err := bot.Send(stopPoll)
 
 	if err != nil {
