@@ -108,6 +108,14 @@ type Poll struct {
 	CloseDate             int                `json:"close_date"`
 }
 
+func (p *Poll) IsRegular() bool {
+	return p.Type == PollTypeRegular
+}
+
+func (p *Poll) IsQuiz() bool {
+	return p.Type == PollTypeQuiz
+}
+
 // PollAnswerOption represents poll answer details
 type PollAnswerOption struct {
 	Text       string `json:"text"`
