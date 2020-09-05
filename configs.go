@@ -48,6 +48,12 @@ const (
 	ErrBadURL      = "bad or empty url"
 )
 
+// Constant values for Poll Type
+const (
+	PollTypeRegular = "regular"
+	PollTypeQuiz    = "quiz"
+)
+
 // Chattable is any config type that can be sent.
 type Chattable interface {
 	values() (url.Values, error)
@@ -235,7 +241,34 @@ type PollConfig struct {
 	Question              string
 	Options               []string
 	Anonymous             bool
+	Type                  string
 	AllowsMultipleAnswers bool
+	CorrectOptionID       int
+	Explanation           string
+	ExplanationParseMode  string
+	OpenPeriod            int
+	CloseDate             int
+	IsClosed              bool
+}
+
+// StopPollConfig specifies a poll to be stopped.
+type StopPollConfig struct {
+	BaseChat
+	MessageID int64
+}
+
+func (config StopPollConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("message_id", strconv.FormatInt(config.MessageID, 10))
+	return v, nil
+}
+
+func (config StopPollConfig) method() string {
+	return "stopPoll"
 }
 
 // values returns a url.Values representation of PollConfig.
