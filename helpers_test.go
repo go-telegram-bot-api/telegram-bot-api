@@ -161,8 +161,8 @@ func TestNewEditMessageCaption(t *testing.T) {
 func TestNewEditMessageReplyMarkup(t *testing.T) {
 	markup := tgbotapi.InlineKeyboardMarkup{
 		InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
-			[]tgbotapi.InlineKeyboardButton{
-				tgbotapi.InlineKeyboardButton{Text: "test"},
+			{
+				{Text: "test"},
 			},
 		},
 	}
@@ -191,6 +191,22 @@ func TestNewDiceWithEmoji(t *testing.T) {
 
 	if dice.ChatID != 42 ||
 		dice.Emoji != "🏀" {
+		t.Fail()
+	}
+}
+
+func TestNewPoll(t *testing.T) {
+	poll := tgbotapi.NewPoll(ChatID, "question", []string{"yes", "no"})
+
+	if poll.ChatID != ChatID || poll.Question != "question" || poll.Options[0] != "yes" || poll.Options[1] != "no" {
+		t.Fail()
+	}
+}
+
+func TestNewStopPoll(t *testing.T) {
+	stopPoll := tgbotapi.NewStopPoll(ChatID, 59401)
+
+	if stopPoll.ChatID != ChatID || stopPoll.MessageID != 59401 {
 		t.Fail()
 	}
 }
