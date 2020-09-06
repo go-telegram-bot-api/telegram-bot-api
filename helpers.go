@@ -25,8 +25,7 @@ func NewMessage(chatID int64, text string) MessageConfig {
 func NewPoll(chatID int64, question string, options []string) PollConfig {
 	return PollConfig{
 		BaseChat: BaseChat{
-			ChatID:           chatID,
-			ReplyToMessageID: 0,
+			ChatID: chatID,
 		},
 		Question: question,
 		Options:  options,
@@ -40,8 +39,7 @@ func NewPoll(chatID int64, question string, options []string) PollConfig {
 func NewStopPoll(chatID int64, messageID int64) StopPollConfig {
 	return StopPollConfig{
 		BaseChat: BaseChat{
-			ChatID:           chatID,
-			ReplyToMessageID: 0,
+			ChatID: chatID,
 		},
 		MessageID: messageID,
 	}
