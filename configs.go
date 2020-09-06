@@ -240,7 +240,7 @@ type PollConfig struct {
 	BaseChat
 	Question              string
 	Options               []string
-	Anonymous             bool
+	IsAnonymous           bool
 	Type                  string
 	AllowsMultipleAnswers bool
 	CorrectOptionID       int
@@ -286,7 +286,7 @@ func (config PollConfig) values() (url.Values, error) {
 	}
 
 	v.Add("options", string(options))
-	v.Add("is_anonymous", strconv.FormatBool(config.Anonymous))
+	v.Add("is_anonymous", strconv.FormatBool(config.IsAnonymous))
 	v.Add("allows_multiple_answers", strconv.FormatBool(config.AllowsMultipleAnswers))
 	return v, nil
 }
