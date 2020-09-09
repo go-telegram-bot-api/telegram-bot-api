@@ -139,7 +139,7 @@ type Message struct {
 	ForwardFrom           *User              `json:"forward_from"`            // optional
 	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
 	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
-	ForwardSenderName     int                `json:"forward_sender_name"` // optional
+	ForwardSenderName     string             `json:"forward_sender_name"` // optional
 	ForwardDate           int                `json:"forward_date"`            // optional
 	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
 	EditDate              int                `json:"edit_date"`               // optional
