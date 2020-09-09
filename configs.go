@@ -953,6 +953,7 @@ type UpdateConfig struct {
 	Offset  int
 	Limit   int
 	Timeout int
+	AllowedUpdates string
 }
 
 // WebhookConfig contains information about a SetWebhook request.
