@@ -21,6 +21,7 @@ type APIResponse struct {
 
 // ResponseParameters are various errors that can be returned in APIResponse.
 type ResponseParameters struct {
+	ErrorCode            int   `json:"-"`
 	MigrateToChatID int64 `json:"migrate_to_chat_id"` // optional
 	RetryAfter      int   `json:"retry_after"`        // optional
 }
