@@ -1036,3 +1036,18 @@ func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error)
 	}
 	return stickerSet, nil
 }
+
+// SetMyCommands changes the list of the bot's commands.
+func (bot *BotAPI) SetMyCommands(commands []BotCommand) error {
+	v := url.Values{}
+	data, err := json.Marshal(commands)
+	if err != nil {
+		return err
+	}
+	v.Add("commands", string(data))
+	_, err = bot.MakeRequest("setMyCommands", v)
+	if err != nil {
+		return err
+	}
+	return nil
+}
