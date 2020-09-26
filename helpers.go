@@ -18,6 +18,30 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewDice creates a new DiceConfig.
+//
+// chatID is where to send it
+func NewDice(chatID int64) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+	}
+}
+
+// NewDiceWithEmoji creates a new DiceConfig.
+//
+// chatID is where to send it
+// emoji is type of the Dice
+func NewDiceWithEmoji(chatID int64, emoji string) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Emoji: emoji,
+	}
+}
+
 // NewDeleteMessage creates a request to delete a message.
 func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	return DeleteMessageConfig{
@@ -29,7 +53,8 @@ func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 // NewMessageToChannel creates a new Message that is sent to a channel
 // by username.
 //
-// username is the username of the channel, text is the message text.
+// username is the username of the channel, text is the message text,
+// and the username should be in the form of `@username`.
 func NewMessageToChannel(username string, text string) MessageConfig {
 	return MessageConfig{
 		BaseChat: BaseChat{
@@ -437,6 +462,19 @@ func NewInlineQueryResultArticleMarkdown(id, title, messageText string) InlineQu
 	}
 }
 
+// NewInlineQueryResultArticleMarkdownV2 creates a new inline query article with MarkdownV2 parsing.
+func NewInlineQueryResultArticleMarkdownV2(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text:      messageText,
+			ParseMode: "MarkdownV2",
+		},
+	}
+}
+
 // NewInlineQueryResultArticleHTML creates a new inline query article with HTML parsing.
 func NewInlineQueryResultArticleHTML(id, title, messageText string) InlineQueryResultArticle {
 	return InlineQueryResultArticle{
@@ -459,12 +497,30 @@ func NewInlineQueryResultGIF(id, url string) InlineQueryResultGIF {
 	}
 }
 
+// NewInlineQueryResultCachedGIF create a new inline query with cached photo.
+func NewInlineQueryResultCachedGIF(id, gifID string) InlineQueryResultCachedGIF {
+	return InlineQueryResultCachedGIF{
+		Type:  "gif",
+		ID:    id,
+		GifID: gifID,
+	}
+}
+
 // NewInlineQueryResultMPEG4GIF creates a new inline query MPEG4 GIF.
 func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 	return InlineQueryResultMPEG4GIF{
 		Type: "mpeg4_gif",
 		ID:   id,
 		URL:  url,
+	}
+}
+
+// NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached MPEG4 GIF.
+func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GifID string) InlineQueryResultCachedMpeg4Gif {
+	return InlineQueryResultCachedMpeg4Gif{
+		Type:   "mpeg4_gif",
+		ID:     id,
+		MGifID: MPEG4GifID,
 	}
 }
 
@@ -487,12 +543,41 @@ func NewInlineQueryResultPhotoWithThumb(id, url, thumb string) InlineQueryResult
 	}
 }
 
+// NewInlineQueryResultCachedPhoto create a new inline query with cached photo.
+func NewInlineQueryResultCachedPhoto(id, photoID string) InlineQueryResultCachedPhoto {
+	return InlineQueryResultCachedPhoto{
+		Type:    "photo",
+		ID:      id,
+		PhotoID: photoID,
+	}
+}
+
 // NewInlineQueryResultVideo creates a new inline query video.
 func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
 	return InlineQueryResultVideo{
 		Type: "video",
 		ID:   id,
 		URL:  url,
+	}
+}
+
+// NewInlineQueryResultCachedVideo create a new inline query with cached video.
+func NewInlineQueryResultCachedVideo(id, videoID, title string) InlineQueryResultCachedVideo {
+	return InlineQueryResultCachedVideo{
+		Type:    "video",
+		ID:      id,
+		VideoID: videoID,
+		Title:   title,
+	}
+}
+
+// NewInlineQueryResultCachedSticker create a new inline query with cached sticker.
+func NewInlineQueryResultCachedSticker(id, stickerID, title string) InlineQueryResultCachedSticker {
+	return InlineQueryResultCachedSticker{
+		Type:      "sticker",
+		ID:        id,
+		StickerID: stickerID,
+		Title:     title,
 	}
 }
 
@@ -506,6 +591,15 @@ func NewInlineQueryResultAudio(id, url, title string) InlineQueryResultAudio {
 	}
 }
 
+// NewInlineQueryResultCachedAudio create a new inline query with cached photo.
+func NewInlineQueryResultCachedAudio(id, audioID string) InlineQueryResultCachedAudio {
+	return InlineQueryResultCachedAudio{
+		Type:    "audio",
+		ID:      id,
+		AudioID: audioID,
+	}
+}
+
 // NewInlineQueryResultVoice creates a new inline query voice.
 func NewInlineQueryResultVoice(id, url, title string) InlineQueryResultVoice {
 	return InlineQueryResultVoice{
@@ -513,6 +607,16 @@ func NewInlineQueryResultVoice(id, url, title string) InlineQueryResultVoice {
 		ID:    id,
 		URL:   url,
 		Title: title,
+	}
+}
+
+// NewInlineQueryResultCachedVoice create a new inline query with cached photo.
+func NewInlineQueryResultCachedVoice(id, voiceID, title string) InlineQueryResultCachedVoice {
+	return InlineQueryResultCachedVoice{
+		Type:    "voice",
+		ID:      id,
+		VoiceID: voiceID,
+		Title:   title,
 	}
 }
 
@@ -527,6 +631,16 @@ func NewInlineQueryResultDocument(id, url, title, mimeType string) InlineQueryRe
 	}
 }
 
+// NewInlineQueryResultCachedDocument create a new inline query with cached photo.
+func NewInlineQueryResultCachedDocument(id, documentID, title string) InlineQueryResultCachedDocument {
+	return InlineQueryResultCachedDocument{
+		Type:       "document",
+		ID:         id,
+		DocumentID: documentID,
+		Title:      title,
+	}
+}
+
 // NewInlineQueryResultLocation creates a new inline query location.
 func NewInlineQueryResultLocation(id, title string, latitude, longitude float64) InlineQueryResultLocation {
 	return InlineQueryResultLocation{
@@ -538,12 +652,36 @@ func NewInlineQueryResultLocation(id, title string, latitude, longitude float64)
 	}
 }
 
+// NewInlineQueryResultVenue creates a new inline query venue.
+func NewInlineQueryResultVenue(id, title, address string, latitude, longitude float64) InlineQueryResultVenue {
+	return InlineQueryResultVenue{
+		Type:      "venue",
+		ID:        id,
+		Title:     title,
+		Address:   address,
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
 // NewEditMessageText allows you to edit the text of a message.
 func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTextConfig {
 	return EditMessageTextConfig{
 		BaseEdit: BaseEdit{
 			ChatID:    chatID,
 			MessageID: messageID,
+		},
+		Text: text,
+	}
+}
+
+// NewEditMessageTextAndMarkup allows you to edit the text and replymarkup of a message.
+func NewEditMessageTextAndMarkup(chatID int64, messageID int, text string, replyMarkup InlineKeyboardMarkup) EditMessageTextConfig {
+	return EditMessageTextConfig{
+		BaseEdit: BaseEdit{
+			ChatID:      chatID,
+			MessageID:   messageID,
+			ReplyMarkup: &replyMarkup,
 		},
 		Text: text,
 	}
@@ -636,6 +774,13 @@ func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
 		ResizeKeyboard: true,
 		Keyboard:       keyboard,
 	}
+}
+
+// NewOneTimeReplyKeyboard creates a new one time keyboard.
+func NewOneTimeReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
+	markup := NewReplyKeyboard(rows...)
+	markup.OneTimeKeyboard = true
+	return markup
 }
 
 // NewInlineKeyboardButtonData creates an inline keyboard button with text

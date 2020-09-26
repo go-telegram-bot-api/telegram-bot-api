@@ -3,7 +3,7 @@ package tgbotapi_test
 import (
 	"testing"
 
-	"github.com/bcmk/telegram-bot-api"
+	tgbotapi "github.com/bcmk/telegram-bot-api"
 )
 
 func TestNewInlineQueryResultArticle(t *testing.T) {
@@ -175,4 +175,22 @@ func TestNewEditMessageReplyMarkup(t *testing.T) {
 		t.Fail()
 	}
 
+}
+
+func TestNewDice(t *testing.T) {
+	dice := tgbotapi.NewDice(42)
+
+	if dice.ChatID != 42 ||
+		dice.Emoji != "" {
+		t.Fail()
+	}
+}
+
+func TestNewDiceWithEmoji(t *testing.T) {
+	dice := tgbotapi.NewDiceWithEmoji(42, "🏀")
+
+	if dice.ChatID != 42 ||
+		dice.Emoji != "🏀" {
+		t.Fail()
+	}
 }
