@@ -479,8 +479,13 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	bot.Request(RemoveWebhookConfig{})
 
-	wh := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
-	_, err := bot.Request(wh)
+	wh, err := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
+
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = bot.Request(wh)
+
 	if err != nil {
 		t.Error(err)
 	}
@@ -501,8 +506,14 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	bot.Request(RemoveWebhookConfig{})
 
-	wh := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
-	_, err := bot.Request(wh)
+	wh, err := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = bot.Request(wh)
+
 	if err != nil {
 		t.Error(err)
 	}
@@ -589,7 +600,14 @@ func ExampleNewWebhook() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.Request(NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	wh, err := NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem")
+
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = bot.Request(wh)
+
 	if err != nil {
 		panic(err)
 	}
@@ -622,7 +640,13 @@ func ExampleWebhookHandler() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.Request(NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem"))
+	wh, err := NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem")
+
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = bot.Request(wh)
 	if err != nil {
 		panic(err)
 	}
