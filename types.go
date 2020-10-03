@@ -51,12 +51,12 @@ func (ch UpdatesChannel) Clear() {
 
 // User is a user on Telegram.
 type User struct {
-	ID                      int    `json:"id"`
-	FirstName               string `json:"first_name"`
-	LastName                string `json:"last_name"`                   // optional
-	UserName                string `json:"username"`                    // optional
-	LanguageCode            string `json:"language_code"`               // optional
-	IsBot                   bool   `json:"is_bot"`                      // optional
+	ID           int    `json:"id"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`     // optional
+	UserName     string `json:"username"`      // optional
+	LanguageCode string `json:"language_code"` // optional
+	IsBot        bool   `json:"is_bot"`        // optional
 	CanJoinGroups           bool   `json:"can_join_groups"`             // optional. Returned only in getMe
 	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages"` // optional. Returned only in getMe
 	SupportsInlineQueries   bool   `json:"supports_inline_queries"`     // optional. Returned only in getMe
@@ -90,25 +90,24 @@ type GroupChat struct {
 
 // ChatPhoto represents a chat photo.
 type ChatPhoto struct {
-	SmallFileID       string `json:"small_file_id"`
+	SmallFileID string `json:"small_file_id"`
 	SmallFileUniqueID string `json:"small_file_unique_id"`
-	BigFileID         string `json:"big_file_id"`
+	BigFileID string `json:"big_file_id"`
 	BigFileUniqueID   string `json:"big_file_unique_id"`
 }
-
 // Chat contains information about the place a message was sent.
 type Chat struct {
-	ID                  int64            `json:"id"`
-	Type                string           `json:"type"`
-	Title               string           `json:"title"`                          // optional
-	UserName            string           `json:"username"`                       // optional
-	FirstName           string           `json:"first_name"`                     // optional
-	LastName            string           `json:"last_name"`                      // optional
-	AllMembersAreAdmins bool             `json:"all_members_are_administrators"` // optional
-	Photo               *ChatPhoto       `json:"photo"`
-	Description         string           `json:"description,omitempty"` // optional
-	InviteLink          string           `json:"invite_link,omitempty"` // optional
-	PinnedMessage       *Message         `json:"pinned_message"`        // optional
+	ID                  int64      `json:"id"`
+	Type                string     `json:"type"`
+	Title               string     `json:"title"`                          // optional
+	UserName            string     `json:"username"`                       // optional
+	FirstName           string     `json:"first_name"`                     // optional
+	LastName            string     `json:"last_name"`                      // optional
+	AllMembersAreAdmins bool       `json:"all_members_are_administrators"` // optional
+	Photo               *ChatPhoto `json:"photo"`
+	Description         string     `json:"description,omitempty"` // optional
+	InviteLink          string     `json:"invite_link,omitempty"` // optional
+	PinnedMessage       *Message   `json:"pinned_message"`        // optional
 	Permissions         *ChatPermissions `json:"permissions"`           //optional
 	SlowModelDelay      int              `json:"slow_mode_delay"`       //optional
 	StickerSetName      string           `json:"sticker_set_name"`      //optional
