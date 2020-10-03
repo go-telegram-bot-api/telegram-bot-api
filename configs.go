@@ -48,6 +48,12 @@ const (
 	ErrBadURL      = "bad or empty url"
 )
 
+// Constant values for Poll Type
+const (
+	PollTypeRegular = "regular"
+	PollTypeQuiz    = "quiz"
+)
+
 // Chattable is any config type that can be sent.
 type Chattable interface {
 	values() (url.Values, error)
@@ -215,6 +221,67 @@ func (config MessageConfig) values() (url.Values, error) {
 // method returns Telegram API method name for sending Message.
 func (config MessageConfig) method() string {
 	return "sendMessage"
+}
+
+// PollConfig contains information about a SendPoll request.
+type PollConfig struct {
+	BaseChat
+	Question              string
+	Options               []string
+	IsAnonymous           bool
+	Type                  string
+	AllowsMultipleAnswers bool
+	CorrectOptionID       int
+	Explanation           string
+	ExplanationParseMode  string
+	OpenPeriod            int
+	CloseDate             int
+	IsClosed              bool
+}
+
+// StopPollConfig specifies a poll to be stopped.
+type StopPollConfig struct {
+	BaseChat
+	MessageID int64
+}
+
+func (config StopPollConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("message_id", strconv.FormatInt(config.MessageID, 10))
+	return v, nil
+}
+
+func (config StopPollConfig) method() string {
+	return "stopPoll"
+}
+
+// values returns a url.Values representation of PollConfig.
+func (config PollConfig) values() (url.Values, error) {
+	v, err := config.BaseChat.values()
+	if err != nil {
+		return v, err
+	}
+	v.Add("question", config.Question)
+
+	options, err := json.Marshal(config.Options)
+
+	if err != nil {
+		return v, err
+	}
+
+	v.Add("options", string(options))
+	v.Add("is_anonymous", strconv.FormatBool(config.IsAnonymous))
+	v.Add("allows_multiple_answers", strconv.FormatBool(config.AllowsMultipleAnswers))
+	return v, nil
+}
+
+// method returns Telegram API method name for sending Poll.
+func (config PollConfig) method() string {
+	return "sendPoll"
 }
 
 // ForwardConfig contains information about a ForwardMessage request.

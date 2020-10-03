@@ -425,7 +425,33 @@ func TestSendWithDiceWithEmoji(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
+}
 
+func TestSendWithPoll(t *testing.T) {
+	bot, _ := getBot(t)
+
+	poll := tgbotapi.NewPoll(ChatID, "question", []string{"yes", "no"})
+	_, err := bot.Send(poll)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+}
+
+func TestSendWithStopPoll(t *testing.T) {
+	bot, _ := getBot(t)
+
+	poll := tgbotapi.NewPoll(ChatID, "question", []string{"yes", "no"})
+	pollDetails, _ := bot.Send(poll)
+
+	stopPoll := tgbotapi.NewStopPoll(ChatID, int64(pollDetails.MessageID))
+	_, err := bot.Send(stopPoll)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
 }
 
 func TestGetFile(t *testing.T) {

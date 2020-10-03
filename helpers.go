@@ -18,6 +18,33 @@ func NewMessage(chatID int64, text string) MessageConfig {
 	}
 }
 
+// NewPoll creates a new Poll.
+//
+// chatID is where to send it, question is the poll title,
+// options – list of options.
+func NewPoll(chatID int64, question string, options []string) PollConfig {
+	return PollConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Question: question,
+		Options:  options,
+	}
+}
+
+// NewStopPoll closes poll for further voting.
+//
+// chatID is where to send it, messageID is an identifier of message
+// containing poll.
+func NewStopPoll(chatID int64, messageID int64) StopPollConfig {
+	return StopPollConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		MessageID: messageID,
+	}
+}
+
 // NewDice creates a new DiceConfig.
 //
 // chatID is where to send it

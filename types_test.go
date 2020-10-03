@@ -278,3 +278,19 @@ func TestFileLink(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestPollIsRegular(t *testing.T) {
+	poll := tgbotapi.Poll{Type: "regular"}
+
+	if !poll.IsRegular() {
+		t.Fail()
+	}
+}
+
+func TestPollIsQuiz(t *testing.T) {
+	poll := tgbotapi.Poll{Type: "quiz"}
+
+	if !poll.IsQuiz() {
+		t.Fail()
+	}
+}

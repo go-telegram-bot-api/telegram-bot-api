@@ -37,6 +37,46 @@ type Update struct {
 	CallbackQuery      *CallbackQuery      `json:"callback_query"`
 	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
 	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
+	Poll               *Poll               `json:"poll"`
+	PollAnswer         *PollAnswer         `json:"poll_answer"`
+}
+
+// PollAnswer is a result for quiz or poll
+type PollAnswer struct {
+	PollID    string `json:"poll_id"`
+	User      *User  `json:"user"`
+	OptionIDs []int  `json:"option_ids"`
+}
+
+// Poll represents poll details
+type Poll struct {
+	ID                    string             `json:"id"`
+	Question              string             `json:"question"`
+	Options               []PollAnswerOption `json:"options"`
+	TotalVoterCount       int                `json:"total_voter_count"`
+	IsClosed              bool               `json:"is_closed"`
+	IsAnonymous           bool               `json:"is_anonymous"`
+	Type                  string             `json:"type"`
+	AllowsMultipleAnswers bool               `json:"allows_multiple_answers"`
+	CorrectOptionID       int                `json:"correct_option_id"`
+	Explanation           string             `json:"explanation"`
+	ExplanationEntities   *[]MessageEntity   `json:"explanation_entities"`
+	OpenPeriod            int                `json:"open_period"`
+	CloseDate             int                `json:"close_date"`
+}
+
+func (p *Poll) IsRegular() bool {
+	return p.Type == PollTypeRegular
+}
+
+func (p *Poll) IsQuiz() bool {
+	return p.Type == PollTypeQuiz
+}
+
+// PollAnswerOption represents poll answer details
+type PollAnswerOption struct {
+	Text       string `json:"text"`
+	VoterCount int    `json:"voter_count"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -177,6 +217,7 @@ type Message struct {
 	Invoice               *Invoice           `json:"invoice"`                 // optional
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
 	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	Poll                  *Poll              `json:"poll"`                    // optional
 }
 
 // Time converts the message timestamp into a Time.
