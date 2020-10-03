@@ -357,16 +357,19 @@ type PhotoSize struct {
 // Audio contains information about audio.
 type Audio struct {
 	FileID    string `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
 	Duration  int    `json:"duration"`
 	Performer string `json:"performer"` // optional
 	Title     string `json:"title"`     // optional
 	MimeType  string `json:"mime_type"` // optional
 	FileSize  int    `json:"file_size"` // optional
+	Thumbnail *PhotoSize `json:"thumb"` // optional
 }
 
 // Document contains information about a document.
 type Document struct {
 	FileID    string     `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
 	Thumbnail *PhotoSize `json:"thumb"`     // optional
 	FileName  string     `json:"file_name"` // optional
 	MimeType  string     `json:"mime_type"` // optional
@@ -410,6 +413,7 @@ type ChatAnimation struct {
 // Video contains information about a video.
 type Video struct {
 	FileID    string     `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
 	Width     int        `json:"width"`
 	Height    int        `json:"height"`
 	Duration  int        `json:"duration"`
@@ -421,6 +425,7 @@ type Video struct {
 // VideoNote contains information about a video.
 type VideoNote struct {
 	FileID    string     `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
 	Length    int        `json:"length"`
 	Duration  int        `json:"duration"`
 	Thumbnail *PhotoSize `json:"thumb"`     // optional
