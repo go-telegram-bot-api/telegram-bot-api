@@ -172,6 +172,7 @@ type Message struct {
 	Caption               string             `json:"caption"`                 // optional
 	Contact               *Contact           `json:"contact"`                 // optional
 	Dice                  *Dice              `json:"dice"`                    // optional
+	Poll                  *Poll              `json:"poll"`                    // optional // Not implemented yet
 	Location              *Location          `json:"location"`                // optional
 	Venue                 *Venue             `json:"venue"`                   // optional
 	NewChatMembers        *[]User            `json:"new_chat_members"`        // optional
@@ -189,6 +190,7 @@ type Message struct {
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
 	ConnectedWebsite      string             `json:"connected_website"`       // optional
 	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup"`         // optional // Not implemented yet
 }
 
 // Time converts the message timestamp into a Time.
@@ -455,6 +457,10 @@ type Dice struct {
 	Emoji string `json:"emoji"`
 	Value int    `json:"value"`
 }
+
+// Poll contains information about a poll.
+// TODO
+type Poll struct {}
 
 // Location contains information about a place.
 type Location struct {
