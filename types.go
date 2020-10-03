@@ -269,6 +269,7 @@ type MessageEntity struct {
 	Length int    `json:"length"`
 	URL    string `json:"url"`  // optional
 	User   *User  `json:"user"` // optional
+	Language string `json:"language"` // optional
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
