@@ -51,12 +51,15 @@ func (ch UpdatesChannel) Clear() {
 
 // User is a user on Telegram.
 type User struct {
-	ID           int    `json:"id"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`     // optional
-	UserName     string `json:"username"`      // optional
-	LanguageCode string `json:"language_code"` // optional
-	IsBot        bool   `json:"is_bot"`        // optional
+	ID                      int    `json:"id"`
+	FirstName               string `json:"first_name"`
+	LastName                string `json:"last_name"`                   // optional
+	UserName                string `json:"username"`                    // optional
+	LanguageCode            string `json:"language_code"`               // optional
+	IsBot                   bool   `json:"is_bot"`                      // optional
+	CanJoinGroups           bool   `json:"can_join_groups"`             // optional. Returned only in getMe
+	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages"` // optional. Returned only in getMe
+	SupportsInlineQueries   bool   `json:"supports_inline_queries"`     // optional. Returned only in getMe
 }
 
 // String displays a simple text version of a user.
