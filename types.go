@@ -470,6 +470,7 @@ type Venue struct {
 	Title        string   `json:"title"`
 	Address      string   `json:"address"`
 	FoursquareID string   `json:"foursquare_id"` // optional
+	FoursquareType string   `json:"foursquare_type"` // optional
 }
 
 // UserProfilePhotos contains a set of user profile photos.
