@@ -171,8 +171,8 @@ type Message struct {
 	Caption              string           `json:"caption"`                 // optional
 	CaptionEntities      *[]MessageEntity `json:"caption_entities"`        // optional
 	Contact              *Contact         `json:"contact"`                 // optional
-	// Dice                  *Dice                 `json:"dice"`                    // optional // Not implemented yet
-	Game *Game `json:"game"` // optional
+	Dice                 *Dice            `json:"dice"`                    // optional
+	Game                 *Game            `json:"game"`                    // optional
 	// Poll                  *Poll                 `json:"poll"`                    // optional // Not implemented yet
 	Venue                 *Venue             `json:"venue"`                   // optional
 	Location              *Location          `json:"location"`                // optional
@@ -427,6 +427,12 @@ type Contact struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"` // optional
 	UserID      int    `json:"user_id"`   // optional
+}
+
+// Dice represents an animated emoji that displays a random value.
+type Dice struct {
+	Emoji string `json:"emoji"`
+	Value int    `json:"value"`
 }
 
 // Location contains information about a place.
