@@ -449,6 +449,7 @@ type Contact struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"` // optional
 	UserID      int    `json:"user_id"`   // optional
+	Vcard string `json:"vcard"` //optional
 }
 
 // Dice represents an animated emoji that displays a random value.
