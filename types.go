@@ -109,7 +109,7 @@ type Chat struct {
 	Description         string           `json:"description,omitempty"` // optional
 	InviteLink          string           `json:"invite_link,omitempty"` // optional
 	PinnedMessage       *Message         `json:"pinned_message"`        // optional
-	// Permissions         *ChatPermissions `json:"permissions"`           //optional
+	Permissions         *ChatPermissions `json:"permissions"`           //optional
 	SlowModelDelay      int              `json:"slow_mode_delay"`       //optional
 	StickerSetName      string           `json:"sticker_set_name"`      //optional
 	CanSetStickerSet    bool             `json:"can_set_sticker_set"`   //optional
@@ -560,6 +560,18 @@ func (chat ChatMember) HasLeft() bool { return chat.Status == "left" }
 
 // WasKicked returns if the ChatMember was kicked from the chat.
 func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
+
+// ChatPermissions describes actions that a non-administrator user is allowed to take in a chat
+type ChatPermissions struct {
+	CanSendMessages       bool `json:"can_send_messages"`
+	CanSendMediaMessages  bool `json:"can_send_media_messages"`
+	CanSendPolls          bool `json:"can_send_polls"`
+	CanSendOtherMessages  bool `json:"can_send_other_messages"`
+	CanAddWebPagePreviews bool `json:"can_add_web_page_previews"`
+	CanChangeInfo         bool `json:"can_change_info"`
+	CanInviteUsers        bool `json:"can_invite_users"`
+	CanPinMessages        bool `json:"can_pin_messages"`
+}
 
 // Game is a game within Telegram.
 type Game struct {
