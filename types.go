@@ -596,6 +596,7 @@ type ChatMember struct {
 	CanSendMediaMessages  bool   `json:"can_send_media_messages,omitempty"`   // optional
 	CanSendOtherMessages  bool   `json:"can_send_other_messages,omitempty"`   // optional
 	CanAddWebPagePreviews bool   `json:"can_add_web_page_previews,omitempty"` // optional
+	CanSendPolls          bool   `json:"can_send_polls"`                      // optional
 }
 
 // IsCreator returns if the ChatMember was the creator of the chat.
