@@ -507,6 +507,12 @@ type KeyboardButton struct {
 	Text            string `json:"text"`
 	RequestContact  bool   `json:"request_contact"`
 	RequestLocation bool   `json:"request_location"`
+	RequestPoll *KeyboardButtonPollType `json:"request_poll"`
+}
+
+// KeyboardButtonPollType represents type of a poll
+type KeyboardButtonPollType struct {
+	Type string `json:"type"`
 }
 
 // ReplyKeyboardHide allows the Bot to hide a custom keyboard.
