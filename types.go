@@ -1005,3 +1005,9 @@ type Error struct {
 func (e Error) Error() string {
 	return e.Message
 }
+
+// BotCommand represents a bot command.
+type BotCommand struct {
+	Command     string `json:"command"`
+	Description string `json:"description"`
+}
