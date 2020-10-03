@@ -98,17 +98,21 @@ type ChatPhoto struct {
 
 // Chat contains information about the place a message was sent.
 type Chat struct {
-	ID                  int64      `json:"id"`
-	Type                string     `json:"type"`
-	Title               string     `json:"title"`                          // optional
-	UserName            string     `json:"username"`                       // optional
-	FirstName           string     `json:"first_name"`                     // optional
-	LastName            string     `json:"last_name"`                      // optional
-	AllMembersAreAdmins bool       `json:"all_members_are_administrators"` // optional
-	Photo               *ChatPhoto `json:"photo"`
-	Description         string     `json:"description,omitempty"` // optional
-	InviteLink          string     `json:"invite_link,omitempty"` // optional
-	PinnedMessage       *Message   `json:"pinned_message"`        // optional
+	ID                  int64            `json:"id"`
+	Type                string           `json:"type"`
+	Title               string           `json:"title"`                          // optional
+	UserName            string           `json:"username"`                       // optional
+	FirstName           string           `json:"first_name"`                     // optional
+	LastName            string           `json:"last_name"`                      // optional
+	AllMembersAreAdmins bool             `json:"all_members_are_administrators"` // optional
+	Photo               *ChatPhoto       `json:"photo"`
+	Description         string           `json:"description,omitempty"` // optional
+	InviteLink          string           `json:"invite_link,omitempty"` // optional
+	PinnedMessage       *Message         `json:"pinned_message"`        // optional
+	// Permissions         *ChatPermissions `json:"permissions"`           //optional
+	SlowModelDelay      int              `json:"slow_mode_delay"`       //optional
+	StickerSetName      string           `json:"sticker_set_name"`      //optional
+	CanSetStickerSet    bool             `json:"can_set_sticker_set"`   //optional
 }
 
 // IsPrivate returns if the Chat is a private conversation.
