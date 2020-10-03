@@ -143,35 +143,39 @@ func (c Chat) ChatConfig() ChatConfig {
 // Message is returned by almost every request, and contains data about
 // almost anything.
 type Message struct {
-	MessageID             int                `json:"message_id"`
-	From                  *User              `json:"from"` // optional
-	Date                  int                `json:"date"`
-	Chat                  *Chat              `json:"chat"`
-	ForwardFrom           *User              `json:"forward_from"`            // optional
-	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
-	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
-	ForwardDate           int                `json:"forward_date"`            // optional
-	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
-	ViaBot                *User              `json:"via_bot"`                 // optional
-	EditDate              int                `json:"edit_date"`               // optional
-	MediaGroupID          string             `json:"media_group_id"`          // optional
-	AuthorSignature       string             `json:"author_signature"`        // optional
-	Text                  string             `json:"text"`                    // optional
-	Entities              *[]MessageEntity   `json:"entities"`                // optional
-	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
-	Audio                 *Audio             `json:"audio"`                   // optional
-	Document              *Document          `json:"document"`                // optional
-	Animation             *ChatAnimation     `json:"animation"`               // optional
-	Game                  *Game              `json:"game"`                    // optional
-	Photo                 *[]PhotoSize       `json:"photo"`                   // optional
-	Sticker               *Sticker           `json:"sticker"`                 // optional
-	Video                 *Video             `json:"video"`                   // optional
-	VideoNote             *VideoNote         `json:"video_note"`              // optional
-	Voice                 *Voice             `json:"voice"`                   // optional
-	Caption               string             `json:"caption"`                 // optional
-	Contact               *Contact           `json:"contact"`                 // optional
-	Location              *Location          `json:"location"`                // optional
+	MessageID            int              `json:"message_id"`
+	From                 *User            `json:"from"` // optional
+	Date                 int              `json:"date"`
+	Chat                 *Chat            `json:"chat"`
+	ForwardFrom          *User            `json:"forward_from"`            // optional
+	ForwardFromChat      *Chat            `json:"forward_from_chat"`       // optional
+	ForwardFromMessageID int              `json:"forward_from_message_id"` // optional
+	ForwardSignature     string           `json:"forward_signature"`       // optional
+	ForwardSenderName    string           `json:"forward_sender_name"`     // optional
+	ForwardDate          int              `json:"forward_date"`            // optional
+	ReplyToMessage       *Message         `json:"reply_to_message"`        // optional
+	ViaBot               *User            `json:"via_bot"`                 // optional
+	EditDate             int              `json:"edit_date"`               // optional
+	MediaGroupID         string           `json:"media_group_id"`          // optional
+	AuthorSignature      string           `json:"author_signature"`        // optional
+	Text                 string           `json:"text"`                    // optional
+	Entities             *[]MessageEntity `json:"entities"`                // optional
+	Animation            *ChatAnimation   `json:"animation"`               // optional
+	Audio                *Audio           `json:"audio"`                   // optional
+	Document             *Document        `json:"document"`                // optional
+	Photo                *[]PhotoSize     `json:"photo"`                   // optional
+	Sticker              *Sticker         `json:"sticker"`                 // optional
+	Video                *Video           `json:"video"`                   // optional
+	VideoNote            *VideoNote       `json:"video_note"`              // optional
+	Voice                *Voice           `json:"voice"`                   // optional
+	Caption              string           `json:"caption"`                 // optional
+	CaptionEntities      *[]MessageEntity `json:"caption_entities"`        // optional
+	Contact              *Contact         `json:"contact"`                 // optional
+	// Dice                  *Dice                 `json:"dice"`                    // optional // Not implemented yet
+	Game *Game `json:"game"` // optional
+	// Poll                  *Poll                 `json:"poll"`                    // optional // Not implemented yet
 	Venue                 *Venue             `json:"venue"`                   // optional
+	Location              *Location          `json:"location"`                // optional
 	NewChatMembers        *[]User            `json:"new_chat_members"`        // optional
 	LeftChatMember        *User              `json:"left_chat_member"`        // optional
 	NewChatTitle          string             `json:"new_chat_title"`          // optional
@@ -185,7 +189,9 @@ type Message struct {
 	PinnedMessage         *Message           `json:"pinned_message"`          // optional
 	Invoice               *Invoice           `json:"invoice"`                 // optional
 	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
+	ConnectedWebsite      string             `json:"connected_website"`       // optional
 	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	// ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup"`            // optional // Not implemented yet
 }
 
 // Time converts the message timestamp into a Time.
