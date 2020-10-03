@@ -291,6 +291,11 @@ func (e MessageEntity) IsHashtag() bool {
 	return e.Type == "hashtag"
 }
 
+// IsCashtag returns true if the type of the message entity is "cashtag".
+func (e MessageEntity) IsCashtag() bool {
+	return e.Type == "cashtag"
+}
+
 // IsCommand returns true if the type of the message entity is "bot_command".
 func (e MessageEntity) IsCommand() bool {
 	return e.Type == "bot_command"
@@ -304,6 +309,11 @@ func (e MessageEntity) IsUrl() bool {
 // IsEmail returns true if the type of the message entity is "email".
 func (e MessageEntity) IsEmail() bool {
 	return e.Type == "email"
+}
+
+// IsPhoneNumber returns true if the type of the message entity is "phone_number".
+func (e MessageEntity) IsPhoneNumber() bool {
+	return e.Type == "phone_number"
 }
 
 // IsBold returns true if the type of the message entity is "bold" (bold text).
@@ -329,6 +339,11 @@ func (e MessageEntity) IsPre() bool {
 // IsTextLink returns true if the type of the message entity is "text_link" (clickable text URL).
 func (e MessageEntity) IsTextLink() bool {
 	return e.Type == "text_link"
+}
+
+// IsTextMention returns true if the type of the message entity is "text_mention".
+func (e MessageEntity) IsTextMention() bool {
+	return e.Type == "text_mention"
 }
 
 // PhotoSize contains information about photos.
