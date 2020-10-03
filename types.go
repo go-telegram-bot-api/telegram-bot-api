@@ -435,6 +435,7 @@ type VideoNote struct {
 // Voice contains information about a voice.
 type Voice struct {
 	FileID   string `json:"file_id"`
+	FileUniqueID string `json:"file_unique_id"`
 	Duration int    `json:"duration"`
 	MimeType string `json:"mime_type"` // optional
 	FileSize int    `json:"file_size"` // optional
