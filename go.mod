@@ -1,4 +1,4 @@
-module github.com/go-telegram-bot-api/telegram-bot-api
+module github.com/dilfish/telegram-bot-api-up
 
 go 1.15
 
