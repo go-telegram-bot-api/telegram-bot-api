@@ -1,4 +1,7 @@
+# THIS REPO IS REPUBLISHED BY DILFISH, KEEP TRACK OF ORIGINAL REPO.
+
 # Golang bindings for the Telegram Bot API
+
 
 [![GoDoc](https://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api?status.svg)](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api)
 [![Travis](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api.svg)](https://travis-ci.org/go-telegram-bot-api/telegram-bot-api)
