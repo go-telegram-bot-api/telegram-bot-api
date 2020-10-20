@@ -72,6 +72,18 @@ type BaseChat struct {
 	DisableNotification bool
 }
 
+func (chat *BaseChat) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
+	params.AddBool("disable_notification", chat.DisableNotification)
+
+	err := params.AddInterface("reply_markup", chat.ReplyMarkup)
+
+	return params, err
+}
+
 // values returns url.Values representation of BaseChat
 func (chat *BaseChat) values() (url.Values, error) {
 	v := url.Values{}
@@ -763,6 +775,47 @@ func (config ContactConfig) values() (url.Values, error) {
 
 func (config ContactConfig) method() string {
 	return "sendContact"
+}
+
+// SendPollConfig allows you to send a poll.
+type SendPollConfig struct {
+	BaseChat
+	Question              string
+	Options               []string
+	IsAnonymous           bool
+	Type                  string
+	AllowsMultipleAnswers bool
+	CorrectOptionID       int64
+	Explanation           string
+	ExplanationParseMode  string
+	OpenPeriod            int
+	CloseDate             int
+	IsClosed              bool
+}
+
+func (config SendPollConfig) values() (url.Values, error) {
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params.toValues(), err
+	}
+
+	params["question"] = config.Question
+	err = params.AddInterface("options", config.Options)
+	params["is_anonymous"] = strconv.FormatBool(config.IsAnonymous)
+	params.AddNonEmpty("type", config.Type)
+	params["allows_multiple_answers"] = strconv.FormatBool(config.AllowsMultipleAnswers)
+	params["correct_option_id"] = strconv.FormatInt(config.CorrectOptionID, 10)
+	params.AddBool("is_closed", config.IsClosed)
+	params.AddNonEmpty("explanation", config.Explanation)
+	params.AddNonEmpty("explanation_parse_mode", config.ExplanationParseMode)
+	params.AddNonZero("open_period", config.OpenPeriod)
+	params.AddNonZero("close_date", config.CloseDate)
+
+	return params.toValues(), err
+}
+
+func (SendPollConfig) method() string {
+	return "sendPoll"
 }
 
 // GameConfig allows you to send a game.

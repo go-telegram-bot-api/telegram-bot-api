@@ -134,49 +134,160 @@ func (c Chat) ChatConfig() ChatConfig {
 // Message is returned by almost every request, and contains data about
 // almost anything.
 type Message struct {
-	MessageID             int                `json:"message_id"`
-	From                  *User              `json:"from"` // optional
-	Date                  int                `json:"date"`
-	Chat                  *Chat              `json:"chat"`
-	ForwardFrom           *User              `json:"forward_from"`            // optional
-	ForwardFromChat       *Chat              `json:"forward_from_chat"`       // optional
-	ForwardFromMessageID  int                `json:"forward_from_message_id"` // optional
-	ForwardDate           int                `json:"forward_date"`            // optional
-	ReplyToMessage        *Message           `json:"reply_to_message"`        // optional
-	ViaBot                *User              `json:"via_bot"`                 // optional
-	EditDate              int                `json:"edit_date"`               // optional
-	MediaGroupID          string             `json:"media_group_id"`          // optional
-	AuthorSignature       string             `json:"author_signature"`        // optional
-	Text                  string             `json:"text"`                    // optional
-	Entities              *[]MessageEntity   `json:"entities"`                // optional
-	CaptionEntities       *[]MessageEntity   `json:"caption_entities"`        // optional
-	Audio                 *Audio             `json:"audio"`                   // optional
-	Document              *Document          `json:"document"`                // optional
-	Animation             *ChatAnimation     `json:"animation"`               // optional
-	Game                  *Game              `json:"game"`                    // optional
-	Photo                 *[]PhotoSize       `json:"photo"`                   // optional
-	Sticker               *Sticker           `json:"sticker"`                 // optional
-	Video                 *Video             `json:"video"`                   // optional
-	VideoNote             *VideoNote         `json:"video_note"`              // optional
-	Voice                 *Voice             `json:"voice"`                   // optional
-	Caption               string             `json:"caption"`                 // optional
-	Contact               *Contact           `json:"contact"`                 // optional
-	Location              *Location          `json:"location"`                // optional
-	Venue                 *Venue             `json:"venue"`                   // optional
-	NewChatMembers        *[]User            `json:"new_chat_members"`        // optional
-	LeftChatMember        *User              `json:"left_chat_member"`        // optional
-	NewChatTitle          string             `json:"new_chat_title"`          // optional
-	NewChatPhoto          *[]PhotoSize       `json:"new_chat_photo"`          // optional
-	DeleteChatPhoto       bool               `json:"delete_chat_photo"`       // optional
-	GroupChatCreated      bool               `json:"group_chat_created"`      // optional
-	SuperGroupChatCreated bool               `json:"supergroup_chat_created"` // optional
-	ChannelChatCreated    bool               `json:"channel_chat_created"`    // optional
-	MigrateToChatID       int64              `json:"migrate_to_chat_id"`      // optional
-	MigrateFromChatID     int64              `json:"migrate_from_chat_id"`    // optional
-	PinnedMessage         *Message           `json:"pinned_message"`          // optional
-	Invoice               *Invoice           `json:"invoice"`                 // optional
-	SuccessfulPayment     *SuccessfulPayment `json:"successful_payment"`      // optional
-	PassportData          *PassportData      `json:"passport_data,omitempty"` // optional
+	// MessageID is a unique message identifier inside this chat
+	MessageID int `json:"message_id"`
+	// From is a sender, empty for messages sent to channels;
+	// optional
+	From *User `json:"from"`
+	// Date of the message was sent in Unix time
+	Date int `json:"date"`
+	// Chat is the conversation the message belongs to
+	Chat *Chat `json:"chat"`
+	// ForwardFrom for forwarded messages, sender of the original message;
+	// optional
+	ForwardFrom *User `json:"forward_from"`
+	// ForwardFromChat for messages forwarded from channels,
+	// information about the original channel;
+	// optional
+	ForwardFromChat *Chat `json:"forward_from_chat"`
+	// ForwardFromMessageID for messages forwarded from channels,
+	// identifier of the original message in the channel;
+	// optional
+	ForwardFromMessageID int `json:"forward_from_message_id"`
+	// ForwardDate for forwarded messages, date the original message was sent in Unix time;
+	// optional
+	ForwardDate int `json:"forward_date"`
+	// ReplyToMessage for replies, the original message.
+	// Note that the Message object in this field will not contain further ReplyToMessage fields
+	// even if it itself is a reply;
+	// optional
+	ReplyToMessage *Message `json:"reply_to_message"`
+	// ViaBot through which the message was sent;
+	// optional
+	ViaBot *User `json:"via_bot"`
+	// EditDate of the message was last edited in Unix time;
+	// optional
+	EditDate int `json:"edit_date"`
+	// MediaGroupID is the unique identifier of a media message group this message belongs to;
+	// optional
+	MediaGroupID string `json:"media_group_id"`
+	// AuthorSignature is the signature of the post author for messages in channels;
+	// optional
+	AuthorSignature string `json:"author_signature"`
+	// Text is for text messages, the actual UTF-8 text of the message, 0-4096 characters;
+	// optional
+	Text string `json:"text"`
+	// Entities is for text messages, special entities like usernames,
+	// URLs, bot commands, etc. that appear in the text;
+	// optional
+	Entities *[]MessageEntity `json:"entities"`
+	// CaptionEntities;
+	// optional
+	CaptionEntities *[]MessageEntity `json:"caption_entities"`
+	// Audio message is an audio file, information about the file;
+	// optional
+	Audio *Audio `json:"audio"`
+	// Document message is a general file, information about the file;
+	// optional
+	Document *Document `json:"document"`
+	// Animation message is an animation, information about the animation.
+	// For backward compatibility, when this field is set, the document field will also be set;
+	// optional
+	Animation *ChatAnimation `json:"animation"`
+	// Game message is a game, information about the game;
+	// optional
+	Game *Game `json:"game"`
+	// Photo message is a photo, available sizes of the photo;
+	// optional
+	Photo *[]PhotoSize `json:"photo"`
+	// Sticker message is a sticker, information about the sticker;
+	// optional
+	Sticker *Sticker `json:"sticker"`
+	// Video message is a video, information about the video;
+	// optional
+	Video *Video `json:"video"`
+	// VideoNote message is a video note, information about the video message;
+	// optional
+	VideoNote *VideoNote `json:"video_note"`
+	// Voice message is a voice message, information about the file;
+	// optional
+	Voice *Voice `json:"voice"`
+	// Caption for the animation, audio, document, photo, video or voice, 0-1024 characters;
+	// optional
+	Caption string `json:"caption"`
+	// Contact message is a shared contact, information about the contact;
+	// optional
+	Contact *Contact `json:"contact"`
+	// Location message is a shared location, information about the location;
+	// optional
+	Location *Location `json:"location"`
+	// Venue message is a venue, information about the venue.
+	// For backward compatibility, when this field is set, the location field will also be set;
+	// optional
+	Venue *Venue `json:"venue"`
+	// NewChatMembers that were added to the group or supergroup
+	// and information about them (the bot itself may be one of these members);
+	// optional
+	NewChatMembers *[]User `json:"new_chat_members"`
+	// LeftChatMember is a member was removed from the group,
+	// information about them (this member may be the bot itself);
+	// optional
+	LeftChatMember *User `json:"left_chat_member"`
+	// NewChatTitle is a chat title was changed to this value;
+	// optional
+	NewChatTitle string `json:"new_chat_title"`
+	// NewChatPhoto is a chat photo was change to this value;
+	// optional
+	NewChatPhoto *[]PhotoSize `json:"new_chat_photo"`
+	// DeleteChatPhoto is a service message: the chat photo was deleted;
+	// optional
+	DeleteChatPhoto bool `json:"delete_chat_photo"`
+	// GroupChatCreated is a service message: the group has been created;
+	// optional
+	GroupChatCreated bool `json:"group_chat_created"`
+	// SuperGroupChatCreated is a service message: the supergroup has been created.
+	// This field can't be received in a message coming through updates,
+	// because bot can't be a member of a supergroup when it is created.
+	// It can only be found in ReplyToMessage if someone replies to a very first message
+	// in a directly created supergroup;
+	// optional
+	SuperGroupChatCreated bool `json:"supergroup_chat_created"`
+	// ChannelChatCreated is a service message: the channel has been created.
+	// This field can't be received in a message coming through updates,
+	// because bot can't be a member of a channel when it is created.
+	// It can only be found in ReplyToMessage
+	// if someone replies to a very first message in a channel;
+	// optional
+	ChannelChatCreated bool `json:"channel_chat_created"`
+	// MigrateToChatID is the group has been migrated to a supergroup with the specified identifier.
+	// This number may be greater than 32 bits and some programming languages
+	// may have difficulty/silent defects in interpreting it.
+	// But it is smaller than 52 bits, so a signed 64 bit integer
+	// or double-precision float type are safe for storing this identifier;
+	// optional
+	MigrateToChatID int64 `json:"migrate_to_chat_id"`
+	// MigrateFromChatID is the supergroup has been migrated from a group with the specified identifier.
+	// This number may be greater than 32 bits and some programming languages
+	// may have difficulty/silent defects in interpreting it.
+	// But it is smaller than 52 bits, so a signed 64 bit integer
+	// or double-precision float type are safe for storing this identifier;
+	// optional
+	MigrateFromChatID int64 `json:"migrate_from_chat_id"`
+	// PinnedMessage is a specified message was pinned.
+	// Note that the Message object in this field will not contain further ReplyToMessage
+	// fields even if it is itself a reply;
+	// optional
+	PinnedMessage *Message `json:"pinned_message"`
+	// Invoice message is an invoice for a payment;
+	// optional
+	Invoice *Invoice `json:"invoice"`
+	// SuccessfulPayment message is a service message about a successful payment,
+	// information about the payment;
+	// optional
+	SuccessfulPayment *SuccessfulPayment `json:"successful_payment"`
+	// PassportData is a Telegram Passport data;
+	// optional
+	PassportData *PassportData `json:"passport_data,omitempty"`
 }
 
 // Time converts the message timestamp into a Time.
