@@ -549,9 +549,8 @@ func TestSendWithMediaGroup(t *testing.T) {
 	bot, _ := getBot(t)
 
 	cfg := tgbotapi.NewMediaGroup(ChatID, []interface{}{
-		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
-		tgbotapi.NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
-		tgbotapi.NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
+		tgbotapi.NewInputMediaPhoto("https://github.com/go-telegram-bot-api/telegram-bot-api/raw/0a3a1c8716c4cd8d26a262af9f12dcbab7f3f28c/tests/image.jpg"),
+		tgbotapi.NewInputMediaVideo("https://github.com/go-telegram-bot-api/telegram-bot-api/raw/0a3a1c8716c4cd8d26a262af9f12dcbab7f3f28c/tests/video.mp4"),
 	})
 	_, err := bot.Send(cfg)
 	if err != nil {
