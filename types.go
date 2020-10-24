@@ -583,20 +583,32 @@ type VideoNote struct {
 
 // Voice contains information about a voice.
 type Voice struct {
-	FileID   string `json:"file_id"`
-	Duration int    `json:"duration"`
-	MimeType string `json:"mime_type"` // optional
-	FileSize int    `json:"file_size"` // optional
+	// FileID identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Duration of the audio in seconds as defined by sender
+	Duration int `json:"duration"`
+	// MimeType of the file as defined by sender
+	// optional
+	MimeType string `json:"mime_type"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // Contact contains information about a contact.
 //
 // Note that LastName and UserID may be empty.
 type Contact struct {
+	// PhoneNumber contact's phone number
 	PhoneNumber string `json:"phone_number"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"` // optional
-	UserID      int    `json:"user_id"`   // optional
+	// FirstName contact's first name
+	FirstName string `json:"first_name"`
+	// LastName contact's last name
+	// optional
+	LastName string `json:"last_name"`
+	// UserID contact's user identifier in Telegram
+	// optional
+	UserID int `json:"user_id"`
 }
 
 // Location contains information about a place.
