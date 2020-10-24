@@ -546,22 +546,39 @@ type ChatAnimation struct {
 
 // Video contains information about a video.
 type Video struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Duration  int        `json:"duration"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	MimeType  string     `json:"mime_type"` // optional
-	FileSize  int        `json:"file_size"` // optional
+	// FileID identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Width video width as defined by sender
+	Width int `json:"width"`
+	// Height video height as defined by sender
+	Height int `json:"height"`
+	// Duration of the video in seconds as defined by sender
+	Duration int `json:"duration"`
+	// Thumbnail video thumbnail
+	// optional
+	Thumbnail *PhotoSize `json:"thumb"`
+	// MimeType of a file as defined by sender
+	// optional
+	MimeType string `json:"mime_type"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // VideoNote contains information about a video.
 type VideoNote struct {
-	FileID    string     `json:"file_id"`
-	Length    int        `json:"length"`
-	Duration  int        `json:"duration"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	FileSize  int        `json:"file_size"` // optional
+	// FileID identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Length video width and height (diameter of the video message) as defined by sender
+	Length int `json:"length"`
+	// Duration of the video in seconds as defined by sender
+	Duration int `json:"duration"`
+	// Thumbnail video thumbnail
+	// optional
+	Thumbnail *PhotoSize `json:"thumb"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // Voice contains information about a voice.
