@@ -27,16 +27,44 @@ type ResponseParameters struct {
 
 // Update is an update response, from GetUpdates.
 type Update struct {
-	UpdateID           int                 `json:"update_id"`
-	Message            *Message            `json:"message"`
-	EditedMessage      *Message            `json:"edited_message"`
-	ChannelPost        *Message            `json:"channel_post"`
-	EditedChannelPost  *Message            `json:"edited_channel_post"`
-	InlineQuery        *InlineQuery        `json:"inline_query"`
+	// UpdateID is the update's unique identifier.
+	// Update identifiers start from a certain positive number and increase sequentially.
+	// This ID becomes especially handy if you're using Webhooks,
+	// since it allows you to ignore repeated updates or to restore
+	// the correct update sequence, should they get out of order.
+	// If there are no new updates for at least a week, then identifier
+	// of the next update will be chosen randomly instead of sequentially.
+	UpdateID int `json:"update_id"`
+	// Message new incoming message of any kind — text, photo, sticker, etc.
+	// optional
+	Message *Message `json:"message"`
+	// EditedMessage
+	// optional
+	EditedMessage *Message `json:"edited_message"`
+	// ChannelPost new version of a message that is known to the bot and was edited
+	// optional
+	ChannelPost *Message `json:"channel_post"`
+	// EditedChannelPost new incoming channel post of any kind — text, photo, sticker, etc.
+	// optional
+	EditedChannelPost *Message `json:"edited_channel_post"`
+	// InlineQuery new incoming inline query
+	// optional
+	InlineQuery *InlineQuery `json:"inline_query"`
+	// ChosenInlineResult is the result of an inline query
+	// that was chosen by a user and sent to their chat partner.
+	// Please see our documentation on the feedback collecting
+	// for details on how to enable these updates for your bot.
+	// optional
 	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result"`
-	CallbackQuery      *CallbackQuery      `json:"callback_query"`
-	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
-	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
+	// CallbackQuery new incoming callback query
+	// optional
+	CallbackQuery *CallbackQuery `json:"callback_query"`
+	// ShippingQuery new incoming shipping query. Only for invoices with flexible price
+	// optional
+	ShippingQuery *ShippingQuery `json:"shipping_query"`
+	// PreCheckoutQuery new incoming pre-checkout query. Contains full information about checkout
+	// optional
+	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
 }
 
 // UpdatesChannel is the channel for getting updates.
