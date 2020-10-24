@@ -730,43 +730,121 @@ type InputMediaVideo struct {
 
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {
-	ID       string    `json:"id"`
-	From     *User     `json:"from"`
-	Location *Location `json:"location"` // optional
-	Query    string    `json:"query"`
-	Offset   string    `json:"offset"`
+	// ID unique identifier for this query
+	ID string `json:"id"`
+	// From sender
+	From *User `json:"from"`
+	// Location sender location, only for bots that request user location.
+	//
+	// optional
+	Location *Location `json:"location"`
+	// Query text of the query (up to 256 characters).
+	Query string `json:"query"`
+	// Offset of the results to be returned, can be controlled by the bot.
+	Offset string `json:"offset"`
 }
 
 // InlineQueryResultArticle is an inline query response article.
 type InlineQueryResultArticle struct {
-	Type                string                `json:"type"`                            // required
-	ID                  string                `json:"id"`                              // required
-	Title               string                `json:"title"`                           // required
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"` // required
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	URL                 string                `json:"url"`
-	HideURL             bool                  `json:"hide_url"`
-	Description         string                `json:"description"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be article.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// Title of the result
+	//
+	// required
+	Title string `json:"title"`
+	// InputMessageContent content of the message to be sent.
+	//
+	// required
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ReplyMarkup Inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// URL of the result.
+	//
+	// optional
+	URL string `json:"url"`
+	// HideURL pass True, if you don't want the URL to be shown in the message.
+	//
+	// optional
+	HideURL bool `json:"hide_url"`
+	// Description short description of the result.
+	//
+	// optional
+	Description string `json:"description"`
+	// ThumbURL url of the thumbnail for the result
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultPhoto is an inline query response photo.
 type InlineQueryResultPhoto struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"photo_url"` // required
-	MimeType            string                `json:"mime_type"`
-	Width               int                   `json:"photo_width"`
-	Height              int                   `json:"photo_height"`
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Description         string                `json:"description"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be article.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL of the photo. Photo must be in jpeg format.
+	// Photo size must not exceed 5MB.
+	URL string `json:"photo_url"`
+	// MimeType
+	MimeType string `json:"mime_type"`
+	// Width of the photo
+	//
+	// optional
+	Width int `json:"photo_width"`
+	// Height of the photo
+	//
+	// optional
+	Height int `json:"photo_height"`
+	// ThumbURL url of the thumbnail for the photo.
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// Caption of the photo to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the photo caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the photo.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedPhoto is an inline query response with cached photo.
