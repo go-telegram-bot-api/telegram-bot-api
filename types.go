@@ -428,51 +428,96 @@ func (e MessageEntity) IsTextLink() bool {
 
 // PhotoSize contains information about photos.
 type PhotoSize struct {
-	FileID   string `json:"file_id"`
-	Width    int    `json:"width"`
-	Height   int    `json:"height"`
-	FileSize int    `json:"file_size"` // optional
+	// FileID identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Width photo width
+	Width int `json:"width"`
+	// Height photo height
+	Height int `json:"height"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // Audio contains information about audio.
 type Audio struct {
-	FileID    string `json:"file_id"`
-	Duration  int    `json:"duration"`
-	Performer string `json:"performer"` // optional
-	Title     string `json:"title"`     // optional
-	MimeType  string `json:"mime_type"` // optional
-	FileSize  int    `json:"file_size"` // optional
+	// FileID is an identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Duration of the audio in seconds as defined by sender
+	Duration int `json:"duration"`
+	// Performer of the audio as defined by sender or by audio tags
+	// optional
+	Performer string `json:"performer"`
+	// Title of the audio as defined by sender or by audio tags
+	// optional
+	Title string `json:"title"`
+	// MimeType of the file as defined by sender
+	// optional
+	MimeType string `json:"mime_type"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // Document contains information about a document.
 type Document struct {
-	FileID    string     `json:"file_id"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	FileName  string     `json:"file_name"` // optional
-	MimeType  string     `json:"mime_type"` // optional
-	FileSize  int        `json:"file_size"` // optional
+	// FileID is a identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Thumbnail document thumbnail as defined by sender
+	// optional
+	Thumbnail *PhotoSize `json:"thumb"`
+	// FileName original filename as defined by sender
+	// optional
+	FileName string `json:"file_name"`
+	// MimeType  of the file as defined by sender
+	// optional
+	MimeType string `json:"mime_type"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // Sticker contains information about a sticker.
 type Sticker struct {
-	FileUniqueID string     `json:"file_unique_id"`
-	FileID       string     `json:"file_id"`
-	Width        int        `json:"width"`
-	Height       int        `json:"height"`
-	Thumbnail    *PhotoSize `json:"thumb"`       // optional
-	Emoji        string     `json:"emoji"`       // optional
-	FileSize     int        `json:"file_size"`   // optional
-	SetName      string     `json:"set_name"`    // optional
-	IsAnimated   bool       `json:"is_animated"` // optional
+	// FileUniqueID is an unique identifier for this file,
+	// which is supposed to be the same over time and for different bots.
+	// Can't be used to download or reuse the file.
+	FileUniqueID string `json:"file_unique_id"`
+	// FileID is an identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Width sticker width
+	Width int `json:"width"`
+	// Height sticker height
+	Height int `json:"height"`
+	// Thumbnail sticker thumbnail in the .WEBP or .JPG format
+	// optional
+	Thumbnail *PhotoSize `json:"thumb"`
+	// Emoji associated with the sticker
+	// optional
+	Emoji string `json:"emoji"`
+	// FileSize
+	// optional
+	FileSize int `json:"file_size"`
+	// SetName of the sticker set to which the sticker belongs
+	// optional
+	SetName string `json:"set_name"`
+	// IsAnimated true, if the sticker is animated
+	// optional
+	IsAnimated bool `json:"is_animated"`
 }
 
 // StickerSet contains information about an sticker set.
 type StickerSet struct {
-	Name          string    `json:"name"`
-	Title         string    `json:"title"`
-	IsAnimated    bool      `json:"is_animated"`
-	ContainsMasks bool      `json:"contains_masks"`
-	Stickers      []Sticker `json:"stickers"`
+	// Name sticker set name
+	Name string `json:"name"`
+	// Title sticker set title
+	Title string `json:"title"`
+	// IsAnimated true, if the sticker set contains animated stickers
+	IsAnimated bool `json:"is_animated"`
+	// ContainsMasks true, if the sticker set contains masks
+	ContainsMasks bool `json:"contains_masks"`
+	// Stickers list of all set stickers
+	Stickers []Sticker `json:"stickers"`
 }
 
 // ChatAnimation contains information about an animation.
