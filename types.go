@@ -137,6 +137,7 @@ type Message struct {
 	// MessageID is a unique message identifier inside this chat
 	MessageID int `json:"message_id"`
 	// From is a sender, empty for messages sent to channels;
+	//
 	// optional
 	From *User `json:"from"`
 	// Date of the message was sent in Unix time
@@ -144,105 +145,136 @@ type Message struct {
 	// Chat is the conversation the message belongs to
 	Chat *Chat `json:"chat"`
 	// ForwardFrom for forwarded messages, sender of the original message;
+	//
 	// optional
 	ForwardFrom *User `json:"forward_from"`
 	// ForwardFromChat for messages forwarded from channels,
 	// information about the original channel;
+	//
 	// optional
 	ForwardFromChat *Chat `json:"forward_from_chat"`
 	// ForwardFromMessageID for messages forwarded from channels,
 	// identifier of the original message in the channel;
+	//
 	// optional
 	ForwardFromMessageID int `json:"forward_from_message_id"`
 	// ForwardDate for forwarded messages, date the original message was sent in Unix time;
+	//
 	// optional
 	ForwardDate int `json:"forward_date"`
 	// ReplyToMessage for replies, the original message.
 	// Note that the Message object in this field will not contain further ReplyToMessage fields
 	// even if it itself is a reply;
+	//
 	// optional
 	ReplyToMessage *Message `json:"reply_to_message"`
 	// ViaBot through which the message was sent;
+	//
 	// optional
 	ViaBot *User `json:"via_bot"`
 	// EditDate of the message was last edited in Unix time;
+	//
 	// optional
 	EditDate int `json:"edit_date"`
 	// MediaGroupID is the unique identifier of a media message group this message belongs to;
+	//
 	// optional
 	MediaGroupID string `json:"media_group_id"`
 	// AuthorSignature is the signature of the post author for messages in channels;
+	//
 	// optional
 	AuthorSignature string `json:"author_signature"`
 	// Text is for text messages, the actual UTF-8 text of the message, 0-4096 characters;
+	//
 	// optional
 	Text string `json:"text"`
 	// Entities is for text messages, special entities like usernames,
 	// URLs, bot commands, etc. that appear in the text;
+	//
 	// optional
 	Entities *[]MessageEntity `json:"entities"`
 	// CaptionEntities;
+	//
 	// optional
 	CaptionEntities *[]MessageEntity `json:"caption_entities"`
 	// Audio message is an audio file, information about the file;
+	//
 	// optional
 	Audio *Audio `json:"audio"`
 	// Document message is a general file, information about the file;
+	//
 	// optional
 	Document *Document `json:"document"`
 	// Animation message is an animation, information about the animation.
 	// For backward compatibility, when this field is set, the document field will also be set;
+	//
 	// optional
 	Animation *ChatAnimation `json:"animation"`
 	// Game message is a game, information about the game;
+	//
 	// optional
 	Game *Game `json:"game"`
 	// Photo message is a photo, available sizes of the photo;
+	//
 	// optional
 	Photo *[]PhotoSize `json:"photo"`
 	// Sticker message is a sticker, information about the sticker;
+	//
 	// optional
 	Sticker *Sticker `json:"sticker"`
 	// Video message is a video, information about the video;
+	//
 	// optional
 	Video *Video `json:"video"`
 	// VideoNote message is a video note, information about the video message;
+	//
 	// optional
 	VideoNote *VideoNote `json:"video_note"`
 	// Voice message is a voice message, information about the file;
+	//
 	// optional
 	Voice *Voice `json:"voice"`
 	// Caption for the animation, audio, document, photo, video or voice, 0-1024 characters;
+	//
 	// optional
 	Caption string `json:"caption"`
 	// Contact message is a shared contact, information about the contact;
+	//
 	// optional
 	Contact *Contact `json:"contact"`
 	// Location message is a shared location, information about the location;
+	//
 	// optional
 	Location *Location `json:"location"`
 	// Venue message is a venue, information about the venue.
 	// For backward compatibility, when this field is set, the location field will also be set;
+	//
 	// optional
 	Venue *Venue `json:"venue"`
 	// NewChatMembers that were added to the group or supergroup
 	// and information about them (the bot itself may be one of these members);
+	//
 	// optional
 	NewChatMembers *[]User `json:"new_chat_members"`
 	// LeftChatMember is a member was removed from the group,
 	// information about them (this member may be the bot itself);
+	//
 	// optional
 	LeftChatMember *User `json:"left_chat_member"`
 	// NewChatTitle is a chat title was changed to this value;
+	//
 	// optional
 	NewChatTitle string `json:"new_chat_title"`
 	// NewChatPhoto is a chat photo was change to this value;
+	//
 	// optional
 	NewChatPhoto *[]PhotoSize `json:"new_chat_photo"`
 	// DeleteChatPhoto is a service message: the chat photo was deleted;
+	//
 	// optional
 	DeleteChatPhoto bool `json:"delete_chat_photo"`
 	// GroupChatCreated is a service message: the group has been created;
+	//
 	// optional
 	GroupChatCreated bool `json:"group_chat_created"`
 	// SuperGroupChatCreated is a service message: the supergroup has been created.
@@ -250,6 +282,7 @@ type Message struct {
 	// because bot can't be a member of a supergroup when it is created.
 	// It can only be found in ReplyToMessage if someone replies to a very first message
 	// in a directly created supergroup;
+	//
 	// optional
 	SuperGroupChatCreated bool `json:"supergroup_chat_created"`
 	// ChannelChatCreated is a service message: the channel has been created.
@@ -257,6 +290,7 @@ type Message struct {
 	// because bot can't be a member of a channel when it is created.
 	// It can only be found in ReplyToMessage
 	// if someone replies to a very first message in a channel;
+	//
 	// optional
 	ChannelChatCreated bool `json:"channel_chat_created"`
 	// MigrateToChatID is the group has been migrated to a supergroup with the specified identifier.
@@ -264,6 +298,7 @@ type Message struct {
 	// may have difficulty/silent defects in interpreting it.
 	// But it is smaller than 52 bits, so a signed 64 bit integer
 	// or double-precision float type are safe for storing this identifier;
+	//
 	// optional
 	MigrateToChatID int64 `json:"migrate_to_chat_id"`
 	// MigrateFromChatID is the supergroup has been migrated from a group with the specified identifier.
@@ -271,21 +306,26 @@ type Message struct {
 	// may have difficulty/silent defects in interpreting it.
 	// But it is smaller than 52 bits, so a signed 64 bit integer
 	// or double-precision float type are safe for storing this identifier;
+	//
 	// optional
 	MigrateFromChatID int64 `json:"migrate_from_chat_id"`
 	// PinnedMessage is a specified message was pinned.
 	// Note that the Message object in this field will not contain further ReplyToMessage
 	// fields even if it is itself a reply;
+	//
 	// optional
 	PinnedMessage *Message `json:"pinned_message"`
 	// Invoice message is an invoice for a payment;
+	//
 	// optional
 	Invoice *Invoice `json:"invoice"`
 	// SuccessfulPayment message is a service message about a successful payment,
 	// information about the payment;
+	//
 	// optional
 	SuccessfulPayment *SuccessfulPayment `json:"successful_payment"`
 	// PassportData is a Telegram Passport data;
+	//
 	// optional
 	PassportData *PassportData `json:"passport_data,omitempty"`
 }
@@ -435,6 +475,7 @@ type PhotoSize struct {
 	// Height photo height
 	Height int `json:"height"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -446,15 +487,19 @@ type Audio struct {
 	// Duration of the audio in seconds as defined by sender
 	Duration int `json:"duration"`
 	// Performer of the audio as defined by sender or by audio tags
+	//
 	// optional
 	Performer string `json:"performer"`
 	// Title of the audio as defined by sender or by audio tags
+	//
 	// optional
 	Title string `json:"title"`
 	// MimeType of the file as defined by sender
+	//
 	// optional
 	MimeType string `json:"mime_type"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -464,15 +509,19 @@ type Document struct {
 	// FileID is a identifier for this file, which can be used to download or reuse the file
 	FileID string `json:"file_id"`
 	// Thumbnail document thumbnail as defined by sender
+	//
 	// optional
 	Thumbnail *PhotoSize `json:"thumb"`
 	// FileName original filename as defined by sender
+	//
 	// optional
 	FileName string `json:"file_name"`
 	// MimeType  of the file as defined by sender
+	//
 	// optional
 	MimeType string `json:"mime_type"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -490,18 +539,23 @@ type Sticker struct {
 	// Height sticker height
 	Height int `json:"height"`
 	// Thumbnail sticker thumbnail in the .WEBP or .JPG format
+	//
 	// optional
 	Thumbnail *PhotoSize `json:"thumb"`
 	// Emoji associated with the sticker
+	//
 	// optional
 	Emoji string `json:"emoji"`
 	// FileSize
+	//
 	// optional
 	FileSize int `json:"file_size"`
 	// SetName of the sticker set to which the sticker belongs
+	//
 	// optional
 	SetName string `json:"set_name"`
 	// IsAnimated true, if the sticker is animated
+	//
 	// optional
 	IsAnimated bool `json:"is_animated"`
 }
@@ -531,15 +585,19 @@ type ChatAnimation struct {
 	// Duration of the video in seconds as defined by sender
 	Duration int `json:"duration"`
 	// Thumbnail animation thumbnail as defined by sender
+	//
 	// optional
 	Thumbnail *PhotoSize `json:"thumb"`
 	// FileName original animation filename as defined by sender
+	//
 	// optional
 	FileName string `json:"file_name"`
 	// MimeType of the file as defined by sender
+	//
 	// optional
 	MimeType string `json:"mime_type"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -555,12 +613,15 @@ type Video struct {
 	// Duration of the video in seconds as defined by sender
 	Duration int `json:"duration"`
 	// Thumbnail video thumbnail
+	//
 	// optional
 	Thumbnail *PhotoSize `json:"thumb"`
 	// MimeType of a file as defined by sender
+	//
 	// optional
 	MimeType string `json:"mime_type"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -574,9 +635,11 @@ type VideoNote struct {
 	// Duration of the video in seconds as defined by sender
 	Duration int `json:"duration"`
 	// Thumbnail video thumbnail
+	//
 	// optional
 	Thumbnail *PhotoSize `json:"thumb"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -588,9 +651,11 @@ type Voice struct {
 	// Duration of the audio in seconds as defined by sender
 	Duration int `json:"duration"`
 	// MimeType of the file as defined by sender
+	//
 	// optional
 	MimeType string `json:"mime_type"`
 	// FileSize file size
+	//
 	// optional
 	FileSize int `json:"file_size"`
 }
@@ -604,9 +669,11 @@ type Contact struct {
 	// FirstName contact's first name
 	FirstName string `json:"first_name"`
 	// LastName contact's last name
+	//
 	// optional
 	LastName string `json:"last_name"`
 	// UserID contact's user identifier in Telegram
+	//
 	// optional
 	UserID int `json:"user_id"`
 }
@@ -628,6 +695,7 @@ type Venue struct {
 	// Address of the venue
 	Address string `json:"address"`
 	// FoursquareID foursquare identifier of the venue
+	//
 	// optional
 	FoursquareID string `json:"foursquare_id"`
 }
@@ -642,9 +710,16 @@ type UserProfilePhotos struct {
 
 // File contains information about a file to download from Telegram.
 type File struct {
-	FileID   string `json:"file_id"`
-	FileSize int    `json:"file_size"` // optional
-	FilePath string `json:"file_path"` // optional
+	// FileID identifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// FileSize file size, if known
+	//
+	// optional
+	FileSize int `json:"file_size"`
+	// FilePath file path
+	//
+	// optional
+	FilePath string `json:"file_path"`
 }
 
 // Link returns a full path to the download URL for a File.
@@ -656,17 +731,52 @@ func (f *File) Link(token string) string {
 
 // ReplyKeyboardMarkup allows the Bot to set a custom keyboard.
 type ReplyKeyboardMarkup struct {
-	Keyboard        [][]KeyboardButton `json:"keyboard"`
-	ResizeKeyboard  bool               `json:"resize_keyboard"`   // optional
-	OneTimeKeyboard bool               `json:"one_time_keyboard"` // optional
-	Selective       bool               `json:"selective"`         // optional
+	// Keyboard is an array of button rows, each represented by an Array of KeyboardButton objects
+	Keyboard [][]KeyboardButton `json:"keyboard"`
+	// ResizeKeyboard requests clients to resize the keyboard vertically for optimal fit
+	// (e.g., make the keyboard smaller if there are just two rows of buttons).
+	// Defaults to false, in which case the custom keyboard
+	// is always of the same height as the app's standard keyboard.
+	//
+	// optional
+	ResizeKeyboard bool `json:"resize_keyboard"`
+	// OneTimeKeyboard requests clients to hide the keyboard as soon as it's been used.
+	// The keyboard will still be available, but clients will automatically display
+	// the usual letter-keyboard in the chat – the user can press a special button
+	// in the input field to see the custom keyboard again.
+	// Defaults to false.
+	//
+	// optional
+	OneTimeKeyboard bool `json:"one_time_keyboard"`
+	// Selective use this parameter if you want to show the keyboard to specific users only.
+	// Targets:
+	//  1) users that are @mentioned in the text of the Message object;
+	//  2) if the bot's message is a reply (has Message.ReplyToMessage not nil), sender of the original message.
+	//
+	// Example: A user requests to change the bot's language,
+	// bot replies to the request with a keyboard to select the new language.
+	// Other users in the group don't see the keyboard.
+	//
+	// optional
+	Selective bool `json:"selective"`
 }
 
 // KeyboardButton is a button within a custom keyboard.
 type KeyboardButton struct {
-	Text            string `json:"text"`
-	RequestContact  bool   `json:"request_contact"`
-	RequestLocation bool   `json:"request_location"`
+	// Text of the button. If none of the optional fields are used,
+	// it will be sent as a message when the button is pressed.
+	Text string `json:"text"`
+	// RequestContact if True, the user's phone number will be sent
+	// as a contact when the button is pressed.
+	// Available in private chats only.
+	//
+	// optional
+	RequestContact bool `json:"request_contact"`
+	// RequestLocation if True, the user's current location will be sent when the button is pressed.
+	// Available in private chats only.
+	//
+	// optional
+	RequestLocation bool `json:"request_location"`
 }
 
 // ReplyKeyboardHide allows the Bot to hide a custom keyboard.
@@ -677,12 +787,27 @@ type ReplyKeyboardHide struct {
 
 // ReplyKeyboardRemove allows the Bot to hide a custom keyboard.
 type ReplyKeyboardRemove struct {
+	// RemoveKeyboard requests clients to remove the custom keyboard
+	// (user will not be able to summon this keyboard;
+	// if you want to hide the keyboard from sight but keep it accessible,
+	// use one_time_keyboard in ReplyKeyboardMarkup).
 	RemoveKeyboard bool `json:"remove_keyboard"`
-	Selective      bool `json:"selective"`
+	// Selective use this parameter if you want to remove the keyboard for specific users only.
+	// Targets:
+	//  1) users that are @mentioned in the text of the Message object;
+	//  2) if the bot's message is a reply (has Message.ReplyToMessage not nil), sender of the original message.
+	//
+	// Example: A user votes in a poll, bot returns confirmation message
+	// in reply to the vote and removes the keyboard for that user,
+	// while still showing the keyboard with poll options to users who haven't voted yet.
+	//
+	// optional
+	Selective bool `json:"selective"`
 }
 
 // InlineKeyboardMarkup is a custom keyboard presented for an inline bot.
 type InlineKeyboardMarkup struct {
+	// InlineKeyboard array of button rows, each represented by an Array of InlineKeyboardButton objects
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
@@ -694,13 +819,47 @@ type InlineKeyboardMarkup struct {
 //
 // CallbackGame, if set, MUST be first button in first row.
 type InlineKeyboardButton struct {
-	Text                         string        `json:"text"`
-	URL                          *string       `json:"url,omitempty"`                              // optional
-	CallbackData                 *string       `json:"callback_data,omitempty"`                    // optional
-	SwitchInlineQuery            *string       `json:"switch_inline_query,omitempty"`              // optional
-	SwitchInlineQueryCurrentChat *string       `json:"switch_inline_query_current_chat,omitempty"` // optional
-	CallbackGame                 *CallbackGame `json:"callback_game,omitempty"`                    // optional
-	Pay                          bool          `json:"pay,omitempty"`                              // optional
+	// Text label text on the button
+	Text string `json:"text"`
+	// URL HTTP or tg:// url to be opened when button is pressed.
+	//
+	// optional
+	URL *string `json:"url,omitempty"`
+	// CallbackData data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
+	//
+	// optional
+	CallbackData *string `json:"callback_data,omitempty"`
+	// SwitchInlineQuery if set, pressing the button will prompt the user to select one of their chats,
+	// open that chat and insert the bot's username and the specified inline query in the input field.
+	// Can be empty, in which case just the bot's username will be inserted.
+	//
+	// This offers an easy way for users to start using your bot
+	// in inline mode when they are currently in a private chat with it.
+	// Especially useful when combined with switch_pm… actions – in this case
+	// the user will be automatically returned to the chat they switched from,
+	// skipping the chat selection screen.
+	//
+	// optional
+	SwitchInlineQuery *string `json:"switch_inline_query,omitempty"`
+	// SwitchInlineQueryCurrentChat if set, pressing the button will insert the bot's username
+	// and the specified inline query in the current chat's input field.
+	// Can be empty, in which case only the bot's username will be inserted.
+	//
+	// This offers a quick way for the user to open your bot in inline mode
+	// in the same chat – good for selecting something from multiple options.
+	//
+	// optional
+	SwitchInlineQueryCurrentChat *string `json:"switch_inline_query_current_chat,omitempty"`
+	// CallbackGame description of the game that will be launched when the user presses the button.
+	//
+	// optional
+	CallbackGame *CallbackGame `json:"callback_game,omitempty"`
+	// Pay specify True, to send a Pay button.
+	//
+	// NOTE: This type of button must always be the first button in the first row.
+	//
+	// optional
+	Pay bool `json:"pay,omitempty"`
 }
 
 // CallbackQuery is data sent when a keyboard button with callback data
