@@ -1644,39 +1644,69 @@ type Invoice struct {
 	Currency string `json:"currency"`
 	// TotalAmount otal price in the smallest units of the currency (integer, not float/double).
 	// For example, for a price of US$ 1.45 pass amount = 145.
-	// See the exp parameter in currencies.json, it shows the number of digits
-	// past the decimal point for each currency (2 for the majority of currencies).
+	// See the exp parameter in currencies.json
+	// (https://core.telegram.org/bots/payments/currencies.json),
+	// it shows the number of digits past the decimal point
+	// for each currency (2 for the majority of currencies).
 	TotalAmount int `json:"total_amount"`
 }
 
 // LabeledPrice represents a portion of the price for goods or services.
 type LabeledPrice struct {
-	Label  string `json:"label"`
-	Amount int    `json:"amount"`
+	// Label portion label
+	Label string `json:"label"`
+	// Amount price of the product in the smallest units of the currency (integer, not float/double).
+	// For example, for a price of US$ 1.45 pass amount = 145.
+	// See the exp parameter in currencies.json
+	// (https://core.telegram.org/bots/payments/currencies.json),
+	// it shows the number of digits past the decimal point
+	// for each currency (2 for the majority of currencies).
+	Amount int `json:"amount"`
 }
 
 // ShippingAddress represents a shipping address.
 type ShippingAddress struct {
+	// CountryCode ISO 3166-1 alpha-2 country code
 	CountryCode string `json:"country_code"`
-	State       string `json:"state"`
-	City        string `json:"city"`
+	// State if applicable
+	State string `json:"state"`
+	// City city
+	City string `json:"city"`
+	// StreetLine1 fFirst line for the address
 	StreetLine1 string `json:"street_line1"`
+	// StreetLine2 second line for the address
 	StreetLine2 string `json:"street_line2"`
-	PostCode    string `json:"post_code"`
+	// PostCode address post code
+	PostCode string `json:"post_code"`
 }
 
 // OrderInfo represents information about an order.
 type OrderInfo struct {
-	Name            string           `json:"name,omitempty"`
-	PhoneNumber     string           `json:"phone_number,omitempty"`
-	Email           string           `json:"email,omitempty"`
+	// Name user name
+	//
+	// optional
+	Name string `json:"name,omitempty"`
+	// PhoneNumber user's phone number
+	//
+	// optional
+	PhoneNumber string `json:"phone_number,omitempty"`
+	// Email user email
+	//
+	// optional
+	Email string `json:"email,omitempty"`
+	// ShippingAddress user shipping address
+	//
+	// optional
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
 // ShippingOption represents one shipping option.
 type ShippingOption struct {
-	ID     string          `json:"id"`
-	Title  string          `json:"title"`
+	// ID shipping option identifier
+	ID string `json:"id"`
+	// Title option title
+	Title string `json:"title"`
+	// Prices list of price portions
 	Prices *[]LabeledPrice `json:"prices"`
 }
 
