@@ -98,8 +98,14 @@ type GroupChat struct {
 
 // ChatPhoto represents a chat photo.
 type ChatPhoto struct {
+	// SmallFileID is a file identifier of small (160x160) chat photo.
+	// This file_id can be used only for photo download and
+	// only for as long as the photo is not changed.
 	SmallFileID string `json:"small_file_id"`
-	BigFileID   string `json:"big_file_id"`
+	// BigFileID is a file identifier of big (640x640) chat photo.
+	// This file_id can be used only for photo download and
+	// only for as long as the photo is not changed.
+	BigFileID string `json:"big_file_id"`
 }
 
 // Chat contains information about the place a message was sent.
@@ -392,11 +398,34 @@ func (m *Message) CommandArguments() string {
 
 // MessageEntity contains information about data in a Message.
 type MessageEntity struct {
-	Type   string `json:"type"`
-	Offset int    `json:"offset"`
-	Length int    `json:"length"`
-	URL    string `json:"url"`  // optional
-	User   *User  `json:"user"` // optional
+	// Type of the entity.
+	// Can be:
+	//  “mention” (@username),
+	//  “hashtag” (#hashtag),
+	//  “cashtag” ($USD),
+	//  “bot_command” (/start@jobs_bot),
+	//  “url” (https://telegram.org),
+	//  “email” (do-not-reply@telegram.org),
+	//  “phone_number” (+1-212-555-0123),
+	//  “bold” (bold text),
+	//  “italic” (italic text),
+	//  “underline” (underlined text),
+	//  “strikethrough” (strikethrough text),
+	//  “code” (monowidth string),
+	//  “pre” (monowidth block),
+	//  “text_link” (for clickable text URLs),
+	//  “text_mention” (for users without usernames)
+	Type string `json:"type"`
+	// Offset in UTF-16 code units to the start of the entity
+	Offset int `json:"offset"`
+	// Length
+	Length int `json:"length"`
+	// URL for “text_link” only, url that will be opened after user taps on the text
+	// optional
+	URL string `json:"url"`
+	// User for “text_mention” only, the mentioned user
+	// optional
+	User *User `json:"user"`
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
