@@ -911,23 +911,95 @@ type ForceReply struct {
 
 // ChatMember is information about a member in a chat.
 type ChatMember struct {
-	User                  *User  `json:"user"`
-	Status                string `json:"status"`
-	CustomTitle           string `json:"custom_title,omitempty"`              // optional
-	UntilDate             int64  `json:"until_date,omitempty"`                // optional
-	CanBeEdited           bool   `json:"can_be_edited,omitempty"`             // optional
-	CanChangeInfo         bool   `json:"can_change_info,omitempty"`           // optional
-	CanPostMessages       bool   `json:"can_post_messages,omitempty"`         // optional
-	CanEditMessages       bool   `json:"can_edit_messages,omitempty"`         // optional
-	CanDeleteMessages     bool   `json:"can_delete_messages,omitempty"`       // optional
-	CanInviteUsers        bool   `json:"can_invite_users,omitempty"`          // optional
-	CanRestrictMembers    bool   `json:"can_restrict_members,omitempty"`      // optional
-	CanPinMessages        bool   `json:"can_pin_messages,omitempty"`          // optional
-	CanPromoteMembers     bool   `json:"can_promote_members,omitempty"`       // optional
-	CanSendMessages       bool   `json:"can_send_messages,omitempty"`         // optional
-	CanSendMediaMessages  bool   `json:"can_send_media_messages,omitempty"`   // optional
-	CanSendOtherMessages  bool   `json:"can_send_other_messages,omitempty"`   // optional
-	CanAddWebPagePreviews bool   `json:"can_add_web_page_previews,omitempty"` // optional
+	// User information about the user
+	User *User `json:"user"`
+	// Status the member's status in the chat.
+	// Can be
+	//  “creator”,
+	//  “administrator”,
+	//  “member”,
+	//  “restricted”,
+	//  “left” or
+	//  “kicked”
+	Status string `json:"status"`
+	// CustomTitle owner and administrators only. Custom title for this user
+	//
+	// optional
+	CustomTitle string `json:"custom_title,omitempty"`
+	// UntilDate restricted and kicked only.
+	// Date when restrictions will be lifted for this user;
+	// unix time.
+	//
+	// optional
+	UntilDate int64 `json:"until_date,omitempty"`
+	// CanBeEdited administrators only.
+	// True, if the bot is allowed to edit administrator privileges of that user.
+	//
+	// optional
+	CanBeEdited bool `json:"can_be_edited,omitempty"`
+	// CanChangeInfo administrators and restricted only.
+	// True, if the user is allowed to change the chat title, photo and other settings.
+	//
+	// optional
+	CanChangeInfo bool `json:"can_change_info,omitempty"`
+	// CanChangeInfo administrators only.
+	// True, if the administrator can post in the channel;
+	// channels only.
+	//
+	// optional
+	CanPostMessages bool `json:"can_post_messages,omitempty"`
+	// CanEditMessages administrators only.
+	// True, if the administrator can edit messages of other users and can pin messages;
+	// channels only.
+	//
+	// optional
+	CanEditMessages bool `json:"can_edit_messages,omitempty"`
+	// CanDeleteMessages administrators only.
+	// True, if the administrator can delete messages of other users.
+	//
+	// optional
+	CanDeleteMessages bool `json:"can_delete_messages,omitempty"`
+	// CanInviteUsers administrators and restricted only.
+	// True, if the user is allowed to invite new users to the chat.
+	//
+	// optional
+	CanInviteUsers bool `json:"can_invite_users,omitempty"`
+	// CanRestrictMembers administrators only.
+	// True, if the administrator can restrict, ban or unban chat members.
+	//
+	// optional
+	CanRestrictMembers bool `json:"can_restrict_members,omitempty"`
+	// CanPinMessages
+	//
+	// optional
+	CanPinMessages bool `json:"can_pin_messages,omitempty"`
+	// CanPromoteMembers administrators only.
+	// True, if the administrator can add new administrators
+	// with a subset of their own privileges or demote administrators that he has promoted,
+	// directly or indirectly (promoted by administrators that were appointed by the user).
+	//
+	// optional
+	CanPromoteMembers bool `json:"can_promote_members,omitempty"`
+	// CanSendMessages
+	//
+	// optional
+	CanSendMessages bool `json:"can_send_messages,omitempty"`
+	// CanSendMediaMessages restricted only.
+	// True, if the user is allowed to send text messages, contacts, locations and venues
+	//
+	// optional
+	CanSendMediaMessages bool `json:"can_send_media_messages,omitempty"`
+	// CanSendOtherMessages restricted only.
+	// True, if the user is allowed to send audios, documents,
+	// photos, videos, video notes and voice notes.
+	//
+	// optional
+	CanSendOtherMessages bool `json:"can_send_other_messages,omitempty"`
+	// CanAddWebPagePreviews restricted only.
+	// True, if the user is allowed to add web page previews to their messages.
+	//
+	// optional
+	CanAddWebPagePreviews bool `json:"can_add_web_page_previews,omitempty"`
 }
 
 // IsCreator returns if the ChatMember was the creator of the chat.
