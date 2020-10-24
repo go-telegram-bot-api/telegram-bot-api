@@ -49,14 +49,25 @@ func (ch UpdatesChannel) Clear() {
 	}
 }
 
-// User is a user on Telegram.
+// User represents a Telegram user or bot.
 type User struct {
-	ID           int    `json:"id"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`     // optional
-	UserName     string `json:"username"`      // optional
-	LanguageCode string `json:"language_code"` // optional
-	IsBot        bool   `json:"is_bot"`        // optional
+	// ID is a unique identifier for this user or bot
+	ID int `json:"id"`
+	// FirstName user's or bot's first name
+	FirstName string `json:"first_name"`
+	// LastName user's or bot's last name
+	// optional
+	LastName string `json:"last_name"`
+	// UserName user's or bot's username
+	// optional
+	UserName string `json:"username"`
+	// LanguageCode IETF language tag of the user's language
+	// more info: https://en.wikipedia.org/wiki/IETF_language_tag
+	// optional
+	LanguageCode string `json:"language_code"`
+	// IsBot true, if this user is a bot
+	// optional
+	IsBot bool `json:"is_bot"`
 }
 
 // String displays a simple text version of a user.
