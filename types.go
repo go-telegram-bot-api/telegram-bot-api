@@ -522,14 +522,26 @@ type StickerSet struct {
 
 // ChatAnimation contains information about an animation.
 type ChatAnimation struct {
-	FileID    string     `json:"file_id"`
-	Width     int        `json:"width"`
-	Height    int        `json:"height"`
-	Duration  int        `json:"duration"`
-	Thumbnail *PhotoSize `json:"thumb"`     // optional
-	FileName  string     `json:"file_name"` // optional
-	MimeType  string     `json:"mime_type"` // optional
-	FileSize  int        `json:"file_size"` // optional
+	// FileID odentifier for this file, which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+	// Width video width as defined by sender
+	Width int `json:"width"`
+	// Height video height as defined by sender
+	Height int `json:"height"`
+	// Duration of the video in seconds as defined by sender
+	Duration int `json:"duration"`
+	// Thumbnail animation thumbnail as defined by sender
+	// optional
+	Thumbnail *PhotoSize `json:"thumb"`
+	// FileName original animation filename as defined by sender
+	// optional
+	FileName string `json:"file_name"`
+	// MimeType of the file as defined by sender
+	// optional
+	MimeType string `json:"mime_type"`
+	// FileSize file size
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // Video contains information about a video.
