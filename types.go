@@ -849,30 +849,92 @@ type InlineQueryResultPhoto struct {
 
 // InlineQueryResultCachedPhoto is an inline query response with cached photo.
 type InlineQueryResultCachedPhoto struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	PhotoID             string                `json:"photo_file_id"` // required
-	Title               string                `json:"title"`
-	Description         string                `json:"description"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be photo.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// PhotoID a valid file identifier of the photo.
+	//
+	// required
+	PhotoID string `json:"photo_file_id"`
+	// Title for the result.
+	//
+	// optional
+	Title string `json:"title"`
+	// Description short description of the result.
+	//
+	// optional
+	Description string `json:"description"`
+	// Caption of the photo to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the photo caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the photo.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultGIF is an inline query response GIF.
 type InlineQueryResultGIF struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"gif_url"`   // required
-	ThumbURL            string                `json:"thumb_url"` // required
-	Width               int                   `json:"gif_width,omitempty"`
-	Height              int                   `json:"gif_height,omitempty"`
-	Duration            int                   `json:"gif_duration,omitempty"`
-	Title               string                `json:"title,omitempty"`
-	Caption             string                `json:"caption,omitempty"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be gif.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL for the GIF file. File size must not exceed 1MB.
+	//
+	// required
+	URL string `json:"gif_url"`
+	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
+	//
+	// required
+	ThumbURL string `json:"thumb_url"`
+	// Width of the GIF
+	//
+	// optional
+	Width int `json:"gif_width,omitempty"`
+	// Height of the GIF
+	//
+	// optional
+	Height int `json:"gif_height,omitempty"`
+	// Duration of the GIF
+	//
+	// optional
+	Duration int `json:"gif_duration,omitempty"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title,omitempty"`
+	// Caption of the GIF file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption,omitempty"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the GIF animation.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedGIF is an inline query response with cached gif.
