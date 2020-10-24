@@ -939,42 +939,125 @@ type InlineQueryResultGIF struct {
 
 // InlineQueryResultCachedGIF is an inline query response with cached gif.
 type InlineQueryResultCachedGIF struct {
-	Type                string                `json:"type"`        // required
-	ID                  string                `json:"id"`          // required
-	GifID               string                `json:"gif_file_id"` // required
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be gif.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// GifID a valid file identifier for the GIF file.
+	//
+	// required
+	GifID string `json:"gif_file_id"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Caption of the GIF file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the GIF animation.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
 type InlineQueryResultMPEG4GIF struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"mpeg4_url"` // required
-	Width               int                   `json:"mpeg4_width"`
-	Height              int                   `json:"mpeg4_height"`
-	Duration            int                   `json:"mpeg4_duration"`
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be mpeg4_gif
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL for the MP4 file. File size must not exceed 1MB
+	//
+	// required
+	URL string `json:"mpeg4_url"`
+	// Width video width
+	//
+	// optional
+	Width int `json:"mpeg4_width"`
+	// Height vVideo height
+	//
+	// optional
+	Height int `json:"mpeg4_height"`
+	// Duration video duration
+	//
+	// optional
+	Duration int `json:"mpeg4_duration"`
+	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
+	ThumbURL string `json:"thumb_url"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video animation
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedMpeg4Gif is an inline query response with cached
 // H.264/MPEG-4 AVC video without sound gif.
 type InlineQueryResultCachedMpeg4Gif struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	MGifID              string                `json:"mpeg4_file_id"` // required
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be mpeg4_gif
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// MGifID a valid file identifier for the MP4 file
+	//
+	// required
+	MGifID string `json:"mpeg4_file_id"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video animation.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultVideo is an inline query response video.
