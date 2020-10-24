@@ -1044,18 +1044,34 @@ type Game struct {
 
 // Animation is a GIF animation demonstrating the game.
 type Animation struct {
-	FileID   string    `json:"file_id"`
-	Thumb    PhotoSize `json:"thumb"`
-	FileName string    `json:"file_name"`
-	MimeType string    `json:"mime_type"`
-	FileSize int       `json:"file_size"`
+	// FileID identifier for this file, which can be used to download or reuse the file.
+	FileID string `json:"file_id"`
+	// Thumb animation thumbnail as defined by sender.
+	//
+	// optional
+	Thumb PhotoSize `json:"thumb"`
+	// FileName original animation filename as defined by sender.
+	//
+	// optional
+	FileName string `json:"file_name"`
+	// MimeType of the file as defined by sender.
+	//
+	// optional
+	MimeType string `json:"mime_type"`
+	// FileSize ile size
+	//
+	// optional
+	FileSize int `json:"file_size"`
 }
 
 // GameHighScore is a user's score and position on the leaderboard.
 type GameHighScore struct {
-	Position int  `json:"position"`
-	User     User `json:"user"`
-	Score    int  `json:"score"`
+	// Position in high score table for the game
+	Position int `json:"position"`
+	// User user
+	User User `json:"user"`
+	// Score score
+	Score int `json:"score"`
 }
 
 // CallbackGame is for starting a game in an inline keyboard button.
@@ -1063,12 +1079,27 @@ type CallbackGame struct{}
 
 // WebhookInfo is information about a currently set webhook.
 type WebhookInfo struct {
-	URL                  string `json:"url"`
-	HasCustomCertificate bool   `json:"has_custom_certificate"`
-	PendingUpdateCount   int    `json:"pending_update_count"`
-	LastErrorDate        int    `json:"last_error_date"`    // optional
-	LastErrorMessage     string `json:"last_error_message"` // optional
-	MaxConnections       int    `json:"max_connections"`    // optional
+	// URL webhook URL, may be empty if webhook is not set up.
+	URL string `json:"url"`
+	// HasCustomCertificate true, if a custom certificate was provided for webhook certificate checks.
+	HasCustomCertificate bool `json:"has_custom_certificate"`
+	// PendingUpdateCount number of updates awaiting delivery.
+	PendingUpdateCount int `json:"pending_update_count"`
+	// LastErrorDate unix time for the most recent error
+	// that happened when trying to deliver an update via webhook.
+	//
+	// optional
+	LastErrorDate int `json:"last_error_date"`
+	// LastErrorMessage error message in human-readable format for the most recent error
+	// that happened when trying to deliver an update via webhook.
+	//
+	// optional
+	LastErrorMessage string `json:"last_error_message"`
+	// MaxConnections maximum allowed number of simultaneous
+	// HTTPS connections to the webhook for update delivery.
+	//
+	// optional
+	MaxConnections int `json:"max_connections"`
 }
 
 // IsSet returns true if a webhook is currently set.
