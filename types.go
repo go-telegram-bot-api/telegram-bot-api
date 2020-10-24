@@ -1109,23 +1109,64 @@ func (info WebhookInfo) IsSet() bool {
 
 // InputMediaPhoto contains a photo for displaying as part of a media group.
 type InputMediaPhoto struct {
-	Type      string `json:"type"`
-	Media     string `json:"media"`
-	Caption   string `json:"caption"`
+	// Type of the result, must be photo.
+	Type string `json:"type"`
+	// Media file to send. Pass a file_id to send a file that
+	// exists on the Telegram servers (recommended),
+	// pass an HTTP URL for Telegram to get a file from the Internet,
+	// or pass “attach://<file_attach_name>” to upload a new one
+	// using multipart/form-data under <file_attach_name> name.
+	Media string `json:"media"`
+	// Caption of the photo to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the photo caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
 	ParseMode string `json:"parse_mode"`
 }
 
 // InputMediaVideo contains a video for displaying as part of a media group.
 type InputMediaVideo struct {
-	Type  string `json:"type"`
+	// Type of the result, must be video.
+	Type string `json:"type"`
+	// Media file to send. Pass a file_id to send a file
+	// that exists on the Telegram servers (recommended),
+	// pass an HTTP URL for Telegram to get a file from the Internet,
+	// or pass “attach://<file_attach_name>” to upload a new one
+	// using multipart/form-data under <file_attach_name> name.
 	Media string `json:"media"`
 	// thumb intentionally missing as it is not currently compatible
-	Caption           string `json:"caption"`
-	ParseMode         string `json:"parse_mode"`
-	Width             int    `json:"width"`
-	Height            int    `json:"height"`
-	Duration          int    `json:"duration"`
-	SupportsStreaming bool   `json:"supports_streaming"`
+
+	// Caption of the video to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// Width video width
+	//
+	// optional
+	Width int `json:"width"`
+	// Height video height
+	//
+	// optional
+	Height int `json:"height"`
+	// Duration video duration
+	//
+	// optional
+	Duration int `json:"duration"`
+	// SupportsStreaming pass True, if the uploaded video is suitable for streaming.
+	//
+	// optional
+	SupportsStreaming bool `json:"supports_streaming"`
 }
 
 // InlineQuery is a Query from Telegram for an inline request.
