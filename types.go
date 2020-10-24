@@ -1578,34 +1578,57 @@ type ChosenInlineResult struct {
 // InputTextMessageContent contains text for displaying
 // as an inline query result.
 type InputTextMessageContent struct {
-	Text                  string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	// Text of the message to be sent, 1-4096 characters
+	Text string `json:"message_text"`
+	// ParseMode mode for parsing entities in the message text.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// DisableWebPagePreview disables link previews for links in the sent message
+	//
+	// optional
+	DisableWebPagePreview bool `json:"disable_web_page_preview"`
 }
 
 // InputLocationMessageContent contains a location for displaying
 // as an inline query result.
 type InputLocationMessageContent struct {
-	Latitude  float64 `json:"latitude"`
+	// Latitude of the location in degrees
+	Latitude float64 `json:"latitude"`
+	// Longitude of the location in degrees
 	Longitude float64 `json:"longitude"`
 }
 
 // InputVenueMessageContent contains a venue for displaying
 // as an inline query result.
 type InputVenueMessageContent struct {
-	Latitude     float64 `json:"latitude"`
-	Longitude    float64 `json:"longitude"`
-	Title        string  `json:"title"`
-	Address      string  `json:"address"`
-	FoursquareID string  `json:"foursquare_id"`
+	// Latitude of the venue in degrees
+	Latitude float64 `json:"latitude"`
+	// Longitude of the venue in degrees
+	Longitude float64 `json:"longitude"`
+	// Title name of the venue
+	Title string `json:"title"`
+	// Address of the venue
+	Address string `json:"address"`
+	// FoursquareID foursquare identifier of the venue, if known
+	//
+	// optional
+	FoursquareID string `json:"foursquare_id"`
 }
 
 // InputContactMessageContent contains a contact for displaying
 // as an inline query result.
 type InputContactMessageContent struct {
+	// 	PhoneNumber contact's phone number
 	PhoneNumber string `json:"phone_number"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
+	// FirstName contact's first name
+	FirstName string `json:"first_name"`
+	// LastName contact's last name
+	//
+	// optional
+	LastName string `json:"last_name"`
 }
 
 // Invoice contains basic information about an invoice.
