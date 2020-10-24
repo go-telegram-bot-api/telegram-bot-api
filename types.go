@@ -1268,26 +1268,76 @@ type InlineQueryResultCachedAudio struct {
 
 // InlineQueryResultVoice is an inline query response voice.
 type InlineQueryResultVoice struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"voice_url"` // required
-	Title               string                `json:"title"`     // required
-	Caption             string                `json:"caption"`
-	Duration            int                   `json:"voice_duration"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be voice
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL for the voice recording
+	//
+	// required
+	URL string `json:"voice_url"`
+	// Title recording title
+	//
+	// required
+	Title string `json:"title"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Duration recording duration in seconds
+	//
+	// optional
+	Duration int `json:"voice_duration"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the voice recording
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedVoice is an inline query response with cached voice.
 type InlineQueryResultCachedVoice struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	VoiceID             string                `json:"voice_file_id"` // required
-	Title               string                `json:"title"`         // required
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be voice
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// VoiceID a valid file identifier for the voice message
+	//
+	// required
+	VoiceID string `json:"voice_file_id"`
+	// Title voice message title
+	//
+	// required
+	Title string `json:"title"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the voice message
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultDocument is an inline query response document.
