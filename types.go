@@ -1342,31 +1342,96 @@ type InlineQueryResultCachedVoice struct {
 
 // InlineQueryResultDocument is an inline query response document.
 type InlineQueryResultDocument struct {
-	Type                string                `json:"type"`  // required
-	ID                  string                `json:"id"`    // required
-	Title               string                `json:"title"` // required
-	Caption             string                `json:"caption"`
-	URL                 string                `json:"document_url"` // required
-	MimeType            string                `json:"mime_type"`    // required
-	Description         string                `json:"description"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be document
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// Title for the result
+	//
+	// required
+	Title string `json:"title"`
+	// Caption of the document to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// URL a valid url for the file
+	//
+	// required
+	URL string `json:"document_url"`
+	// MimeType of the content of the file, either “application/pdf” or “application/zip”
+	//
+	// required
+	MimeType string `json:"mime_type"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// ReplyMarkup nline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the file
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ThumbURL url of the thumbnail (jpeg only) for the file
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultCachedDocument is an inline query response with cached document.
 type InlineQueryResultCachedDocument struct {
-	Type                string                `json:"type"`             // required
-	ID                  string                `json:"id"`               // required
-	DocumentID          string                `json:"document_file_id"` // required
-	Title               string                `json:"title"`            // required
-	Caption             string                `json:"caption"`
-	Description         string                `json:"description"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be document
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// DocumentID a valid file identifier for the file
+	//
+	// required
+	DocumentID string `json:"document_file_id"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"` // required
+	// Caption of the document to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// ParseMode mode for parsing entities in the video caption.
+	//	// See formatting options for more details
+	//	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the file
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultLocation is an inline query response location.
