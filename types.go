@@ -36,33 +36,42 @@ type Update struct {
 	// of the next update will be chosen randomly instead of sequentially.
 	UpdateID int `json:"update_id"`
 	// Message new incoming message of any kind — text, photo, sticker, etc.
+	//
 	// optional
 	Message *Message `json:"message"`
 	// EditedMessage
+	//
 	// optional
 	EditedMessage *Message `json:"edited_message"`
 	// ChannelPost new version of a message that is known to the bot and was edited
+	//
 	// optional
 	ChannelPost *Message `json:"channel_post"`
 	// EditedChannelPost new incoming channel post of any kind — text, photo, sticker, etc.
+	//
 	// optional
 	EditedChannelPost *Message `json:"edited_channel_post"`
 	// InlineQuery new incoming inline query
+	//
 	// optional
 	InlineQuery *InlineQuery `json:"inline_query"`
 	// ChosenInlineResult is the result of an inline query
 	// that was chosen by a user and sent to their chat partner.
 	// Please see our documentation on the feedback collecting
 	// for details on how to enable these updates for your bot.
+	//
 	// optional
 	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result"`
 	// CallbackQuery new incoming callback query
+	//
 	// optional
 	CallbackQuery *CallbackQuery `json:"callback_query"`
 	// ShippingQuery new incoming shipping query. Only for invoices with flexible price
+	//
 	// optional
 	ShippingQuery *ShippingQuery `json:"shipping_query"`
 	// PreCheckoutQuery new incoming pre-checkout query. Contains full information about checkout
+	//
 	// optional
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
 }
@@ -84,16 +93,20 @@ type User struct {
 	// FirstName user's or bot's first name
 	FirstName string `json:"first_name"`
 	// LastName user's or bot's last name
+	//
 	// optional
 	LastName string `json:"last_name"`
 	// UserName user's or bot's username
+	//
 	// optional
 	UserName string `json:"username"`
 	// LanguageCode IETF language tag of the user's language
 	// more info: https://en.wikipedia.org/wiki/IETF_language_tag
+	//
 	// optional
 	LanguageCode string `json:"language_code"`
 	// IsBot true, if this user is a bot
+	//
 	// optional
 	IsBot bool `json:"is_bot"`
 }
@@ -143,31 +156,39 @@ type Chat struct {
 	// Type of chat, can be either “private”, “group”, “supergroup” or “channel”
 	Type string `json:"type"`
 	// Title for supergroups, channels and group chats
+	//
 	// optional
 	Title string `json:"title"`
 	// UserName for private chats, supergroups and channels if available
+	//
 	// optional
 	UserName string `json:"username"`
 	// FirstName of the other party in a private chat
+	//
 	// optional
 	FirstName string `json:"first_name"`
 	// LastName of the other party in a private chat
+	//
 	// optional
 	LastName string `json:"last_name"`
 	// AllMembersAreAdmins
+	//
 	// optional
 	AllMembersAreAdmins bool `json:"all_members_are_administrators"`
 	// Photo is a chat photo
 	Photo *ChatPhoto `json:"photo"`
 	// Description for groups, supergroups and channel chats
+	//
 	// optional
 	Description string `json:"description,omitempty"`
 	// InviteLink is a chat invite link, for groups, supergroups and channel chats.
 	// Each administrator in a chat generates their own invite links,
 	// so the bot must first generate the link using exportChatInviteLink
+	//
 	// optional
 	InviteLink string `json:"invite_link,omitempty"`
 	// PinnedMessage Pinned message, for groups, supergroups and channels
+	//
 	// optional
 	PinnedMessage *Message `json:"pinned_message"`
 }
@@ -449,9 +470,11 @@ type MessageEntity struct {
 	// Length
 	Length int `json:"length"`
 	// URL for “text_link” only, url that will be opened after user taps on the text
+	//
 	// optional
 	URL string `json:"url"`
 	// User for “text_mention” only, the mentioned user
+	//
 	// optional
 	User *User `json:"user"`
 }
