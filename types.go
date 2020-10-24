@@ -1436,41 +1436,123 @@ type InlineQueryResultCachedDocument struct {
 
 // InlineQueryResultLocation is an inline query response location.
 type InlineQueryResultLocation struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	Latitude            float64               `json:"latitude"`  // required
-	Longitude           float64               `json:"longitude"` // required
-	Title               string                `json:"title"`     // required
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be location
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes
+	//
+	// required
+	ID string `json:"id"`
+	// Latitude  of the location in degrees
+	//
+	// required
+	Latitude float64 `json:"latitude"`
+	// Longitude of the location in degrees
+	//
+	// required
+	Longitude float64 `json:"longitude"`
+	// Title of the location
+	//
+	// required
+	Title string `json:"title"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the location
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ThumbURL url of the thumbnail for the result
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultVenue is an inline query response venue.
 type InlineQueryResultVenue struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	Latitude            float64               `json:"latitude"`  // required
-	Longitude           float64               `json:"longitude"` // required
-	Title               string                `json:"title"`     // required
-	Address             string                `json:"address"`   // required
-	FoursquareID        string                `json:"foursquare_id"`
-	FoursquareType      string                `json:"foursquare_type"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be venue
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes
+	//
+	// required
+	ID string `json:"id"`
+	// Latitude of the venue location in degrees
+	//
+	// required
+	Latitude float64 `json:"latitude"`
+	// Longitude of the venue location in degrees
+	//
+	// required
+	Longitude float64 `json:"longitude"`
+	// Title of the venue
+	//
+	// required
+	Title string `json:"title"`
+	// Address of the venue
+	//
+	// required
+	Address string `json:"address"`
+	// FoursquareID foursquare identifier of the venue if known
+	//
+	// optional
+	FoursquareID string `json:"foursquare_id"`
+	// FoursquareType foursquare type of the venue, if known.
+	// (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+	//
+	// optional
+	FoursquareType string `json:"foursquare_type"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the venue
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ThumbURL url of the thumbnail for the result
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultGame is an inline query response game.
 type InlineQueryResultGame struct {
-	Type          string                `json:"type"`
-	ID            string                `json:"id"`
-	GameShortName string                `json:"game_short_name"`
-	ReplyMarkup   *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// Type of the result, must be game
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// GameShortName short name of the game
+	//
+	// required
+	GameShortName string `json:"game_short_name"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // ChosenInlineResult is an inline query result chosen by a User
