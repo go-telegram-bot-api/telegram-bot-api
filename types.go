@@ -1062,32 +1062,102 @@ type InlineQueryResultCachedMpeg4Gif struct {
 
 // InlineQueryResultVideo is an inline query response video.
 type InlineQueryResultVideo struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"video_url"` // required
-	MimeType            string                `json:"mime_type"` // required
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	Width               int                   `json:"video_width"`
-	Height              int                   `json:"video_height"`
-	Duration            int                   `json:"video_duration"`
-	Description         string                `json:"description"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be video
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid url for the embedded video player or video file
+	//
+	// required
+	URL string `json:"video_url"`
+	// MimeType of the content of video url, “text/html” or “video/mp4”
+	//
+	// required
+	MimeType string `json:"mime_type"`
+	//
+	// ThumbURL url of the thumbnail (jpeg only) for the video
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// Title for the result
+	//
+	// required
+	Title string `json:"title"`
+	// Caption of the video to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Width video width
+	//
+	// optional
+	Width int `json:"video_width"`
+	// Height video height
+	//
+	// optional
+	Height int `json:"video_height"`
+	// Duration video duration in seconds
+	//
+	// optional
+	Duration int `json:"video_duration"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video.
+	// This field is required if InlineQueryResultVideo is used to send
+	// an HTML-page as a result (e.g., a YouTube video).
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedVideo is an inline query response with cached video.
 type InlineQueryResultCachedVideo struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	VideoID             string                `json:"video_file_id"` // required
-	Title               string                `json:"title"`         // required
-	Description         string                `json:"description"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be video
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// VideoID a valid file identifier for the video file
+	//
+	// required
+	VideoID string `json:"video_file_id"`
+	// Title for the result
+	//
+	// required
+	Title string `json:"title"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// Caption of the video to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedSticker is an inline query response with cached sticker.
