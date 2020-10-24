@@ -865,20 +865,48 @@ type InlineKeyboardButton struct {
 // CallbackQuery is data sent when a keyboard button with callback data
 // is clicked.
 type CallbackQuery struct {
-	ID              string   `json:"id"`
-	From            *User    `json:"from"`
-	Message         *Message `json:"message"`           // optional
-	InlineMessageID string   `json:"inline_message_id"` // optional
-	ChatInstance    string   `json:"chat_instance"`
-	Data            string   `json:"data"`            // optional
-	GameShortName   string   `json:"game_short_name"` // optional
+	// ID unique identifier for this query
+	ID string `json:"id"`
+	// From sender
+	From *User `json:"from"`
+	// Message with the callback button that originated the query.
+	// Note that message content and message date will not be available if the message is too old.
+	//
+	// optional
+	Message *Message `json:"message"`
+	// InlineMessageID identifier of the message sent via the bot in inline mode, that originated the query.
+	//
+	// optional
+	//
+	InlineMessageID string `json:"inline_message_id"`
+	// ChatInstance global identifier, uniquely corresponding to the chat to which
+	// the message with the callback button was sent. Useful for high scores in games.
+	//
+	ChatInstance string `json:"chat_instance"`
+	// Data associated with the callback button. Be aware that
+	// a bad client can send arbitrary data in this field.
+	//
+	// optional
+	Data string `json:"data"`
+	// GameShortName short name of a Game to be returned, serves as the unique identifier for the game.
+	//
+	// optional
+	GameShortName string `json:"game_short_name"`
 }
 
 // ForceReply allows the Bot to have users directly reply to it without
 // additional interaction.
 type ForceReply struct {
+	// ForceReply shows reply interface to the user,
+	// as if they manually selected the bot's message and tapped 'Reply'.
 	ForceReply bool `json:"force_reply"`
-	Selective  bool `json:"selective"` // optional
+	// Selective use this parameter if you want to force reply from specific users only.
+	// Targets:
+	//  1) users that are @mentioned in the text of the Message object;
+	//  2) if the bot's message is a reply (has Message.ReplyToMessage not nil), sender of the original message.
+	//
+	// optional
+	Selective bool `json:"selective"`
 }
 
 // ChatMember is information about a member in a chat.
