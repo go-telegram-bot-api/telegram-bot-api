@@ -1740,21 +1740,42 @@ type SuccessfulPayment struct {
 
 // ShippingQuery contains information about an incoming shipping query.
 type ShippingQuery struct {
-	ID              string           `json:"id"`
-	From            *User            `json:"from"`
-	InvoicePayload  string           `json:"invoice_payload"`
+	// ID unique query identifier
+	ID string `json:"id"`
+	// From user who sent the query
+	From *User `json:"from"`
+	// InvoicePayload bot specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// ShippingAddress user specified shipping address
 	ShippingAddress *ShippingAddress `json:"shipping_address"`
 }
 
 // PreCheckoutQuery contains information about an incoming pre-checkout query.
 type PreCheckoutQuery struct {
-	ID               string     `json:"id"`
-	From             *User      `json:"from"`
-	Currency         string     `json:"currency"`
-	TotalAmount      int        `json:"total_amount"`
-	InvoicePayload   string     `json:"invoice_payload"`
-	ShippingOptionID string     `json:"shipping_option_id,omitempty"`
-	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
+	// ID unique query identifier
+	ID string `json:"id"`
+	// From user who sent the query
+	From *User `json:"from"`
+	// Currency three-letter ISO 4217 currency code
+	//	// (see https://core.telegram.org/bots/payments#supported-currencies)
+	Currency string `json:"currency"`
+	// TotalAmount total price in the smallest units of the currency (integer, not float/double).
+	//	// For example, for a price of US$ 1.45 pass amount = 145.
+	//	// See the exp parameter in currencies.json,
+	//	// (https://core.telegram.org/bots/payments/currencies.json)
+	//	// it shows the number of digits past the decimal point
+	//	// for each currency (2 for the majority of currencies).
+	TotalAmount int `json:"total_amount"`
+	// InvoicePayload bot specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// ShippingOptionID identifier of the shipping option chosen by the user
+	//
+	// optional
+	ShippingOptionID string `json:"shipping_option_id,omitempty"`
+	// OrderInfo order info provided by the user
+	//
+	// optional
+	OrderInfo *OrderInfo `json:"order_info,omitempty"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.
@@ -1770,6 +1791,9 @@ func (e Error) Error() string {
 
 // BotCommand represents a bot command.
 type BotCommand struct {
-	Command     string `json:"command"`
+	// Command text of the command, 1-32 characters.
+	// Can contain only lowercase English letters, digits and underscores.
+	Command string `json:"command"`
+	// Description of the command, 3-256 characters.
 	Description string `json:"description"`
 }
