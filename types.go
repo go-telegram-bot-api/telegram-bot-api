@@ -1162,37 +1162,108 @@ type InlineQueryResultCachedVideo struct {
 
 // InlineQueryResultCachedSticker is an inline query response with cached sticker.
 type InlineQueryResultCachedSticker struct {
-	Type                string                `json:"type"`            // required
-	ID                  string                `json:"id"`              // required
-	StickerID           string                `json:"sticker_file_id"` // required
-	Title               string                `json:"title"`           // required
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be sticker
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// StickerID a valid file identifier of the sticker
+	//
+	// required
+	StickerID string `json:"sticker_file_id"`
+	// Title is a title
+	Title string `json:"title"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the sticker
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultAudio is an inline query response audio.
 type InlineQueryResultAudio struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"audio_url"` // required
-	Title               string                `json:"title"`     // required
-	Caption             string                `json:"caption"`
-	Performer           string                `json:"performer"`
-	Duration            int                   `json:"audio_duration"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be audio
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid url for the audio file
+	//
+	// required
+	URL string `json:"audio_url"`
+	// Title is a title
+	//
+	// required
+	Title string `json:"title"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Performer is a performer
+	//
+	// optional
+	Performer string `json:"performer"`
+	// Duration audio duration in seconds
+	//
+	// optional
+	Duration int `json:"audio_duration"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the audio
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedAudio is an inline query response with cached audio.
 type InlineQueryResultCachedAudio struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	AudioID             string                `json:"audio_file_id"` // required
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be audio
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// AudioID a valid file identifier for the audio file
+	//
+	// required
+	AudioID string `json:"audio_file_id"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the audio
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultVoice is an inline query response voice.
