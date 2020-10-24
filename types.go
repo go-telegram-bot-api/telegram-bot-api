@@ -1557,11 +1557,22 @@ type InlineQueryResultGame struct {
 
 // ChosenInlineResult is an inline query result chosen by a User
 type ChosenInlineResult struct {
-	ResultID        string    `json:"result_id"`
-	From            *User     `json:"from"`
-	Location        *Location `json:"location"`
-	InlineMessageID string    `json:"inline_message_id"`
-	Query           string    `json:"query"`
+	// ResultID the unique identifier for the result that was chosen
+	ResultID string `json:"result_id"`
+	// From the user that chose the result
+	From *User `json:"from"`
+	// Location sender location, only for bots that require user location
+	//
+	// optional
+	Location *Location `json:"location"`
+	// InlineMessageID identifier of the sent inline message.
+	// Available only if there is an inline keyboard attached to the message.
+	// Will be also received in callback queries and can be used to edit the message.
+	//
+	// optional
+	InlineMessageID string `json:"inline_message_id"`
+	// Query the query that was used to obtain the result
+	Query string `json:"query"`
 }
 
 // InputTextMessageContent contains text for displaying
