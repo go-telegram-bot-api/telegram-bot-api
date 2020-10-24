@@ -1642,7 +1642,7 @@ type Invoice struct {
 	// Currency three-letter ISO 4217 currency code
 	// (see https://core.telegram.org/bots/payments#supported-currencies)
 	Currency string `json:"currency"`
-	// TotalAmount otal price in the smallest units of the currency (integer, not float/double).
+	// TotalAmount total price in the smallest units of the currency (integer, not float/double).
 	// For example, for a price of US$ 1.45 pass amount = 145.
 	// See the exp parameter in currencies.json
 	// (https://core.telegram.org/bots/payments/currencies.json),
@@ -1672,7 +1672,7 @@ type ShippingAddress struct {
 	State string `json:"state"`
 	// City city
 	City string `json:"city"`
-	// StreetLine1 fFirst line for the address
+	// StreetLine1 first line for the address
 	StreetLine1 string `json:"street_line1"`
 	// StreetLine2 second line for the address
 	StreetLine2 string `json:"street_line2"`
@@ -1712,13 +1712,30 @@ type ShippingOption struct {
 
 // SuccessfulPayment contains basic information about a successful payment.
 type SuccessfulPayment struct {
-	Currency                string     `json:"currency"`
-	TotalAmount             int        `json:"total_amount"`
-	InvoicePayload          string     `json:"invoice_payload"`
-	ShippingOptionID        string     `json:"shipping_option_id,omitempty"`
-	OrderInfo               *OrderInfo `json:"order_info,omitempty"`
-	TelegramPaymentChargeID string     `json:"telegram_payment_charge_id"`
-	ProviderPaymentChargeID string     `json:"provider_payment_charge_id"`
+	// Currency three-letter ISO 4217 currency code
+	// (see https://core.telegram.org/bots/payments#supported-currencies)
+	Currency string `json:"currency"`
+	// TotalAmount total price in the smallest units of the currency (integer, not float/double).
+	// For example, for a price of US$ 1.45 pass amount = 145.
+	// See the exp parameter in currencies.json,
+	// (https://core.telegram.org/bots/payments/currencies.json)
+	// it shows the number of digits past the decimal point
+	// for each currency (2 for the majority of currencies).
+	TotalAmount int `json:"total_amount"`
+	// InvoicePayload bot specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// ShippingOptionID identifier of the shipping option chosen by the user
+	//
+	// optional
+	ShippingOptionID string `json:"shipping_option_id,omitempty"`
+	// OrderInfo order info provided by the user
+	//
+	// optional
+	OrderInfo *OrderInfo `json:"order_info,omitempty"`
+	// TelegramPaymentChargeID telegram payment identifier
+	TelegramPaymentChargeID string `json:"telegram_payment_charge_id"`
+	// ProviderPaymentChargeID provider payment identifier
+	ProviderPaymentChargeID string `json:"provider_payment_charge_id"`
 }
 
 // ShippingQuery contains information about an incoming shipping query.
