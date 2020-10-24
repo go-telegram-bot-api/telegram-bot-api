@@ -613,22 +613,31 @@ type Contact struct {
 
 // Location contains information about a place.
 type Location struct {
+	// Longitude as defined by sender
 	Longitude float64 `json:"longitude"`
-	Latitude  float64 `json:"latitude"`
+	// Latitude as defined by sender
+	Latitude float64 `json:"latitude"`
 }
 
 // Venue contains information about a venue, including its Location.
 type Venue struct {
-	Location     Location `json:"location"`
-	Title        string   `json:"title"`
-	Address      string   `json:"address"`
-	FoursquareID string   `json:"foursquare_id"` // optional
+	// Location venue location
+	Location Location `json:"location"`
+	// Title name of the venue
+	Title string `json:"title"`
+	// Address of the venue
+	Address string `json:"address"`
+	// FoursquareID foursquare identifier of the venue
+	// optional
+	FoursquareID string `json:"foursquare_id"`
 }
 
 // UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
-	TotalCount int           `json:"total_count"`
-	Photos     [][]PhotoSize `json:"photos"`
+	// TotalCount total number of profile pictures the target user has
+	TotalCount int `json:"total_count"`
+	// Photos requested profile pictures (in up to 4 sizes each)
+	Photos [][]PhotoSize `json:"photos"`
 }
 
 // File contains information about a file to download from Telegram.
