@@ -417,10 +417,12 @@ func NewUpdate(offset int) UpdateConfig {
 //
 // link is the url parsable link you wish to get the updates.
 func NewWebhook(link string) WebhookConfig {
-	u, _ := url.Parse(link)
+	u, err := url.Parse(link)
+	// Cannot return error for compatibility reasons
 
 	return WebhookConfig{
 		URL: u,
+		err: err,
 	}
 }
 
@@ -429,11 +431,22 @@ func NewWebhook(link string) WebhookConfig {
 // link is the url you wish to get webhooks,
 // file contains a string to a file, FileReader, or FileBytes.
 func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
-	u, _ := url.Parse(link)
+	u, err := url.Parse(link)
+
+	switch file.(type) {
+	case string:
+	case FileReader:
+	case FileBytes:
+		break
+
+	default:
+		panic("NewWebhookWithCert: file is not a valid type")
+	}
 
 	return WebhookConfig{
 		URL:         u,
 		Certificate: file,
+		err:         err,
 	}
 }
 

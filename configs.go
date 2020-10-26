@@ -1013,6 +1013,15 @@ type WebhookConfig struct {
 	URL            *url.URL
 	Certificate    interface{}
 	MaxConnections int
+
+	// err is the error generated during the creation of the WebhookConfig
+	// use GetError to retrive
+	err error
+}
+
+// GetError returns the error inside WEbhookConfig, should be checked after creating
+func (info WebhookConfig) GetError() error {
+	return info.err
 }
 
 // FileBytes contains information about a set of bytes to upload
