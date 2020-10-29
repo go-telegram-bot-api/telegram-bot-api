@@ -1283,380 +1283,1052 @@ type InputMediaVideo struct {
 
 // InlineQuery is a Query from Telegram for an inline request.
 type InlineQuery struct {
-	ID       string    `json:"id"`
-	From     *User     `json:"from"`
-	Location *Location `json:"location"` // optional
-	Query    string    `json:"query"`
-	Offset   string    `json:"offset"`
+	// ID unique identifier for this query
+	ID string `json:"id"`
+	// From sender
+	From *User `json:"from"`
+	// Location sender location, only for bots that request user location.
+	//
+	// optional
+	Location *Location `json:"location"`
+	// Query text of the query (up to 256 characters).
+	Query string `json:"query"`
+	// Offset of the results to be returned, can be controlled by the bot.
+	Offset string `json:"offset"`
 }
 
 // InlineQueryResultArticle is an inline query response article.
 type InlineQueryResultArticle struct {
-	Type                string                `json:"type"`                            // required
-	ID                  string                `json:"id"`                              // required
-	Title               string                `json:"title"`                           // required
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"` // required
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	URL                 string                `json:"url"`
-	HideURL             bool                  `json:"hide_url"`
-	Description         string                `json:"description"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be article.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// Title of the result
+	//
+	// required
+	Title string `json:"title"`
+	// InputMessageContent content of the message to be sent.
+	//
+	// required
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ReplyMarkup Inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// URL of the result.
+	//
+	// optional
+	URL string `json:"url"`
+	// HideURL pass True, if you don't want the URL to be shown in the message.
+	//
+	// optional
+	HideURL bool `json:"hide_url"`
+	// Description short description of the result.
+	//
+	// optional
+	Description string `json:"description"`
+	// ThumbURL url of the thumbnail for the result
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultPhoto is an inline query response photo.
 type InlineQueryResultPhoto struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"photo_url"` // required
-	MimeType            string                `json:"mime_type"`
-	Width               int                   `json:"photo_width"`
-	Height              int                   `json:"photo_height"`
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Description         string                `json:"description"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be article.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL of the photo. Photo must be in jpeg format.
+	// Photo size must not exceed 5MB.
+	URL string `json:"photo_url"`
+	// MimeType
+	MimeType string `json:"mime_type"`
+	// Width of the photo
+	//
+	// optional
+	Width int `json:"photo_width"`
+	// Height of the photo
+	//
+	// optional
+	Height int `json:"photo_height"`
+	// ThumbURL url of the thumbnail for the photo.
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// Caption of the photo to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the photo caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the photo.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedPhoto is an inline query response with cached photo.
 type InlineQueryResultCachedPhoto struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	PhotoID             string                `json:"photo_file_id"` // required
-	Title               string                `json:"title"`
-	Description         string                `json:"description"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be photo.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// PhotoID a valid file identifier of the photo.
+	//
+	// required
+	PhotoID string `json:"photo_file_id"`
+	// Title for the result.
+	//
+	// optional
+	Title string `json:"title"`
+	// Description short description of the result.
+	//
+	// optional
+	Description string `json:"description"`
+	// Caption of the photo to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the photo caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the photo.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultGIF is an inline query response GIF.
 type InlineQueryResultGIF struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"gif_url"`   // required
-	ThumbURL            string                `json:"thumb_url"` // required
-	Width               int                   `json:"gif_width,omitempty"`
-	Height              int                   `json:"gif_height,omitempty"`
-	Duration            int                   `json:"gif_duration,omitempty"`
-	Title               string                `json:"title,omitempty"`
-	Caption             string                `json:"caption,omitempty"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be gif.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL for the GIF file. File size must not exceed 1MB.
+	//
+	// required
+	URL string `json:"gif_url"`
+	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
+	//
+	// required
+	ThumbURL string `json:"thumb_url"`
+	// Width of the GIF
+	//
+	// optional
+	Width int `json:"gif_width,omitempty"`
+	// Height of the GIF
+	//
+	// optional
+	Height int `json:"gif_height,omitempty"`
+	// Duration of the GIF
+	//
+	// optional
+	Duration int `json:"gif_duration,omitempty"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title,omitempty"`
+	// Caption of the GIF file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption,omitempty"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the GIF animation.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedGIF is an inline query response with cached gif.
 type InlineQueryResultCachedGIF struct {
-	Type                string                `json:"type"`        // required
-	ID                  string                `json:"id"`          // required
-	GifID               string                `json:"gif_file_id"` // required
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be gif.
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes.
+	//
+	// required
+	ID string `json:"id"`
+	// GifID a valid file identifier for the GIF file.
+	//
+	// required
+	GifID string `json:"gif_file_id"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Caption of the GIF file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the GIF animation.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
 type InlineQueryResultMPEG4GIF struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"mpeg4_url"` // required
-	Width               int                   `json:"mpeg4_width"`
-	Height              int                   `json:"mpeg4_height"`
-	Duration            int                   `json:"mpeg4_duration"`
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be mpeg4_gif
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL for the MP4 file. File size must not exceed 1MB
+	//
+	// required
+	URL string `json:"mpeg4_url"`
+	// Width video width
+	//
+	// optional
+	Width int `json:"mpeg4_width"`
+	// Height vVideo height
+	//
+	// optional
+	Height int `json:"mpeg4_height"`
+	// Duration video duration
+	//
+	// optional
+	Duration int `json:"mpeg4_duration"`
+	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
+	ThumbURL string `json:"thumb_url"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video animation
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedMpeg4Gif is an inline query response with cached
 // H.264/MPEG-4 AVC video without sound gif.
 type InlineQueryResultCachedMpeg4Gif struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	MGifID              string                `json:"mpeg4_file_id"` // required
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be mpeg4_gif
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// MGifID a valid file identifier for the MP4 file
+	//
+	// required
+	MGifID string `json:"mpeg4_file_id"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"`
+	// Caption of the MPEG-4 file to be sent, 0-1024 characters after entities parsing.
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message.
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video animation.
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultVideo is an inline query response video.
 type InlineQueryResultVideo struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"video_url"` // required
-	MimeType            string                `json:"mime_type"` // required
-	ThumbURL            string                `json:"thumb_url"`
-	Title               string                `json:"title"`
-	Caption             string                `json:"caption"`
-	Width               int                   `json:"video_width"`
-	Height              int                   `json:"video_height"`
-	Duration            int                   `json:"video_duration"`
-	Description         string                `json:"description"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be video
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid url for the embedded video player or video file
+	//
+	// required
+	URL string `json:"video_url"`
+	// MimeType of the content of video url, “text/html” or “video/mp4”
+	//
+	// required
+	MimeType string `json:"mime_type"`
+	//
+	// ThumbURL url of the thumbnail (jpeg only) for the video
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// Title for the result
+	//
+	// required
+	Title string `json:"title"`
+	// Caption of the video to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Width video width
+	//
+	// optional
+	Width int `json:"video_width"`
+	// Height video height
+	//
+	// optional
+	Height int `json:"video_height"`
+	// Duration video duration in seconds
+	//
+	// optional
+	Duration int `json:"video_duration"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video.
+	// This field is required if InlineQueryResultVideo is used to send
+	// an HTML-page as a result (e.g., a YouTube video).
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedVideo is an inline query response with cached video.
 type InlineQueryResultCachedVideo struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	VideoID             string                `json:"video_file_id"` // required
-	Title               string                `json:"title"`         // required
-	Description         string                `json:"description"`
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be video
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// VideoID a valid file identifier for the video file
+	//
+	// required
+	VideoID string `json:"video_file_id"`
+	// Title for the result
+	//
+	// required
+	Title string `json:"title"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// Caption of the video to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the video
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedSticker is an inline query response with cached sticker.
 type InlineQueryResultCachedSticker struct {
-	Type                string                `json:"type"`            // required
-	ID                  string                `json:"id"`              // required
-	StickerID           string                `json:"sticker_file_id"` // required
-	Title               string                `json:"title"`           // required
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be sticker
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// StickerID a valid file identifier of the sticker
+	//
+	// required
+	StickerID string `json:"sticker_file_id"`
+	// Title is a title
+	Title string `json:"title"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the sticker
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultAudio is an inline query response audio.
 type InlineQueryResultAudio struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"audio_url"` // required
-	Title               string                `json:"title"`     // required
-	Caption             string                `json:"caption"`
-	Performer           string                `json:"performer"`
-	Duration            int                   `json:"audio_duration"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be audio
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid url for the audio file
+	//
+	// required
+	URL string `json:"audio_url"`
+	// Title is a title
+	//
+	// required
+	Title string `json:"title"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Performer is a performer
+	//
+	// optional
+	Performer string `json:"performer"`
+	// Duration audio duration in seconds
+	//
+	// optional
+	Duration int `json:"audio_duration"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the audio
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedAudio is an inline query response with cached audio.
 type InlineQueryResultCachedAudio struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	AudioID             string                `json:"audio_file_id"` // required
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be audio
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// AudioID a valid file identifier for the audio file
+	//
+	// required
+	AudioID string `json:"audio_file_id"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the audio
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultVoice is an inline query response voice.
 type InlineQueryResultVoice struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	URL                 string                `json:"voice_url"` // required
-	Title               string                `json:"title"`     // required
-	Caption             string                `json:"caption"`
-	Duration            int                   `json:"voice_duration"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be voice
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// URL a valid URL for the voice recording
+	//
+	// required
+	URL string `json:"voice_url"`
+	// Title recording title
+	//
+	// required
+	Title string `json:"title"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Duration recording duration in seconds
+	//
+	// optional
+	Duration int `json:"voice_duration"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the voice recording
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultCachedVoice is an inline query response with cached voice.
 type InlineQueryResultCachedVoice struct {
-	Type                string                `json:"type"`          // required
-	ID                  string                `json:"id"`            // required
-	VoiceID             string                `json:"voice_file_id"` // required
-	Title               string                `json:"title"`         // required
-	Caption             string                `json:"caption"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be voice
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// VoiceID a valid file identifier for the voice message
+	//
+	// required
+	VoiceID string `json:"voice_file_id"`
+	// Title voice message title
+	//
+	// required
+	Title string `json:"title"`
+	// Caption 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the voice message
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultDocument is an inline query response document.
 type InlineQueryResultDocument struct {
-	Type                string                `json:"type"`  // required
-	ID                  string                `json:"id"`    // required
-	Title               string                `json:"title"` // required
-	Caption             string                `json:"caption"`
-	URL                 string                `json:"document_url"` // required
-	MimeType            string                `json:"mime_type"`    // required
-	Description         string                `json:"description"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be document
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// Title for the result
+	//
+	// required
+	Title string `json:"title"`
+	// Caption of the document to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// URL a valid url for the file
+	//
+	// required
+	URL string `json:"document_url"`
+	// MimeType of the content of the file, either “application/pdf” or “application/zip”
+	//
+	// required
+	MimeType string `json:"mime_type"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// ReplyMarkup nline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the file
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ThumbURL url of the thumbnail (jpeg only) for the file
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultCachedDocument is an inline query response with cached document.
 type InlineQueryResultCachedDocument struct {
-	Type                string                `json:"type"`             // required
-	ID                  string                `json:"id"`               // required
-	DocumentID          string                `json:"document_file_id"` // required
-	Title               string                `json:"title"`            // required
-	Caption             string                `json:"caption"`
-	Description         string                `json:"description"`
-	ParseMode           string                `json:"parse_mode"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
+	// Type of the result, must be document
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// DocumentID a valid file identifier for the file
+	//
+	// required
+	DocumentID string `json:"document_file_id"`
+	// Title for the result
+	//
+	// optional
+	Title string `json:"title"` // required
+	// Caption of the document to be sent, 0-1024 characters after entities parsing
+	//
+	// optional
+	Caption string `json:"caption"`
+	// Description short description of the result
+	//
+	// optional
+	Description string `json:"description"`
+	// ParseMode mode for parsing entities in the video caption.
+	//	// See formatting options for more details
+	//	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the file
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
 // InlineQueryResultLocation is an inline query response location.
 type InlineQueryResultLocation struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	Latitude            float64               `json:"latitude"`  // required
-	Longitude           float64               `json:"longitude"` // required
-	Title               string                `json:"title"`     // required
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be location
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes
+	//
+	// required
+	ID string `json:"id"`
+	// Latitude  of the location in degrees
+	//
+	// required
+	Latitude float64 `json:"latitude"`
+	// Longitude of the location in degrees
+	//
+	// required
+	Longitude float64 `json:"longitude"`
+	// Title of the location
+	//
+	// required
+	Title string `json:"title"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the location
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ThumbURL url of the thumbnail for the result
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultVenue is an inline query response venue.
 type InlineQueryResultVenue struct {
-	Type                string                `json:"type"`      // required
-	ID                  string                `json:"id"`        // required
-	Latitude            float64               `json:"latitude"`  // required
-	Longitude           float64               `json:"longitude"` // required
-	Title               string                `json:"title"`     // required
-	Address             string                `json:"address"`   // required
-	FoursquareID        string                `json:"foursquare_id"`
-	FoursquareType      string                `json:"foursquare_type"`
-	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	// Type of the result, must be venue
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 Bytes
+	//
+	// required
+	ID string `json:"id"`
+	// Latitude of the venue location in degrees
+	//
+	// required
+	Latitude float64 `json:"latitude"`
+	// Longitude of the venue location in degrees
+	//
+	// required
+	Longitude float64 `json:"longitude"`
+	// Title of the venue
+	//
+	// required
+	Title string `json:"title"`
+	// Address of the venue
+	//
+	// required
+	Address string `json:"address"`
+	// FoursquareID foursquare identifier of the venue if known
+	//
+	// optional
+	FoursquareID string `json:"foursquare_id"`
+	// FoursquareType foursquare type of the venue, if known.
+	// (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+	//
+	// optional
+	FoursquareType string `json:"foursquare_type"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent content of the message to be sent instead of the venue
+	//
+	// optional
+	InputMessageContent interface{} `json:"input_message_content,omitempty"`
+	// ThumbURL url of the thumbnail for the result
+	//
+	// optional
+	ThumbURL string `json:"thumb_url"`
+	// ThumbWidth thumbnail width
+	//
+	// optional
+	ThumbWidth int `json:"thumb_width"`
+	// ThumbHeight thumbnail height
+	//
+	// optional
+	ThumbHeight int `json:"thumb_height"`
 }
 
 // InlineQueryResultGame is an inline query response game.
 type InlineQueryResultGame struct {
-	Type          string                `json:"type"`
-	ID            string                `json:"id"`
-	GameShortName string                `json:"game_short_name"`
-	ReplyMarkup   *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// Type of the result, must be game
+	//
+	// required
+	Type string `json:"type"`
+	// ID unique identifier for this result, 1-64 bytes
+	//
+	// required
+	ID string `json:"id"`
+	// GameShortName short name of the game
+	//
+	// required
+	GameShortName string `json:"game_short_name"`
+	// ReplyMarkup inline keyboard attached to the message
+	//
+	// optional
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // ChosenInlineResult is an inline query result chosen by a User
 type ChosenInlineResult struct {
-	ResultID        string    `json:"result_id"`
-	From            *User     `json:"from"`
-	Location        *Location `json:"location"`
-	InlineMessageID string    `json:"inline_message_id"`
-	Query           string    `json:"query"`
+	// ResultID the unique identifier for the result that was chosen
+	ResultID string `json:"result_id"`
+	// From the user that chose the result
+	From *User `json:"from"`
+	// Location sender location, only for bots that require user location
+	//
+	// optional
+	Location *Location `json:"location"`
+	// InlineMessageID identifier of the sent inline message.
+	// Available only if there is an inline keyboard attached to the message.
+	// Will be also received in callback queries and can be used to edit the message.
+	//
+	// optional
+	InlineMessageID string `json:"inline_message_id"`
+	// Query the query that was used to obtain the result
+	Query string `json:"query"`
 }
 
 // InputTextMessageContent contains text for displaying
 // as an inline query result.
 type InputTextMessageContent struct {
-	Text                  string `json:"message_text"`
-	ParseMode             string `json:"parse_mode"`
-	DisableWebPagePreview bool   `json:"disable_web_page_preview"`
+	// Text of the message to be sent, 1-4096 characters
+	Text string `json:"message_text"`
+	// ParseMode mode for parsing entities in the message text.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// DisableWebPagePreview disables link previews for links in the sent message
+	//
+	// optional
+	DisableWebPagePreview bool `json:"disable_web_page_preview"`
 }
 
 // InputLocationMessageContent contains a location for displaying
 // as an inline query result.
 type InputLocationMessageContent struct {
-	Latitude  float64 `json:"latitude"`
+	// Latitude of the location in degrees
+	Latitude float64 `json:"latitude"`
+	// Longitude of the location in degrees
 	Longitude float64 `json:"longitude"`
 }
 
 // InputVenueMessageContent contains a venue for displaying
 // as an inline query result.
 type InputVenueMessageContent struct {
-	Latitude     float64 `json:"latitude"`
-	Longitude    float64 `json:"longitude"`
-	Title        string  `json:"title"`
-	Address      string  `json:"address"`
-	FoursquareID string  `json:"foursquare_id"`
+	// Latitude of the venue in degrees
+	Latitude float64 `json:"latitude"`
+	// Longitude of the venue in degrees
+	Longitude float64 `json:"longitude"`
+	// Title name of the venue
+	Title string `json:"title"`
+	// Address of the venue
+	Address string `json:"address"`
+	// FoursquareID foursquare identifier of the venue, if known
+	//
+	// optional
+	FoursquareID string `json:"foursquare_id"`
 }
 
 // InputContactMessageContent contains a contact for displaying
 // as an inline query result.
 type InputContactMessageContent struct {
+	// 	PhoneNumber contact's phone number
 	PhoneNumber string `json:"phone_number"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
+	// FirstName contact's first name
+	FirstName string `json:"first_name"`
+	// LastName contact's last name
+	//
+	// optional
+	LastName string `json:"last_name"`
 }
 
 // Invoice contains basic information about an invoice.
 type Invoice struct {
-	Title          string `json:"title"`
-	Description    string `json:"description"`
+	// Title product name
+	Title string `json:"title"`
+	// Description product description
+	Description string `json:"description"`
+	// StartParameter unique bot deep-linking parameter that can be used to generate this invoice
 	StartParameter string `json:"start_parameter"`
-	Currency       string `json:"currency"`
-	TotalAmount    int    `json:"total_amount"`
+	// Currency three-letter ISO 4217 currency code
+	// (see https://core.telegram.org/bots/payments#supported-currencies)
+	Currency string `json:"currency"`
+	// TotalAmount total price in the smallest units of the currency (integer, not float/double).
+	// For example, for a price of US$ 1.45 pass amount = 145.
+	// See the exp parameter in currencies.json
+	// (https://core.telegram.org/bots/payments/currencies.json),
+	// it shows the number of digits past the decimal point
+	// for each currency (2 for the majority of currencies).
+	TotalAmount int `json:"total_amount"`
 }
 
 // LabeledPrice represents a portion of the price for goods or services.
 type LabeledPrice struct {
-	Label  string `json:"label"`
-	Amount int    `json:"amount"`
+	// Label portion label
+	Label string `json:"label"`
+	// Amount price of the product in the smallest units of the currency (integer, not float/double).
+	// For example, for a price of US$ 1.45 pass amount = 145.
+	// See the exp parameter in currencies.json
+	// (https://core.telegram.org/bots/payments/currencies.json),
+	// it shows the number of digits past the decimal point
+	// for each currency (2 for the majority of currencies).
+	Amount int `json:"amount"`
 }
 
 // ShippingAddress represents a shipping address.
 type ShippingAddress struct {
+	// CountryCode ISO 3166-1 alpha-2 country code
 	CountryCode string `json:"country_code"`
-	State       string `json:"state"`
-	City        string `json:"city"`
+	// State if applicable
+	State string `json:"state"`
+	// City city
+	City string `json:"city"`
+	// StreetLine1 first line for the address
 	StreetLine1 string `json:"street_line1"`
+	// StreetLine2 second line for the address
 	StreetLine2 string `json:"street_line2"`
-	PostCode    string `json:"post_code"`
+	// PostCode address post code
+	PostCode string `json:"post_code"`
 }
 
 // OrderInfo represents information about an order.
 type OrderInfo struct {
-	Name            string           `json:"name,omitempty"`
-	PhoneNumber     string           `json:"phone_number,omitempty"`
-	Email           string           `json:"email,omitempty"`
+	// Name user name
+	//
+	// optional
+	Name string `json:"name,omitempty"`
+	// PhoneNumber user's phone number
+	//
+	// optional
+	PhoneNumber string `json:"phone_number,omitempty"`
+	// Email user email
+	//
+	// optional
+	Email string `json:"email,omitempty"`
+	// ShippingAddress user shipping address
+	//
+	// optional
 	ShippingAddress *ShippingAddress `json:"shipping_address,omitempty"`
 }
 
 // ShippingOption represents one shipping option.
 type ShippingOption struct {
-	ID     string          `json:"id"`
-	Title  string          `json:"title"`
+	// ID shipping option identifier
+	ID string `json:"id"`
+	// Title option title
+	Title string `json:"title"`
+	// Prices list of price portions
 	Prices *[]LabeledPrice `json:"prices"`
 }
 
 // SuccessfulPayment contains basic information about a successful payment.
 type SuccessfulPayment struct {
-	Currency                string     `json:"currency"`
-	TotalAmount             int        `json:"total_amount"`
-	InvoicePayload          string     `json:"invoice_payload"`
-	ShippingOptionID        string     `json:"shipping_option_id,omitempty"`
-	OrderInfo               *OrderInfo `json:"order_info,omitempty"`
-	TelegramPaymentChargeID string     `json:"telegram_payment_charge_id"`
-	ProviderPaymentChargeID string     `json:"provider_payment_charge_id"`
+	// Currency three-letter ISO 4217 currency code
+	// (see https://core.telegram.org/bots/payments#supported-currencies)
+	Currency string `json:"currency"`
+	// TotalAmount total price in the smallest units of the currency (integer, not float/double).
+	// For example, for a price of US$ 1.45 pass amount = 145.
+	// See the exp parameter in currencies.json,
+	// (https://core.telegram.org/bots/payments/currencies.json)
+	// it shows the number of digits past the decimal point
+	// for each currency (2 for the majority of currencies).
+	TotalAmount int `json:"total_amount"`
+	// InvoicePayload bot specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// ShippingOptionID identifier of the shipping option chosen by the user
+	//
+	// optional
+	ShippingOptionID string `json:"shipping_option_id,omitempty"`
+	// OrderInfo order info provided by the user
+	//
+	// optional
+	OrderInfo *OrderInfo `json:"order_info,omitempty"`
+	// TelegramPaymentChargeID telegram payment identifier
+	TelegramPaymentChargeID string `json:"telegram_payment_charge_id"`
+	// ProviderPaymentChargeID provider payment identifier
+	ProviderPaymentChargeID string `json:"provider_payment_charge_id"`
 }
 
 // ShippingQuery contains information about an incoming shipping query.
 type ShippingQuery struct {
-	ID              string           `json:"id"`
-	From            *User            `json:"from"`
-	InvoicePayload  string           `json:"invoice_payload"`
+	// ID unique query identifier
+	ID string `json:"id"`
+	// From user who sent the query
+	From *User `json:"from"`
+	// InvoicePayload bot specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// ShippingAddress user specified shipping address
 	ShippingAddress *ShippingAddress `json:"shipping_address"`
 }
 
 // PreCheckoutQuery contains information about an incoming pre-checkout query.
 type PreCheckoutQuery struct {
-	ID               string     `json:"id"`
-	From             *User      `json:"from"`
-	Currency         string     `json:"currency"`
-	TotalAmount      int        `json:"total_amount"`
-	InvoicePayload   string     `json:"invoice_payload"`
-	ShippingOptionID string     `json:"shipping_option_id,omitempty"`
-	OrderInfo        *OrderInfo `json:"order_info,omitempty"`
+	// ID unique query identifier
+	ID string `json:"id"`
+	// From user who sent the query
+	From *User `json:"from"`
+	// Currency three-letter ISO 4217 currency code
+	//	// (see https://core.telegram.org/bots/payments#supported-currencies)
+	Currency string `json:"currency"`
+	// TotalAmount total price in the smallest units of the currency (integer, not float/double).
+	//	// For example, for a price of US$ 1.45 pass amount = 145.
+	//	// See the exp parameter in currencies.json,
+	//	// (https://core.telegram.org/bots/payments/currencies.json)
+	//	// it shows the number of digits past the decimal point
+	//	// for each currency (2 for the majority of currencies).
+	TotalAmount int `json:"total_amount"`
+	// InvoicePayload bot specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+	// ShippingOptionID identifier of the shipping option chosen by the user
+	//
+	// optional
+	ShippingOptionID string `json:"shipping_option_id,omitempty"`
+	// OrderInfo order info provided by the user
+	//
+	// optional
+	OrderInfo *OrderInfo `json:"order_info,omitempty"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.
@@ -1672,6 +2344,9 @@ func (e Error) Error() string {
 
 // BotCommand represents a bot command.
 type BotCommand struct {
-	Command     string `json:"command"`
+	// Command text of the command, 1-32 characters.
+	// Can contain only lowercase English letters, digits and underscores.
+	Command string `json:"command"`
+	// Description of the command, 3-256 characters.
 	Description string `json:"description"`
 }
