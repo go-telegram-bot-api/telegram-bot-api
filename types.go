@@ -27,16 +27,53 @@ type ResponseParameters struct {
 
 // Update is an update response, from GetUpdates.
 type Update struct {
-	UpdateID           int                 `json:"update_id"`
-	Message            *Message            `json:"message"`
-	EditedMessage      *Message            `json:"edited_message"`
-	ChannelPost        *Message            `json:"channel_post"`
-	EditedChannelPost  *Message            `json:"edited_channel_post"`
-	InlineQuery        *InlineQuery        `json:"inline_query"`
+	// UpdateID is the update's unique identifier.
+	// Update identifiers start from a certain positive number and increase sequentially.
+	// This ID becomes especially handy if you're using Webhooks,
+	// since it allows you to ignore repeated updates or to restore
+	// the correct update sequence, should they get out of order.
+	// If there are no new updates for at least a week, then identifier
+	// of the next update will be chosen randomly instead of sequentially.
+	UpdateID int `json:"update_id"`
+	// Message new incoming message of any kind — text, photo, sticker, etc.
+	//
+	// optional
+	Message *Message `json:"message"`
+	// EditedMessage
+	//
+	// optional
+	EditedMessage *Message `json:"edited_message"`
+	// ChannelPost new version of a message that is known to the bot and was edited
+	//
+	// optional
+	ChannelPost *Message `json:"channel_post"`
+	// EditedChannelPost new incoming channel post of any kind — text, photo, sticker, etc.
+	//
+	// optional
+	EditedChannelPost *Message `json:"edited_channel_post"`
+	// InlineQuery new incoming inline query
+	//
+	// optional
+	InlineQuery *InlineQuery `json:"inline_query"`
+	// ChosenInlineResult is the result of an inline query
+	// that was chosen by a user and sent to their chat partner.
+	// Please see our documentation on the feedback collecting
+	// for details on how to enable these updates for your bot.
+	//
+	// optional
 	ChosenInlineResult *ChosenInlineResult `json:"chosen_inline_result"`
-	CallbackQuery      *CallbackQuery      `json:"callback_query"`
-	ShippingQuery      *ShippingQuery      `json:"shipping_query"`
-	PreCheckoutQuery   *PreCheckoutQuery   `json:"pre_checkout_query"`
+	// CallbackQuery new incoming callback query
+	//
+	// optional
+	CallbackQuery *CallbackQuery `json:"callback_query"`
+	// ShippingQuery new incoming shipping query. Only for invoices with flexible price
+	//
+	// optional
+	ShippingQuery *ShippingQuery `json:"shipping_query"`
+	// PreCheckoutQuery new incoming pre-checkout query. Contains full information about checkout
+	//
+	// optional
+	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -49,14 +86,29 @@ func (ch UpdatesChannel) Clear() {
 	}
 }
 
-// User is a user on Telegram.
+// User represents a Telegram user or bot.
 type User struct {
-	ID           int    `json:"id"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`     // optional
-	UserName     string `json:"username"`      // optional
-	LanguageCode string `json:"language_code"` // optional
-	IsBot        bool   `json:"is_bot"`        // optional
+	// ID is a unique identifier for this user or bot
+	ID int `json:"id"`
+	// FirstName user's or bot's first name
+	FirstName string `json:"first_name"`
+	// LastName user's or bot's last name
+	//
+	// optional
+	LastName string `json:"last_name"`
+	// UserName user's or bot's username
+	//
+	// optional
+	UserName string `json:"username"`
+	// LanguageCode IETF language tag of the user's language
+	// more info: https://en.wikipedia.org/wiki/IETF_language_tag
+	//
+	// optional
+	LanguageCode string `json:"language_code"`
+	// IsBot true, if this user is a bot
+	//
+	// optional
+	IsBot bool `json:"is_bot"`
 }
 
 // String displays a simple text version of a user.
@@ -87,23 +139,58 @@ type GroupChat struct {
 
 // ChatPhoto represents a chat photo.
 type ChatPhoto struct {
+	// SmallFileID is a file identifier of small (160x160) chat photo.
+	// This file_id can be used only for photo download and
+	// only for as long as the photo is not changed.
 	SmallFileID string `json:"small_file_id"`
-	BigFileID   string `json:"big_file_id"`
+	// BigFileID is a file identifier of big (640x640) chat photo.
+	// This file_id can be used only for photo download and
+	// only for as long as the photo is not changed.
+	BigFileID string `json:"big_file_id"`
 }
 
 // Chat contains information about the place a message was sent.
 type Chat struct {
-	ID                  int64      `json:"id"`
-	Type                string     `json:"type"`
-	Title               string     `json:"title"`                          // optional
-	UserName            string     `json:"username"`                       // optional
-	FirstName           string     `json:"first_name"`                     // optional
-	LastName            string     `json:"last_name"`                      // optional
-	AllMembersAreAdmins bool       `json:"all_members_are_administrators"` // optional
-	Photo               *ChatPhoto `json:"photo"`
-	Description         string     `json:"description,omitempty"` // optional
-	InviteLink          string     `json:"invite_link,omitempty"` // optional
-	PinnedMessage       *Message   `json:"pinned_message"`        // optional
+	// ID is a unique identifier for this chat
+	ID int64 `json:"id"`
+	// Type of chat, can be either “private”, “group”, “supergroup” or “channel”
+	Type string `json:"type"`
+	// Title for supergroups, channels and group chats
+	//
+	// optional
+	Title string `json:"title"`
+	// UserName for private chats, supergroups and channels if available
+	//
+	// optional
+	UserName string `json:"username"`
+	// FirstName of the other party in a private chat
+	//
+	// optional
+	FirstName string `json:"first_name"`
+	// LastName of the other party in a private chat
+	//
+	// optional
+	LastName string `json:"last_name"`
+	// AllMembersAreAdmins
+	//
+	// optional
+	AllMembersAreAdmins bool `json:"all_members_are_administrators"`
+	// Photo is a chat photo
+	Photo *ChatPhoto `json:"photo"`
+	// Description for groups, supergroups and channel chats
+	//
+	// optional
+	Description string `json:"description,omitempty"`
+	// InviteLink is a chat invite link, for groups, supergroups and channel chats.
+	// Each administrator in a chat generates their own invite links,
+	// so the bot must first generate the link using exportChatInviteLink
+	//
+	// optional
+	InviteLink string `json:"invite_link,omitempty"`
+	// PinnedMessage Pinned message, for groups, supergroups and channels
+	//
+	// optional
+	PinnedMessage *Message `json:"pinned_message"`
 }
 
 // IsPrivate returns if the Chat is a private conversation.
@@ -360,11 +447,36 @@ func (m *Message) CommandArguments() string {
 
 // MessageEntity contains information about data in a Message.
 type MessageEntity struct {
-	Type   string `json:"type"`
-	Offset int    `json:"offset"`
-	Length int    `json:"length"`
-	URL    string `json:"url"`  // optional
-	User   *User  `json:"user"` // optional
+	// Type of the entity.
+	// Can be:
+	//  “mention” (@username),
+	//  “hashtag” (#hashtag),
+	//  “cashtag” ($USD),
+	//  “bot_command” (/start@jobs_bot),
+	//  “url” (https://telegram.org),
+	//  “email” (do-not-reply@telegram.org),
+	//  “phone_number” (+1-212-555-0123),
+	//  “bold” (bold text),
+	//  “italic” (italic text),
+	//  “underline” (underlined text),
+	//  “strikethrough” (strikethrough text),
+	//  “code” (monowidth string),
+	//  “pre” (monowidth block),
+	//  “text_link” (for clickable text URLs),
+	//  “text_mention” (for users without usernames)
+	Type string `json:"type"`
+	// Offset in UTF-16 code units to the start of the entity
+	Offset int `json:"offset"`
+	// Length
+	Length int `json:"length"`
+	// URL for “text_link” only, url that will be opened after user taps on the text
+	//
+	// optional
+	URL string `json:"url"`
+	// User for “text_mention” only, the mentioned user
+	//
+	// optional
+	User *User `json:"user"`
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
