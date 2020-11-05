@@ -311,7 +311,7 @@ var (
 	_ Chattable = PhotoConfig{}
 	_ Chattable = PinChatMessageConfig{}
 	_ Chattable = PromoteChatMemberConfig{}
-	_ Chattable = RemoveWebhookConfig{}
+	_ Chattable = DeleteWebhookConfig{}
 	_ Chattable = RestrictChatMemberConfig{}
 	_ Chattable = SendPollConfig{}
 	_ Chattable = SetChatDescriptionConfig{}

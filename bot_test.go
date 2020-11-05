@@ -477,7 +477,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 
 	wh := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
 	_, err := bot.Request(wh)
@@ -491,7 +491,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 	}
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -499,7 +499,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 
 	wh := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 	_, err := bot.Request(wh)
@@ -519,7 +519,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 }
 
 func TestSendWithMediaGroup(t *testing.T) {
