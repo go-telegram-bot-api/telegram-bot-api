@@ -526,9 +526,8 @@ func TestSendWithMediaGroup(t *testing.T) {
 	bot, _ := getBot(t)
 
 	cfg := NewMediaGroup(ChatID, []interface{}{
-		NewInputMediaPhoto("https://i.imgur.com/unQLJIb.jpg"),
-		NewInputMediaPhoto("https://i.imgur.com/J5qweNZ.jpg"),
-		NewInputMediaVideo("https://i.imgur.com/F6RmI24.mp4"),
+		NewInputMediaPhoto("https://github.com/go-telegram-bot-api/telegram-bot-api/raw/0a3a1c8716c4cd8d26a262af9f12dcbab7f3f28c/tests/image.jpg"),
+		NewInputMediaVideo("https://github.com/go-telegram-bot-api/telegram-bot-api/raw/0a3a1c8716c4cd8d26a262af9f12dcbab7f3f28c/tests/video.mp4"),
 	})
 
 	messages, err := bot.SendMediaGroup(cfg)
@@ -540,7 +539,7 @@ func TestSendWithMediaGroup(t *testing.T) {
 		t.Error()
 	}
 
-	if len(messages) != 3 {
+	if len(messages) != 2 {
 		t.Error()
 	}
 }
