@@ -174,3 +174,21 @@ func TestNewEditMessageReplyMarkup(t *testing.T) {
 	}
 
 }
+
+func TestNewDice(t *testing.T) {
+	dice := NewDice(42)
+
+	if dice.ChatID != 42 ||
+		dice.Emoji != "" {
+		t.Fail()
+	}
+}
+
+func TestNewDiceWithEmoji(t *testing.T) {
+	dice := NewDiceWithEmoji(42, "🏀")
+
+	if dice.ChatID != 42 ||
+		dice.Emoji != "🏀" {
+		t.Fail()
+	}
+}

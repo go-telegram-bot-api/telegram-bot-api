@@ -23,9 +23,24 @@ const (
 	ExistingStickerFileID   = "BQADAgADcwADjMcoCbdl-6eB--YPAg"
 )
 
+type testLogger struct {
+	t *testing.T
+}
+
+func (t testLogger) Println(v ...interface{}) {
+	t.t.Log(v...)
+}
+
+func (t testLogger) Printf(format string, v ...interface{}) {
+	t.t.Logf(format, v...)
+}
+
 func getBot(t *testing.T) (*BotAPI, error) {
 	bot, err := NewBotAPI(TestToken)
 	bot.Debug = true
+
+	logger := testLogger{t}
+	SetLogger(logger)
 
 	if err != nil {
 		t.Error(err)
@@ -417,6 +432,32 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 	}
 }
 
+func TestSendWithDice(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := NewDice(ChatID)
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+}
+
+func TestSendWithDiceWithEmoji(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := NewDiceWithEmoji(ChatID, "🏀")
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+}
+
 func TestGetFile(t *testing.T) {
 	bot, _ := getBot(t)
 
@@ -634,7 +675,12 @@ func ExampleWebhookHandler() {
 	}
 
 	http.HandleFunc("/"+bot.Token, func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%+v\n", bot.HandleUpdate(w, r))
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			log.Printf("%+v\n", err.Error())
+		} else {
+			log.Printf("%+v\n", *update)
+		}
 	})
 
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)

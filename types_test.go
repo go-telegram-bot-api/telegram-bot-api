@@ -310,6 +310,7 @@ var (
 	_ Chattable = MessageConfig{}
 	_ Chattable = PhotoConfig{}
 	_ Chattable = PinChatMessageConfig{}
+	_ Chattable = PreCheckoutConfig{}
 	_ Chattable = PromoteChatMemberConfig{}
 	_ Chattable = DeleteWebhookConfig{}
 	_ Chattable = RestrictChatMemberConfig{}
@@ -318,6 +319,7 @@ var (
 	_ Chattable = SetChatPhotoConfig{}
 	_ Chattable = SetChatTitleConfig{}
 	_ Chattable = SetGameScoreConfig{}
+	_ Chattable = ShippingConfig{}
 	_ Chattable = StickerConfig{}
 	_ Chattable = StopPollConfig{}
 	_ Chattable = StopMessageLiveLocationConfig{}
