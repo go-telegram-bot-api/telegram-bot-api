@@ -1072,7 +1072,7 @@ func (bot *BotAPI) SetMyCommands(commands []BotCommand) error {
 //
 // parseMode is the text formatting mode (ModeMarkdown, ModeMarkdownV2 or ModeHTML)
 // text is the input string that will be escaped
-func (*BotAPI) EscapeText(parseMode string, text string) string {
+func EscapeText(parseMode string, text string) string {
 	var replacer *strings.Replacer
 
 	if parseMode == ModeHTML {
