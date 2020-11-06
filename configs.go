@@ -831,7 +831,7 @@ type RemoveWebhookConfig struct {
 }
 
 func (config RemoveWebhookConfig) method() string {
-	return "setWebhook"
+	return "deleteWebhook"
 }
 
 func (config RemoveWebhookConfig) params() (Params, error) {
@@ -878,12 +878,9 @@ func (config InlineConfig) params() (Params, error) {
 	params.AddNonEmpty("next_offset", config.NextOffset)
 	params.AddNonEmpty("switch_pm_text", config.SwitchPMText)
 	params.AddNonEmpty("switch_pm_parameter", config.SwitchPMParameter)
+	err := params.AddInterface("results", config.Results)
 
-	if err := params.AddInterface("results", config.Results); err != nil {
-		return params, err
-	}
-
-	return params, nil
+	return params, err
 }
 
 // CallbackConfig contains information on making a CallbackQuery response.
@@ -975,12 +972,10 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero("user_id", config.UserID)
 
-	if err := params.AddInterface("permissions", config.Permissions); err != nil {
-		return params, err
-	}
+	err := params.AddInterface("permissions", config.Permissions)
 	params.AddNonZero64("until_date", config.UntilDate)
 
-	return params, nil
+	return params, err
 }
 
 // PromoteChatMemberConfig contains fields to promote members of chat
@@ -1200,10 +1195,7 @@ func (config InvoiceConfig) params() (Params, error) {
 	params["start_parameter"] = config.StartParameter
 	params["currency"] = config.Currency
 
-	if err = params.AddInterface("prices", config.Prices); err != nil {
-		return params, err
-	}
-
+	err = params.AddInterface("prices", config.Prices)
 	params.AddNonEmpty("provider_data", config.ProviderData)
 	params.AddNonEmpty("photo_url", config.PhotoURL)
 	params.AddNonZero("photo_size", config.PhotoSize)
@@ -1217,7 +1209,7 @@ func (config InvoiceConfig) params() (Params, error) {
 	params.AddBool("send_phone_number_to_provider", config.SendPhoneNumberToProvider)
 	params.AddBool("send_email_to_provider", config.SendEmailToProvider)
 
-	return params, nil
+	return params, err
 }
 
 func (config InvoiceConfig) method() string {
@@ -1232,11 +1224,40 @@ type ShippingConfig struct {
 	ErrorMessage    string
 }
 
+func (config ShippingConfig) method() string {
+	return "answerShippingQuery"
+}
+
+func (config ShippingConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["shipping_query_id"] = config.ShippingQueryID
+	params.AddBool("ok", config.OK)
+	err := params.AddInterface("shipping_options", config.ShippingOptions)
+	params.AddNonEmpty("error_message", config.ErrorMessage)
+
+	return params, err
+}
+
 // PreCheckoutConfig conatins information for answerPreCheckoutQuery request.
 type PreCheckoutConfig struct {
 	PreCheckoutQueryID string // required
 	OK                 bool   // required
 	ErrorMessage       string
+}
+
+func (config PreCheckoutConfig) method() string {
+	return "answerPreCheckoutQuery"
+}
+
+func (config PreCheckoutConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["pre_checkout_query_id"] = config.PreCheckoutQueryID
+	params.AddBool("ok", config.OK)
+	params.AddNonEmpty("error_message", config.ErrorMessage)
+
+	return params, nil
 }
 
 // DeleteMessageConfig contains information of a message in a chat to delete.
@@ -1678,30 +1699,6 @@ func (config MediaGroupConfig) params() (Params, error) {
 	return params, nil
 }
 
-// DiceConfig allows you to send a random dice roll to Telegram.
-//
-// Emoji may be one of the following: 🎲 (1-6), 🎯 (1-6), 🏀 (1-5).
-type DiceConfig struct {
-	BaseChat
-
-	Emoji string
-}
-
-func (config DiceConfig) method() string {
-	return "sendDice"
-}
-
-func (config DiceConfig) params() (Params, error) {
-	params, err := config.BaseChat.params()
-	if err != nil {
-		return params, err
-	}
-
-	params.AddNonEmpty("emoji", config.Emoji)
-
-	return params, err
-}
-
 // GetMyCommandsConfig gets a list of the currently registered commands.
 type GetMyCommandsConfig struct{}
 
@@ -1710,7 +1707,7 @@ func (config GetMyCommandsConfig) method() string {
 }
 
 func (config GetMyCommandsConfig) params() (Params, error) {
-	return make(Params), nil
+	return nil, nil
 }
 
 // SetMyCommandsConfig sets a list of commands the bot understands.
@@ -1726,6 +1723,31 @@ func (config SetMyCommandsConfig) params() (Params, error) {
 	params := make(Params)
 
 	err := params.AddInterface("commands", config.commands)
+
+	return params, err
+}
+
+// DiceConfig contains information about a sendDice request.
+type DiceConfig struct {
+	BaseChat
+	// Emoji on which the dice throw animation is based.
+	// Currently, must be one of “🎲”, “🎯”, or “🏀”.
+	// Dice can have values 1-6 for “🎲” and “🎯”, and values 1-5 for “🏀”.
+	// Defaults to “🎲”
+	Emoji string
+}
+
+func (config DiceConfig) method() string {
+	return "sendDice"
+}
+
+func (config DiceConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+
+	params.AddNonEmpty("emoji", config.Emoji)
 
 	return params, err
 }
