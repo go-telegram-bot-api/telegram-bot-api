@@ -52,6 +52,18 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
+// NewCopyMessage creates a new copy message.
+//
+// chatID is where to send it, fromChatID is the source chat,
+// and messageID is the ID of the original message.
+func NewCopyMessage(chatID int64, fromChatID int64, messageID int) CopyMessageConfig {
+	return CopyMessageConfig{
+		BaseChat:   BaseChat{ChatID: chatID},
+		FromChatID: fromChatID,
+		MessageID:  messageID,
+	}
+}
+
 // NewPhotoUpload creates a new photo uploader.
 //
 // chatID is where to send it, file is a string path to the file,

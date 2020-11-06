@@ -286,6 +286,8 @@ var (
 	_ Chattable = ChatActionConfig{}
 	_ Chattable = ChatInfoConfig{}
 	_ Chattable = ChatInviteLinkConfig{}
+	_ Chattable = CloseConfig{}
+	_ Chattable = CopyMessageConfig{}
 	_ Chattable = ContactConfig{}
 	_ Chattable = DeleteChatPhotoConfig{}
 	_ Chattable = DeleteChatStickerSetConfig{}
@@ -306,6 +308,7 @@ var (
 	_ Chattable = KickChatMemberConfig{}
 	_ Chattable = LeaveChatConfig{}
 	_ Chattable = LocationConfig{}
+	_ Chattable = LogOutConfig{}
 	_ Chattable = MediaGroupConfig{}
 	_ Chattable = MessageConfig{}
 	_ Chattable = PhotoConfig{}

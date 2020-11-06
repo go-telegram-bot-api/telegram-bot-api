@@ -668,3 +668,23 @@ func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
 
 	return commands, err
 }
+
+// CopyMessage copy messages of any kind. The method is analogous to the method
+// forwardMessage, but the copied message doesn't have a link to the original
+// message. Returns the MessageID of the sent message on success.
+func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
+	params, err := config.params()
+	if err != nil {
+		return MessageID{}, err
+	}
+
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return MessageID{}, err
+	}
+
+	var messageID MessageID
+	err = json.Unmarshal(resp.Result, &messageID)
+
+	return messageID, err
+}

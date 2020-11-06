@@ -241,6 +241,10 @@ func (config CopyMessageConfig) params() (Params, error) {
 	return params, err
 }
 
+func (config CopyMessageConfig) method() string {
+	return "copyMessage"
+}
+
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile

@@ -584,6 +584,11 @@ func (m *Message) CommandArguments() string {
 	return m.Text[entity.Length+1:]
 }
 
+// MessageID represents a unique message identifier.
+type MessageID struct {
+	MessageID int `json:"message_id"`
+}
+
 // MessageEntity represents one special entity in a text message.
 type MessageEntity struct {
 	// Type of the entity.
