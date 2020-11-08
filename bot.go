@@ -445,6 +445,10 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	if config.Timeout > 0 {
 		v.Add("timeout", strconv.Itoa(config.Timeout))
 	}
+	if len(config.AllowedUpdates) > 0 {
+		data, _ := json.Marshal(config.AllowedUpdates)
+		v.Add("allowed_updates", string(data))
+	}
 
 	resp, err := bot.MakeRequest("getUpdates", v)
 	if err != nil {
