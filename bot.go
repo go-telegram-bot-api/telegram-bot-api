@@ -4,6 +4,7 @@ package tgbotapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -81,10 +82,10 @@ func (bot *BotAPI) SetAPIEndpoint(apiEndpoint string) {
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
+func (bot *BotAPI) MakeRequestContext(ctx context.Context, endpoint string, params url.Values) (APIResponse, error) {
 	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
-	req, err := http.NewRequest("POST", method, strings.NewReader(params.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", method, strings.NewReader(params.Encode()))
 	if err != nil {
 		return APIResponse{}, err
 	}
@@ -115,6 +116,11 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 
 	return apiResp, nil
+}
+
+// The same as bot.MakeRequestContext but with background context
+func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse, error) {
+	return bot.MakeRequestContext(context.Background(), endpoint, params)
 }
 
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
@@ -434,7 +440,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // To avoid stale items, set Offset to one higher than the previous item.
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
-func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
+func (bot *BotAPI) GetUpdatesContext(ctx context.Context, config UpdateConfig) ([]Update, error) {
 	v := url.Values{}
 	if config.Offset != 0 {
 		v.Add("offset", strconv.Itoa(config.Offset))
@@ -446,7 +452,7 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 		v.Add("timeout", strconv.Itoa(config.Timeout))
 	}
 
-	resp, err := bot.MakeRequest("getUpdates", v)
+	resp, err := bot.MakeRequestContext(ctx, "getUpdates", v)
 	if err != nil {
 		return []Update{}, err
 	}
@@ -457,6 +463,11 @@ func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	bot.debugLog("getUpdates", v, updates)
 
 	return updates, nil
+}
+
+// The same as bot.GetUpdatesContext but with background context
+func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
+	return bot.GetUpdatesContext(context.Background(), config)
 }
 
 // RemoveWebhook unsets the webhook.
@@ -515,15 +526,26 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
 	ch := make(chan Update, bot.Buffer)
 
 	go func() {
+		defer close(ch)
 		for {
 			select {
 			case <-bot.shutdownChannel:
-				close(ch)
 				return
 			default:
 			}
-
-			updates, err := bot.GetUpdates(config)
+			ctx, cancel := context.WithCancel(context.Background())
+			go func() {
+				select {
+				case <-ctx.Done():
+				case <-bot.shutdownChannel:
+					cancel()
+				}
+			}()
+			updates, err := bot.GetUpdatesContext(ctx, config)
+			if ctx.Err() == context.Canceled {
+				return
+			}
+			cancel()
 			if err != nil {
 				log.Println(err)
 				log.Println("Failed to get updates, retrying in 3 seconds...")
