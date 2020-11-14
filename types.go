@@ -606,6 +606,14 @@ type Audio struct {
 	//
 	// optional
 	Title string `json:"title"`
+	// Thumbnail audio thumbnail
+	//
+	// optional
+	Thumbnail *PhotoSize `json:"thumb"`
+	// FileName original audio filename as defined by sender
+	//
+	// optional
+	FileName string `json:"file_name"`
 	// MimeType of the file as defined by sender
 	//
 	// optional
@@ -728,6 +736,10 @@ type Video struct {
 	//
 	// optional
 	Thumbnail *PhotoSize `json:"thumb"`
+	// FileName original video filename as defined by sender
+	//
+	// optional
+	FileName string `json:"file_name"`
 	// MimeType of a file as defined by sender
 	//
 	// optional
