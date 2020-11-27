@@ -567,7 +567,29 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 		}
 
 		ch <- *update
+		close(ch)
 	})
+
+	return ch
+}
+
+// ListenForWebhookRespReqFormat registers a http handler for a webhook.
+func (bot *BotAPI) ListenForWebhookRespReqFormat(w http.ResponseWriter, r *http.Request) UpdatesChannel {
+	ch := make(chan Update, bot.Buffer)
+
+	func(w http.ResponseWriter, r *http.Request) {
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(errMsg)
+			return
+		}
+
+		ch <- *update
+		close(ch)
+	}(w, r)
 
 	return ch
 }
