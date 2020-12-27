@@ -1238,7 +1238,8 @@ func (config PinChatMessageConfig) values() (url.Values, error) {
 
 // UnpinChatMessageConfig contains information of chat to unpin.
 type UnpinChatMessageConfig struct {
-	ChatID int64
+	ChatID    int64
+	MessageID int
 }
 
 func (config UnpinChatMessageConfig) method() string {
@@ -1249,6 +1250,9 @@ func (config UnpinChatMessageConfig) values() (url.Values, error) {
 	v := url.Values{}
 
 	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	if config.MessageID != 0 {
+		v.Add("message_id", strconv.FormatInt(int64(config.MessageID), 10))
+	}
 
 	return v, nil
 }
