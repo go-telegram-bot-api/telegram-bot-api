@@ -1767,6 +1767,16 @@ type InlineQueryResultAudio struct {
 	//
 	// optional
 	Caption string `json:"caption"`
+	// ParseMode mode for parsing entities in the audio caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode"`
+	// List of special entities that appear in the caption, which can be specified instead of parse_mode
+	//
+	// optional
+	CaptionEntities *[]MessageEntity `json:"caption_entities"`
 	// Performer is a performer
 	//
 	// optional
@@ -1803,12 +1813,16 @@ type InlineQueryResultCachedAudio struct {
 	//
 	// optional
 	Caption string `json:"caption"`
-	// ParseMode mode for parsing entities in the video caption.
+	// ParseMode mode for parsing entities in the audio caption.
 	// See formatting options for more details
 	// (https://core.telegram.org/bots/api#formatting-options).
 	//
 	// optional
 	ParseMode string `json:"parse_mode"`
+	// List of special entities that appear in the caption, which can be specified instead of parse_mode
+	//
+	// optional
+	CaptionEntities *[]MessageEntity `json:"caption_entities"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -1841,6 +1855,16 @@ type InlineQueryResultVoice struct {
 	//
 	// optional
 	Caption string `json:"caption"`
+	// Mode for parsing entities in the voice message caption
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMod string `json:"parse_mod"`
+	// List of special entities that appear in the caption, which can be specified instead of parse_mode
+	//
+	// optional
+	CaptionEntities *[]MessageEntity `json:"caption_entities"`
 	// Duration recording duration in seconds
 	//
 	// optional
@@ -1877,12 +1901,16 @@ type InlineQueryResultCachedVoice struct {
 	//
 	// optional
 	Caption string `json:"caption"`
-	// ParseMode mode for parsing entities in the video caption.
+	// ParseMode mode for parsing entities in the voice caption.
 	// See formatting options for more details
 	// (https://core.telegram.org/bots/api#formatting-options).
 	//
 	// optional
 	ParseMode string `json:"parse_mode"`
+	// List of special entities that appear in the caption, which can be specified instead of parse_mode
+	//
+	// optional
+	CaptionEntities *[]MessageEntity `json:"caption_entities"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
