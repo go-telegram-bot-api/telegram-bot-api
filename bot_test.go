@@ -100,7 +100,7 @@ func TestSendWithMessageForward(t *testing.T) {
 func TestSendWithNewPhoto(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg")
+	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg", "")
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -116,7 +116,7 @@ func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 	data, _ := ioutil.ReadFile("tests/image.jpg")
 	b := tgbotapi.FileBytes{Name: "image.jpg", Bytes: data}
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, b)
+	msg := tgbotapi.NewPhotoUpload(ChatID, b, "")
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -132,7 +132,7 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 	f, _ := os.Open("tests/image.jpg")
 	reader := tgbotapi.FileReader{Name: "image.jpg", Reader: f, Size: -1}
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, reader)
+	msg := tgbotapi.NewPhotoUpload(ChatID, reader, "")
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -145,7 +145,7 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 func TestSendWithNewPhotoReply(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg")
+	msg := tgbotapi.NewPhotoUpload(ChatID, "tests/image.jpg", "")
 	msg.ReplyToMessageID = ReplyToMessageID
 
 	_, err := bot.Send(msg)
@@ -159,7 +159,7 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 func TestSendWithExistingPhoto(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewPhotoShare(ChatID, ExistingPhotoFileID)
+	msg := tgbotapi.NewPhotoShare(ChatID, ExistingPhotoFileID, "")
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -172,7 +172,7 @@ func TestSendWithExistingPhoto(t *testing.T) {
 func TestSendWithNewDocument(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewDocumentUpload(ChatID, "tests/image.jpg")
+	msg := tgbotapi.NewDocumentUpload(ChatID, "tests/image.jpg", "")
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -184,7 +184,7 @@ func TestSendWithNewDocument(t *testing.T) {
 func TestSendWithExistingDocument(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewDocumentShare(ChatID, ExistingDocumentFileID)
+	msg := tgbotapi.NewDocumentShare(ChatID, ExistingDocumentFileID, "")
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -196,7 +196,7 @@ func TestSendWithExistingDocument(t *testing.T) {
 func TestSendWithNewAudio(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewAudioUpload(ChatID, "tests/audio.mp3")
+	msg := tgbotapi.NewAudioUpload(ChatID, "tests/audio.mp3", "")
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
@@ -242,7 +242,7 @@ func TestSendWithNewVoice(t *testing.T) {
 func TestSendWithExistingVoice(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVoiceShare(ChatID, ExistingVoiceFileID)
+	msg := tgbotapi.NewVoiceShare(ChatID, ExistingVoiceFileID, "")
 	msg.Duration = 10
 	_, err := bot.Send(msg)
 
@@ -288,7 +288,7 @@ func TestSendWithVenue(t *testing.T) {
 func TestSendWithNewVideo(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := tgbotapi.NewVideoUpload(ChatID, "tests/video.mp4")
+	msg := tgbotapi.NewVideoUpload(ChatID, "tests/video.mp4", "")
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
