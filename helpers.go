@@ -82,13 +82,14 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 // FileReader, or FileBytes.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhotoUpload(chatID int64, file interface{}) PhotoConfig {
+func NewPhotoUpload(chatID int64, file interface{}, caption string) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			File:        file,
 			UseExisting: false,
 		},
+		Caption: caption,
 	}
 }
 
@@ -97,13 +98,14 @@ func NewPhotoUpload(chatID int64, file interface{}) PhotoConfig {
 //
 // chatID is where to send it, fileID is the ID of the file
 // already uploaded.
-func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
+func NewPhotoShare(chatID int64, fileID string, caption string) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			FileID:      fileID,
 			UseExisting: true,
 		},
+		Caption: caption,
 	}
 }
 
@@ -111,13 +113,14 @@ func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewAudioUpload(chatID int64, file interface{}) AudioConfig {
+func NewAudioUpload(chatID int64, file interface{}, caption string) AudioConfig {
 	return AudioConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			File:        file,
 			UseExisting: false,
 		},
+		Caption: caption,
 	}
 }
 
@@ -141,13 +144,14 @@ func NewAudioShare(chatID int64, fileID string) AudioConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewDocumentUpload(chatID int64, file interface{}) DocumentConfig {
+func NewDocumentUpload(chatID int64, file interface{}, caption string) DocumentConfig {
 	return DocumentConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			File:        file,
 			UseExisting: false,
 		},
+		Caption: caption,
 	}
 }
 
@@ -157,13 +161,14 @@ func NewDocumentUpload(chatID int64, file interface{}) DocumentConfig {
 //
 // chatID is where to send it, fileID is the ID of the document
 // already uploaded.
-func NewDocumentShare(chatID int64, fileID string) DocumentConfig {
+func NewDocumentShare(chatID int64, fileID string, caption string) DocumentConfig {
 	return DocumentConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			FileID:      fileID,
 			UseExisting: true,
 		},
+		Caption: caption,
 	}
 }
 
@@ -201,13 +206,14 @@ func NewStickerShare(chatID int64, fileID string) StickerConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewVideoUpload(chatID int64, file interface{}) VideoConfig {
+func NewVideoUpload(chatID int64, file interface{}, caption string) VideoConfig {
 	return VideoConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			File:        file,
 			UseExisting: false,
 		},
+		Caption: caption,
 	}
 }
 
@@ -230,13 +236,14 @@ func NewVideoShare(chatID int64, fileID string) VideoConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
+func NewAnimationUpload(chatID int64, file interface{}, caption string) AnimationConfig {
 	return AnimationConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			File:        file,
 			UseExisting: false,
 		},
+		Caption: caption,
 	}
 }
 
@@ -245,13 +252,14 @@ func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
 //
 // chatID is where to send it, fileID is the ID of the animation
 // already uploaded.
-func NewAnimationShare(chatID int64, fileID string) AnimationConfig {
+func NewAnimationShare(chatID int64, fileID string, caption string) AnimationConfig {
 	return AnimationConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			FileID:      fileID,
 			UseExisting: true,
 		},
+		Caption: caption,
 	}
 }
 
@@ -305,13 +313,14 @@ func NewVoiceUpload(chatID int64, file interface{}) VoiceConfig {
 //
 // chatID is where to send it, fileID is the ID of the video
 // already uploaded.
-func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
+func NewVoiceShare(chatID int64, fileID string, caption string) VoiceConfig {
 	return VoiceConfig{
 		BaseFile: BaseFile{
 			BaseChat:    BaseChat{ChatID: chatID},
 			FileID:      fileID,
 			UseExisting: true,
 		},
+		Caption: caption,
 	}
 }
 
