@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/url"
 	"strconv"
@@ -18,9 +19,10 @@ func init() {
 	FileEndpoint = "https://api.telegram.org/file/bot%s/%s"
 }
 
-// ReplaceAPIEndpoint replace the API endpoint to switch to local server
-func ReplaceAPIEndpoint() {
-	APIEndpoint = "http://127.0.0.1:8081/bot%s/%s"
+// SwitchAPIEndpointToLocal switch the API endpoint to local bot api server
+// with customize port
+func SwitchAPIEndpointToLocal(port int) {
+	APIEndpoint = fmt.Sprintf("http://127.0.0.1:%d", port) + "/bot%s/%s"
 }
 
 // Constant values for ChatActions
