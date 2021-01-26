@@ -1066,6 +1066,16 @@ func (bot *BotAPI) SetMyCommands(commands []BotCommand) error {
 	return nil
 }
 
+// LogOut log out from the cloud Bot API server before launching the bot locally
+func (bot *BotAPI) LogOut() error {
+	_, err := bot.MakeRequest("logOut", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // EscapeText takes an input text and escape Telegram markup symbols.
 // In this way we can send a text without being afraid of having to escape the characters manually.
 // Note that you don't have to include the formatting style in the input text, or it will be escaped too.
