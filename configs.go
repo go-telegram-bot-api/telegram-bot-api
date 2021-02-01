@@ -2,19 +2,29 @@ package tgbotapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/url"
 	"strconv"
 )
 
-// Telegram constants
-const (
-	// APIEndpoint is the endpoint for all API methods,
-	// with formatting for Sprintf.
+// APIEndpoint is the endpoint for all API methods,
+// with formatting for Sprintf.
+var APIEndpoint string
+// FileEndpoint is the endpoint for downloading a file from Telegram.
+var FileEndpoint string
+
+func init() {
 	APIEndpoint = "https://api.telegram.org/bot%s/%s"
-	// FileEndpoint is the endpoint for downloading a file from Telegram.
 	FileEndpoint = "https://api.telegram.org/file/bot%s/%s"
-)
+}
+
+// SwitchAPIEndpointToLocal switch the API endpoint to local bot api server
+// with customize IP or domain, and port
+// local bot api server only support HTTP requests
+func SwitchAPIEndpointToLocal(host, port string) {
+	APIEndpoint = fmt.Sprintf("http://%s:%s", host, port) + "/bot%s/%s"
+}
 
 // Constant values for ChatActions
 const (
