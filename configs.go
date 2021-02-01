@@ -20,9 +20,10 @@ func init() {
 }
 
 // SwitchAPIEndpointToLocal switch the API endpoint to local bot api server
-// with customize port
-func SwitchAPIEndpointToLocal(port int) {
-	APIEndpoint = fmt.Sprintf("http://127.0.0.1:%d", port) + "/bot%s/%s"
+// with customize IP or domain, and port
+// local bot api server only support HTTP requests
+func SwitchAPIEndpointToLocal(host, port string) {
+	APIEndpoint = fmt.Sprintf("http://%s:%s", host, port) + "/bot%s/%s"
 }
 
 // Constant values for ChatActions
