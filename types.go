@@ -76,6 +76,53 @@ type Update struct {
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
 }
 
+// SentFrom return user sender of update. Can be nil, if telegram wont provide info about him in
+// update object.
+func (u *Update) SentFrom() *User {
+	switch {
+	case u.Message != nil:
+		return u.Message.From
+	case u.EditedMessage != nil:
+		return u.EditedMessage.From
+	case u.InlineQuery != nil:
+		return u.InlineQuery.From
+	case u.ChosenInlineResult != nil:
+		return u.ChosenInlineResult.From
+	case u.CallbackQuery != nil:
+		return u.CallbackQuery.From
+	case u.ShippingQuery != nil:
+		return u.ShippingQuery.From
+	case u.PreCheckoutQuery != nil:
+		return u.PreCheckoutQuery.From
+	default:
+		return nil
+	}
+}
+
+func (u *Update) CallbackData() string {
+	if u.CallbackQuery != nil {
+		return u.CallbackQuery.Data
+	}
+	return ""
+}
+
+func (u *Update) FromChat() *Chat {
+	switch {
+	case u.Message != nil:
+		return u.Message.Chat
+	case u.EditedMessage != nil:
+		return u.EditedMessage.Chat
+	case u.ChannelPost != nil:
+		return u.ChannelPost.Chat
+	case u.EditedChannelPost != nil:
+		return u.EditedChannelPost.Chat
+	case u.CallbackQuery != nil:
+		return u.CallbackQuery.Message.Chat
+	default:
+		return nil
+	}
+}
+
 // UpdatesChannel is the channel for getting updates.
 type UpdatesChannel <-chan Update
 
