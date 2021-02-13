@@ -3,7 +3,7 @@ package tgbotapi_test
 import (
 	"testing"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func TestNewInlineQueryResultArticle(t *testing.T) {
