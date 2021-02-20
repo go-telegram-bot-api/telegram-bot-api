@@ -1112,10 +1112,11 @@ type BotCommand struct {
 
 // BaseInputMedia is a base type for the InputMedia types.
 type BaseInputMedia struct {
-	Type      string      `json:"type"`
-	Media     interface{} `json:"media"`
-	Caption   string      `json:"caption,omitempty"`
-	ParseMode string      `json:"parse_mode,omitempty"`
+	Type            string          `json:"type"`
+	Media           interface{}     `json:"media"`
+	Caption         string          `json:"caption,omitempty"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	ParseMode       string          `json:"parse_mode,omitempty"`
 }
 
 // InputMediaPhoto is a photo to send as part of a media group.
@@ -1144,6 +1145,7 @@ type InputMediaAnimation struct {
 // InputMediaAudio is a audio to send as part of a media group.
 type InputMediaAudio struct {
 	BaseInputMedia
+	Thumb     interface{}
 	Duration  int    `json:"duration"`
 	Performer string `json:"performer"`
 	Title     string `json:"title"`
@@ -1152,6 +1154,8 @@ type InputMediaAudio struct {
 // InputMediaDocument is a audio to send as part of a media group.
 type InputMediaDocument struct {
 	BaseInputMedia
+	Thumb                       interface{}
+	DisableContentTypeDetection bool `json:"disable_content_type_detection,omitempty"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.

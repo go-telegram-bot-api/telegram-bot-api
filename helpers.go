@@ -201,7 +201,7 @@ func NewInputMediaAudio(media interface{}) InputMediaAudio {
 }
 
 // NewInputMediaDocument creates a new InputMediaDocument.
-func NewInputMediaDocument(media string) InputMediaDocument {
+func NewInputMediaDocument(media interface{}) InputMediaDocument {
 	return InputMediaDocument{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "document",

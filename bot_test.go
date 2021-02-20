@@ -532,13 +532,57 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 	bot.Request(RemoveWebhookConfig{})
 }
 
-func TestSendWithMediaGroup(t *testing.T) {
+func TestSendWithMediaGroupPhotoVideo(t *testing.T) {
 	bot, _ := getBot(t)
 
 	cfg := NewMediaGroup(ChatID, []interface{}{
 		NewInputMediaPhoto(FileURL("https://i.imgur.com/unQLJIb.jpg")),
 		NewInputMediaPhoto("tests/image.jpg"),
 		NewInputMediaVideo("tests/video.mp4"),
+	})
+
+	messages, err := bot.SendMediaGroup(cfg)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if messages == nil {
+		t.Error("No received messages")
+	}
+
+	if len(messages) != len(cfg.Media) {
+		t.Errorf("Different number of messages: %d", len(messages))
+	}
+}
+
+func TestSendWithMediaGroupDocument(t *testing.T) {
+	bot, _ := getBot(t)
+
+	cfg := NewMediaGroup(ChatID, []interface{}{
+		NewInputMediaDocument(FileURL("https://i.imgur.com/unQLJIb.jpg")),
+		NewInputMediaDocument("tests/image.jpg"),
+	})
+
+	messages, err := bot.SendMediaGroup(cfg)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if messages == nil {
+		t.Error("No received messages")
+	}
+
+	if len(messages) != len(cfg.Media) {
+		t.Errorf("Different number of messages: %d", len(messages))
+	}
+}
+
+func TestSendWithMediaGroupAudio(t *testing.T) {
+	bot, _ := getBot(t)
+
+	cfg := NewMediaGroup(ChatID, []interface{}{
+		NewInputMediaAudio("tests/audio.mp3"),
+		NewInputMediaAudio("tests/audio.mp3"),
 	})
 
 	messages, err := bot.SendMediaGroup(cfg)

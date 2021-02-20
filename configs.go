@@ -1806,6 +1806,30 @@ func prepareInputMediaParam(inputMedia interface{}, idx int) interface{} {
 		}
 
 		return m
+	case InputMediaAudio:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
+
+		switch m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		}
+
+		return m
+	case InputMediaDocument:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
+
+		switch m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		}
+
+		return m
 	}
 
 	return nil
@@ -1844,6 +1868,38 @@ func prepareInputMediaFile(inputMedia interface{}, idx int) []RequestFile {
 		case string, FileBytes, FileReader:
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d-thumb", idx),
+				File: f,
+			})
+		}
+	case InputMediaDocument:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+
+		switch f := m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+	case InputMediaAudio:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+
+		switch f := m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
 				File: f,
 			})
 		}
