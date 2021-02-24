@@ -74,6 +74,14 @@ type Update struct {
 	//
 	// optional
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
+	// Poll New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot
+	//
+	// optional
+	Poll *Poll `json:"poll"`
+	// Poll A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself.
+	//
+	// optional
+	PollAnswer *PollAnswer `json:"poll_answer"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -2329,6 +2337,36 @@ type PreCheckoutQuery struct {
 	//
 	// optional
 	OrderInfo *OrderInfo `json:"order_info,omitempty"`
+}
+
+// PollOption contains information about poll options
+type PollOption struct {
+	Text       string `json:"text"`
+	VoterCount int    `json:"voter_count"`
+}
+
+// Poll contains information about poll
+type Poll struct {
+	ID                    string          `json:"id"`
+	Question              string          `json:"question"`
+	Options               []PollOption    `json:"options"`
+	TotalVoterCount       int             `json:"total_voter_count"`
+	IsClosed              bool            `json:"is_closed"`
+	IsAnonymous           bool            `json:"is_anonymous"`
+	Type                  string          `json:"type"`
+	AllowsMultipleAnswers bool            `json:"allows_multiple_answers"`
+	CorrectOptionID       int             `json:"correct_option_id"`
+	Explanation           string          `json:"explanation"`
+	ExplanationEntities   []MessageEntity `json:"explanation_entities"`
+	OpenPeriod            int             `json:"open_period"`
+	CloseDate             int             `json:"close_date"`
+}
+
+// PollAnswer contains information about poll answer
+type PollAnswer struct {
+	PollID string `json:"poll_id"`
+	User User `json:"user"`
+	OptionIds []int `json:"option_ids"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.
