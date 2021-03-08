@@ -417,7 +417,10 @@ func NewUpdate(offset int) UpdateConfig {
 //
 // link is the url parsable link you wish to get the updates.
 func NewWebhook(link string) WebhookConfig {
-	u, _ := url.Parse(link)
+	u, err := url.Parse(link)
+	if err != nil {
+		log.Printf("malformed URL: %s, error: %s\n", link, err)
+	}
 
 	return WebhookConfig{
 		URL: u,
