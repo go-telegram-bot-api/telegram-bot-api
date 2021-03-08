@@ -419,7 +419,7 @@ func NewUpdate(offset int) UpdateConfig {
 func NewWebhook(link string) WebhookConfig {
 	u, err := url.Parse(link)
 	if err != nil {
-		log.Println("malformed URL: %s, error: %s", link, err)
+		log.Printf("malformed URL: %s, error: %s\n", link, err)
 	}
 
 	return WebhookConfig{
