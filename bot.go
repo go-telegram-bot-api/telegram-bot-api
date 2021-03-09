@@ -387,7 +387,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // GetUpdates fetches updates.
 // If a WebHook is set, this will not return any data!
 //
-// Offset, Limit, and Timeout are optional.
+// Offset, Limit, Timeout, and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.

@@ -42,6 +42,54 @@ const (
 	ModeHTML       = "HTML"
 )
 
+// Constant values for update types
+const (
+	// New incoming message of any kind — text, photo, sticker, etc.
+	UpdateTypeMessage = "message"
+
+	// New version of a message that is known to the bot and was edited
+	UpdateTypeEditedMessage = "edited_message"
+
+	// New incoming channel post of any kind — text, photo, sticker, etc.
+	UpdateTypeChannelPost = "channel_post"
+
+	// New version of a channel post that is known to the bot and was edited
+	UpdateTypeEditedChannelPost = "edited_channel_post"
+
+	// New incoming inline query
+	UpdateTypeInlineQuery = "inline_query"
+
+	// The result of an inline query that was chosen by a user and sent to their
+	// chat partner. Please see the documentation on the feedback collecting for
+	// details on how to enable these updates for your bot.
+	UpdateTypeChosenInlineResult = "chosen_inline_result"
+
+	// New incoming callback query
+	UpdateTypeCallbackQuery = "callback_query"
+
+	// New incoming shipping query. Only for invoices with flexible price
+	UpdateTypeShippingQuery = "shipping_query"
+
+	// New incoming pre-checkout query. Contains full information about checkout
+	UpdateTypePreCheckoutQuery = "pre_checkout_query"
+
+	// New poll state. Bots receive only updates about stopped polls and polls
+	// which are sent by the bot
+	UpdateTypePoll = "poll"
+
+	// A user changed their answer in a non-anonymous poll. Bots receive new votes
+	// only in polls that were sent by the bot itself.
+	UpdateTypePollAnswer = "poll_answer"
+
+	// The bot's chat member status was updated in a chat. For private chats, this
+	// update is received only when the bot is blocked or unblocked by the user.
+	UpdateTypeMyChatMember = "my_chat_member"
+
+	// The bot must be an administrator in the chat and must explicitly specify
+	// this update in the list of allowed_updates to receive these updates.
+	UpdateTypeChatMember = "chat_member"
+)
+
 // Library errors
 const (
 	// ErrBadFileType happens when you pass an unknown type
@@ -888,9 +936,10 @@ func (config FileConfig) params() (Params, error) {
 
 // UpdateConfig contains information about a GetUpdates request.
 type UpdateConfig struct {
-	Offset  int
-	Limit   int
-	Timeout int
+	Offset         int
+	Limit          int
+	Timeout        int
+	AllowedUpdates []string
 }
 
 func (UpdateConfig) method() string {
@@ -903,6 +952,7 @@ func (config UpdateConfig) params() (Params, error) {
 	params.AddNonZero("offset", config.Offset)
 	params.AddNonZero("limit", config.Limit)
 	params.AddNonZero("timeout", config.Timeout)
+	params.AddInterface("allowed_updates", config.AllowedUpdates)
 
 	return params, nil
 }
