@@ -96,6 +96,18 @@ type Update struct {
 	//
 	// optional
 	PollAnswer *PollAnswer `json:"poll_answer,omitempty"`
+	// MyChatMember is the bot's chat member status was updated in a chat. For
+	// private chats, this update is received only when the bot is blocked or
+	// unblocked by the user.
+	//
+	// optional
+	MyChatMember *ChatMemberUpdated `json:"my_chat_member"`
+	// ChatMember is a chat member's status was updated in a chat. The bot must
+	// be an administrator in the chat and must explicitly specify "chat_member"
+	// in the list of allowed_updates to receive these updates.
+	//
+	// optional
+	ChatMember *ChatMemberUpdated `json:"chat_member"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -463,6 +475,11 @@ type Message struct {
 	//
 	// optional
 	ChannelChatCreated bool `json:"channel_chat_created,omitempty"`
+	// MessageAutoDeleteTimerChanged is a service message: auto-delete timer
+	// settings changed in the chat.
+	//
+	// optional
+	MessageAutoDeleteTimerChanged *MessageAutoDeleteTimerChanged `json:"message_auto_delete_timer_changed"`
 	// MigrateToChatID is the group has been migrated to a supergroup with the specified identifier.
 	// This number may be greater than 32 bits and some programming languages
 	// may have difficulty/silent defects in interpreting it.
@@ -508,6 +525,19 @@ type Message struct {
 	//
 	// optional
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered"`
+	// VoiceChatStarted is a service message: voice chat started.
+	//
+	// optional
+	VoiceChatStarted *VoiceChatStarted `json:"voice_chat_started"`
+	// VoiceChatEnded is a service message: voice chat ended.
+	//
+	// optional
+	VoiceChatEnded *VoiceChatEnded `json:"voice_chat_ended"`
+	// VoiceChatParticipantsInvited is a service message: new participants
+	// invited to a voice chat.
+	//
+	// optional
+	VoiceChatParticipantsInvited *VoiceChatParticipantsInvited `json:"voice_chat_participants_invited"`
 	// ReplyMarkup is the Inline keyboard attached to the message.
 	// login_url buttons are represented as ordinary url buttons.
 	//
@@ -1037,6 +1067,33 @@ type ProximityAlertTriggered struct {
 	Distance int `json:"distance"`
 }
 
+// MessageAutoDeleteTimerChanged represents a service message about a change in
+// auto-delete timer settings.
+type MessageAutoDeleteTimerChanged struct {
+	// New auto-delete time for messages in the chat.
+	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
+}
+
+// VoiceChatStarted represents a service message about a voice chat started in
+// the chat.
+type VoiceChatStarted struct{}
+
+// VoiceChatEnded represents a service message about a voice chat ended in the
+// chat.
+type VoiceChatEnded struct {
+	// Voice chat duration; in seconds.
+	Duration int `json:"duration"`
+}
+
+// VoiceChatParticipantsInvited represents a service message about new members
+// invited to a voice chat.
+type VoiceChatParticipantsInvited struct {
+	// New members that were invited to the voice chat.
+	//
+	// optional
+	Users []User `json:"users"`
+}
+
 // UserProfilePhotos contains a set of user profile photos.
 type UserProfilePhotos struct {
 	// TotalCount total number of profile pictures the target user has
@@ -1336,6 +1393,29 @@ type ChatPhoto struct {
 	BigFileUniqueID string `json:"big_file_unique_id"`
 }
 
+// ChatInviteLink represents an invite link for a chat.
+type ChatInviteLink struct {
+	// InviteLink is the invite link. If the link was created by another chat
+	// administrator, then the second part of the link will be replaced with “…”.
+	InviteLink string `json:"invite_link"`
+	// Creator of the link.
+	Creator User `json:"creator"`
+	// IsPrimary is true, if the link is primary.
+	IsPrimary bool `json:"is_primary"`
+	// IsRevoked is true, if the link is revoked.
+	IsRevoked bool `json:"is_revoked"`
+	// ExpireDate is the point in time (Unix timestamp) when the link will
+	// expire or has been expired.
+	//
+	// optional
+	ExpireDate int `json:"expire_date"`
+	// MemberLimit is the maximum number of users that can be members of the
+	// chat simultaneously after joining the chat via this invite link; 1-99999.
+	//
+	// optional
+	MemberLimit int `json:"member_limit"`
+}
+
 // ChatMember contains information about one member of a chat.
 type ChatMember struct {
 	// User information about the user
@@ -1369,6 +1449,14 @@ type ChatMember struct {
 	//
 	// optional
 	CanBeEdited bool `json:"can_be_edited,omitempty"`
+	// CanManageChat administrators only.
+	// True, if the administrator can access the chat event log, chat
+	// statistics, message statistics in channels, see channel members, see
+	// anonymous administrators in supergoups and ignore slow mode. Implied by
+	// any other administrator privilege.
+	//
+	// optional
+	CanManageChat bool `json:"can_manage_chat"`
 	// CanPostMessages administrators only.
 	// True, if the administrator can post in the channel;
 	// channels only.
@@ -1386,6 +1474,11 @@ type ChatMember struct {
 	//
 	// optional
 	CanDeleteMessages bool `json:"can_delete_messages,omitempty"`
+	// CanManageVoiceChats administrators only.
+	// True, if the administrator can manage voice chats.
+	//
+	// optional
+	CanManageVoiceChats bool `json:"can_manage_voice_chats"`
 	// CanRestrictMembers administrators only.
 	// True, if the administrator can restrict, ban or unban chat members.
 	//
@@ -1454,6 +1547,25 @@ func (chat ChatMember) HasLeft() bool { return chat.Status == "left" }
 
 // WasKicked returns if the ChatMember was kicked from the chat.
 func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
+
+// ChatMemberUpdated represents changes in the status of a chat member.
+type ChatMemberUpdated struct {
+	// Chat the user belongs to.
+	Chat Chat `json:"chat"`
+	// From is the performer of the action, which resulted in the change.
+	From User `json:"from"`
+	// Date the change was done in Unix time.
+	Date int `json:"date"`
+	// Previous information about the chat member.
+	OldChatMember ChatMember `json:"old_chat_member"`
+	// New information about the chat member.
+	NewChatMember ChatMember `json:"new_chat_member"`
+	// InviteLink is the link which was used by the user to join the chat;
+	// for joining by invite link events only.
+	//
+	// optional
+	InviteLink *ChatInviteLink `json:"invite_link"`
+}
 
 // ChatPermissions describes actions that a non-administrator user is
 // allowed to take in a chat. All fields are optional.

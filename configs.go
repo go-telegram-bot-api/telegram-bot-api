@@ -1067,7 +1067,8 @@ func (config UnbanChatMemberConfig) params() (Params, error) {
 // KickChatMemberConfig contains extra fields to kick user
 type KickChatMemberConfig struct {
 	ChatMemberConfig
-	UntilDate int64
+	UntilDate      int64
+	RevokeMessages bool
 }
 
 func (config KickChatMemberConfig) method() string {
@@ -1080,6 +1081,7 @@ func (config KickChatMemberConfig) params() (Params, error) {
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("user_id", config.UserID)
 	params.AddNonZero64("until_date", config.UntilDate)
+	params.AddBool("revoke_messages", config.RevokeMessages)
 
 	return params, nil
 }
@@ -1110,15 +1112,17 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 // PromoteChatMemberConfig contains fields to promote members of chat
 type PromoteChatMemberConfig struct {
 	ChatMemberConfig
-	IsAnonymous        bool
-	CanChangeInfo      bool
-	CanPostMessages    bool
-	CanEditMessages    bool
-	CanDeleteMessages  bool
-	CanInviteUsers     bool
-	CanRestrictMembers bool
-	CanPinMessages     bool
-	CanPromoteMembers  bool
+	IsAnonymous         bool
+	CanManageChat       bool
+	CanChangeInfo       bool
+	CanPostMessages     bool
+	CanEditMessages     bool
+	CanDeleteMessages   bool
+	CanManageVoiceChats bool
+	CanInviteUsers      bool
+	CanRestrictMembers  bool
+	CanPinMessages      bool
+	CanPromoteMembers   bool
 }
 
 func (config PromoteChatMemberConfig) method() string {
@@ -1132,10 +1136,12 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params.AddNonZero("user_id", config.UserID)
 
 	params.AddBool("is_anonymous", config.IsAnonymous)
+	params.AddBool("can_manage_chat", config.CanManageChat)
 	params.AddBool("can_change_info", config.CanChangeInfo)
 	params.AddBool("can_post_messages", config.CanPostMessages)
 	params.AddBool("can_edit_messages", config.CanEditMessages)
 	params.AddBool("can_delete_messages", config.CanDeleteMessages)
+	params.AddBool("can_manage_voice_chats", config.CanManageVoiceChats)
 	params.AddBool("can_invite_users", config.CanInviteUsers)
 	params.AddBool("can_restrict_members", config.CanRestrictMembers)
 	params.AddBool("can_pin_messages", config.CanPinMessages)
@@ -1242,6 +1248,77 @@ func (config ChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
+// CreateChatInviteLinkConfig allows you to create an additional invite link for
+// a chat. The bot must be an administrator in the chat for this to work and
+// must have the appropriate admin rights. The link can be revoked using the
+// RevokeChatInviteLinkConfig.
+type CreateChatInviteLinkConfig struct {
+	ChatConfig
+	ExpireDate  int
+	MemberLimit int
+}
+
+func (CreateChatInviteLinkConfig) method() string {
+	return "createChatInviteLink"
+}
+
+func (config CreateChatInviteLinkConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("expire_date", config.ExpireDate)
+	params.AddNonZero("member_limit", config.MemberLimit)
+
+	return params, nil
+}
+
+// EditChatInviteLinkConfig allows you to edit a non-primary invite link created
+// by the bot. The bot must be an administrator in the chat for this to work and
+// must have the appropriate admin rights.
+type EditChatInviteLinkConfig struct {
+	ChatConfig
+	InviteLink  string
+	ExpireDate  int
+	MemberLimit int
+}
+
+func (EditChatInviteLinkConfig) method() string {
+	return "editChatInviteLink"
+}
+
+func (config EditChatInviteLinkConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params["invite_link"] = config.InviteLink
+	params.AddNonZero("expire_date", config.ExpireDate)
+	params.AddNonZero("member_limit", config.MemberLimit)
+
+	return params, nil
+}
+
+// RevokeChatInviteLinkConfig allows you to revoke an invite link created by the
+// bot. If the primary link is revoked, a new link is automatically generated.
+// The bot must be an administrator in the chat for this to work and must have
+// the appropriate admin rights.
+type RevokeChatInviteLinkConfig struct {
+	ChatConfig
+	InviteLink string
+}
+
+func (RevokeChatInviteLinkConfig) method() string {
+	return "revokeChatInviteLink"
+}
+
+func (config RevokeChatInviteLinkConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params["invite_link"] = config.InviteLink
 
 	return params, nil
 }
@@ -1885,8 +1962,9 @@ func (config SetMyCommandsConfig) params() (Params, error) {
 type DiceConfig struct {
 	BaseChat
 	// Emoji on which the dice throw animation is based.
-	// Currently, must be one of “🎲”, “🎯”, or “🏀”.
-	// Dice can have values 1-6 for “🎲” and “🎯”, and values 1-5 for “🏀”.
+	// Currently, must be one of 🎲, 🎯, 🏀, ⚽, 🎳, or 🎰.
+	// Dice can have values 1-6 for 🎲, 🎯, and 🎳, values 1-5 for 🏀 and ⚽,
+	// and values 1-64 for 🎰.
 	// Defaults to “🎲”
 	Emoji string
 }
