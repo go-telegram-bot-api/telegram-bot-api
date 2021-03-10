@@ -794,7 +794,7 @@ func (config GameConfig) method() string {
 
 // SetGameScoreConfig allows you to update the game score in a chat.
 type SetGameScoreConfig struct {
-	UserID             int
+	UserID             int64
 	Score              int
 	Force              bool
 	DisableEditMessage bool
@@ -807,7 +807,7 @@ type SetGameScoreConfig struct {
 func (config SetGameScoreConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 	params.AddNonZero("scrore", config.Score)
 	params.AddBool("disable_edit_message", config.DisableEditMessage)
 
@@ -827,8 +827,8 @@ func (config SetGameScoreConfig) method() string {
 
 // GetGameHighScoresConfig allows you to fetch the high scores for a game.
 type GetGameHighScoresConfig struct {
-	UserID          int
-	ChatID          int
+	UserID          int64
+	ChatID          int64
 	ChannelUsername string
 	MessageID       int
 	InlineMessageID string
@@ -837,7 +837,7 @@ type GetGameHighScoresConfig struct {
 func (config GetGameHighScoresConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 
 	if config.InlineMessageID != "" {
 		params["inline_message_id"] = config.InlineMessageID
@@ -979,7 +979,7 @@ func (StopPollConfig) method() string {
 // UserProfilePhotosConfig contains information about a
 // GetUserProfilePhotos request.
 type UserProfilePhotosConfig struct {
-	UserID int
+	UserID int64
 	Offset int
 	Limit  int
 }
@@ -991,7 +991,7 @@ func (UserProfilePhotosConfig) method() string {
 func (config UserProfilePhotosConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 	params.AddNonZero("offset", config.Offset)
 	params.AddNonZero("limit", config.Limit)
 
@@ -1174,7 +1174,7 @@ type ChatMemberConfig struct {
 	ChatID             int64
 	SuperGroupUsername string
 	ChannelUsername    string
-	UserID             int
+	UserID             int64
 }
 
 // UnbanChatMemberConfig allows you to unban a user.
@@ -1191,7 +1191,7 @@ func (config UnbanChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 	params.AddBool("only_if_banned", config.OnlyIfBanned)
 
 	return params, nil
@@ -1212,7 +1212,7 @@ func (config KickChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 	params.AddNonZero64("until_date", config.UntilDate)
 	params.AddBool("revoke_messages", config.RevokeMessages)
 
@@ -1234,7 +1234,7 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 
 	err := params.AddInterface("permissions", config.Permissions)
 	params.AddNonZero64("until_date", config.UntilDate)
@@ -1266,7 +1266,7 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 
 	params.AddBool("is_anonymous", config.IsAnonymous)
 	params.AddBool("can_manage_chat", config.CanManageChat)
@@ -1298,7 +1298,7 @@ func (config SetChatAdministratorCustomTitle) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 	params.AddNonEmpty("custom_title", config.CustomTitle)
 
 	return params, nil
@@ -1478,14 +1478,14 @@ func (config LeaveChatConfig) params() (Params, error) {
 type ChatConfigWithUser struct {
 	ChatID             int64
 	SuperGroupUsername string
-	UserID             int
+	UserID             int64
 }
 
 func (config ChatConfigWithUser) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 
 	return params, nil
 }
@@ -1930,7 +1930,7 @@ func (config DeleteStickerConfig) params() (Params, error) {
 // SetStickerSetThumbConfig allows you to set the thumbnail for a sticker set.
 type SetStickerSetThumbConfig struct {
 	Name   string
-	UserID int
+	UserID int64
 	Thumb  interface{}
 }
 
@@ -1942,7 +1942,7 @@ func (config SetStickerSetThumbConfig) params() (Params, error) {
 	params := make(Params)
 
 	params["name"] = config.Name
-	params.AddNonZero("user_id", config.UserID)
+	params.AddNonZero64("user_id", config.UserID)
 
 	return params, nil
 }

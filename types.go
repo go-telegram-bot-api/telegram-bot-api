@@ -123,7 +123,7 @@ func (ch UpdatesChannel) Clear() {
 // User represents a Telegram user or bot.
 type User struct {
 	// ID is a unique identifier for this user or bot
-	ID int `json:"id"`
+	ID int64 `json:"id"`
 	// IsBot true, if this user is a bot
 	//
 	// optional
@@ -916,7 +916,7 @@ type Contact struct {
 	// UserID contact's user identifier in Telegram
 	//
 	// optional
-	UserID int `json:"user_id,omitempty"`
+	UserID int64 `json:"user_id,omitempty"`
 	// VCard is additional data about the contact in the form of a vCard.
 	//
 	// optional
