@@ -38,6 +38,15 @@ pull request!
   evaluating updates, you must make sure you check that the field is not nil
   before trying to access any of it's fields.
 
+## Privacy Mode
+
+- By default, bots only get updates directly addressed to them. If you need to
+  get all messages, you must disable privacy mode with Botfather. Bots already
+  added to groups will need to be removed and readded for the changes to take
+  effect. You can read more on the [Telegram Bot API docs][api-docs].
+
+[api-docs]: https://core.telegram.org/bots/faq#what-messages-will-my-bot-get
+
 ## User and Chat ID size
 
 - These types require up to 52 significant bits to store correctly, making a
