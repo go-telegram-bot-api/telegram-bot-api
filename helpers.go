@@ -29,7 +29,8 @@ func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 // NewMessageToChannel creates a new Message that is sent to a channel
 // by username.
 //
-// username is the username of the channel, text is the message text.
+// username is the username of the channel, text is the message text,
+// and the username should be in the form of `@username`.
 func NewMessageToChannel(username string, text string) MessageConfig {
 	return MessageConfig{
 		BaseChat: BaseChat{
@@ -51,7 +52,22 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
+// NewCopyMessage creates a new copy message.
+//
+// chatID is where to send it, fromChatID is the source chat,
+// and messageID is the ID of the original message.
+func NewCopyMessage(chatID int64, fromChatID int64, messageID int) CopyMessageConfig {
+	return CopyMessageConfig{
+		BaseChat:   BaseChat{ChatID: chatID},
+		FromChatID: fromChatID,
+		MessageID:  messageID,
+	}
+}
+
 // NewPhoto creates a new sendPhoto request.
+//
+// chatID is where to send it, file is a string path to the file,
+// FileReader, or FileBytes.
 //
 // Note that you must send animated GIFs as a document.
 func NewPhoto(chatID int64, file interface{}) PhotoConfig {
@@ -370,7 +386,7 @@ func NewInlineQueryResultCachedGIF(id, gifID string) InlineQueryResultCachedGIF 
 	return InlineQueryResultCachedGIF{
 		Type:  "gif",
 		ID:    id,
-		GifID: gifID,
+		GIFID: gifID,
 	}
 }
 
@@ -383,12 +399,12 @@ func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 	}
 }
 
-// NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached photo.
-func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GifID string) InlineQueryResultCachedMpeg4Gif {
-	return InlineQueryResultCachedMpeg4Gif{
-		Type:   "mpeg4_gif",
-		ID:     id,
-		MGifID: MPEG4GifID,
+// NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached MPEG4 GIF.
+func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GIFID string) InlineQueryResultCachedMPEG4GIF {
+	return InlineQueryResultCachedMPEG4GIF{
+		Type:        "mpeg4_gif",
+		ID:          id,
+		MPEG4FileID: MPEG4GIFID,
 	}
 }
 
@@ -543,6 +559,18 @@ func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTex
 	}
 }
 
+// NewEditMessageTextAndMarkup allows you to edit the text and replymarkup of a message.
+func NewEditMessageTextAndMarkup(chatID int64, messageID int, text string, replyMarkup InlineKeyboardMarkup) EditMessageTextConfig {
+	return EditMessageTextConfig{
+		BaseEdit: BaseEdit{
+			ChatID:      chatID,
+			MessageID:   messageID,
+			ReplyMarkup: &replyMarkup,
+		},
+		Text: text,
+	}
+}
+
 // NewEditMessageCaption allows you to edit the caption of a message.
 func NewEditMessageCaption(chatID int64, messageID int, caption string) EditMessageCaptionConfig {
 	return EditMessageCaptionConfig{
@@ -563,17 +591,6 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 			MessageID:   messageID,
 			ReplyMarkup: &replyMarkup,
 		},
-	}
-}
-
-// NewHideKeyboard hides the keyboard, with the option for being selective
-// or hiding for everyone.
-func NewHideKeyboard(selective bool) ReplyKeyboardHide {
-	log.Println("NewHideKeyboard is deprecated, please use NewRemoveKeyboard")
-
-	return ReplyKeyboardHide{
-		HideKeyboard: true,
-		Selective:    selective,
 	}
 }
 

@@ -17,14 +17,20 @@ import (
 	"time"
 )
 
+// HTTPClient is the type needed for the bot to perform HTTP requests.
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+	PostForm(url string, data url.Values) (*http.Response, error)
+}
+
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
 	Token  string `json:"token"`
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self            User         `json:"-"`
-	Client          *http.Client `json:"-"`
+	Self            User       `json:"-"`
+	Client          HTTPClient `json:"-"`
 	shutdownChannel chan interface{}
 
 	apiEndpoint string
@@ -34,21 +40,29 @@ type BotAPI struct {
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPI(token string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, &http.Client{})
+	return NewBotAPIWithClient(token, APIEndpoint, &http.Client{})
+}
+
+// NewBotAPIWithAPIEndpoint creates a new BotAPI instance
+// and allows you to pass API endpoint.
+//
+// It requires a token, provided by @BotFather on Telegram and API endpoint.
+func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
+	return NewBotAPIWithClient(token, apiEndpoint, &http.Client{})
 }
 
 // NewBotAPIWithClient creates a new BotAPI instance
 // and allows you to pass a http.Client.
 //
-// It requires a token, provided by @BotFather on Telegram.
-func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
+// It requires a token, provided by @BotFather on Telegram and API endpoint.
+func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:           token,
 		Client:          client,
 		Buffer:          100,
 		shutdownChannel: make(chan interface{}),
 
-		apiEndpoint: APIEndpoint,
+		apiEndpoint: apiEndpoint,
 	}
 
 	self, err := bot.GetMe()
@@ -411,7 +425,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // GetUpdates fetches updates.
 // If a WebHook is set, this will not return any data!
 //
-// Offset, Limit, and Timeout are optional.
+// Offset, Limit, Timeout, and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
@@ -449,6 +463,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 		for {
 			select {
 			case <-bot.shutdownChannel:
+				close(ch)
 				return
 			default:
 			}
@@ -487,21 +502,35 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		ch <- bot.HandleUpdate(w, r)
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(errMsg)
+			return
+		}
+
+		ch <- *update
 	})
 
 	return ch
 }
 
 // HandleUpdate parses and returns update received via webhook
-func (bot *BotAPI) HandleUpdate(res http.ResponseWriter, req *http.Request) Update {
-	bytes, _ := ioutil.ReadAll(req.Body)
-	req.Body.Close()
+func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
+	if r.Method != http.MethodPost {
+		err := errors.New("wrong HTTP method required POST")
+		return nil, err
+	}
 
 	var update Update
-	json.Unmarshal(bytes, &update)
+	err := json.NewDecoder(r.Body).Decode(&update)
+	if err != nil {
+		return nil, err
+	}
 
-	return update
+	return &update, nil
 }
 
 // WriteToHTTPResponse writes the request to the HTTP ResponseWriter.
@@ -650,4 +679,24 @@ func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
 	err = json.Unmarshal(resp.Result, &commands)
 
 	return commands, err
+}
+
+// CopyMessage copy messages of any kind. The method is analogous to the method
+// forwardMessage, but the copied message doesn't have a link to the original
+// message. Returns the MessageID of the sent message on success.
+func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
+	params, err := config.params()
+	if err != nil {
+		return MessageID{}, err
+	}
+
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return MessageID{}, err
+	}
+
+	var messageID MessageID
+	err = json.Unmarshal(resp.Result, &messageID)
+
+	return messageID, err
 }
