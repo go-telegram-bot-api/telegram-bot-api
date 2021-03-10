@@ -52,6 +52,18 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
+// NewCopyMessage creates a new copy message.
+//
+// chatID is where to send it, fromChatID is the source chat,
+// and messageID is the ID of the original message.
+func NewCopyMessage(chatID int64, fromChatID int64, messageID int) CopyMessageConfig {
+	return CopyMessageConfig{
+		BaseChat:   BaseChat{ChatID: chatID},
+		FromChatID: fromChatID,
+		MessageID:  messageID,
+	}
+}
+
 // NewPhotoUpload creates a new photo uploader.
 //
 // chatID is where to send it, file is a string path to the file,
@@ -528,7 +540,7 @@ func NewInlineQueryResultCachedGIF(id, gifID string) InlineQueryResultCachedGIF 
 	return InlineQueryResultCachedGIF{
 		Type:  "gif",
 		ID:    id,
-		GifID: gifID,
+		GIFID: gifID,
 	}
 }
 
@@ -542,11 +554,11 @@ func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 }
 
 // NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached MPEG4 GIF.
-func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GifID string) InlineQueryResultCachedMPEG4GIF {
+func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GIFID string) InlineQueryResultCachedMPEG4GIF {
 	return InlineQueryResultCachedMPEG4GIF{
 		Type:        "mpeg4_gif",
 		ID:          id,
-		MPEG4FileID: MPEG4GifID,
+		MPEG4FileID: MPEG4GIFID,
 	}
 }
 

@@ -387,7 +387,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // GetUpdates fetches updates.
 // If a WebHook is set, this will not return any data!
 //
-// Offset, Limit, and Timeout are optional.
+// Offset, Limit, Timeout, and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
@@ -667,4 +667,24 @@ func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
 	err = json.Unmarshal(resp.Result, &commands)
 
 	return commands, err
+}
+
+// CopyMessage copy messages of any kind. The method is analogous to the method
+// forwardMessage, but the copied message doesn't have a link to the original
+// message. Returns the MessageID of the sent message on success.
+func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
+	params, err := config.params()
+	if err != nil {
+		return MessageID{}, err
+	}
+
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return MessageID{}, err
+	}
+
+	var messageID MessageID
+	err = json.Unmarshal(resp.Result, &messageID)
+
+	return messageID, err
 }

@@ -73,7 +73,7 @@ func TestSendWithMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
-	msg.ParseMode = "markdown"
+	msg.ParseMode = ModeMarkdown
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -101,6 +101,26 @@ func TestSendWithMessageForward(t *testing.T) {
 
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestCopyMessage(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
+	message, err := bot.Send(msg)
+	if err != nil {
+		t.Error(err)
+	}
+
+	copyMessageConfig := NewCopyMessage(SupergroupChatID, message.Chat.ID, message.MessageID)
+	messageID, err := bot.CopyMessage(copyMessageConfig)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if messageID.MessageID == message.MessageID {
+		t.Error("copied message ID was the same as original message")
 	}
 }
 
@@ -518,7 +538,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 
 	wh := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
 	_, err := bot.Request(wh)
@@ -532,7 +552,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 	}
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -540,7 +560,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 
 	wh := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 	_, err := bot.Request(wh)
@@ -560,7 +580,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}
 
-	bot.Request(RemoveWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{})
 }
 
 func TestSendWithMediaGroup(t *testing.T) {
@@ -724,7 +744,7 @@ func TestDeleteMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
-	msg.ParseMode = "markdown"
+	msg.ParseMode = ModeMarkdown
 	message, _ := bot.Send(msg)
 
 	deleteMessageConfig := DeleteMessageConfig{
@@ -742,7 +762,7 @@ func TestPinChatMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
-	msg.ParseMode = "markdown"
+	msg.ParseMode = ModeMarkdown
 	message, _ := bot.Send(msg)
 
 	pinChatMessageConfig := PinChatMessageConfig{
@@ -761,7 +781,7 @@ func TestUnpinChatMessage(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
-	msg.ParseMode = "markdown"
+	msg.ParseMode = ModeMarkdown
 	message, _ := bot.Send(msg)
 
 	// We need pin message to unpin something
@@ -776,10 +796,37 @@ func TestUnpinChatMessage(t *testing.T) {
 	}
 
 	unpinChatMessageConfig := UnpinChatMessageConfig{
-		ChatID: message.Chat.ID,
+		ChatID:    message.Chat.ID,
+		MessageID: message.MessageID,
 	}
 
 	if _, err := bot.Request(unpinChatMessageConfig); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestUnpinAllChatMessages(t *testing.T) {
+	bot, _ := getBot(t)
+
+	msg := NewMessage(SupergroupChatID, "A test message from the test library in telegram-bot-api")
+	msg.ParseMode = ModeMarkdown
+	message, _ := bot.Send(msg)
+
+	pinChatMessageConfig := PinChatMessageConfig{
+		ChatID:              message.Chat.ID,
+		MessageID:           message.MessageID,
+		DisableNotification: true,
+	}
+
+	if _, err := bot.Request(pinChatMessageConfig); err != nil {
+		t.Error(err)
+	}
+
+	unpinAllChatMessagesConfig := UnpinAllChatMessagesConfig{
+		ChatID: message.Chat.ID,
+	}
+
+	if _, err := bot.Request(unpinAllChatMessagesConfig); err != nil {
 		t.Error(err)
 	}
 }
