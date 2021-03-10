@@ -12,8 +12,9 @@ pull request!
 
 ## ChatMemberUpdated
 
-- In order to receive `chat_member` and updates, you must explicitly add it to
-  your `allowed_updates` when getting updates or setting your webhook.
+- In order to receive `ChatMember` updates, you must explicitly add
+  `UpdateTypeChatMember` to your `AllowedUpdates` when getting updates or
+  setting your webhook.
 
 ## Entities use UTF16
 
