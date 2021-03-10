@@ -339,3 +339,24 @@ var (
 	_ Chattable = VoiceConfig{}
 	_ Chattable = WebhookConfig{}
 )
+
+// Ensure all Fileable types are correct.
+var (
+	_ Fileable = (*PhotoConfig)(nil)
+	_ Fileable = (*AudioConfig)(nil)
+	_ Fileable = (*DocumentConfig)(nil)
+	_ Fileable = (*StickerConfig)(nil)
+	_ Fileable = (*VideoConfig)(nil)
+	_ Fileable = (*AnimationConfig)(nil)
+	_ Fileable = (*VideoNoteConfig)(nil)
+	_ Fileable = (*VoiceConfig)(nil)
+	_ Fileable = (*SetChatPhotoConfig)(nil)
+	_ Fileable = (*EditMessageMediaConfig)(nil)
+	_ Fileable = (*SetChatPhotoConfig)(nil)
+	_ Fileable = (*UploadStickerConfig)(nil)
+	_ Fileable = (*NewStickerSetConfig)(nil)
+	_ Fileable = (*AddStickerConfig)(nil)
+	_ Fileable = (*MediaGroupConfig)(nil)
+	_ Fileable = (*WebhookConfig)(nil)
+	_ Fileable = (*SetStickerSetThumbConfig)(nil)
+)

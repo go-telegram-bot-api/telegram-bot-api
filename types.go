@@ -180,12 +180,6 @@ func (u *User) String() string {
 	return name
 }
 
-// GroupChat is a group chat.
-type GroupChat struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-}
-
 // Chat represents a chat.
 type Chat struct {
 	// ID is a unique identifier for this chat
@@ -1654,7 +1648,7 @@ type BaseInputMedia struct {
 	// pass an HTTP URL for Telegram to get a file from the Internet,
 	// or pass “attach://<file_attach_name>” to upload a new one
 	// using multipart/form-data under <file_attach_name> name.
-	Media string `json:"media"`
+	Media interface{} `json:"media"`
 	// thumb intentionally missing as it is not currently compatible
 
 	// Caption of the video to be sent, 0-1024 characters after entities parsing.
@@ -1682,6 +1676,11 @@ type InputMediaPhoto struct {
 // InputMediaVideo is a video to send as part of a media group.
 type InputMediaVideo struct {
 	BaseInputMedia
+	// Thumbnail of the file sent; can be ignored if thumbnail generation for
+	// the file is supported server-side.
+	//
+	// optional
+	Thumb interface{} `json:"thumb"`
 	// Width video width
 	//
 	// optional
@@ -1703,6 +1702,11 @@ type InputMediaVideo struct {
 // InputMediaAnimation is an animation to send as part of a media group.
 type InputMediaAnimation struct {
 	BaseInputMedia
+	// Thumbnail of the file sent; can be ignored if thumbnail generation for
+	// the file is supported server-side.
+	//
+	// optional
+	Thumb interface{} `json:"thumb"`
 	// Width video width
 	//
 	// optional
@@ -1720,6 +1724,11 @@ type InputMediaAnimation struct {
 // InputMediaAudio is a audio to send as part of a media group.
 type InputMediaAudio struct {
 	BaseInputMedia
+	// Thumbnail of the file sent; can be ignored if thumbnail generation for
+	// the file is supported server-side.
+	//
+	// optional
+	Thumb interface{} `json:"thumb"`
 	// Duration of the audio in seconds
 	//
 	// optional
@@ -1737,6 +1746,11 @@ type InputMediaAudio struct {
 // InputMediaDocument is a general file to send as part of a media group.
 type InputMediaDocument struct {
 	BaseInputMedia
+	// Thumbnail of the file sent; can be ignored if thumbnail generation for
+	// the file is supported server-side.
+	//
+	// optional
+	Thumb interface{} `json:"thumb"`
 	// DisableContentTypeDetection disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data. Always true, if
 	// the document is sent as part of an album

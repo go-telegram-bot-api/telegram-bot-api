@@ -1,6 +1,7 @@
 package tgbotapi
 
 import (
+	"fmt"
 	"io"
 	"net/url"
 	"strconv"
@@ -103,12 +104,19 @@ type Chattable interface {
 	method() string
 }
 
+// RequestFile represents a file associated with a request. May involve
+// uploading a file, or passing an existing ID.
+type RequestFile struct {
+	// The multipart upload field name.
+	Name string
+	// The file to upload.
+	File interface{}
+}
+
 // Fileable is any config type that can be sent that includes a file.
 type Fileable interface {
 	Chattable
-	name() string
-	getFile() interface{}
-	useExistingFile() bool
+	files() []RequestFile
 }
 
 // LogOutConfig is a request to log out of the cloud Bot API server.
@@ -164,28 +172,11 @@ func (chat *BaseChat) params() (Params, error) {
 // BaseFile is a base type for all file config types.
 type BaseFile struct {
 	BaseChat
-	File        interface{}
-	FileID      string
-	UseExisting bool
-	MimeType    string
-	FileSize    int
+	File interface{}
 }
 
 func (file BaseFile) params() (Params, error) {
-	params, err := file.BaseChat.params()
-
-	params.AddNonEmpty("mime_type", file.MimeType)
-	params.AddNonZero("file_size", file.FileSize)
-
-	return params, err
-}
-
-func (file BaseFile) getFile() interface{} {
-	return file.File
-}
-
-func (file BaseFile) useExistingFile() bool {
-	return file.UseExisting
+	return file.BaseChat.params()
 }
 
 // BaseEdit is base type of all chat edits.
@@ -296,6 +287,7 @@ func (config CopyMessageConfig) method() string {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
+	Thumb           interface{}
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -307,7 +299,6 @@ func (config PhotoConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 	err = params.AddInterface("caption_entities", config.CaptionEntities)
@@ -315,17 +306,30 @@ func (config PhotoConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config PhotoConfig) name() string {
-	return "photo"
-}
-
 func (config PhotoConfig) method() string {
 	return "sendPhoto"
+}
+
+func (config PhotoConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "photo",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	BaseFile
+	Thumb           interface{}
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -340,7 +344,6 @@ func (config AudioConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("performer", config.Performer)
 	params.AddNonEmpty("title", config.Title)
@@ -351,17 +354,30 @@ func (config AudioConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config AudioConfig) name() string {
-	return "audio"
-}
-
 func (config AudioConfig) method() string {
 	return "sendAudio"
+}
+
+func (config AudioConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "audio",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
+	Thumb                       interface{}
 	Caption                     string
 	ParseMode                   string
 	CaptionEntities             []MessageEntity
@@ -371,7 +387,6 @@ type DocumentConfig struct {
 func (config DocumentConfig) params() (Params, error) {
 	params, err := config.BaseFile.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 	params.AddBool("disable_content_type_detection", config.DisableContentTypeDetection)
@@ -379,12 +394,24 @@ func (config DocumentConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config DocumentConfig) name() string {
-	return "document"
-}
-
 func (config DocumentConfig) method() string {
 	return "sendDocument"
+}
+
+func (config DocumentConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "document",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // StickerConfig contains information about a SendSticker request.
@@ -393,24 +420,24 @@ type StickerConfig struct {
 }
 
 func (config StickerConfig) params() (Params, error) {
-	params, err := config.BaseChat.params()
-
-	params.AddNonEmpty(config.name(), config.FileID)
-
-	return params, err
-}
-
-func (config StickerConfig) name() string {
-	return "sticker"
+	return config.BaseChat.params()
 }
 
 func (config StickerConfig) method() string {
 	return "sendSticker"
 }
 
+func (config StickerConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "sticker",
+		File: config.File,
+	}}
+}
+
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
+	Thumb             interface{}
 	Duration          int
 	Caption           string
 	ParseMode         string
@@ -424,7 +451,6 @@ func (config VideoConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -434,18 +460,31 @@ func (config VideoConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config VideoConfig) name() string {
-	return "video"
-}
-
 func (config VideoConfig) method() string {
 	return "sendVideo"
+}
+
+func (config VideoConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "video",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // AnimationConfig contains information about a SendAnimation request.
 type AnimationConfig struct {
 	BaseFile
 	Duration        int
+	Thumb           interface{}
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -457,7 +496,6 @@ func (config AnimationConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -466,17 +504,30 @@ func (config AnimationConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config AnimationConfig) name() string {
-	return "animation"
-}
-
 func (config AnimationConfig) method() string {
 	return "sendAnimation"
+}
+
+func (config AnimationConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "animation",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // VideoNoteConfig contains information about a SendVideoNote request.
 type VideoNoteConfig struct {
 	BaseFile
+	Thumb    interface{}
 	Duration int
 	Length   int
 }
@@ -484,24 +535,36 @@ type VideoNoteConfig struct {
 func (config VideoNoteConfig) params() (Params, error) {
 	params, err := config.BaseChat.params()
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonZero("length", config.Length)
 
 	return params, err
 }
 
-func (config VideoNoteConfig) name() string {
-	return "video_note"
-}
-
 func (config VideoNoteConfig) method() string {
 	return "sendVideoNote"
+}
+
+func (config VideoNoteConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "video_note",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
+	Thumb           interface{}
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -514,7 +577,6 @@ func (config VoiceConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddNonEmpty(config.name(), config.FileID)
 	params.AddNonZero("duration", config.Duration)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -523,12 +585,24 @@ func (config VoiceConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config VoiceConfig) name() string {
-	return "voice"
-}
-
 func (config VoiceConfig) method() string {
 	return "sendVoice"
+}
+
+func (config VoiceConfig) files() []RequestFile {
+	files := []RequestFile{{
+		Name: "voice",
+		File: config.File,
+	}}
+
+	if config.Thumb != nil {
+		files = append(files, RequestFile{
+			Name: "thumb",
+			File: config.Thumb,
+		})
+	}
+
+	return files
 }
 
 // LocationConfig contains information about a SendLocation request.
@@ -849,7 +923,7 @@ func (config EditMessageCaptionConfig) method() string {
 	return "editMessageCaption"
 }
 
-// EditMessageMediaConfig contains information about editing a message's media.
+// EditMessageMediaConfig allows you to make an editMessageMedia request.
 type EditMessageMediaConfig struct {
 	BaseEdit
 
@@ -862,10 +936,17 @@ func (EditMessageMediaConfig) method() string {
 
 func (config EditMessageMediaConfig) params() (Params, error) {
 	params, err := config.BaseEdit.params()
+	if err != nil {
+		return params, err
+	}
 
-	params.AddInterface("media", config.Media)
+	err = params.AddInterface("media", prepareInputMediaParam(config.Media, 0))
 
 	return params, err
+}
+
+func (config EditMessageMediaConfig) files() []RequestFile {
+	return prepareInputMediaFile(config.Media, 0)
 }
 
 // EditMessageReplyMarkupConfig allows you to modify the reply markup
@@ -980,22 +1061,21 @@ func (config WebhookConfig) params() (Params, error) {
 
 	params.AddNonEmpty("ip_address", config.IPAddress)
 	params.AddNonZero("max_connections", config.MaxConnections)
-	params.AddInterface("allowed_updates", config.AllowedUpdates)
+	err := params.AddInterface("allowed_updates", config.AllowedUpdates)
 	params.AddBool("drop_pending_updates", config.DropPendingUpdates)
 
-	return params, nil
+	return params, err
 }
 
-func (config WebhookConfig) name() string {
-	return "certificate"
-}
+func (config WebhookConfig) files() []RequestFile {
+	if config.Certificate != nil {
+		return []RequestFile{{
+			Name: "certificate",
+			File: config.Certificate,
+		}}
+	}
 
-func (config WebhookConfig) getFile() interface{} {
-	return config.Certificate
-}
-
-func (config WebhookConfig) useExistingFile() bool {
-	return config.URL != nil
+	return nil
 }
 
 // DeleteWebhookConfig is a helper to delete a webhook.
@@ -1023,13 +1103,16 @@ type FileBytes struct {
 }
 
 // FileReader contains information about a reader to upload as a File.
-// If Size is -1, it will read the entire Reader into memory to
-// calculate a Size.
 type FileReader struct {
 	Name   string
 	Reader io.Reader
-	Size   int64
 }
+
+// FileURL is a URL to use as a file for a request.
+type FileURL string
+
+// FileID is an ID of a file already uploaded to Telegram.
+type FileID string
 
 // InlineConfig contains information on making an InlineQuery response.
 type InlineConfig struct {
@@ -1278,9 +1361,9 @@ func (config SetChatPermissionsConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
-	params.AddInterface("permissions", config.Permissions)
+	err := params.AddInterface("permissions", config.Permissions)
 
-	return params, nil
+	return params, err
 }
 
 // ChatInviteLinkConfig contains information about getting a chat link.
@@ -1610,16 +1693,11 @@ func (config SetChatPhotoConfig) method() string {
 	return "setChatPhoto"
 }
 
-func (config SetChatPhotoConfig) name() string {
-	return "photo"
-}
-
-func (config SetChatPhotoConfig) getFile() interface{} {
-	return config.File
-}
-
-func (config SetChatPhotoConfig) useExistingFile() bool {
-	return config.UseExisting
+func (config SetChatPhotoConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "photo",
+		File: config.File,
+	}}
 }
 
 // DeleteChatPhotoConfig allows you to delete a group, supergroup, or channel's photo.
@@ -1717,18 +1795,11 @@ func (config UploadStickerConfig) params() (Params, error) {
 	return params, nil
 }
 
-func (config UploadStickerConfig) name() string {
-	return "png_sticker"
-}
-
-func (config UploadStickerConfig) getFile() interface{} {
-	return config.PNGSticker
-}
-
-func (config UploadStickerConfig) useExistingFile() bool {
-	_, ok := config.PNGSticker.(string)
-
-	return ok
+func (config UploadStickerConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "png_sticker",
+		File: config.PNGSticker,
+	}}
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
@@ -1756,12 +1827,6 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params["name"] = config.Name
 	params["title"] = config.Title
 
-	if sticker, ok := config.PNGSticker.(string); ok {
-		params[config.name()] = sticker
-	} else if sticker, ok := config.TGSSticker.(string); ok {
-		params[config.name()] = sticker
-	}
-
 	params["emojis"] = config.Emojis
 
 	params.AddBool("contains_masks", config.ContainsMasks)
@@ -1771,26 +1836,18 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	return params, err
 }
 
-func (config NewStickerSetConfig) getFile() interface{} {
-	return config.PNGSticker
-}
-
-func (config NewStickerSetConfig) name() string {
-	return "png_sticker"
-}
-
-func (config NewStickerSetConfig) useExistingFile() bool {
+func (config NewStickerSetConfig) files() []RequestFile {
 	if config.PNGSticker != nil {
-		_, ok := config.PNGSticker.(string)
-		return ok
+		return []RequestFile{{
+			Name: "png_sticker",
+			File: config.PNGSticker,
+		}}
 	}
 
-	if config.TGSSticker != nil {
-		_, ok := config.TGSSticker.(string)
-		return ok
-	}
-
-	panic("NewStickerSetConfig had nil PNGSticker and TGSSticker")
+	return []RequestFile{{
+		Name: "tgs_sticker",
+		File: config.TGSSticker,
+	}}
 }
 
 // AddStickerConfig allows you to add a sticker to a set.
@@ -1814,29 +1871,24 @@ func (config AddStickerConfig) params() (Params, error) {
 	params["name"] = config.Name
 	params["emojis"] = config.Emojis
 
-	if sticker, ok := config.PNGSticker.(string); ok {
-		params[config.name()] = sticker
-	} else if sticker, ok := config.TGSSticker.(string); ok {
-		params[config.name()] = sticker
-	}
-
 	err := params.AddInterface("mask_position", config.MaskPosition)
 
 	return params, err
 }
 
-func (config AddStickerConfig) name() string {
-	return "png_sticker"
-}
+func (config AddStickerConfig) files() []RequestFile {
+	if config.PNGSticker != nil {
+		return []RequestFile{{
+			Name: "png_sticker",
+			File: config.PNGSticker,
+		}}
+	}
 
-func (config AddStickerConfig) getFile() interface{} {
-	return config.PNGSticker
-}
+	return []RequestFile{{
+		Name: "tgs_sticker",
+		File: config.TGSSticker,
+	}}
 
-func (config AddStickerConfig) useExistingFile() bool {
-	_, ok := config.PNGSticker.(string)
-
-	return ok
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
@@ -1892,24 +1944,14 @@ func (config SetStickerSetThumbConfig) params() (Params, error) {
 	params["name"] = config.Name
 	params.AddNonZero("user_id", config.UserID)
 
-	if thumb, ok := config.Thumb.(string); ok {
-		params["thumb"] = thumb
-	}
-
 	return params, nil
 }
 
-func (config SetStickerSetThumbConfig) name() string {
-	return "thumb"
-}
-
-func (config SetStickerSetThumbConfig) getFile() interface{} {
-	return config.Thumb
-}
-
-func (config SetStickerSetThumbConfig) useExistingFile() bool {
-	_, ok := config.Thumb.(string)
-	return ok
+func (config SetStickerSetThumbConfig) files() []RequestFile {
+	return []RequestFile{{
+		Name: "thumb",
+		File: config.Thumb,
+	}}
 }
 
 // SetChatStickerSetConfig allows you to set the sticker set for a supergroup.
@@ -1971,13 +2013,42 @@ func (config MediaGroupConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
-	if err := params.AddInterface("media", config.Media); err != nil {
-		return params, nil
-	}
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
-	return params, nil
+	err := params.AddInterface("media", prepareInputMediaForParams(config.Media))
+
+	return params, err
+}
+
+func (config MediaGroupConfig) files() []RequestFile {
+	return prepareInputMediaForFiles(config.Media)
+}
+
+// DiceConfig contains information about a sendDice request.
+type DiceConfig struct {
+	BaseChat
+	// Emoji on which the dice throw animation is based.
+	// Currently, must be one of 🎲, 🎯, 🏀, ⚽, 🎳, or 🎰.
+	// Dice can have values 1-6 for 🎲, 🎯, and 🎳, values 1-5 for 🏀 and ⚽,
+	// and values 1-64 for 🎰.
+	// Defaults to “🎲”
+	Emoji string
+}
+
+func (config DiceConfig) method() string {
+	return "sendDice"
+}
+
+func (config DiceConfig) params() (Params, error) {
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+
+	params.AddNonEmpty("emoji", config.Emoji)
+
+	return params, err
 }
 
 // GetMyCommandsConfig gets a list of the currently registered commands.
@@ -2008,28 +2079,170 @@ func (config SetMyCommandsConfig) params() (Params, error) {
 	return params, err
 }
 
-// DiceConfig contains information about a sendDice request.
-type DiceConfig struct {
-	BaseChat
-	// Emoji on which the dice throw animation is based.
-	// Currently, must be one of 🎲, 🎯, 🏀, ⚽, 🎳, or 🎰.
-	// Dice can have values 1-6 for 🎲, 🎯, and 🎳, values 1-5 for 🏀 and ⚽,
-	// and values 1-64 for 🎰.
-	// Defaults to “🎲”
-	Emoji string
-}
+// prepareInputMediaParam evaluates a single InputMedia and determines if it
+// needs to be modified for a successful upload. If it returns nil, then the
+// value does not need to be included in the params. Otherwise, it will return
+// the same type as was originally provided.
+//
+// The idx is used to calculate the file field name. If you only have a single
+// file, 0 may be used. It is formatted into "attach://file-%d" for the primary
+// media and "attach://file-%d-thumb" for thumbnails.
+//
+// It is expected to be used in conjunction with prepareInputMediaFile.
+func prepareInputMediaParam(inputMedia interface{}, idx int) interface{} {
+	switch m := inputMedia.(type) {
+	case InputMediaPhoto:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
 
-func (config DiceConfig) method() string {
-	return "sendDice"
-}
+		return m
+	case InputMediaVideo:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
 
-func (config DiceConfig) params() (Params, error) {
-	params, err := config.BaseChat.params()
-	if err != nil {
-		return params, err
+		switch m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		}
+
+		return m
+	case InputMediaAudio:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
+
+		switch m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		}
+
+		return m
+	case InputMediaDocument:
+		switch m.Media.(type) {
+		case string, FileBytes, FileReader:
+			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		}
+
+		switch m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		}
+
+		return m
 	}
 
-	params.AddNonEmpty("emoji", config.Emoji)
+	return nil
+}
 
-	return params, err
+// prepareInputMediaFile generates an array of RequestFile to provide for
+// Fileable's files method. It returns an array as a single InputMedia may have
+// multiple files, for the primary media and a thumbnail.
+//
+// The idx parameter is used to generate file field names. It uses the names
+// "file-%d" for the main file and "file-%d-thumb" for the thumbnail.
+//
+// It is expected to be used in conjunction with prepareInputMediaParam.
+func prepareInputMediaFile(inputMedia interface{}, idx int) []RequestFile {
+	files := []RequestFile{}
+
+	switch m := inputMedia.(type) {
+	case InputMediaPhoto:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+	case InputMediaVideo:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+
+		switch f := m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d-thumb", idx),
+				File: f,
+			})
+		}
+	case InputMediaDocument:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+
+		switch f := m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+	case InputMediaAudio:
+		switch f := m.Media.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+
+		switch f := m.Thumb.(type) {
+		case string, FileBytes, FileReader:
+			files = append(files, RequestFile{
+				Name: fmt.Sprintf("file-%d", idx),
+				File: f,
+			})
+		}
+	}
+
+	return files
+}
+
+// prepareInputMediaForParams calls prepareInputMediaParam for each item
+// provided and returns a new array with the correct params for a request.
+//
+// It is expected that files will get data from the associated function,
+// prepareInputMediaForFiles.
+func prepareInputMediaForParams(inputMedia []interface{}) []interface{} {
+	newMedia := make([]interface{}, len(inputMedia))
+	copy(newMedia, inputMedia)
+
+	for idx, media := range inputMedia {
+		if param := prepareInputMediaParam(media, idx); param != nil {
+			newMedia[idx] = param
+		}
+	}
+
+	return newMedia
+}
+
+// prepareInputMediaForFiles calls prepareInputMediaFile for each item
+// provided and returns a new array with the correct files for a request.
+//
+// It is expected that params will get data from the associated function,
+// prepareInputMediaForParams.
+func prepareInputMediaForFiles(inputMedia []interface{}) []RequestFile {
+	files := []RequestFile{}
+
+	for idx, media := range inputMedia {
+		if file := prepareInputMediaFile(media, idx); file != nil {
+			files = append(files, file...)
+		}
+	}
+
+	return files
 }
