@@ -300,25 +300,33 @@ func NewUpdate(offset int) UpdateConfig {
 // NewWebhook creates a new webhook.
 //
 // link is the url parsable link you wish to get the updates.
-func NewWebhook(link string) WebhookConfig {
-	u, _ := url.Parse(link)
+func NewWebhook(link string) (WebhookConfig, error) {
+	u, err := url.Parse(link)
+
+	if err != nil {
+		return WebhookConfig{}, err
+	}
 
 	return WebhookConfig{
 		URL: u,
-	}
+	}, nil
 }
 
 // NewWebhookWithCert creates a new webhook with a certificate.
 //
 // link is the url you wish to get webhooks,
 // file contains a string to a file, FileReader, or FileBytes.
-func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
-	u, _ := url.Parse(link)
+func NewWebhookWithCert(link string, file interface{}) (WebhookConfig, error) {
+	u, err := url.Parse(link)
+
+	if err != nil {
+		return WebhookConfig{}, err
+	}
 
 	return WebhookConfig{
 		URL:         u,
 		Certificate: file,
-	}
+	}, nil
 }
 
 // NewInlineQueryResultArticle creates a new inline query article.
