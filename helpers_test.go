@@ -4,6 +4,31 @@ import (
 	"testing"
 )
 
+func TestNewWebhook(t *testing.T) {
+	result, err := NewWebhook("https://example.com/token")
+
+	if err != nil ||
+		result.URL.String() != "https://example.com/token" ||
+		result.Certificate != interface{}(nil) ||
+		result.MaxConnections != 0 ||
+		len(result.AllowedUpdates) != 0 {
+		t.Fail()
+	}
+}
+
+func TestNewWebhookWithCert(t *testing.T) {
+	exampleFile := File{FileID: "123"}
+	result, err := NewWebhookWithCert("https://example.com/token", exampleFile)
+
+	if err != nil ||
+		result.URL.String() != "https://example.com/token" ||
+		result.Certificate != exampleFile ||
+		result.MaxConnections != 0 ||
+		len(result.AllowedUpdates) != 0 {
+		t.Fail()
+	}
+}
+
 func TestNewInlineQueryResultArticle(t *testing.T) {
 	result := NewInlineQueryResultArticle("id", "title", "message")
 
@@ -176,8 +201,8 @@ func TestNewEditMessageCaption(t *testing.T) {
 func TestNewEditMessageReplyMarkup(t *testing.T) {
 	markup := InlineKeyboardMarkup{
 		InlineKeyboard: [][]InlineKeyboardButton{
-			[]InlineKeyboardButton{
-				InlineKeyboardButton{Text: "test"},
+			{
+				{Text: "test"},
 			},
 		},
 	}
@@ -190,4 +215,22 @@ func TestNewEditMessageReplyMarkup(t *testing.T) {
 		t.Fail()
 	}
 
+}
+
+func TestNewDice(t *testing.T) {
+	dice := NewDice(42)
+
+	if dice.ChatID != 42 ||
+		dice.Emoji != "" {
+		t.Fail()
+	}
+}
+
+func TestNewDiceWithEmoji(t *testing.T) {
+	dice := NewDiceWithEmoji(42, "🏀")
+
+	if dice.ChatID != 42 ||
+		dice.Emoji != "🏀" {
+		t.Fail()
+	}
 }

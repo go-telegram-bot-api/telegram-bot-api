@@ -189,6 +189,86 @@ func TestChatIsSuperGroup(t *testing.T) {
 	}
 }
 
+func TestMessageEntityIsMention(t *testing.T) {
+	entity := MessageEntity{Type: "mention"}
+
+	if !entity.IsMention() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsHashtag(t *testing.T) {
+	entity := MessageEntity{Type: "hashtag"}
+
+	if !entity.IsHashtag() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsBotCommand(t *testing.T) {
+	entity := MessageEntity{Type: "bot_command"}
+
+	if !entity.IsCommand() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsUrl(t *testing.T) {
+	entity := MessageEntity{Type: "url"}
+
+	if !entity.IsURL() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsEmail(t *testing.T) {
+	entity := MessageEntity{Type: "email"}
+
+	if !entity.IsEmail() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsBold(t *testing.T) {
+	entity := MessageEntity{Type: "bold"}
+
+	if !entity.IsBold() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsItalic(t *testing.T) {
+	entity := MessageEntity{Type: "italic"}
+
+	if !entity.IsItalic() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsCode(t *testing.T) {
+	entity := MessageEntity{Type: "code"}
+
+	if !entity.IsCode() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsPre(t *testing.T) {
+	entity := MessageEntity{Type: "pre"}
+
+	if !entity.IsPre() {
+		t.Fail()
+	}
+}
+
+func TestMessageEntityIsTextLink(t *testing.T) {
+	entity := MessageEntity{Type: "text_link"}
+
+	if !entity.IsTextLink() {
+		t.Fail()
+	}
+}
+
 func TestFileLink(t *testing.T) {
 	file := File{FilePath: "test/test.txt"}
 
@@ -203,31 +283,53 @@ var (
 	_ Chattable = AudioConfig{}
 	_ Chattable = CallbackConfig{}
 	_ Chattable = ChatActionConfig{}
+	_ Chattable = ChatAdministratorsConfig{}
+	_ Chattable = ChatInfoConfig{}
+	_ Chattable = ChatInviteLinkConfig{}
+	_ Chattable = CloseConfig{}
 	_ Chattable = ContactConfig{}
+	_ Chattable = CopyMessageConfig{}
+	_ Chattable = CreateChatInviteLinkConfig{}
 	_ Chattable = DeleteChatPhotoConfig{}
 	_ Chattable = DeleteChatStickerSetConfig{}
 	_ Chattable = DeleteMessageConfig{}
+	_ Chattable = DeleteWebhookConfig{}
 	_ Chattable = DocumentConfig{}
+	_ Chattable = EditChatInviteLinkConfig{}
 	_ Chattable = EditMessageCaptionConfig{}
 	_ Chattable = EditMessageLiveLocationConfig{}
+	_ Chattable = EditMessageMediaConfig{}
 	_ Chattable = EditMessageReplyMarkupConfig{}
 	_ Chattable = EditMessageTextConfig{}
+	_ Chattable = FileConfig{}
 	_ Chattable = ForwardConfig{}
 	_ Chattable = GameConfig{}
+	_ Chattable = GetChatMemberConfig{}
 	_ Chattable = GetGameHighScoresConfig{}
 	_ Chattable = InlineConfig{}
 	_ Chattable = InvoiceConfig{}
 	_ Chattable = KickChatMemberConfig{}
+	_ Chattable = LeaveChatConfig{}
 	_ Chattable = LocationConfig{}
+	_ Chattable = LogOutConfig{}
 	_ Chattable = MediaGroupConfig{}
 	_ Chattable = MessageConfig{}
 	_ Chattable = PhotoConfig{}
 	_ Chattable = PinChatMessageConfig{}
+	_ Chattable = PreCheckoutConfig{}
+	_ Chattable = PromoteChatMemberConfig{}
+	_ Chattable = RestrictChatMemberConfig{}
+	_ Chattable = RevokeChatInviteLinkConfig{}
+	_ Chattable = SendPollConfig{}
 	_ Chattable = SetChatDescriptionConfig{}
 	_ Chattable = SetChatPhotoConfig{}
 	_ Chattable = SetChatTitleConfig{}
 	_ Chattable = SetGameScoreConfig{}
+	_ Chattable = ShippingConfig{}
 	_ Chattable = StickerConfig{}
+	_ Chattable = StopMessageLiveLocationConfig{}
+	_ Chattable = StopPollConfig{}
+	_ Chattable = UnbanChatMemberConfig{}
 	_ Chattable = UnpinChatMessageConfig{}
 	_ Chattable = UpdateConfig{}
 	_ Chattable = UserProfilePhotosConfig{}
@@ -236,4 +338,25 @@ var (
 	_ Chattable = VideoNoteConfig{}
 	_ Chattable = VoiceConfig{}
 	_ Chattable = WebhookConfig{}
+)
+
+// Ensure all Fileable types are correct.
+var (
+	_ Fileable = (*PhotoConfig)(nil)
+	_ Fileable = (*AudioConfig)(nil)
+	_ Fileable = (*DocumentConfig)(nil)
+	_ Fileable = (*StickerConfig)(nil)
+	_ Fileable = (*VideoConfig)(nil)
+	_ Fileable = (*AnimationConfig)(nil)
+	_ Fileable = (*VideoNoteConfig)(nil)
+	_ Fileable = (*VoiceConfig)(nil)
+	_ Fileable = (*SetChatPhotoConfig)(nil)
+	_ Fileable = (*EditMessageMediaConfig)(nil)
+	_ Fileable = (*SetChatPhotoConfig)(nil)
+	_ Fileable = (*UploadStickerConfig)(nil)
+	_ Fileable = (*NewStickerSetConfig)(nil)
+	_ Fileable = (*AddStickerConfig)(nil)
+	_ Fileable = (*MediaGroupConfig)(nil)
+	_ Fileable = (*WebhookConfig)(nil)
+	_ Fileable = (*SetStickerSetThumbConfig)(nil)
 )

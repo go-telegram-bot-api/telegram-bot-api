@@ -29,7 +29,8 @@ func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 // NewMessageToChannel creates a new Message that is sent to a channel
 // by username.
 //
-// username is the username of the channel, text is the message text.
+// username is the username of the channel, text is the message text,
+// and the username should be in the form of `@username`.
 func NewMessageToChannel(username string, text string) MessageConfig {
 	return MessageConfig{
 		BaseChat: BaseChat{
@@ -51,241 +52,117 @@ func NewForward(chatID int64, fromChatID int64, messageID int) ForwardConfig {
 	}
 }
 
-// NewPhotoUpload creates a new photo uploader.
+// NewCopyMessage creates a new copy message.
+//
+// chatID is where to send it, fromChatID is the source chat,
+// and messageID is the ID of the original message.
+func NewCopyMessage(chatID int64, fromChatID int64, messageID int) CopyMessageConfig {
+	return CopyMessageConfig{
+		BaseChat:   BaseChat{ChatID: chatID},
+		FromChatID: fromChatID,
+		MessageID:  messageID,
+	}
+}
+
+// NewPhoto creates a new sendPhoto request.
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhotoUpload(chatID int64, file interface{}) PhotoConfig {
+func NewPhoto(chatID int64, file interface{}) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
 
-// NewPhotoShare shares an existing photo.
-// You may use this to reshare an existing photo without reuploading it.
+// NewPhotoToChannel creates a new photo uploader to send a photo to a channel.
 //
-// chatID is where to send it, fileID is the ID of the file
-// already uploaded.
-func NewPhotoShare(chatID int64, fileID string) PhotoConfig {
+// Note that you must send animated GIFs as a document.
+func NewPhotoToChannel(username string, file interface{}) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{
+				ChannelUsername: username,
+			},
+			File: file,
 		},
 	}
 }
 
-// NewAudioUpload creates a new audio uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewAudioUpload(chatID int64, file interface{}) AudioConfig {
+// NewAudio creates a new sendAudio request.
+func NewAudio(chatID int64, file interface{}) AudioConfig {
 	return AudioConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
 
-// NewAudioShare shares an existing audio file.
-// You may use this to reshare an existing audio file without
-// reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the audio
-// already uploaded.
-func NewAudioShare(chatID int64, fileID string) AudioConfig {
-	return AudioConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewDocumentUpload creates a new document uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewDocumentUpload(chatID int64, file interface{}) DocumentConfig {
+// NewDocument creates a new sendDocument request.
+func NewDocument(chatID int64, file interface{}) DocumentConfig {
 	return DocumentConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
 
-// NewDocumentShare shares an existing document.
-// You may use this to reshare an existing document without
-// reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the document
-// already uploaded.
-func NewDocumentShare(chatID int64, fileID string) DocumentConfig {
-	return DocumentConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewStickerUpload creates a new sticker uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewStickerUpload(chatID int64, file interface{}) StickerConfig {
+// NewSticker creates a new sendSticker request.
+func NewSticker(chatID int64, file interface{}) StickerConfig {
 	return StickerConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
 
-// NewStickerShare shares an existing sticker.
-// You may use this to reshare an existing sticker without
-// reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the sticker
-// already uploaded.
-func NewStickerShare(chatID int64, fileID string) StickerConfig {
-	return StickerConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewVideoUpload creates a new video uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewVideoUpload(chatID int64, file interface{}) VideoConfig {
+// NewVideo creates a new sendVideo request.
+func NewVideo(chatID int64, file interface{}) VideoConfig {
 	return VideoConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
 
-// NewVideoShare shares an existing video.
-// You may use this to reshare an existing video without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video
-// already uploaded.
-func NewVideoShare(chatID int64, fileID string) VideoConfig {
-	return VideoConfig{
+// NewAnimation creates a new sendAnimation request.
+func NewAnimation(chatID int64, file interface{}) AnimationConfig {
+	return AnimationConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
 
-// NewAnimationUpload creates a new animation uploader.
+// NewVideoNote creates a new sendVideoNote request.
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewAnimationUpload(chatID int64, file interface{}) AnimationConfig {
-	return AnimationConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewAnimationShare shares an existing animation.
-// You may use this to reshare an existing animation without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the animation
-// already uploaded.
-func NewAnimationShare(chatID int64, fileID string) AnimationConfig {
-	return AnimationConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
-// NewVideoNoteUpload creates a new video note uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewVideoNoteUpload(chatID int64, length int, file interface{}) VideoNoteConfig {
+func NewVideoNote(chatID int64, length int, file interface{}) VideoNoteConfig {
 	return VideoNoteConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 		Length: length,
 	}
 }
 
-// NewVideoNoteShare shares an existing video.
-// You may use this to reshare an existing video without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video
-// already uploaded.
-func NewVideoNoteShare(chatID int64, length int, fileID string) VideoNoteConfig {
-	return VideoNoteConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-		Length: length,
-	}
-}
-
-// NewVoiceUpload creates a new voice uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-func NewVoiceUpload(chatID int64, file interface{}) VoiceConfig {
+// NewVoice creates a new sendVoice request.
+func NewVoice(chatID int64, file interface{}) VoiceConfig {
 	return VoiceConfig{
 		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewVoiceShare shares an existing voice.
-// You may use this to reshare an existing voice without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the video
-// already uploaded.
-func NewVoiceShare(chatID int64, fileID string) VoiceConfig {
-	return VoiceConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
+			BaseChat: BaseChat{ChatID: chatID},
+			File:     file,
 		},
 	}
 }
@@ -300,7 +177,7 @@ func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 }
 
 // NewInputMediaPhoto creates a new InputMediaPhoto.
-func NewInputMediaPhoto(media string) InputMediaPhoto {
+func NewInputMediaPhoto(media interface{}) InputMediaPhoto {
 	return InputMediaPhoto{
 		BaseInputMedia{
 			Type:  "photo",
@@ -310,7 +187,7 @@ func NewInputMediaPhoto(media string) InputMediaPhoto {
 }
 
 // NewInputMediaVideo creates a new InputMediaVideo.
-func NewInputMediaVideo(media string) InputMediaVideo {
+func NewInputMediaVideo(media interface{}) InputMediaVideo {
 	return InputMediaVideo{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "video",
@@ -320,7 +197,7 @@ func NewInputMediaVideo(media string) InputMediaVideo {
 }
 
 // NewInputMediaAnimation creates a new InputMediaAnimation.
-func NewInputMediaAnimation(media string) InputMediaAnimation {
+func NewInputMediaAnimation(media interface{}) InputMediaAnimation {
 	return InputMediaAnimation{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "animation",
@@ -330,7 +207,7 @@ func NewInputMediaAnimation(media string) InputMediaAnimation {
 }
 
 // NewInputMediaAudio creates a new InputMediaAudio.
-func NewInputMediaAudio(media string) InputMediaAudio {
+func NewInputMediaAudio(media interface{}) InputMediaAudio {
 	return InputMediaAudio{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "audio",
@@ -340,7 +217,7 @@ func NewInputMediaAudio(media string) InputMediaAudio {
 }
 
 // NewInputMediaDocument creates a new InputMediaDocument.
-func NewInputMediaDocument(media string) InputMediaDocument {
+func NewInputMediaDocument(media interface{}) InputMediaDocument {
 	return InputMediaDocument{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "document",
@@ -400,7 +277,7 @@ func NewChatAction(chatID int64, action string) ChatActionConfig {
 // NewUserProfilePhotos gets user profile photos.
 //
 // userID is the ID of the user you wish to get profile photos from.
-func NewUserProfilePhotos(userID int) UserProfilePhotosConfig {
+func NewUserProfilePhotos(userID int64) UserProfilePhotosConfig {
 	return UserProfilePhotosConfig{
 		UserID: userID,
 		Offset: 0,
@@ -423,25 +300,33 @@ func NewUpdate(offset int) UpdateConfig {
 // NewWebhook creates a new webhook.
 //
 // link is the url parsable link you wish to get the updates.
-func NewWebhook(link string) WebhookConfig {
-	u, _ := url.Parse(link)
+func NewWebhook(link string) (WebhookConfig, error) {
+	u, err := url.Parse(link)
+
+	if err != nil {
+		return WebhookConfig{}, err
+	}
 
 	return WebhookConfig{
 		URL: u,
-	}
+	}, nil
 }
 
 // NewWebhookWithCert creates a new webhook with a certificate.
 //
 // link is the url you wish to get webhooks,
 // file contains a string to a file, FileReader, or FileBytes.
-func NewWebhookWithCert(link string, file interface{}) WebhookConfig {
-	u, _ := url.Parse(link)
+func NewWebhookWithCert(link string, file interface{}) (WebhookConfig, error) {
+	u, err := url.Parse(link)
+
+	if err != nil {
+		return WebhookConfig{}, err
+	}
 
 	return WebhookConfig{
 		URL:         u,
 		Certificate: file,
-	}
+	}, nil
 }
 
 // NewInlineQueryResultArticle creates a new inline query article.
@@ -469,6 +354,19 @@ func NewInlineQueryResultArticleMarkdown(id, title, messageText string) InlineQu
 	}
 }
 
+// NewInlineQueryResultArticleMarkdownV2 creates a new inline query article with MarkdownV2 parsing.
+func NewInlineQueryResultArticleMarkdownV2(id, title, messageText string) InlineQueryResultArticle {
+	return InlineQueryResultArticle{
+		Type:  "article",
+		ID:    id,
+		Title: title,
+		InputMessageContent: InputTextMessageContent{
+			Text:      messageText,
+			ParseMode: "MarkdownV2",
+		},
+	}
+}
+
 // NewInlineQueryResultArticleHTML creates a new inline query article with HTML parsing.
 func NewInlineQueryResultArticleHTML(id, title, messageText string) InlineQueryResultArticle {
 	return InlineQueryResultArticle{
@@ -491,12 +389,30 @@ func NewInlineQueryResultGIF(id, url string) InlineQueryResultGIF {
 	}
 }
 
+// NewInlineQueryResultCachedGIF create a new inline query with cached photo.
+func NewInlineQueryResultCachedGIF(id, gifID string) InlineQueryResultCachedGIF {
+	return InlineQueryResultCachedGIF{
+		Type:  "gif",
+		ID:    id,
+		GIFID: gifID,
+	}
+}
+
 // NewInlineQueryResultMPEG4GIF creates a new inline query MPEG4 GIF.
 func NewInlineQueryResultMPEG4GIF(id, url string) InlineQueryResultMPEG4GIF {
 	return InlineQueryResultMPEG4GIF{
 		Type: "mpeg4_gif",
 		ID:   id,
 		URL:  url,
+	}
+}
+
+// NewInlineQueryResultCachedMPEG4GIF create a new inline query with cached MPEG4 GIF.
+func NewInlineQueryResultCachedMPEG4GIF(id, MPEG4GIFID string) InlineQueryResultCachedMPEG4GIF {
+	return InlineQueryResultCachedMPEG4GIF{
+		Type:        "mpeg4_gif",
+		ID:          id,
+		MPEG4FileID: MPEG4GIFID,
 	}
 }
 
@@ -519,12 +435,41 @@ func NewInlineQueryResultPhotoWithThumb(id, url, thumb string) InlineQueryResult
 	}
 }
 
+// NewInlineQueryResultCachedPhoto create a new inline query with cached photo.
+func NewInlineQueryResultCachedPhoto(id, photoID string) InlineQueryResultCachedPhoto {
+	return InlineQueryResultCachedPhoto{
+		Type:    "photo",
+		ID:      id,
+		PhotoID: photoID,
+	}
+}
+
 // NewInlineQueryResultVideo creates a new inline query video.
 func NewInlineQueryResultVideo(id, url string) InlineQueryResultVideo {
 	return InlineQueryResultVideo{
 		Type: "video",
 		ID:   id,
 		URL:  url,
+	}
+}
+
+// NewInlineQueryResultCachedVideo create a new inline query with cached video.
+func NewInlineQueryResultCachedVideo(id, videoID, title string) InlineQueryResultCachedVideo {
+	return InlineQueryResultCachedVideo{
+		Type:    "video",
+		ID:      id,
+		VideoID: videoID,
+		Title:   title,
+	}
+}
+
+// NewInlineQueryResultCachedSticker create a new inline query with cached sticker.
+func NewInlineQueryResultCachedSticker(id, stickerID, title string) InlineQueryResultCachedSticker {
+	return InlineQueryResultCachedSticker{
+		Type:      "sticker",
+		ID:        id,
+		StickerID: stickerID,
+		Title:     title,
 	}
 }
 
@@ -538,6 +483,15 @@ func NewInlineQueryResultAudio(id, url, title string) InlineQueryResultAudio {
 	}
 }
 
+// NewInlineQueryResultCachedAudio create a new inline query with cached photo.
+func NewInlineQueryResultCachedAudio(id, audioID string) InlineQueryResultCachedAudio {
+	return InlineQueryResultCachedAudio{
+		Type:    "audio",
+		ID:      id,
+		AudioID: audioID,
+	}
+}
+
 // NewInlineQueryResultVoice creates a new inline query voice.
 func NewInlineQueryResultVoice(id, url, title string) InlineQueryResultVoice {
 	return InlineQueryResultVoice{
@@ -545,6 +499,16 @@ func NewInlineQueryResultVoice(id, url, title string) InlineQueryResultVoice {
 		ID:    id,
 		URL:   url,
 		Title: title,
+	}
+}
+
+// NewInlineQueryResultCachedVoice create a new inline query with cached photo.
+func NewInlineQueryResultCachedVoice(id, voiceID, title string) InlineQueryResultCachedVoice {
+	return InlineQueryResultCachedVoice{
+		Type:    "voice",
+		ID:      id,
+		VoiceID: voiceID,
+		Title:   title,
 	}
 }
 
@@ -559,6 +523,16 @@ func NewInlineQueryResultDocument(id, url, title, mimeType string) InlineQueryRe
 	}
 }
 
+// NewInlineQueryResultCachedDocument create a new inline query with cached photo.
+func NewInlineQueryResultCachedDocument(id, documentID, title string) InlineQueryResultCachedDocument {
+	return InlineQueryResultCachedDocument{
+		Type:       "document",
+		ID:         id,
+		DocumentID: documentID,
+		Title:      title,
+	}
+}
+
 // NewInlineQueryResultLocation creates a new inline query location.
 func NewInlineQueryResultLocation(id, title string, latitude, longitude float64) InlineQueryResultLocation {
 	return InlineQueryResultLocation{
@@ -570,12 +544,36 @@ func NewInlineQueryResultLocation(id, title string, latitude, longitude float64)
 	}
 }
 
+// NewInlineQueryResultVenue creates a new inline query venue.
+func NewInlineQueryResultVenue(id, title, address string, latitude, longitude float64) InlineQueryResultVenue {
+	return InlineQueryResultVenue{
+		Type:      "venue",
+		ID:        id,
+		Title:     title,
+		Address:   address,
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+}
+
 // NewEditMessageText allows you to edit the text of a message.
 func NewEditMessageText(chatID int64, messageID int, text string) EditMessageTextConfig {
 	return EditMessageTextConfig{
 		BaseEdit: BaseEdit{
 			ChatID:    chatID,
 			MessageID: messageID,
+		},
+		Text: text,
+	}
+}
+
+// NewEditMessageTextAndMarkup allows you to edit the text and replymarkup of a message.
+func NewEditMessageTextAndMarkup(chatID int64, messageID int, text string, replyMarkup InlineKeyboardMarkup) EditMessageTextConfig {
+	return EditMessageTextConfig{
+		BaseEdit: BaseEdit{
+			ChatID:      chatID,
+			MessageID:   messageID,
+			ReplyMarkup: &replyMarkup,
 		},
 		Text: text,
 	}
@@ -601,17 +599,6 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 			MessageID:   messageID,
 			ReplyMarkup: &replyMarkup,
 		},
-	}
-}
-
-// NewHideKeyboard hides the keyboard, with the option for being selective
-// or hiding for everyone.
-func NewHideKeyboard(selective bool) ReplyKeyboardHide {
-	log.Println("NewHideKeyboard is deprecated, please use NewRemoveKeyboard")
-
-	return ReplyKeyboardHide{
-		HideKeyboard: true,
-		Selective:    selective,
 	}
 }
 
@@ -668,6 +655,13 @@ func NewReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
 		ResizeKeyboard: true,
 		Keyboard:       keyboard,
 	}
+}
+
+// NewOneTimeReplyKeyboard creates a new one time keyboard.
+func NewOneTimeReplyKeyboard(rows ...[]KeyboardButton) ReplyKeyboardMarkup {
+	markup := NewReplyKeyboard(rows...)
+	markup.OneTimeKeyboard = true
+	return markup
 }
 
 // NewInlineKeyboardButtonData creates an inline keyboard button with text
@@ -758,37 +752,6 @@ func NewInvoice(chatID int64, title, description, payload, providerToken, startP
 		Prices:         prices}
 }
 
-// NewSetChatPhotoUpload creates a new chat photo uploader.
-//
-// chatID is where to send it, file is a string path to the file,
-// FileReader, or FileBytes.
-//
-// Note that you must send animated GIFs as a document.
-func NewSetChatPhotoUpload(chatID int64, file interface{}) SetChatPhotoConfig {
-	return SetChatPhotoConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			File:        file,
-			UseExisting: false,
-		},
-	}
-}
-
-// NewSetChatPhotoShare shares an existing photo.
-// You may use this to reshare an existing photo without reuploading it.
-//
-// chatID is where to send it, fileID is the ID of the file
-// already uploaded.
-func NewSetChatPhotoShare(chatID int64, fileID string) SetChatPhotoConfig {
-	return SetChatPhotoConfig{
-		BaseFile: BaseFile{
-			BaseChat:    BaseChat{ChatID: chatID},
-			FileID:      fileID,
-			UseExisting: true,
-		},
-	}
-}
-
 // NewChatTitle allows you to update the title of a chat.
 func NewChatTitle(chatID int64, title string) SetChatTitleConfig {
 	return SetChatTitleConfig{
@@ -830,8 +793,9 @@ func NewPoll(chatID int64, question string, options ...string) SendPollConfig {
 		BaseChat: BaseChat{
 			ChatID: chatID,
 		},
-		Question: question,
-		Options:  options,
+		Question:    question,
+		Options:     options,
+		IsAnonymous: true, // This is Telegram's default.
 	}
 }
 
@@ -843,4 +807,37 @@ func NewStopPoll(chatID int64, messageID int) StopPollConfig {
 			MessageID: messageID,
 		},
 	}
+}
+
+// NewSendDice allows you to send a random dice roll.
+//
+// Deprecated: Use NewDice instead.
+func NewSendDice(chatID int64) DiceConfig {
+	return NewDice(chatID)
+}
+
+// NewDice allows you to send a random dice roll.
+func NewDice(chatID int64) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+	}
+}
+
+// NewDiceWithEmoji allows you to send a random roll of one of many types.
+//
+// Emoji may be 🎲 (1-6), 🎯 (1-6), or 🏀 (1-5).
+func NewDiceWithEmoji(chatID int64, emoji string) DiceConfig {
+	return DiceConfig{
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
+		Emoji: emoji,
+	}
+}
+
+// NewSetMyCommands allows you to set the registered commands.
+func NewSetMyCommands(commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{commands: commands}
 }
