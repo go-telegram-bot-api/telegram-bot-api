@@ -646,6 +646,9 @@ func (bot *BotAPI) KickChatMember(config KickChatMemberConfig) (APIResponse, err
 	if config.UntilDate != 0 {
 		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
 	}
+	if config.RevokeMessages != nil {
+		v.Add("revoke_messages", strconv.FormatBool(*config.RevokeMessages))
+	}
 
 	bot.debugLog("kickChatMember", v, nil)
 
@@ -856,6 +859,12 @@ func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIRespons
 	if config.CanPromoteMembers != nil {
 		v.Add("can_promote_members", strconv.FormatBool(*config.CanPromoteMembers))
 	}
+	if config.CanManageVoiceChats != nil {
+		v.Add("can_manage_voice_chats", strconv.FormatBool(*config.CanManageVoiceChats))
+	}
+	if config.CanManageChat != nil {
+		v.Add("can_manage_chat", strconv.FormatBool(*config.CanManageChat))
+	}
 
 	bot.debugLog("promoteChatMember", v, nil)
 
@@ -1064,6 +1073,67 @@ func (bot *BotAPI) SetMyCommands(commands []BotCommand) error {
 		return err
 	}
 	return nil
+}
+
+// CreateChatInviteLink creates an additional invite link for a chat.
+//The bot must be an administrator in the chat for this to work and must have the appropriate admin rights
+func (bot *BotAPI) CreateChatInviteLink(config CreateChatInviteLinkConfig) (*ChatInviteLink, error) {
+	values, err := config.values()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := bot.MakeRequest(config.method(), values)
+	if err != nil {
+		return nil, err
+	}
+
+	var link ChatInviteLink
+	if err := json.Unmarshal(resp.Result, &link); err != nil {
+		return nil, err
+	}
+
+	return &link, nil
+}
+
+// EditChatInviteLink edits a non-primary invite link created by the bot.
+// The bot must be an administrator in the chat for this to work and must have the appropriate admin rights
+func (bot *BotAPI) EditChatInviteLink(config EditChatInviteLinkConfig) (*ChatInviteLink, error) {
+	values, err := config.values()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := bot.MakeRequest(config.method(), values)
+	if err != nil {
+		return nil, err
+	}
+
+	var link ChatInviteLink
+	if err := json.Unmarshal(resp.Result, &link); err != nil {
+		return nil, err
+	}
+
+	return &link, nil
+}
+
+// RevokeChatInviteLink revokes an invite link created by the bot.
+// If the primary link is revoked, a new link is automatically generated.
+// The bot must be an administrator in the chat for this to work and must have the appropriate admin rights
+func (bot *BotAPI) RevokeChatInviteLink(config RevokeChatInviteLinkConfig) (*ChatInviteLink, error) {
+	values, err := config.values()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := bot.MakeRequest(config.method(), values)
+	if err != nil {
+		return nil, err
+	}
+
+	var link ChatInviteLink
+	if err := json.Unmarshal(resp.Result, &link); err != nil {
+		return nil, err
+	}
+
+	return &link, nil
 }
 
 // EscapeText takes an input text and escape Telegram markup symbols.
