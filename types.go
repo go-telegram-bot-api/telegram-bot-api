@@ -74,6 +74,16 @@ type Update struct {
 	//
 	// optional
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
+	// The bot's chat member status was updated in a chat.
+	// For private chats, this update is received only when the bot is blocked or unblocked by the user.
+	//
+	// optional
+	MyChatMember *ChatMemberUpdated `json:"my_chat_member"`
+	// A chat member's status was updated in a chat.
+	// The bot must be an administrator in the chat and must explicitly specify “chat_member” in the list of allowed_updates to receive these updates.
+	//
+	// optional
+	ChatMember *ChatMemberUpdated `json:"chat_member"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -415,6 +425,26 @@ type Message struct {
 	//
 	// optional
 	PassportData *PassportData `json:"passport_data,omitempty"`
+
+	// Service message: voice chat started
+	//
+	// optional
+	VoiceChatStarted *VoiceChatStarted `json:"voice_chat_started"`
+
+	// Service message: voice chat ended
+	//
+	// optional
+	VoiceChatEnded *VoiceChatEnded `json:"voice_chat_ended"`
+
+	// Service message: new participants invited to a voice chat
+	//
+	// optional
+	VoiceChatParticipantsInvited *VoiceChatParticipantsInvited `json:"voice_chat_participants_invited"`
+
+	// Service message: auto-delete timer settings changed in the chat
+	//
+	// optional
+	MessageAutoDeleteTimerChanged *MessageAutoDeleteTimerChanged `json:"message_auto_delete_timer_changed"`
 }
 
 // Time converts the message timestamp into a Time.
@@ -1112,6 +1142,17 @@ type ChatMember struct {
 	//
 	// optional
 	CanAddWebPagePreviews bool `json:"can_add_web_page_previews,omitempty"`
+	// CanManageVoiceChats administrators only.
+	// True, if the administrator can manage voice chats
+	//
+	// optional
+	CanManageVoiceChats bool `json:"can_manage_voice_chats,omitempty"`
+	// CanManageChat administrators only.
+	// True, if the administrator can access the chat event log, chat statistics, message statistics in channels, see channel members, see anonymous administrators in supergroups and ignore slow mode.
+	// Implied by any other administrator privilege
+	//
+	// optional
+	CanManageChat bool `json:"can_manage_chat,omitempty"`
 }
 
 // IsCreator returns if the ChatMember was the creator of the chat.
@@ -2349,4 +2390,68 @@ type BotCommand struct {
 	Command string `json:"command"`
 	// Description of the command, 3-256 characters.
 	Description string `json:"description"`
+}
+
+// ChatInviteLink an invite link for a chat.
+type ChatInviteLink struct {
+	// The invite link.
+	// If the link was created by another chat administrator, then the second part of the link will be replaced with “…”.
+	InviteLink string `json:"invite_link"`
+	// Creator of the link
+	Creator *User `json:"creator"`
+	// True, if the link is primary
+	IsPrimary bool `json:"is_primary"`
+	// True, if the link is revoked
+	IsRevoked bool `json:"is_revoked"`
+	// Point in time (Unix timestamp) when the link will expire or has been expired
+	//
+	// optional
+	ExpireDate int `json:"expire_date"`
+	// Maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link;
+	// 1-99999
+	//
+	// optional
+	MemberLimit int `json:"member_limit"`
+}
+
+// ChatMemberUpdated represents changes in the status of a chat member.
+type ChatMemberUpdated struct {
+	// Chat the user belongs to
+	Chat *Chat `json:"chat"`
+	// Performer of the action, which resulted in the change
+	User *User `json:"user"`
+	// Date the change was done in Unix time
+	Date int `json:"date"`
+	// Previous information about the chat member
+	OldChatMember *ChatMember `json:"old_chat_member"`
+	// New information about the chat member
+	NewChatMember *ChatMember `json:"new_chat_member"`
+	// Chat invite link, which was used by the user to join the chat; for joining by invite link events only.
+	//
+	// optional
+	InviteLink *ChatInviteLink `json:"invite_link"`
+}
+
+// VoiceChatStarted represents a service message about a voice chat started in the chat. Currently holds no information.
+type VoiceChatStarted struct {
+}
+
+// VoiceChatEnded represents a service message about a voice chat ended in the chat.
+type VoiceChatEnded struct {
+	// Voice chat duration; in seconds
+	Duration int `json:"duration"`
+}
+
+// VoiceChatParticipantsInvited represents a service message about new members invited to a voice chat.
+type VoiceChatParticipantsInvited struct {
+	// New members that were invited to the voice chat
+	//
+	// optional
+	Users []*User `json:"users"`
+}
+
+// MessageAutoDeleteTimerChanged represents a service message about a change in auto-delete timer settings.
+type MessageAutoDeleteTimerChanged struct {
+	// New auto-delete time for messages in the chat
+	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
 }

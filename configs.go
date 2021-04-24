@@ -1063,7 +1063,18 @@ type ChatMemberConfig struct {
 // KickChatMemberConfig contains extra fields to kick user
 type KickChatMemberConfig struct {
 	ChatMemberConfig
+	// Date when the user will be unbanned, unix time.
+	// If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever.
+	// Applied for supergroups and channels only.
+	//
+	// optional
 	UntilDate int64
+	// Pass True to delete all messages from the chat for the user that is being removed.
+	// If False, the user will be able to see messages in the group that were sent before the user was removed.
+	// Always True for supergroups and channels.
+	//
+	// optional
+	RevokeMessages *bool
 }
 
 // RestrictChatMemberConfig contains fields to restrict members of chat
@@ -1079,14 +1090,16 @@ type RestrictChatMemberConfig struct {
 // PromoteChatMemberConfig contains fields to promote members of chat
 type PromoteChatMemberConfig struct {
 	ChatMemberConfig
-	CanChangeInfo      *bool
-	CanPostMessages    *bool
-	CanEditMessages    *bool
-	CanDeleteMessages  *bool
-	CanInviteUsers     *bool
-	CanRestrictMembers *bool
-	CanPinMessages     *bool
-	CanPromoteMembers  *bool
+	CanChangeInfo       *bool
+	CanPostMessages     *bool
+	CanEditMessages     *bool
+	CanDeleteMessages   *bool
+	CanInviteUsers      *bool
+	CanRestrictMembers  *bool
+	CanPinMessages      *bool
+	CanPromoteMembers   *bool
+	CanManageVoiceChats *bool
+	CanManageChat       *bool
 }
 
 // ChatConfig contains information about getting information on a chat.
@@ -1342,8 +1355,8 @@ func (config GetStickerSetConfig) values() (url.Values, error) {
 type DiceConfig struct {
 	BaseChat
 	// Emoji on which the dice throw animation is based.
-	// Currently, must be one of “🎲”, “🎯”, or “🏀”.
-	// Dice can have values 1-6 for “🎲” and “🎯”, and values 1-5 for “🏀”.
+	// Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”
+	// Dice can have values 1-6 for “🎲”, “🎯” and “🎳”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”.
 	// Defaults to “🎲”
 	Emoji string
 }
@@ -1363,4 +1376,72 @@ func (config DiceConfig) values() (url.Values, error) {
 // method returns Telegram API method name for sending Dice.
 func (config DiceConfig) method() string {
 	return "sendDice"
+}
+
+type CreateChatInviteLinkConfig struct {
+	ChatID      int64
+	ExpireDate  *int64
+	MemberLimit *int64
+}
+
+func (config CreateChatInviteLinkConfig) method() string {
+	return "createChatInviteLink"
+}
+
+func (config CreateChatInviteLinkConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	if config.ExpireDate != nil {
+		v.Add("expire_date", strconv.FormatInt(*config.ExpireDate, 10))
+	}
+	if config.MemberLimit != nil {
+		v.Add("member_limit", strconv.FormatInt(*config.MemberLimit, 10))
+	}
+
+	return v, nil
+}
+
+type EditChatInviteLinkConfig struct {
+	ChatID      int64
+	InviteLink  string
+	ExpireDate  *int64
+	MemberLimit *int64
+}
+
+func (config EditChatInviteLinkConfig) method() string {
+	return "editChatInviteLink"
+}
+
+func (config EditChatInviteLinkConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("invite_link", config.InviteLink)
+	if config.ExpireDate != nil {
+		v.Add("expire_date", strconv.FormatInt(*config.ExpireDate, 10))
+	}
+	if config.MemberLimit != nil {
+		v.Add("member_limit", strconv.FormatInt(*config.MemberLimit, 10))
+	}
+
+	return v, nil
+}
+
+type RevokeChatInviteLinkConfig struct {
+	ChatID     int64
+	InviteLink string
+}
+
+func (config RevokeChatInviteLinkConfig) method() string {
+	return "revokeChatInviteLink"
+}
+
+func (config RevokeChatInviteLinkConfig) values() (url.Values, error) {
+	v := url.Values{}
+
+	v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	v.Add("invite_link", config.InviteLink)
+
+	return v, nil
 }
