@@ -519,6 +519,10 @@ type Message struct {
 	//
 	// optional
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered"`
+	// VoiceChatScheduled is a service message: voice chat scheduled.
+	//
+	// optional
+	VoiceChatScheduled *VoiceChatScheduled `json:"voice_chat_scheduled"`
 	// VoiceChatStarted is a service message: voice chat started.
 	//
 	// optional
@@ -1066,6 +1070,19 @@ type ProximityAlertTriggered struct {
 type MessageAutoDeleteTimerChanged struct {
 	// New auto-delete time for messages in the chat.
 	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
+}
+
+// VoiceChatScheduled represents a service message about a voice chat scheduled
+// in the chat.
+type VoiceChatScheduled struct {
+	// Point in time (Unix timestamp) when the voice chat is supposed to be
+	// started by a chat administrator
+	StartDate int `json:"start_date"`
+}
+
+// Time converts the scheduled start date into a Time.
+func (m *VoiceChatScheduled) Time() time.Time {
+	return time.Unix(int64(m.StartDate), 0)
 }
 
 // VoiceChatStarted represents a service message about a voice chat started in
@@ -1680,7 +1697,7 @@ type InputMediaVideo struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb"`
+	Thumb interface{} `json:"thumb,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1706,7 +1723,7 @@ type InputMediaAnimation struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb"`
+	Thumb interface{} `json:"thumb,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1728,7 +1745,7 @@ type InputMediaAudio struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb"`
+	Thumb interface{} `json:"thumb,omitempty"`
 	// Duration of the audio in seconds
 	//
 	// optional
@@ -1750,7 +1767,7 @@ type InputMediaDocument struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb"`
+	Thumb interface{} `json:"thumb,omitempty"`
 	// DisableContentTypeDetection disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data. Always true, if
 	// the document is sent as part of an album
@@ -1917,14 +1934,22 @@ type InlineQuery struct {
 	ID string `json:"id"`
 	// From sender
 	From *User `json:"from"`
-	// Location sender location, only for bots that request user location.
-	//
-	// optional
-	Location *Location `json:"location,omitempty"`
 	// Query text of the query (up to 256 characters).
 	Query string `json:"query"`
 	// Offset of the results to be returned, can be controlled by the bot.
 	Offset string `json:"offset"`
+	// Type of the chat, from which the inline query was sent. Can be either
+	// “sender” for a private chat with the inline query sender, “private”,
+	// “group”, “supergroup”, or “channel”. The chat type should be always known
+	// for requests sent from official clients and most third-party clients,
+	// unless the request was sent from a secret chat
+	//
+	// optional
+	ChatType string `json:"chat_type"`
+	// Location sender location, only for bots that request user location.
+	//
+	// optional
+	Location *Location `json:"location,omitempty"`
 }
 
 // InlineQueryResultCachedAudio is an inline query response with cached audio.
@@ -1949,7 +1974,7 @@ type InlineQueryResultCachedAudio struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -1990,7 +2015,7 @@ type InlineQueryResultCachedDocument struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -2027,7 +2052,7 @@ type InlineQueryResultCachedGIF struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message.
 	//
 	// optional
@@ -2066,7 +2091,7 @@ type InlineQueryResultCachedMPEG4GIF struct {
 	// (https://core.telegram.org/bots/api#formatting-options).
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message.
 	//
 	// optional
@@ -2107,7 +2132,7 @@ type InlineQueryResultCachedPhoto struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message.
 	//
 	// optional
@@ -2166,7 +2191,7 @@ type InlineQueryResultCachedVideo struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -2201,7 +2226,7 @@ type InlineQueryResultCachedVoice struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -2276,7 +2301,7 @@ type InlineQueryResultAudio struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// Performer is a performer
 	//
 	// optional
@@ -2406,7 +2431,7 @@ type InlineQueryResultGIF struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -2512,7 +2537,7 @@ type InlineQueryResultMPEG4GIF struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -2572,7 +2597,7 @@ type InlineQueryResultPhoto struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// InputMessageContent content of the message to be sent instead of the photo.
 	//
 	// optional
@@ -2704,7 +2729,7 @@ type InlineQueryResultVoice struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 	// Duration recording duration in seconds
 	//
 	// optional
@@ -2835,6 +2860,89 @@ type InputContactMessageContent struct {
 	//
 	// optional
 	VCard string `json:"vcard,omitempty"`
+}
+
+// InputInvoiceMessageContent represents the content of an invoice message to be
+// sent as the result of an inline query.
+type InputInvoiceMessageContent struct {
+	// Product name, 1-32 characters
+	Title string `json:"title"`
+	// Product description, 1-255 characters
+	Description string `json:"description"`
+	// Bot-defined invoice payload, 1-128 bytes. This will not be displayed to
+	// the user, use for your internal processes.
+	Payload string `json:"payload"`
+	// Payment provider token, obtained via Botfather
+	ProviderToken string `json:"provider_token"`
+	// Three-letter ISO 4217 currency code
+	Currency string `json:"currency"`
+	// Price breakdown, a JSON-serialized list of components (e.g. product
+	// price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+	Prices []LabeledPrice `json:"prices"`
+	// The maximum accepted amount for tips in the smallest units of the
+	// currency (integer, not float/double).
+	//
+	// optional
+	MaxTipAmount int `json:"max_tip_amount,omitempty"`
+	// An array of suggested amounts of tip in the smallest units of the
+	// currency (integer, not float/double). At most 4 suggested tip amounts can
+	// be specified. The suggested tip amounts must be positive, passed in a
+	// strictly increased order and must not exceed max_tip_amount.
+	//
+	// optional
+	SuggestedTipAmounts []int `json:"suggested_tip_amounts,omitempty"`
+	// A JSON-serialized object for data about the invoice, which will be shared
+	// with the payment provider. A detailed description of the required fields
+	// should be provided by the payment provider.
+	//
+	// optional
+	ProviderData string `json:"provider_data,omitempty"`
+	// URL of the product photo for the invoice. Can be a photo of the goods or
+	// a marketing image for a service. People like it better when they see what
+	// they are paying for.
+	//
+	// optional
+	PhotoURL string `json:"photo_url,omitempty"`
+	// Photo size
+	//
+	// optional
+	PhotoSize int `json:"photo_size,omitempty"`
+	// Photo width
+	//
+	// optional
+	PhotoWidth int `json:"photo_width,omitempty"`
+	// Photo height
+	//
+	// optional
+	PhotoHeight int `json:"photo_height,omitempty"`
+	// Pass True, if you require the user's full name to complete the order
+	//
+	// optional
+	NeedName bool `json:"need_name,omitempty"`
+	// Pass True, if you require the user's phone number to complete the order
+	//
+	// optional
+	NeedPhoneNumber bool `json:"need_phone_number,omitempty"`
+	// Pass True, if you require the user's email address to complete the order
+	//
+	// optional
+	NeedEmail bool `json:"need_email,omitempty"`
+	// Pass True, if you require the user's shipping address to complete the order
+	//
+	// optional
+	NeedShippingAddress bool `json:"need_shipping_address,omitempty"`
+	// Pass True, if user's phone number should be sent to provider
+	//
+	// optional
+	SendPhoneNumberToProvider bool `json:"send_phone_number_to_provider,omitempty"`
+	// Pass True, if user's email address should be sent to provider
+	//
+	// optional
+	SendEmailToProvider bool `json:"send_email_to_provider,omitempty"`
+	// Pass True, if the final price depends on the shipping method
+	//
+	// optional
+	IsFlexible bool `json:"is_flexible,omitempty"`
 }
 
 // LabeledPrice represents a portion of the price for goods or services.

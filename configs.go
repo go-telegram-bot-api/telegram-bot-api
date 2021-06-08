@@ -18,11 +18,15 @@ const (
 
 // Constant values for ChatActions
 const (
-	ChatTyping          = "typing"
-	ChatUploadPhoto     = "upload_photo"
-	ChatRecordVideo     = "record_video"
-	ChatUploadVideo     = "upload_video"
-	ChatRecordAudio     = "record_audio"
+	ChatTyping      = "typing"
+	ChatUploadPhoto = "upload_photo"
+	ChatRecordVideo = "record_video"
+	ChatUploadVideo = "upload_video"
+	ChatRecordVoice = "record_voice"
+	ChatUploadVoice = "upload_voice"
+	// Deprecated: use ChatRecordVoice instead.
+	ChatRecordAudio = "record_audio"
+	// Deprecated: use ChatUploadVoice instead.
 	ChatUploadAudio     = "upload_audio"
 	ChatUploadDocument  = "upload_document"
 	ChatFindLocation    = "find_location"
@@ -1506,9 +1510,11 @@ type InvoiceConfig struct {
 	Description               string         // required
 	Payload                   string         // required
 	ProviderToken             string         // required
-	StartParameter            string         // required
 	Currency                  string         // required
 	Prices                    []LabeledPrice // required
+	MaxTipAmount              int
+	SuggestedTipAmounts       []int
+	StartParameter            string
 	ProviderData              string
 	PhotoURL                  string
 	PhotoSize                 int
@@ -1533,10 +1539,14 @@ func (config InvoiceConfig) params() (Params, error) {
 	params["description"] = config.Description
 	params["payload"] = config.Payload
 	params["provider_token"] = config.ProviderToken
-	params["start_parameter"] = config.StartParameter
 	params["currency"] = config.Currency
+	if err = params.AddInterface("prices", config.Prices); err != nil {
+		return params, err
+	}
 
-	err = params.AddInterface("prices", config.Prices)
+	params.AddNonZero("max_tip_amount", config.MaxTipAmount)
+	err = params.AddInterface("suggested_tip_amounts", config.SuggestedTipAmounts)
+	params.AddNonEmpty("start_parameter", config.StartParameter)
 	params.AddNonEmpty("provider_data", config.ProviderData)
 	params.AddNonEmpty("photo_url", config.PhotoURL)
 	params.AddNonZero("photo_size", config.PhotoSize)
