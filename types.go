@@ -2,7 +2,6 @@ package tgbotapi
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -658,7 +657,7 @@ type MessageEntity struct {
 // ParseURL attempts to parse a URL contained within a MessageEntity.
 func (e MessageEntity) ParseURL() (*url.URL, error) {
 	if e.URL == "" {
-		return nil, errors.New(ErrBadURL)
+		return nil, ErrBadURL
 	}
 
 	return url.Parse(e.URL)
@@ -2744,7 +2743,7 @@ type InlineQueryResultVoice struct {
 	InputMessageContent interface{} `json:"input_message_content,omitempty"`
 }
 
-// ChosenInlineResult is an inline query result chosen by a User
+// ChosenInlineResult is an inline query result chosen by a User.
 type ChosenInlineResult struct {
 	// ResultID the unique identifier for the result that was chosen
 	ResultID string `json:"result_id"`

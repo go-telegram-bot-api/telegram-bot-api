@@ -74,7 +74,7 @@ Now we can take a look at what a completed `params` method looks like.
 func (config DeleteMessageConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddNonZero("message_id", config.MessageID)
 
 	return params, nil
