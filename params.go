@@ -63,6 +63,8 @@ func (p Params) AddInterface(key string, value interface{}) error {
 // AddFirstValid attempts to add the first item that is not a default value.
 //
 // For example, AddFirstValid(0, "", "test") would add "test".
+//
+// If all args are an int, int64, or string, this will never return an error.
 func (p Params) AddFirstValid(key string, args ...interface{}) error {
 	for _, arg := range args {
 		switch v := arg.(type) {

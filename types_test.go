@@ -277,7 +277,7 @@ func TestFileLink(t *testing.T) {
 	}
 }
 
-// Ensure all configs are sendable
+// Ensure all configs are sendable.
 var (
 	_ Chattable = AnimationConfig{}
 	_ Chattable = AudioConfig{}

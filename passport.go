@@ -1,6 +1,6 @@
 package tgbotapi
 
-// PassportRequestInfoConfig allows you to request passport info
+// PassportRequestInfoConfig allows you to request passport info.
 type PassportRequestInfoConfig struct {
 	BotID     int            `json:"bot_id"`
 	Scope     *PassportScope `json:"scope"`
@@ -257,17 +257,6 @@ type (
 
 	// SecureData is a map of the fields and their encrypted values.
 	SecureData map[string]*SecureValue
-	// PersonalDetails       *SecureValue `json:"personal_details"`
-	// Passport              *SecureValue `json:"passport"`
-	// InternalPassport      *SecureValue `json:"internal_passport"`
-	// DriverLicense         *SecureValue `json:"driver_license"`
-	// IdentityCard          *SecureValue `json:"identity_card"`
-	// Address               *SecureValue `json:"address"`
-	// UtilityBill           *SecureValue `json:"utility_bill"`
-	// BankStatement         *SecureValue `json:"bank_statement"`
-	// RentalAgreement       *SecureValue `json:"rental_agreement"`
-	// PassportRegistration  *SecureValue `json:"passport_registration"`
-	// TemporaryRegistration *SecureValue `json:"temporary_registration"`
 
 	// SecureValue contains encrypted values for a SecureData item.
 	SecureValue struct {

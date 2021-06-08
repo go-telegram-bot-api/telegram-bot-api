@@ -4,11 +4,12 @@ package tgbotapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -20,49 +21,60 @@ import (
 // HTTPClient is the type needed for the bot to perform HTTP requests.
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
-	PostForm(url string, data url.Values) (*http.Response, error)
 }
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
-	Token  string `json:"token"`
-	Debug  bool   `json:"debug"`
-	Buffer int    `json:"buffer"`
+	BotAPIConfig
 
-	Self            User       `json:"-"`
-	Client          HTTPClient `json:"-"`
-	shutdownChannel chan interface{}
+	Self User
+}
 
-	apiEndpoint string
+// BotAPIConfig contains information about how the Bot API should operate.
+type BotAPIConfig struct {
+	Token       string
+	APIEndpoint string
+
+	Debug  bool
+	Buffer int
+
+	Client HTTPClient
+	Logger BotLogger
+}
+
+// BotLogger is an interface that represents the required methods to log data.
+//
+// Instead of requiring the standard logger, we can just specify the methods we
+// use and allow users to pass anything that implements these.
+type BotLogger interface {
+	Println(v ...interface{})
+	Printf(format string, v ...interface{})
 }
 
 // NewBotAPI creates a new BotAPI instance.
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPI(token string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, APIEndpoint, &http.Client{})
+	return NewBotAPIWithConfig(BotAPIConfig{
+		Token: token,
+	})
 }
 
-// NewBotAPIWithAPIEndpoint creates a new BotAPI instance
-// and allows you to pass API endpoint.
-//
-// It requires a token, provided by @BotFather on Telegram and API endpoint.
-func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, apiEndpoint, &http.Client{})
-}
-
-// NewBotAPIWithClient creates a new BotAPI instance
-// and allows you to pass a http.Client.
-//
-// It requires a token, provided by @BotFather on Telegram and API endpoint.
-func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI, error) {
+func NewBotAPIWithConfig(config BotAPIConfig) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:           token,
-		Client:          client,
-		Buffer:          100,
-		shutdownChannel: make(chan interface{}),
+		BotAPIConfig: config,
+	}
 
-		apiEndpoint: apiEndpoint,
+	if bot.APIEndpoint == "" {
+		bot.APIEndpoint = APIEndpoint
+	}
+
+	if bot.Client == nil {
+		bot.Client = &http.Client{}
+	}
+
+	if bot.Logger == nil {
+		bot.Logger = &log.Logger{}
 	}
 
 	self, err := bot.GetMe()
@@ -75,9 +87,27 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI,
 	return bot, nil
 }
 
-// SetAPIEndpoint changes the Telegram Bot API endpoint used by the instance.
-func (bot *BotAPI) SetAPIEndpoint(apiEndpoint string) {
-	bot.apiEndpoint = apiEndpoint
+// NewBotAPIWithAPIEndpoint creates a new BotAPI instance
+// and allows you to pass API endpoint.
+//
+// It requires a token, provided by @BotFather on Telegram and API endpoint.
+func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
+	return NewBotAPIWithConfig(BotAPIConfig{
+		Token:       token,
+		APIEndpoint: apiEndpoint,
+	})
+}
+
+// NewBotAPIWithClient creates a new BotAPI instance
+// and allows you to pass a http.Client.
+//
+// It requires a token, provided by @BotFather on Telegram and API endpoint.
+func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI, error) {
+	return NewBotAPIWithConfig(BotAPIConfig{
+		Token:       token,
+		APIEndpoint: apiEndpoint,
+		Client:      client,
+	})
 }
 
 func buildParams(in Params) (out url.Values) {
@@ -94,17 +124,22 @@ func buildParams(in Params) (out url.Values) {
 	return
 }
 
-// MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
+func (bot *BotAPI) MakeRequestWithContext(ctx context.Context, endpoint string, params Params) (*APIResponse, error) {
 	if bot.Debug {
-		log.Printf("Endpoint: %s, params: %v\n", endpoint, params)
+		bot.Logger.Printf("endpoint: %s, params: %v\n", endpoint, params)
 	}
 
-	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.APIEndpoint, bot.Token, endpoint)
 
 	values := buildParams(params)
 
-	resp, err := bot.Client.PostForm(method, values)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, method, strings.NewReader(values.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := bot.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +152,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 	}
 
 	if bot.Debug {
-		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
+		bot.Logger.Printf("endpoint: %s, response: %s\n", endpoint, string(bytes))
 	}
 
 	if !apiResp.Ok {
@@ -137,9 +172,14 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 	return &apiResp, nil
 }
 
+// MakeRequest makes a request to a specific endpoint with our token.
+func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
+	return bot.MakeRequestWithContext(context.Background(), endpoint, params)
+}
+
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
 // If debug disabled, just decode http.Response.Body stream to APIResponse struct
-// for efficient memory usage
+// for efficient memory usage.
 func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
 	if !bot.Debug {
 		dec := json.NewDecoder(responseBody)
@@ -163,6 +203,10 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 
 // UploadFiles makes a request to the API with files.
 func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
+	return bot.UploadFilesWithContext(context.Background(), endpoint, params, files)
+}
+
+func (bot *BotAPI) UploadFilesWithContext(ctx context.Context, endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
 
@@ -174,7 +218,7 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 
 		for field, value := range params {
 			if err := m.WriteField(field, value); err != nil {
-				w.CloseWithError(err)
+				_ = w.CloseWithError(err)
 				return
 			}
 		}
@@ -184,61 +228,70 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 			case string:
 				fileHandle, err := os.Open(f)
 				if err != nil {
-					w.CloseWithError(err)
+					_ = w.CloseWithError(err)
 					return
 				}
 				defer fileHandle.Close()
 
 				part, err := m.CreateFormFile(file.Name, fileHandle.Name())
 				if err != nil {
-					w.CloseWithError(err)
+					_ = w.CloseWithError(err)
 					return
 				}
 
-				io.Copy(part, fileHandle)
+				if _, err := io.Copy(part, fileHandle); err != nil {
+					_ = w.CloseWithError(err)
+					return
+				}
 			case FileBytes:
 				part, err := m.CreateFormFile(file.Name, f.Name)
 				if err != nil {
-					w.CloseWithError(err)
+					_ = w.CloseWithError(err)
 					return
 				}
 
 				buf := bytes.NewBuffer(f.Bytes)
-				io.Copy(part, buf)
+				if _, err := io.Copy(part, buf); err != nil {
+					_ = w.CloseWithError(err)
+					return
+				}
 			case FileReader:
 				part, err := m.CreateFormFile(file.Name, f.Name)
 				if err != nil {
-					w.CloseWithError(err)
+					_ = w.CloseWithError(err)
 					return
 				}
 
-				io.Copy(part, f.Reader)
+				if _, err := io.Copy(part, f.Reader); err != nil {
+					_ = w.CloseWithError(err)
+					return
+				}
 			case FileURL:
 				val := string(f)
 				if err := m.WriteField(file.Name, val); err != nil {
-					w.CloseWithError(err)
+					_ = w.CloseWithError(err)
 					return
 				}
 			case FileID:
 				val := string(f)
 				if err := m.WriteField(file.Name, val); err != nil {
-					w.CloseWithError(err)
+					_ = w.CloseWithError(err)
 					return
 				}
 			default:
-				w.CloseWithError(errors.New(ErrBadFileType))
+				_ = w.CloseWithError(ErrBadFileType)
 				return
 			}
 		}
 	}()
 
 	if bot.Debug {
-		log.Printf("Endpoint: %s, params: %v, with %d files\n", endpoint, params, len(files))
+		bot.Logger.Printf("endpoint: %s, params: %v, with %d files\n", endpoint, params, len(files))
 	}
 
-	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
+	method := fmt.Sprintf(bot.APIEndpoint, bot.Token, endpoint)
 
-	req, err := http.NewRequest("POST", method, r)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, method, r)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +311,7 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 	}
 
 	if bot.Debug {
-		log.Printf("Endpoint: %s, response: %s\n", endpoint, string(bytes))
+		bot.Logger.Printf("endpoint: %s, response: %s\n", endpoint, string(bytes))
 	}
 
 	if !apiResp.Ok {
@@ -327,6 +380,10 @@ func hasFilesNeedingUpload(files []RequestFile) bool {
 
 // Request sends a Chattable to Telegram, and returns the APIResponse.
 func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
+	return bot.RequestWithContext(context.Background(), c)
+}
+
+func (bot *BotAPI) RequestWithContext(ctx context.Context, c Chattable) (*APIResponse, error) {
 	params, err := c.params()
 	if err != nil {
 		return nil, err
@@ -354,20 +411,24 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 			case FileURL:
 				s = string(f)
 			default:
-				return nil, errors.New(ErrBadFileType)
+				return nil, ErrBadFileType
 			}
 
 			params[file.Name] = s
 		}
 	}
 
-	return bot.MakeRequest(c.method(), params)
+	return bot.MakeRequestWithContext(ctx, c.method(), params)
 }
 
 // Send will send a Chattable item to Telegram and provides the
 // returned Message.
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
-	resp, err := bot.Request(c)
+	return bot.SendWithContext(context.Background(), c)
+}
+
+func (bot *BotAPI) SendWithContext(ctx context.Context, c Chattable) (Message, error) {
+	resp, err := bot.RequestWithContext(ctx, c)
 	if err != nil {
 		return Message{}, err
 	}
@@ -432,7 +493,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	resp, err := bot.Request(config)
 	if err != nil {
-		return []Update{}, err
+		return nil, err
 	}
 
 	var updates []Update
@@ -457,21 +518,17 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 
 // GetUpdatesChan starts and returns a channel for getting updates.
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
+	return bot.GetUpdatesChanWithContext(context.Background(), config)
+}
+
+func (bot *BotAPI) GetUpdatesChanWithContext(ctx context.Context, config UpdateConfig) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	go func() {
 		for {
-			select {
-			case <-bot.shutdownChannel:
-				close(ch)
-				return
-			default:
-			}
-
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
-				log.Println(err)
-				log.Println("Failed to get updates, retrying in 3 seconds...")
+				bot.Logger.Printf("failed to get updates: %s\n", err)
 				time.Sleep(time.Second * 3)
 
 				continue
@@ -487,14 +544,6 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 	}()
 
 	return ch
-}
-
-// StopReceivingUpdates stops the go routine which receives updates
-func (bot *BotAPI) StopReceivingUpdates() {
-	if bot.Debug {
-		log.Println("Stopping the update receiver routine...")
-	}
-	close(bot.shutdownChannel)
 }
 
 // ListenForWebhook registers a http handler for a webhook.
@@ -517,11 +566,10 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 	return ch
 }
 
-// HandleUpdate parses and returns update received via webhook
+// HandleUpdate parses and returns update received via webhook.
 func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
 	if r.Method != http.MethodPost {
-		err := errors.New("wrong HTTP method required POST")
-		return nil, err
+		return nil, fmt.Errorf("got %s request: %w", r.Method, ErrWrongMethod)
 	}
 
 	var update Update
@@ -547,7 +595,7 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 
 	if t, ok := c.(Fileable); ok {
 		if hasFilesNeedingUpload(t.files()) {
-			return errors.New("unable to use http response to upload files")
+			return ErrDisallowedUploads
 		}
 	}
 
@@ -627,7 +675,7 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 	return highScores, err
 }
 
-// GetInviteLink get InviteLink for a chat
+// GetInviteLink get InviteLink for a chat.
 func (bot *BotAPI) GetInviteLink(config ChatInviteLinkConfig) (string, error) {
 	resp, err := bot.Request(config)
 	if err != nil {
