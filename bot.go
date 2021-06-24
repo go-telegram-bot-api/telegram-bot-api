@@ -13,7 +13,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -61,7 +63,7 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI,
 		Client:          client,
 		Buffer:          100,
 		shutdownChannel: make(chan interface{}),
-
+	
 		apiEndpoint: apiEndpoint,
 	}
 
@@ -380,6 +382,12 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 	return message, err
 }
 
+func (bot *BotAPI) SendCustom(c Custom) (*APIResponse, error) {
+	return bot.MakeRequest(c.Method(), c.Params())
+}
+
+
+
 // SendMediaGroup sends a media group and returns the resulting messages.
 func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
 	resp, err := bot.Request(config)
@@ -465,7 +473,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 		for {
 			select {
 			case <-bot.shutdownChannel:
-				close(ch)
+				bot.StopReceivingUpdates()
 				return
 			default:
 			}
@@ -496,6 +504,7 @@ func (bot *BotAPI) StopReceivingUpdates() {
 	if bot.Debug {
 		log.Println("Stopping the update receiver routine...")
 	}
+	
 	close(bot.shutdownChannel)
 }
 
@@ -741,4 +750,3 @@ func (bot *BotAPI) AnswerInlineQuery(callback InlineConfig) (bool, error) {
 	}
 	return resp.Ok, nil
 }
-

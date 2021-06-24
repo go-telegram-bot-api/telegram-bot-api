@@ -104,6 +104,11 @@ type Chattable interface {
 	method() string
 }
 
+type Custom interface {
+	Params() Params // must be json body of the request
+	Method() string // method that will be called. For example: "sendMessage"
+}
+
 // RequestFile represents a file associated with a request. May involve
 // uploading a file, or passing an existing ID.
 type RequestFile struct {

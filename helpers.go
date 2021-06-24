@@ -719,6 +719,14 @@ func NewInlineKeyboardMarkup(rows ...[]InlineKeyboardButton) InlineKeyboardMarku
 		InlineKeyboard: keyboard,
 	}
 }
+// RemoveInlineKeyboard remove inline keyboard from a bot message
+func RemoveInlineKeyboard(chatID int64, messageID int) EditMessageReplyMarkupConfig {
+	return EditMessageReplyMarkupConfig{BaseEdit{
+		ChatID:          chatID,
+		MessageID:       messageID,
+		ReplyMarkup:     nil,
+	}}
+}
 
 // NewCallback creates a new callback message.
 func NewCallback(id, text string) CallbackConfig {
@@ -841,3 +849,4 @@ func NewDiceWithEmoji(chatID int64, emoji string) DiceConfig {
 func NewSetMyCommands(commands ...BotCommand) SetMyCommandsConfig {
 	return SetMyCommandsConfig{commands: commands}
 }
+
