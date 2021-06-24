@@ -625,7 +625,6 @@ func (config LocationConfig) params() (Params, error) {
 	params.AddNonZero("live_period", config.LivePeriod)
 	params.AddNonZero("heading", config.Heading)
 	params.AddNonZero("proximity_alert_radius", config.ProximityAlertRadius)
-
 	return params, err
 }
 

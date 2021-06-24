@@ -702,13 +702,43 @@ func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
 
 	return messageID, err
 }
-
-func (bot *BotAPI) AnswerCallbackQuery(callback CallbackConfig) {
-	params, _ := callback.params()
-	bot.MakeRequest(callback.method(), params)
+// ForwardMessage forwards USER'S message to other chat/user
+// Service messages can't be forwarded
+func (bot *BotAPI) ForwardMessage(config ForwardConfig) (Message, error) {
+	params, err := config.params()
+	if err != nil {
+		return Message{}, err
+	}
+	resp, err := bot.MakeRequest(config.method(), params)
+	if err != nil {
+		return Message{}, err
+	}
+	var message Message
+	err = json.Unmarshal(resp.Result, &message)
+	return message, err
 }
 
-func (bot *BotAPI) AnswerInlineQuery(callback InlineConfig)  {
-	params, _ := callback.params()
-	bot.MakeRequest(callback.method(), params)
+func (bot *BotAPI) AnswerCallbackQuery(callback CallbackConfig) (bool, error) {
+	params, err := callback.params()
+	if err != nil {
+		return false, err
+	}
+	resp, err := bot.MakeRequest(callback.method(), params)
+	if err != nil {
+		return false, err
+	}
+	return resp.Ok, nil
 }
+
+func (bot *BotAPI) AnswerInlineQuery(callback InlineConfig) (bool, error) {
+	params, err := callback.params()
+	if err != nil {
+		return false, err
+	}
+	resp, err := bot.MakeRequest(callback.method(), params)
+	if err != nil {
+		return false, err
+	}
+	return resp.Ok, nil
+}
+
