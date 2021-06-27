@@ -293,6 +293,7 @@ var (
 	_ Chattable = DeleteChatPhotoConfig{}
 	_ Chattable = DeleteChatStickerSetConfig{}
 	_ Chattable = DeleteMessageConfig{}
+	_ Chattable = DeleteMyCommandsConfig{}
 	_ Chattable = DeleteWebhookConfig{}
 	_ Chattable = DocumentConfig{}
 	_ Chattable = EditChatInviteLinkConfig{}
