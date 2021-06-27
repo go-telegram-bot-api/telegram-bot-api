@@ -1158,6 +1158,11 @@ type ReplyKeyboardMarkup struct {
 	//
 	// optional
 	OneTimeKeyboard bool `json:"one_time_keyboard,omitempty"`
+	// InputFieldPlaceholder is the placeholder to be shown in the input field when
+	// the keyboard is active; 1-64 characters.
+	//
+	// optional
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
 	// Selective use this parameter if you want to show the keyboard to specific users only.
 	// Targets:
 	//  1) users that are @mentioned in the text of the Message object;
@@ -1375,6 +1380,11 @@ type ForceReply struct {
 	// ForceReply shows reply interface to the user,
 	// as if they manually selected the bot's message and tapped 'Reply'.
 	ForceReply bool `json:"force_reply"`
+	// InputFieldPlaceholder is the placeholder to be shown in the input field when
+	// the reply is active; 1-64 characters.
+	//
+	// optional
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
 	// Selective use this parameter if you want to force reply from specific users only.
 	// Targets:
 	//  1) users that are @mentioned in the text of the Message object;
@@ -1641,6 +1651,16 @@ type BotCommand struct {
 	Command string `json:"command"`
 	// Description of the command, 3-256 characters.
 	Description string `json:"description"`
+}
+
+// BotCommandScope represents the scope to which bot commands are applied.
+//
+// It contains the fields for all types of scopes, different types only support
+// specific (or no) fields.
+type BotCommandScope struct {
+	Type   string `json:"type"`
+	ChatID int64  `json:"chat_id,omitempty"`
+	UserID int64  `json:"user_id,omitempty"`
 }
 
 // ResponseParameters are various errors that can be returned in APIResponse.

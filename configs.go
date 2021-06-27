@@ -2062,19 +2062,29 @@ func (config DiceConfig) params() (Params, error) {
 }
 
 // GetMyCommandsConfig gets a list of the currently registered commands.
-type GetMyCommandsConfig struct{}
+type GetMyCommandsConfig struct {
+	Scope        *BotCommandScope
+	LanguageCode string
+}
 
 func (config GetMyCommandsConfig) method() string {
 	return "getMyCommands"
 }
 
 func (config GetMyCommandsConfig) params() (Params, error) {
-	return nil, nil
+	params := make(Params)
+
+	err := params.AddInterface("scope", config.Scope)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, err
 }
 
 // SetMyCommandsConfig sets a list of commands the bot understands.
 type SetMyCommandsConfig struct {
-	commands []BotCommand
+	Commands     []BotCommand
+	Scope        *BotCommandScope
+	LanguageCode string
 }
 
 func (config SetMyCommandsConfig) method() string {
@@ -2084,7 +2094,29 @@ func (config SetMyCommandsConfig) method() string {
 func (config SetMyCommandsConfig) params() (Params, error) {
 	params := make(Params)
 
-	err := params.AddInterface("commands", config.commands)
+	if err := params.AddInterface("commands", config.Commands); err != nil {
+		return params, err
+	}
+	err := params.AddInterface("scope", config.Scope)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, err
+}
+
+type DeleteMyCommandsConfig struct {
+	Scope        *BotCommandScope
+	LanguageCode string
+}
+
+func (config DeleteMyCommandsConfig) method() string {
+	return "deleteMyCommands"
+}
+
+func (config DeleteMyCommandsConfig) params() (Params, error) {
+	params := make(Params)
+
+	err := params.AddInterface("scope", config.Scope)
+	params.AddNonEmpty("language_code", config.LanguageCode)
 
 	return params, err
 }
