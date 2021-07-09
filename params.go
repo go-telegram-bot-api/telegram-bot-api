@@ -18,14 +18,14 @@ func (p Params) AddNonEmpty(key, value string) {
 
 // AddNonZero adds a value if it is not zero.
 func (p Params) AddNonZero(key string, value int) {
-	if value != 0 {
+	if value {
 		p[key] = strconv.Itoa(value)
 	}
 }
 
 // AddNonZero64 is the same as AddNonZero except uses an int64.
 func (p Params) AddNonZero64(key string, value int64) {
-	if value != 0 {
+	if value {
 		p[key] = strconv.FormatInt(value, 10)
 	}
 }
@@ -39,7 +39,7 @@ func (p Params) AddBool(key string, value bool) {
 
 // AddNonZeroFloat adds a floating point value that is not zero.
 func (p Params) AddNonZeroFloat(key string, value float64) {
-	if value != 0 {
+	if value {
 		p[key] = strconv.FormatFloat(value, 'f', 6, 64)
 	}
 }
@@ -67,12 +67,12 @@ func (p Params) AddFirstValid(key string, args ...interface{}) error {
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case int:
-			if v != 0 {
+			if v {
 				p[key] = strconv.Itoa(v)
 				return nil
 			}
 		case int64:
-			if v != 0 {
+			if v {
 				p[key] = strconv.FormatInt(v, 10)
 				return nil
 			}
