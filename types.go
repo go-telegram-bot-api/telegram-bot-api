@@ -74,6 +74,35 @@ type Update struct {
 	//
 	// optional
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
+	// Poll represents a Telegram poll or quiz
+	//
+	// optional
+	Poll *Poll `json:"poll"`
+	// PollAnswer represents an answer to the poll or quiz
+	//
+	// optional
+	PollAnswer *PollAnswer `json:"poll_answer"`
+}
+
+// PollAnswer is a result for quiz or poll
+type PollAnswer struct {
+	PollID    string `json:"poll_id"`
+	User      *User  `json:"user"`
+	OptionIDs []int  `json:"option_ids"`
+}
+
+// Poll represents poll details
+type Poll struct {
+	ID              string             `json:"id"`
+	Question        string             `json:"question"`
+	Options         []PollAnswerOption `json:"options"`
+	TotalVoterCount int                `json:"total_voter_count"`
+}
+
+// PollAnswerOption represents poll answer details
+type PollAnswerOption struct {
+	Text       string `json:"text"`
+	VoterCount int    `json:"voter_count"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -415,6 +444,10 @@ type Message struct {
 	//
 	// optional
 	PassportData *PassportData `json:"passport_data,omitempty"`
+	// Poll is a Telegram Poll
+	//
+	// optional
+	Poll *Poll `json:"poll"`
 }
 
 // Time converts the message timestamp into a Time.
