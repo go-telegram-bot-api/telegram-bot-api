@@ -84,44 +84,6 @@ type Update struct {
 	PollAnswer *PollAnswer `json:"poll_answer"`
 }
 
-// PollAnswer is a result for quiz or poll
-type PollAnswer struct {
-	PollID    string `json:"poll_id"`
-	User      *User  `json:"user"`
-	OptionIDs []int  `json:"option_ids"`
-}
-
-// Poll represents poll details
-type Poll struct {
-	ID                    string             `json:"id"`
-	Question              string             `json:"question"`
-	Options               []PollAnswerOption `json:"options"`
-	TotalVoterCount       int                `json:"total_voter_count"`
-	IsClosed              bool               `json:"is_closed"`
-	IsAnonymous           bool               `json:"is_anonymous"`
-	Type                  string             `json:"type"`
-	AllowsMultipleAnswers bool               `json:"allows_multiple_answers"`
-	CorrectOptionID       int                `json:"correct_option_id"`
-	Explanation           string             `json:"explanation"`
-	ExplanationEntities   *[]MessageEntity   `json:"explanation_entities"`
-	OpenPeriod            int                `json:"open_period"`
-	CloseDate             int                `json:"close_date"`
-}
-
-func (p *Poll) IsRegular() bool {
-	return p.Type == PollTypeRegular
-}
-
-func (p *Poll) IsQuiz() bool {
-	return p.Type == PollTypeQuiz
-}
-
-// PollAnswerOption represents poll answer details
-type PollAnswerOption struct {
-	Text       string `json:"text"`
-	VoterCount int    `json:"voter_count"`
-}
-
 // UpdatesChannel is the channel for getting updates.
 type UpdatesChannel <-chan Update
 
@@ -2379,6 +2341,72 @@ type PreCheckoutQuery struct {
 	//
 	// optional
 	OrderInfo *OrderInfo `json:"order_info,omitempty"`
+}
+
+// Poll contains information about a poll.
+type Poll struct {
+	// ID Unique poll identifier
+	ID string `json:"id"`
+	// Question Poll question, 1-300 characters
+	Question string `json:"question"`
+	// Options List of poll options
+	Options []PollAnswerOption `json:"options"`
+	// TotalVoterCount Total number of users that voted in the poll
+	TotalVoterCount int `json:"total_voter_count"`
+	// IsClosed True, if the poll is closed
+	IsClosed bool `json:"is_closed"`
+	// IsAnonymous True, if the poll is anonymous
+	IsAnonymous bool `json:"is_anonymous"`
+	// Type Poll type, currently can be “regular” or “quiz”
+	Type string `json:"type"`
+	// AllowsMultipleAnswers True, if the poll allows multiple answers
+	AllowsMultipleAnswers bool `json:"allows_multiple_answers"`
+	// CorrectOptionID 0-based identifier of the correct answer option. Available only for polls in the quiz mode, which are closed, or was sent (not forwarded) by the bot or to the private chat with the bot.
+	//
+	// optional
+	CorrectOptionID int `json:"correct_option_id"`
+	// Explanation Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters
+	//
+	// optional
+	Explanation string `json:"explanation"`
+	// ExplanationEntities Entity	Optional. Special entities like usernames, URLs, bot commands, etc. that appear in the explanation
+	//
+	// optional
+	ExplanationEntities *[]MessageEntity `json:"explanation_entities"`
+	// OpenPeriod Amount of time in seconds the poll will be active after creation
+	//
+	// optional
+	OpenPeriod int `json:"open_period"`
+	// CloseDate Point in time (Unix timestamp) when the poll will be automatically closed
+	//
+	// optional
+	CloseDate int `json:"close_date"`
+}
+
+// PollAnswer represents an answer of a user in a non-anonymous poll.
+type PollAnswer struct {
+	// PollID Unique poll identifier
+	PollID string `json:"poll_id"`
+	// User The user, who changed the answer to the poll
+	User *User `json:"user"`
+	// OptionIDs 0-based identifiers of answer options, chosen by the user. May be empty if the user retracted their vote.
+	OptionIDs []int `json:"option_ids"`
+}
+
+func (p *Poll) IsRegular() bool {
+	return p.Type == PollTypeRegular
+}
+
+func (p *Poll) IsQuiz() bool {
+	return p.Type == PollTypeQuiz
+}
+
+// PollAnswerOption contains information about one answer option in a poll.
+type PollAnswerOption struct {
+	// Text Option text, 1-100 characters
+	Text string `json:"text"`
+	// VoterCount Number of users that voted for this option
+	VoterCount int `json:"voter_count"`
 }
 
 // Error is an error containing extra information returned by the Telegram API.
