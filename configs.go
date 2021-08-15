@@ -483,9 +483,9 @@ func (config VideoConfig) values() (url.Values, error) {
 			v.Add("parse_mode", config.ParseMode)
 		}
 	}
-	if config.SupportsStreaming {
-		v.Add("supports_streaming",strconv.FormatBool(config.SupportsStreaming ) )
-	}
+	//if config. SupportsStreaming!=false  {
+	//	v.Add("supports_streaming", strconv.FormatBool( true) )
+	//}
 	return v, nil
 }
 
@@ -499,6 +499,13 @@ func (config VideoConfig) params() (map[string]string, error) {
 			params["parse_mode"] = config.ParseMode
 		}
 	}
+	if config.SupportsStreaming !=false {
+		params["supports_streaming"]= strconv.FormatBool(config.SupportsStreaming)
+	}
+	if config.Duration>0 {
+		params["duration"]=  strconv.Itoa(config.Duration)
+	}
+
 
 	return params, nil
 }
