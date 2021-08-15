@@ -463,6 +463,7 @@ type VideoConfig struct {
 	Duration  int
 	Caption   string
 	ParseMode string
+	SupportsStreaming bool
 }
 
 // values returns a url.Values representation of VideoConfig.
@@ -482,7 +483,9 @@ func (config VideoConfig) values() (url.Values, error) {
 			v.Add("parse_mode", config.ParseMode)
 		}
 	}
-
+	if config.SupportsStreaming {
+		v.Add("supports_streaming",strconv.FormatBool(config.SupportsStreaming ) )
+	}
 	return v, nil
 }
 
