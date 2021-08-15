@@ -483,9 +483,6 @@ func (config VideoConfig) values() (url.Values, error) {
 			v.Add("parse_mode", config.ParseMode)
 		}
 	}
-	//if config. SupportsStreaming!=false  {
-	//	v.Add("supports_streaming", strconv.FormatBool( true) )
-	//}
 	return v, nil
 }
 
