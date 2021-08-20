@@ -28,14 +28,14 @@ func (config DocumentConfig) files() []RequestFile {
     // there always is a document file, so initialize the array with that.
 	files := []RequestFile{{
 		Name: "document",
-		File: config.File,
+		Data: config.File,
 	}}
 
     // We'll only add a file if we have one.
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -58,7 +58,7 @@ Let's follow through creating a new media group with string and file uploads.
 First, we start by creating some `InputMediaPhoto`.
 
 ```go
-photo := tgbotapi.NewInputMediaPhoto("tests/image.jpg")
+photo := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath("tests/image.jpg"))
 url := tgbotapi.NewInputMediaPhoto(tgbotapi.FileURL("https://i.imgur.com/unQLJIb.jpg"))
 ```
 
@@ -85,24 +85,3 @@ are all changed into `attach://file-%d`. When collecting a list of files to
 upload, it names them the same way. This creates a nearly transparent way of
 handling multiple files in the background without the user having to consider
 what's going on.
-
-## Library Processing
-
-If at some point in the future new upload types are required, let's talk about
-where the current types are used.
-
-Upload types are defined in `configs.go`. Where possible, type aliases are
-preferred. Structs can be used when multiple fields are required.
-
-The main usage of the upload types happens in `UploadFiles`. It switches on each
-file's type in order to determine how to upload it. Files that aren't uploaded
-(file IDs, URLs) are converted back into strings and passed through as strings
-into the correct field. Uploaded types are processed as needed (opening files,
-etc.) and written into the form using a copy approach in a goroutine to reduce
-memory usage.
-
-In addition to `UploadFiles`, there's more processing of upload types in the
-`prepareInputMediaParam` and `prepareInputMediaFile` functions. These look at
-the `InputMedia` types to determine which files are uploaded and which are
-passed through as strings. They only need to be aware of which files need to be
-replaced with `attach://` fields.
