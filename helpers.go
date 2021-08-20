@@ -888,11 +888,6 @@ func NewBotCommandScopeChatMember(chatID, userID int64) BotCommandScope {
 	}
 }
 
-// NewGetMyCommands allows you to set the registered commands.
-func NewGetMyCommands() GetMyCommandsConfig {
-	return GetMyCommandsConfig{}
-}
-
 // NewGetMyCommandsWithScope allows you to set the registered commands for a
 // given scope.
 func NewGetMyCommandsWithScope(scope BotCommandScope) GetMyCommandsConfig {

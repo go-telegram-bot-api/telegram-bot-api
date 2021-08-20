@@ -667,7 +667,12 @@ func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
 }
 
 // GetMyCommands gets the currently registered commands.
-func (bot *BotAPI) GetMyCommands(config GetMyCommandsConfig) ([]BotCommand, error) {
+func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
+	return bot.GetMyCommandsWithConfig(GetMyCommandsConfig{})
+}
+
+// GetMyCommandsWithConfig gets the currently registered commands with a config.
+func (bot *BotAPI) GetMyCommandsWithConfig(config GetMyCommandsConfig) ([]BotCommand, error) {
 	resp, err := bot.Request(config)
 	if err != nil {
 		return nil, err

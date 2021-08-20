@@ -965,7 +965,7 @@ func TestCommands(t *testing.T) {
 		t.Error("Unable to set commands")
 	}
 
-	commands, err := bot.GetMyCommands(NewGetMyCommands())
+	commands, err := bot.GetMyCommands()
 	if err != nil {
 		t.Error("Unable to get commands")
 	}
@@ -987,7 +987,7 @@ func TestCommands(t *testing.T) {
 		t.Error("Unable to set commands")
 	}
 
-	commands, err = bot.GetMyCommands(NewGetMyCommandsWithScope(NewBotCommandScopeAllPrivateChats()))
+	commands, err = bot.GetMyCommandsWithConfig(NewGetMyCommandsWithScope(NewBotCommandScopeAllPrivateChats()))
 	if err != nil {
 		t.Error("Unable to get commands")
 	}
