@@ -20,7 +20,6 @@ import (
 // HTTPClient is the type needed for the bot to perform HTTP requests.
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
-	PostForm(url string, data url.Values) (*http.Response, error)
 }
 
 // BotAPI allows you to interact with the Telegram Bot API.
@@ -80,18 +79,18 @@ func (bot *BotAPI) SetAPIEndpoint(apiEndpoint string) {
 	bot.apiEndpoint = apiEndpoint
 }
 
-func buildParams(in Params) (out url.Values) {
+func buildParams(in Params) url.Values {
 	if in == nil {
 		return url.Values{}
 	}
 
-	out = url.Values{}
+	out := url.Values{}
 
 	for key, value := range in {
 		out.Set(key, value)
 	}
 
-	return
+	return out
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
@@ -104,7 +103,13 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 
 	values := buildParams(params)
 
-	resp, err := bot.Client.PostForm(method, values)
+	req, err := http.NewRequest("POST", method, strings.NewReader(values.Encode()))
+	if err != nil {
+		return &APIResponse{}, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := bot.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -702,4 +707,32 @@ func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
 	err = json.Unmarshal(resp.Result, &messageID)
 
 	return messageID, err
+}
+
+// EscapeText takes an input text and escape Telegram markup symbols.
+// In this way we can send a text without being afraid of having to escape the characters manually.
+// Note that you don't have to include the formatting style in the input text, or it will be escaped too.
+// If there is an error, an empty string will be returned.
+//
+// parseMode is the text formatting mode (ModeMarkdown, ModeMarkdownV2 or ModeHTML)
+// text is the input string that will be escaped
+func EscapeText(parseMode string, text string) string {
+	var replacer *strings.Replacer
+
+	if parseMode == ModeHTML {
+		replacer = strings.NewReplacer("<", "&lt;", ">", "&gt;", "&", "&amp;")
+	} else if parseMode == ModeMarkdown {
+		replacer = strings.NewReplacer("_", "\\_", "*", "\\*", "`", "\\`", "[", "\\[")
+	} else if parseMode == ModeMarkdownV2 {
+		replacer = strings.NewReplacer(
+			"_", "\\_", "*", "\\*", "[", "\\[", "]", "\\]", "(",
+			"\\(", ")", "\\)", "~", "\\~", "`", "\\`", ">", "\\>",
+			"#", "\\#", "+", "\\+", "-", "\\-", "=", "\\=", "|",
+			"\\|", "{", "\\{", "}", "\\}", ".", "\\.", "!", "\\!",
+		)
+	} else {
+		return ""
+	}
+
+	return replacer.Replace(text)
 }
