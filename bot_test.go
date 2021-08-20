@@ -953,7 +953,7 @@ func TestSendDice(t *testing.T) {
 	}
 }
 
-func TestSetCommands(t *testing.T) {
+func TestCommands(t *testing.T) {
 	bot, _ := getBot(t)
 
 	setCommands := NewSetMyCommands(BotCommand{
@@ -975,6 +975,28 @@ func TestSetCommands(t *testing.T) {
 	}
 
 	if commands[0].Command != "test" || commands[0].Description != "a test command" {
+		t.Error("Commands were incorrectly set")
+	}
+
+	setCommands = NewSetMyCommandsWithScope(NewBotCommandScopeAllPrivateChats(), BotCommand{
+		Command:     "private",
+		Description: "a private command",
+	})
+
+	if _, err := bot.Request(setCommands); err != nil {
+		t.Error("Unable to set commands")
+	}
+
+	commands, err = bot.GetMyCommandsWithConfig(NewGetMyCommandsWithScope(NewBotCommandScopeAllPrivateChats()))
+	if err != nil {
+		t.Error("Unable to get commands")
+	}
+
+	if len(commands) != 1 {
+		t.Error("Incorrect number of commands returned")
+	}
+
+	if commands[0].Command != "private" || commands[0].Description != "a private command" {
 		t.Error("Commands were incorrectly set")
 	}
 }

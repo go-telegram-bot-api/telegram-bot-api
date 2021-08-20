@@ -837,7 +837,98 @@ func NewDiceWithEmoji(chatID int64, emoji string) DiceConfig {
 	}
 }
 
+// NewBotCommandScopeDefault represents the default scope of bot commands.
+func NewBotCommandScopeDefault() BotCommandScope {
+	return BotCommandScope{Type: "default"}
+}
+
+// NewBotCommandScopeAllPrivateChats represents the scope of bot commands,
+// covering all private chats.
+func NewBotCommandScopeAllPrivateChats() BotCommandScope {
+	return BotCommandScope{Type: "all_private_chats"}
+}
+
+// NewBotCommandScopeAllGroupChats represents the scope of bot commands,
+// covering all group and supergroup chats.
+func NewBotCommandScopeAllGroupChats() BotCommandScope {
+	return BotCommandScope{Type: "all_group_chats"}
+}
+
+// NewBotCommandScopeAllChatAdministrators represents the scope of bot commands,
+// covering all group and supergroup chat administrators.
+func NewBotCommandScopeAllChatAdministrators() BotCommandScope {
+	return BotCommandScope{Type: "all_chat_administrators"}
+}
+
+// NewBotCommandScopeChat represents the scope of bot commands, covering a
+// specific chat.
+func NewBotCommandScopeChat(chatID int64) BotCommandScope {
+	return BotCommandScope{
+		Type:   "chat",
+		ChatID: chatID,
+	}
+}
+
+// NewBotCommandScopeChatAdministrators represents the scope of bot commands,
+// covering all administrators of a specific group or supergroup chat.
+func NewBotCommandScopeChatAdministrators(chatID int64) BotCommandScope {
+	return BotCommandScope{
+		Type:   "chat_administrators",
+		ChatID: chatID,
+	}
+}
+
+// NewBotCommandScopeChatMember represents the scope of bot commands, covering a
+// specific member of a group or supergroup chat.
+func NewBotCommandScopeChatMember(chatID, userID int64) BotCommandScope {
+	return BotCommandScope{
+		Type:   "chat_member",
+		ChatID: chatID,
+		UserID: userID,
+	}
+}
+
+// NewGetMyCommandsWithScope allows you to set the registered commands for a
+// given scope.
+func NewGetMyCommandsWithScope(scope BotCommandScope) GetMyCommandsConfig {
+	return GetMyCommandsConfig{Scope: &scope}
+}
+
+// NewGetMyCommandsWithScopeAndLanguage allows you to set the registered
+// commands for a given scope and language code.
+func NewGetMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string) GetMyCommandsConfig {
+	return GetMyCommandsConfig{Scope: &scope, LanguageCode: languageCode}
+}
+
 // NewSetMyCommands allows you to set the registered commands.
 func NewSetMyCommands(commands ...BotCommand) SetMyCommandsConfig {
-	return SetMyCommandsConfig{commands: commands}
+	return SetMyCommandsConfig{Commands: commands}
+}
+
+// NewSetMyCommands allows you to set the registered commands for a given scope.
+func NewSetMyCommandsWithScope(scope BotCommandScope, commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{Commands: commands, Scope: &scope}
+}
+
+// NewSetMyCommands allows you to set the registered commands for a given scope
+// and language code.
+func NewSetMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string, commands ...BotCommand) SetMyCommandsConfig {
+	return SetMyCommandsConfig{Commands: commands, Scope: &scope, LanguageCode: languageCode}
+}
+
+// NewDeleteMyCommands allows you to delete the registered commands.
+func NewDeleteMyCommands() DeleteMyCommandsConfig {
+	return DeleteMyCommandsConfig{}
+}
+
+// NewDeleteMyCommands allows you to delete the registered commands for a given
+// scope.
+func NewDeleteMyCommandsWithScope(scope BotCommandScope) DeleteMyCommandsConfig {
+	return DeleteMyCommandsConfig{Scope: &scope}
+}
+
+// NewDeleteMyCommands allows you to delete the registered commands for a given
+// scope and language code.
+func NewDeleteMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string) DeleteMyCommandsConfig {
+	return DeleteMyCommandsConfig{Scope: &scope, LanguageCode: languageCode}
 }
