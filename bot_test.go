@@ -1002,10 +1002,11 @@ func TestCommands(t *testing.T) {
 }
 
 // TODO: figure out why test is failing
+//
 // func TestEditMessageMedia(t *testing.T) {
 // 	bot, _ := getBot(t)
 
-// 	msg := NewPhoto(ChatID, FilePath("tests/image.jpg"))
+// 	msg := NewPhoto(ChatID, "tests/image.jpg")
 // 	msg.Caption = "Test"
 // 	m, err := bot.Send(msg)
 
