@@ -3,7 +3,6 @@
 package tgbotapi
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +11,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 )
@@ -180,54 +178,37 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 		}
 
 		for _, file := range files {
-			switch f := file.File.(type) {
-			case string:
-				fileHandle, err := os.Open(f)
-				if err != nil {
-					w.CloseWithError(err)
-					return
-				}
-				defer fileHandle.Close()
-
-				part, err := m.CreateFormFile(file.Name, fileHandle.Name())
+			if file.Data.NeedsUpload() {
+				name, reader, err := file.Data.UploadData()
 				if err != nil {
 					w.CloseWithError(err)
 					return
 				}
 
-				io.Copy(part, fileHandle)
-			case FileBytes:
-				part, err := m.CreateFormFile(file.Name, f.Name)
+				part, err := m.CreateFormFile(file.Name, name)
 				if err != nil {
 					w.CloseWithError(err)
 					return
 				}
 
-				buf := bytes.NewBuffer(f.Bytes)
-				io.Copy(part, buf)
-			case FileReader:
-				part, err := m.CreateFormFile(file.Name, f.Name)
-				if err != nil {
+				if _, err := io.Copy(part, reader); err != nil {
 					w.CloseWithError(err)
 					return
 				}
 
-				io.Copy(part, f.Reader)
-			case FileURL:
-				val := string(f)
-				if err := m.WriteField(file.Name, val); err != nil {
+				if closer, ok := reader.(io.ReadCloser); ok {
+					if err = closer.Close(); err != nil {
+						w.CloseWithError(err)
+						return
+					}
+				}
+			} else {
+				value := file.Data.SendData()
+
+				if err := m.WriteField(file.Name, value); err != nil {
 					w.CloseWithError(err)
 					return
 				}
-			case FileID:
-				val := string(f)
-				if err := m.WriteField(file.Name, val); err != nil {
-					w.CloseWithError(err)
-					return
-				}
-			default:
-				w.CloseWithError(errors.New(ErrBadFileType))
-				return
 			}
 		}
 	}()
@@ -316,8 +297,7 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 
 func hasFilesNeedingUpload(files []RequestFile) bool {
 	for _, file := range files {
-		switch file.File.(type) {
-		case string, FileBytes, FileReader:
+		if file.Data.NeedsUpload() {
 			return true
 		}
 	}
@@ -344,20 +324,7 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 		// However, if there are no files to be uploaded, there's likely things
 		// that need to be turned into params instead.
 		for _, file := range files {
-			var s string
-
-			switch f := file.File.(type) {
-			case string:
-				s = f
-			case FileID:
-				s = string(f)
-			case FileURL:
-				s = string(f)
-			default:
-				return nil, errors.New(ErrBadFileType)
-			}
-
-			params[file.Name] = s
+			params[file.Name] = file.Data.SendData()
 		}
 	}
 

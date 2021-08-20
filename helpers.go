@@ -70,7 +70,7 @@ func NewCopyMessage(chatID int64, fromChatID int64, messageID int) CopyMessageCo
 // FileReader, or FileBytes.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhoto(chatID int64, file interface{}) PhotoConfig {
+func NewPhoto(chatID int64, file RequestFileData) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -82,7 +82,7 @@ func NewPhoto(chatID int64, file interface{}) PhotoConfig {
 // NewPhotoToChannel creates a new photo uploader to send a photo to a channel.
 //
 // Note that you must send animated GIFs as a document.
-func NewPhotoToChannel(username string, file interface{}) PhotoConfig {
+func NewPhotoToChannel(username string, file RequestFileData) PhotoConfig {
 	return PhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{
@@ -94,7 +94,7 @@ func NewPhotoToChannel(username string, file interface{}) PhotoConfig {
 }
 
 // NewAudio creates a new sendAudio request.
-func NewAudio(chatID int64, file interface{}) AudioConfig {
+func NewAudio(chatID int64, file RequestFileData) AudioConfig {
 	return AudioConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -104,7 +104,7 @@ func NewAudio(chatID int64, file interface{}) AudioConfig {
 }
 
 // NewDocument creates a new sendDocument request.
-func NewDocument(chatID int64, file interface{}) DocumentConfig {
+func NewDocument(chatID int64, file RequestFileData) DocumentConfig {
 	return DocumentConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -114,7 +114,7 @@ func NewDocument(chatID int64, file interface{}) DocumentConfig {
 }
 
 // NewSticker creates a new sendSticker request.
-func NewSticker(chatID int64, file interface{}) StickerConfig {
+func NewSticker(chatID int64, file RequestFileData) StickerConfig {
 	return StickerConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -124,7 +124,7 @@ func NewSticker(chatID int64, file interface{}) StickerConfig {
 }
 
 // NewVideo creates a new sendVideo request.
-func NewVideo(chatID int64, file interface{}) VideoConfig {
+func NewVideo(chatID int64, file RequestFileData) VideoConfig {
 	return VideoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -134,7 +134,7 @@ func NewVideo(chatID int64, file interface{}) VideoConfig {
 }
 
 // NewAnimation creates a new sendAnimation request.
-func NewAnimation(chatID int64, file interface{}) AnimationConfig {
+func NewAnimation(chatID int64, file RequestFileData) AnimationConfig {
 	return AnimationConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -147,7 +147,7 @@ func NewAnimation(chatID int64, file interface{}) AnimationConfig {
 //
 // chatID is where to send it, file is a string path to the file,
 // FileReader, or FileBytes.
-func NewVideoNote(chatID int64, length int, file interface{}) VideoNoteConfig {
+func NewVideoNote(chatID int64, length int, file RequestFileData) VideoNoteConfig {
 	return VideoNoteConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -158,7 +158,7 @@ func NewVideoNote(chatID int64, length int, file interface{}) VideoNoteConfig {
 }
 
 // NewVoice creates a new sendVoice request.
-func NewVoice(chatID int64, file interface{}) VoiceConfig {
+func NewVoice(chatID int64, file RequestFileData) VoiceConfig {
 	return VoiceConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{ChatID: chatID},
@@ -177,7 +177,7 @@ func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 }
 
 // NewInputMediaPhoto creates a new InputMediaPhoto.
-func NewInputMediaPhoto(media interface{}) InputMediaPhoto {
+func NewInputMediaPhoto(media RequestFileData) InputMediaPhoto {
 	return InputMediaPhoto{
 		BaseInputMedia{
 			Type:  "photo",
@@ -187,7 +187,7 @@ func NewInputMediaPhoto(media interface{}) InputMediaPhoto {
 }
 
 // NewInputMediaVideo creates a new InputMediaVideo.
-func NewInputMediaVideo(media interface{}) InputMediaVideo {
+func NewInputMediaVideo(media RequestFileData) InputMediaVideo {
 	return InputMediaVideo{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "video",
@@ -197,7 +197,7 @@ func NewInputMediaVideo(media interface{}) InputMediaVideo {
 }
 
 // NewInputMediaAnimation creates a new InputMediaAnimation.
-func NewInputMediaAnimation(media interface{}) InputMediaAnimation {
+func NewInputMediaAnimation(media RequestFileData) InputMediaAnimation {
 	return InputMediaAnimation{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "animation",
@@ -207,7 +207,7 @@ func NewInputMediaAnimation(media interface{}) InputMediaAnimation {
 }
 
 // NewInputMediaAudio creates a new InputMediaAudio.
-func NewInputMediaAudio(media interface{}) InputMediaAudio {
+func NewInputMediaAudio(media RequestFileData) InputMediaAudio {
 	return InputMediaAudio{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "audio",
@@ -217,7 +217,7 @@ func NewInputMediaAudio(media interface{}) InputMediaAudio {
 }
 
 // NewInputMediaDocument creates a new InputMediaDocument.
-func NewInputMediaDocument(media interface{}) InputMediaDocument {
+func NewInputMediaDocument(media RequestFileData) InputMediaDocument {
 	return InputMediaDocument{
 		BaseInputMedia: BaseInputMedia{
 			Type:  "document",
@@ -316,7 +316,7 @@ func NewWebhook(link string) (WebhookConfig, error) {
 //
 // link is the url you wish to get webhooks,
 // file contains a string to a file, FileReader, or FileBytes.
-func NewWebhookWithCert(link string, file interface{}) (WebhookConfig, error) {
+func NewWebhookWithCert(link string, file RequestFileData) (WebhookConfig, error) {
 	u, err := url.Parse(link)
 
 	if err != nil {
@@ -769,7 +769,7 @@ func NewChatDescription(chatID int64, description string) SetChatDescriptionConf
 }
 
 // NewChatPhoto allows you to update the photo for a chat.
-func NewChatPhoto(chatID int64, photo interface{}) SetChatPhotoConfig {
+func NewChatPhoto(chatID int64, photo RequestFileData) SetChatPhotoConfig {
 	return SetChatPhotoConfig{
 		BaseFile: BaseFile{
 			BaseChat: BaseChat{
@@ -781,7 +781,7 @@ func NewChatPhoto(chatID int64, photo interface{}) SetChatPhotoConfig {
 }
 
 // NewDeleteChatPhoto allows you to delete the photo for a chat.
-func NewDeleteChatPhoto(chatID int64, photo interface{}) DeleteChatPhotoConfig {
+func NewDeleteChatPhoto(chatID int64) DeleteChatPhotoConfig {
 	return DeleteChatPhotoConfig{
 		ChatID: chatID,
 	}
