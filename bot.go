@@ -39,8 +39,16 @@ type BotAPI struct {
 // NewBotAPI creates a new BotAPI instance.
 //
 // It requires a token, provided by @BotFather on Telegram.
-func NewBotAPI(token string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, APIEndpoint, &http.Client{})
+func NewBotAPI(token string, proxy... string) (*BotAPI, error) {
+	httpClient := &http.Client{}
+	if len(proxy) > 0 {
+		proxyUrl, err := url.Parse(proxy[0])
+		if err != nil {
+			return nil, err
+		}
+		httpClient.Transport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
+	}
+	return NewBotAPIWithClient(token, httpClient)
 }
 
 // NewBotAPIWithAPIEndpoint creates a new BotAPI instance
