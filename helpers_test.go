@@ -161,7 +161,7 @@ func TestNewEditMessageCaption(t *testing.T) {
 func TestNewEditMessageReplyMarkup(t *testing.T) {
 	markup := tgbotapi.InlineKeyboardMarkup{
 		InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
-			[]tgbotapi.InlineKeyboardButton{
+			{
 				tgbotapi.InlineKeyboardButton{Text: "test"},
 			},
 		},

@@ -742,6 +742,10 @@ func TestUnpinChatMessage(t *testing.T) {
 		DisableNotification: false,
 	}
 	_, err := bot.PinChatMessage(pinChatMessageConfig)
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
 
 	unpinChatMessageConfig := tgbotapi.UnpinChatMessageConfig{
 		ChatID: message.Chat.ID,

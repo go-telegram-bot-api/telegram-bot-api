@@ -298,9 +298,9 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 //
 // It requires the Chattable to send.
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
-	switch c.(type) {
+	switch c := c.(type) {
 	case Fileable:
-		return bot.sendFile(c.(Fileable))
+		return bot.sendFile(c)
 	default:
 		return bot.sendChattable(c)
 	}
@@ -883,7 +883,7 @@ func (bot *BotAPI) AnswerShippingQuery(config ShippingConfig) (APIResponse, erro
 
 	v.Add("shipping_query_id", config.ShippingQueryID)
 	v.Add("ok", strconv.FormatBool(config.OK))
-	if config.OK == true {
+	if !config.OK {
 		data, err := json.Marshal(config.ShippingOptions)
 		if err != nil {
 			return APIResponse{}, err
@@ -904,7 +904,7 @@ func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse
 
 	v.Add("pre_checkout_query_id", config.PreCheckoutQueryID)
 	v.Add("ok", strconv.FormatBool(config.OK))
-	if config.OK != true {
+	if !config.OK {
 		v.Add("error_message", config.ErrorMessage)
 	}
 

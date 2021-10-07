@@ -10,7 +10,7 @@ import (
 // Params represents a set of parameters that gets passed to a request.
 type Params map[string]string
 
-func newParams(values url.Values) Params {
+func NewParams(values url.Values) Params {
 	params := Params{}
 	for k, v := range values {
 		if len(v) > 0 {
