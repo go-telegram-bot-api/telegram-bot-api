@@ -4,6 +4,7 @@ package tgbotapi
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -165,6 +166,18 @@ func (bot *BotAPI) makeMessageRequest(endpoint string, params url.Values) (Messa
 // Note that if your FileReader has a size set to -1, it will read
 // the file into memory to calculate a size.
 func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
+	return bot.UploadFileWithContext(context.Background(), endpoint, params, fieldname, file)
+}
+
+// UploadFileWithContext makes a request to the API with a file.
+//
+// Requires the parameter to hold the file not be in the params.
+// File should be a string to a file path, a FileBytes struct,
+// a FileReader struct, or a url.URL.
+//
+// Note that if your FileReader has a size set to -1, it will read
+// the file into memory to calculate a size.
+func (bot *BotAPI) UploadFileWithContext(ctx context.Context, endpoint string, params map[string]string, fieldname string, file interface{}) (APIResponse, error) {
 	ms := multipartstreamer.New()
 
 	switch f := file.(type) {
@@ -215,7 +228,7 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 
 	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
-	req, err := http.NewRequest("POST", method, nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", method, nil)
 	if err != nil {
 		return APIResponse{}, err
 	}
