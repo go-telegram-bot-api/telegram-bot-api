@@ -224,7 +224,7 @@ func (fi FileID) SendData() string {
 	return string(fi)
 }
 
-// fileAttach is a internal file type used for processed media groups.
+// fileAttach is an internal file type used for processed media groups.
 type fileAttach string
 
 func (fa fileAttach) NeedsUpload() bool {

@@ -3,7 +3,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/go-telegram-bot-api/telegram-bot-api/v5.svg)](https://pkg.go.dev/github.com/go-telegram-bot-api/telegram-bot-api/v5)
 [![Test](https://github.com/go-telegram-bot-api/telegram-bot-api/actions/workflows/test.yml/badge.svg)](https://github.com/go-telegram-bot-api/telegram-bot-api/actions/workflows/test.yml)
 
-All methods are fairly self explanatory, and reading the [godoc](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api) page should
+All methods are fairly self-explanatory, and reading the [godoc](http://godoc.org/github.com/go-telegram-bot-api/telegram-bot-api) page should
 explain everything. If something isn't clear, open an issue or submit
 a pull request.
 
@@ -63,7 +63,7 @@ func main() {
 ```
 
 There are more examples on the [site](https://go-telegram-bot-api.dev/)
-with detailed information on how to do many different kinds of things.
+with detailed information on how to do many kinds of things.
 It's a great place to get started on using keyboards, commands, or other
 kinds of reply markup.
 
@@ -178,7 +178,7 @@ func main() {
 }
 ```
 
-If you need, you may generate a self signed certficate, as this requires
+If you need, you may generate a self-signed certificate, as this requires
 HTTPS / TLS. The above example tells Telegram that this is your
 certificate and that it should be trusted, even though it is not
 properly signed.

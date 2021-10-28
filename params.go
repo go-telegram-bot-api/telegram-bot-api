@@ -44,7 +44,7 @@ func (p Params) AddNonZeroFloat(key string, value float64) {
 	}
 }
 
-// AddInterface adds an interface if it is not nill and can be JSON marshalled.
+// AddInterface adds an interface if it is not nil and can be JSON marshalled.
 func (p Params) AddInterface(key string, value interface{}) error {
 	if value == nil || (reflect.ValueOf(value).Kind() == reflect.Ptr && reflect.ValueOf(value).IsNil()) {
 		return nil

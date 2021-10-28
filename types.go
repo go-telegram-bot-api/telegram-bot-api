@@ -147,7 +147,7 @@ func (u *Update) CallbackData() string {
 	return ""
 }
 
-// FromChat returns the chat where an update occured.
+// FromChat returns the chat where an update occurred.
 func (u *Update) FromChat() *Chat {
 	switch {
 	case u.Message != nil:
@@ -278,7 +278,7 @@ type Chat struct {
 	//
 	// optional
 	PinnedMessage *Message `json:"pinned_message,omitempty"`
-	// Permissions is default chat member permissions, for groups and
+	// Permissions are default chat member permissions, for groups and
 	// supergroups. Returned only in getChat.
 	//
 	// optional
@@ -410,7 +410,7 @@ type Message struct {
 	//
 	// optional
 	Text string `json:"text,omitempty"`
-	// Entities is for text messages, special entities like usernames,
+	// Entities are for text messages, special entities like usernames,
 	// URLs, bot commands, etc. that appear in the text;
 	//
 	// optional
@@ -532,7 +532,7 @@ type Message struct {
 	// MigrateToChatID is the group has been migrated to a supergroup with the specified identifier.
 	// This number may be greater than 32 bits and some programming languages
 	// may have difficulty/silent defects in interpreting it.
-	// But it is smaller than 52 bits, so a signed 64 bit integer
+	// But it is smaller than 52 bits, so a signed 64-bit integer
 	// or double-precision float type are safe for storing this identifier;
 	//
 	// optional
@@ -540,7 +540,7 @@ type Message struct {
 	// MigrateFromChatID is the supergroup has been migrated from a group with the specified identifier.
 	// This number may be greater than 32 bits and some programming languages
 	// may have difficulty/silent defects in interpreting it.
-	// But it is smaller than 52 bits, so a signed 64 bit integer
+	// But it is smaller than 52 bits, so a signed 64-bit integer
 	// or double-precision float type are safe for storing this identifier;
 	//
 	// optional
@@ -560,7 +560,7 @@ type Message struct {
 	//
 	// optional
 	SuccessfulPayment *SuccessfulPayment `json:"successful_payment,omitempty"`
-	// ConnectedWebsite is Tthe domain name of the website on which the user has
+	// ConnectedWebsite is the domain name of the website on which the user has
 	// logged in;
 	//
 	// optional
@@ -790,7 +790,7 @@ type PhotoSize struct {
 
 // Animation represents an animation file.
 type Animation struct {
-	// FileID odentifier for this file, which can be used to download or reuse
+	// FileID is the identifier for this file, which can be used to download or reuse
 	// the file
 	FileID string `json:"file_id"`
 	// FileUniqueID is the unique identifier for this file, which is supposed to
@@ -860,7 +860,7 @@ type Audio struct {
 
 // Document represents a general file.
 type Document struct {
-	// FileID is a identifier for this file, which can be used to download or
+	// FileID is an identifier for this file, which can be used to download or
 	// reuse the file
 	FileID string `json:"file_id"`
 	// FileUniqueID is the unique identifier for this file, which is supposed to
@@ -1038,7 +1038,7 @@ type Poll struct {
 	//
 	// optional
 	Explanation string `json:"explanation,omitempty"`
-	// ExplainationEntities are special entities like usernames, URLs, bot
+	// ExplanationEntities are special entities like usernames, URLs, bot
 	// commands, etc. that appear in the explanation
 	//
 	// optional
@@ -1048,7 +1048,7 @@ type Poll struct {
 	//
 	// optional
 	OpenPeriod int `json:"open_period,omitempty"`
-	// Closedate is the point in time (unix timestamp) when the poll will be
+	// CloseDate is the point in time (unix timestamp) when the poll will be
 	// automatically closed
 	//
 	// optional
@@ -1258,7 +1258,7 @@ type KeyboardButton struct {
 	RequestPoll *KeyboardButtonPollType `json:"request_poll,omitempty"`
 }
 
-// KeyboardButtonPollType represents type of a poll, which is allowed to
+// KeyboardButtonPollType represents type of poll, which is allowed to
 // be created and sent when the corresponding button is pressed.
 type KeyboardButtonPollType struct {
 	// Type is if quiz is passed, the user will be allowed to create only polls
@@ -1542,7 +1542,7 @@ type ChatMember struct {
 	// CanManageChat administrators only.
 	// True, if the administrator can access the chat event log, chat
 	// statistics, message statistics in channels, see channel members, see
-	// anonymous administrators in supergoups and ignore slow mode. Implied by
+	// anonymous administrators in supergroups and ignore slow mode. Implied by
 	// any other administrator privilege.
 	//
 	// optional
@@ -1845,7 +1845,7 @@ type InputMediaAnimation struct {
 	Duration int `json:"duration,omitempty"`
 }
 
-// InputMediaAudio is a audio to send as part of a media group.
+// InputMediaAudio is an audio to send as part of a media group.
 type InputMediaAudio struct {
 	BaseInputMedia
 	// Thumbnail of the file sent; can be ignored if thumbnail generation for
@@ -1888,7 +1888,7 @@ type Sticker struct {
 	// FileID is an identifier for this file, which can be used to download or
 	// reuse the file
 	FileID string `json:"file_id"`
-	// FileUniqueID is an unique identifier for this file,
+	// FileUniqueID is a unique identifier for this file,
 	// which is supposed to be the same over time and for different bots.
 	// Can't be used to download or reuse the file.
 	FileUniqueID string `json:"file_unique_id"`
@@ -1976,7 +1976,7 @@ type Game struct {
 	//
 	// optional
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
-	// Animation animation that will be displayed in the game message in chats.
+	// Animation is an animation that will be displayed in the game message in chats.
 	// Upload via BotFather (https://t.me/botfather).
 	//
 	// optional
@@ -2094,7 +2094,7 @@ type InlineQueryResultCachedAudio struct {
 
 // InlineQueryResultCachedDocument is an inline query response with cached document.
 type InlineQueryResultCachedDocument struct {
-	// Type of the result, must be document
+	// Type of the result, must be a document
 	Type string `json:"type"`
 	// ID unique identifier for this result, 1-64 bytes
 	ID string `json:"id"`
@@ -2211,7 +2211,7 @@ type InlineQueryResultCachedMPEG4GIF struct {
 
 // InlineQueryResultCachedPhoto is an inline query response with cached photo.
 type InlineQueryResultCachedPhoto struct {
-	// Type of the result, must be photo.
+	// Type of the result, must be a photo.
 	Type string `json:"type"`
 	// ID unique identifier for this result, 1-64 bytes.
 	ID string `json:"id"`
@@ -2252,7 +2252,7 @@ type InlineQueryResultCachedPhoto struct {
 
 // InlineQueryResultCachedSticker is an inline query response with cached sticker.
 type InlineQueryResultCachedSticker struct {
-	// Type of the result, must be sticker
+	// Type of the result, must be a sticker
 	Type string `json:"type"`
 	// ID unique identifier for this result, 1-64 bytes
 	ID string `json:"id"`
@@ -2458,7 +2458,7 @@ type InlineQueryResultGame struct {
 
 // InlineQueryResultDocument is an inline query response document.
 type InlineQueryResultDocument struct {
-	// Type of the result, must be document
+	// Type of the result, must be a document
 	Type string `json:"type"`
 	// ID unique identifier for this result, 1-64 bytes
 	ID string `json:"id"`
@@ -2476,7 +2476,7 @@ type InlineQueryResultDocument struct {
 	//
 	// optional
 	Description string `json:"description,omitempty"`
-	// ReplyMarkup nline keyboard attached to the message
+	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`

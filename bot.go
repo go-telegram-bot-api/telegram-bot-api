@@ -150,7 +150,7 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 		return
 	}
 
-	// if debug, read reponse body
+	// if debug, read response body
 	data, err := ioutil.ReadAll(responseBody)
 	if err != nil {
 		return
@@ -399,7 +399,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 //
 // Offset, Limit, Timeout, and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
-// Set Timeout to a large number to reduce requests so you can get updates
+// Set Timeout to a large number to reduce requests, so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	resp, err := bot.Request(config)
