@@ -76,8 +76,8 @@ type Update struct {
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query"`
 }
 
-// SentFrom return user sender of update. Can be nil, if telegram wont provide info about him in
-// update object.
+// SentFrom returns the user who sent an update. Can be nil, if Telegram did not provide information
+// about the user in the update object.
 func (u *Update) SentFrom() *User {
 	switch {
 	case u.Message != nil:
@@ -99,6 +99,7 @@ func (u *Update) SentFrom() *User {
 	}
 }
 
+// CallbackData returns the callback query data, if it exists.
 func (u *Update) CallbackData() string {
 	if u.CallbackQuery != nil {
 		return u.CallbackQuery.Data
@@ -106,6 +107,7 @@ func (u *Update) CallbackData() string {
 	return ""
 }
 
+// FromChat returns the chat where an update occured.
 func (u *Update) FromChat() *Chat {
 	switch {
 	case u.Message != nil:
