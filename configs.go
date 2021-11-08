@@ -52,48 +52,48 @@ const (
 
 // Constant values for update types
 const (
-	// New incoming message of any kind — text, photo, sticker, etc.
+	// UpdateTypeMessage is new incoming message of any kind — text, photo, sticker, etc.
 	UpdateTypeMessage = "message"
 
-	// New version of a message that is known to the bot and was edited
+	// UpdateTypeEditedMessage is new version of a message that is known to the bot and was edited
 	UpdateTypeEditedMessage = "edited_message"
 
-	// New incoming channel post of any kind — text, photo, sticker, etc.
+	// UpdateTypeChannelPost is new incoming channel post of any kind — text, photo, sticker, etc.
 	UpdateTypeChannelPost = "channel_post"
 
-	// New version of a channel post that is known to the bot and was edited
+	// UpdateTypeEditedChannelPost is new version of a channel post that is known to the bot and was edited
 	UpdateTypeEditedChannelPost = "edited_channel_post"
 
-	// New incoming inline query
+	// UpdateTypeInlineQuery is new incoming inline query
 	UpdateTypeInlineQuery = "inline_query"
 
-	// The result of an inline query that was chosen by a user and sent to their
+	// UpdateTypeChosenInlineResult i the result of an inline query that was chosen by a user and sent to their
 	// chat partner. Please see the documentation on the feedback collecting for
 	// details on how to enable these updates for your bot.
 	UpdateTypeChosenInlineResult = "chosen_inline_result"
 
-	// New incoming callback query
+	// UpdateTypeCallbackQuery is new incoming callback query
 	UpdateTypeCallbackQuery = "callback_query"
 
-	// New incoming shipping query. Only for invoices with flexible price
+	// UpdateTypeShippingQuery is new incoming shipping query. Only for invoices with flexible price
 	UpdateTypeShippingQuery = "shipping_query"
 
-	// New incoming pre-checkout query. Contains full information about checkout
+	// UpdateTypePreCheckoutQuery is new incoming pre-checkout query. Contains full information about checkout
 	UpdateTypePreCheckoutQuery = "pre_checkout_query"
 
-	// New poll state. Bots receive only updates about stopped polls and polls
+	// UpdateTypePoll is new poll state. Bots receive only updates about stopped polls and polls
 	// which are sent by the bot
 	UpdateTypePoll = "poll"
 
-	// A user changed their answer in a non-anonymous poll. Bots receive new votes
+	// UpdateTypePollAnswer is when user changed their answer in a non-anonymous poll. Bots receive new votes
 	// only in polls that were sent by the bot itself.
 	UpdateTypePollAnswer = "poll_answer"
 
-	// The bot's chat member status was updated in a chat. For private chats, this
+	// UpdateTypeMyChatMember is when the bot's chat member status was updated in a chat. For private chats, this
 	// update is received only when the bot is blocked or unblocked by the user.
 	UpdateTypeMyChatMember = "my_chat_member"
 
-	// The bot must be an administrator in the chat and must explicitly specify
+	// UpdateTypeChatMember is when the bot must be an administrator in the chat and must explicitly specify
 	// this update in the list of allowed_updates to receive these updates.
 	UpdateTypeChatMember = "chat_member"
 )
@@ -125,13 +125,13 @@ type RequestFile struct {
 
 // RequestFileData represents the data to be used for a file.
 type RequestFileData interface {
-	// If the file needs to be uploaded.
+	// NeedsUpload shows if the file needs to be uploaded.
 	NeedsUpload() bool
 
-	// Get the file name and an `io.Reader` for the file to be uploaded. This
+	// UploadData gets the file name and an `io.Reader` for the file to be uploaded. This
 	// must only be called when the file needs to be uploaded.
 	UploadData() (string, io.Reader, error)
-	// Get the file data to send when a file does not need to be uploaded. This
+	// SendData gets the file data to send when a file does not need to be uploaded. This
 	// must only be called when the file does not need to be uploaded.
 	SendData() string
 }
