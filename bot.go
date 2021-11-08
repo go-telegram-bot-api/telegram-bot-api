@@ -124,6 +124,11 @@ func buildParams(in Params) (out url.Values) {
 	return
 }
 
+// MakeRequest makes a request to a specific endpoint with our token.
+func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
+	return bot.MakeRequestWithContext(context.Background(), endpoint, params)
+}
+
 func (bot *BotAPI) MakeRequestWithContext(ctx context.Context, endpoint string, params Params) (*APIResponse, error) {
 	if bot.Debug {
 		bot.Logger.Printf("endpoint: %s, params: %v\n", endpoint, params)
@@ -170,11 +175,6 @@ func (bot *BotAPI) MakeRequestWithContext(ctx context.Context, endpoint string, 
 	}
 
 	return &apiResp, nil
-}
-
-// MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
-	return bot.MakeRequestWithContext(context.Background(), endpoint, params)
 }
 
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
@@ -491,7 +491,11 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // Set Timeout to a large number to reduce requests so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
-	resp, err := bot.Request(config)
+	return bot.GetUpdatesWithContext(context.Background(), config)
+}
+
+func (bot *BotAPI) GetUpdatesWithContext(ctx context.Context, config UpdateConfig) ([]Update, error) {
+	resp, err := bot.RequestWithContext(ctx, config)
 	if err != nil {
 		return nil, err
 	}
@@ -525,19 +529,27 @@ func (bot *BotAPI) GetUpdatesChanWithContext(ctx context.Context, config UpdateC
 	ch := make(chan Update, bot.Buffer)
 
 	go func() {
+		defer close(ch)
+
 		for {
-			updates, err := bot.GetUpdates(config)
-			if err != nil {
-				bot.Logger.Printf("failed to get updates: %s\n", err)
-				time.Sleep(time.Second * 3)
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				updates, err := bot.GetUpdatesWithContext(ctx, config)
 
-				continue
-			}
+				if err != nil {
+					bot.Logger.Printf("failed to get updates: %s\n", err)
+					time.Sleep(time.Second * 3)
 
-			for _, update := range updates {
-				if update.UpdateID >= config.Offset {
-					config.Offset = update.UpdateID + 1
-					ch <- update
+					continue
+				}
+
+				for _, update := range updates {
+					if update.UpdateID >= config.Offset {
+						config.Offset = update.UpdateID + 1
+						ch <- update
+					}
 				}
 			}
 		}
