@@ -10,11 +10,8 @@ approaches to solve common problems.
 ## Installing
 
 ```bash
-go get -u github.com/go-telegram-bot-api/telegram-bot-api/v5@develop
+go get -u github.com/go-telegram-bot-api/telegram-bot-api/v5
 ```
-
-It's currently suggested to use the develop branch. While there may be breaking
-changes, it has a number of features not yet available on master.
 
 ## A Simple Bot
 

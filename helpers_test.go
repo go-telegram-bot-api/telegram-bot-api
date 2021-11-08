@@ -17,7 +17,7 @@ func TestNewWebhook(t *testing.T) {
 }
 
 func TestNewWebhookWithCert(t *testing.T) {
-	exampleFile := File{FileID: "123"}
+	exampleFile := FileID("123")
 	result, err := NewWebhookWithCert("https://example.com/token", exampleFile)
 
 	if err != nil ||

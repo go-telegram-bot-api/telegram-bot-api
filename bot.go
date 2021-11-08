@@ -3,9 +3,9 @@
 package tgbotapi
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,7 +13,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 )
@@ -110,18 +109,18 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI,
 	})
 }
 
-func buildParams(in Params) (out url.Values) {
+func buildParams(in Params) url.Values {
 	if in == nil {
 		return url.Values{}
 	}
 
-	out = url.Values{}
+	out := url.Values{}
 
 	for key, value := range in {
 		out.Set(key, value)
 	}
 
-	return
+	return out
 }
 
 // MakeRequest makes a request to a specific endpoint with our token.
@@ -218,69 +217,43 @@ func (bot *BotAPI) UploadFilesWithContext(ctx context.Context, endpoint string, 
 
 		for field, value := range params {
 			if err := m.WriteField(field, value); err != nil {
-				_ = w.CloseWithError(err)
+				w.CloseWithError(err)
 				return
 			}
 		}
 
 		for _, file := range files {
-			switch f := file.File.(type) {
-			case string:
-				fileHandle, err := os.Open(f)
+			if file.Data.NeedsUpload() {
+				name, reader, err := file.Data.UploadData()
 				if err != nil {
-					_ = w.CloseWithError(err)
-					return
-				}
-				defer fileHandle.Close()
-
-				part, err := m.CreateFormFile(file.Name, fileHandle.Name())
-				if err != nil {
-					_ = w.CloseWithError(err)
+					w.CloseWithError(err)
 					return
 				}
 
-				if _, err := io.Copy(part, fileHandle); err != nil {
-					_ = w.CloseWithError(err)
-					return
-				}
-			case FileBytes:
-				part, err := m.CreateFormFile(file.Name, f.Name)
+				part, err := m.CreateFormFile(file.Name, name)
 				if err != nil {
-					_ = w.CloseWithError(err)
+					w.CloseWithError(err)
 					return
 				}
 
-				buf := bytes.NewBuffer(f.Bytes)
-				if _, err := io.Copy(part, buf); err != nil {
-					_ = w.CloseWithError(err)
-					return
-				}
-			case FileReader:
-				part, err := m.CreateFormFile(file.Name, f.Name)
-				if err != nil {
-					_ = w.CloseWithError(err)
+				if _, err := io.Copy(part, reader); err != nil {
+					w.CloseWithError(err)
 					return
 				}
 
-				if _, err := io.Copy(part, f.Reader); err != nil {
-					_ = w.CloseWithError(err)
+				if closer, ok := reader.(io.ReadCloser); ok {
+					if err = closer.Close(); err != nil {
+						w.CloseWithError(err)
+						return
+					}
+				}
+			} else {
+				value := file.Data.SendData()
+
+				if err := m.WriteField(file.Name, value); err != nil {
+					w.CloseWithError(err)
 					return
 				}
-			case FileURL:
-				val := string(f)
-				if err := m.WriteField(file.Name, val); err != nil {
-					_ = w.CloseWithError(err)
-					return
-				}
-			case FileID:
-				val := string(f)
-				if err := m.WriteField(file.Name, val); err != nil {
-					_ = w.CloseWithError(err)
-					return
-				}
-			default:
-				_ = w.CloseWithError(ErrBadFileType)
-				return
 			}
 		}
 	}()
@@ -369,8 +342,7 @@ func (bot *BotAPI) IsMessageToMe(message Message) bool {
 
 func hasFilesNeedingUpload(files []RequestFile) bool {
 	for _, file := range files {
-		switch file.File.(type) {
-		case string, FileBytes, FileReader:
+		if file.Data.NeedsUpload() {
 			return true
 		}
 	}
@@ -401,20 +373,7 @@ func (bot *BotAPI) RequestWithContext(ctx context.Context, c Chattable) (*APIRes
 		// However, if there are no files to be uploaded, there's likely things
 		// that need to be turned into params instead.
 		for _, file := range files {
-			var s string
-
-			switch f := file.File.(type) {
-			case string:
-				s = f
-			case FileID:
-				s = string(f)
-			case FileURL:
-				s = string(f)
-			default:
-				return nil, ErrBadFileType
-			}
-
-			params[file.Name] = s
+			params[file.Name] = file.Data.SendData()
 		}
 	}
 
@@ -573,7 +532,29 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 		}
 
 		ch <- *update
+		close(ch)
 	})
+
+	return ch
+}
+
+// ListenForWebhookRespReqFormat registers a http handler for a webhook.
+func (bot *BotAPI) ListenForWebhookRespReqFormat(w http.ResponseWriter, r *http.Request) UpdatesChannel {
+	ch := make(chan Update, bot.Buffer)
+
+	func(w http.ResponseWriter, r *http.Request) {
+		update, err := bot.HandleUpdate(r)
+		if err != nil {
+			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(errMsg)
+			return
+		}
+
+		ch <- *update
+		close(ch)
+	}(w, r)
 
 	return ch
 }
@@ -581,7 +562,8 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 // HandleUpdate parses and returns update received via webhook.
 func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
 	if r.Method != http.MethodPost {
-		return nil, fmt.Errorf("got %s request: %w", r.Method, ErrWrongMethod)
+		err := errors.New("wrong HTTP method required POST")
+		return nil, err
 	}
 
 	var update Update
@@ -728,8 +710,11 @@ func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
 
 // GetMyCommands gets the currently registered commands.
 func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
-	config := GetMyCommandsConfig{}
+	return bot.GetMyCommandsWithConfig(GetMyCommandsConfig{})
+}
 
+// GetMyCommandsWithConfig gets the currently registered commands with a config.
+func (bot *BotAPI) GetMyCommandsWithConfig(config GetMyCommandsConfig) ([]BotCommand, error) {
 	resp, err := bot.Request(config)
 	if err != nil {
 		return nil, err
@@ -759,4 +744,32 @@ func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
 	err = json.Unmarshal(resp.Result, &messageID)
 
 	return messageID, err
+}
+
+// EscapeText takes an input text and escape Telegram markup symbols.
+// In this way we can send a text without being afraid of having to escape the characters manually.
+// Note that you don't have to include the formatting style in the input text, or it will be escaped too.
+// If there is an error, an empty string will be returned.
+//
+// parseMode is the text formatting mode (ModeMarkdown, ModeMarkdownV2 or ModeHTML)
+// text is the input string that will be escaped.
+func EscapeText(parseMode string, text string) string {
+	var replacer *strings.Replacer
+
+	if parseMode == ModeHTML {
+		replacer = strings.NewReplacer("<", "&lt;", ">", "&gt;", "&", "&amp;")
+	} else if parseMode == ModeMarkdown {
+		replacer = strings.NewReplacer("_", "\\_", "*", "\\*", "`", "\\`", "[", "\\[")
+	} else if parseMode == ModeMarkdownV2 {
+		replacer = strings.NewReplacer(
+			"_", "\\_", "*", "\\*", "[", "\\[", "]", "\\]", "(",
+			"\\(", ")", "\\)", "~", "\\~", "`", "\\`", ">", "\\>",
+			"#", "\\#", "+", "\\+", "-", "\\-", "=", "\\=", "|",
+			"\\|", "{", "\\{", "}", "\\}", ".", "\\.", "!", "\\!",
+		)
+	} else {
+		return ""
+	}
+
+	return replacer.Replace(text)
 }

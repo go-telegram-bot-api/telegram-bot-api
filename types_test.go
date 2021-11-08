@@ -293,6 +293,7 @@ var (
 	_ Chattable = DeleteChatPhotoConfig{}
 	_ Chattable = DeleteChatStickerSetConfig{}
 	_ Chattable = DeleteMessageConfig{}
+	_ Chattable = DeleteMyCommandsConfig{}
 	_ Chattable = DeleteWebhookConfig{}
 	_ Chattable = DocumentConfig{}
 	_ Chattable = EditChatInviteLinkConfig{}
@@ -359,4 +360,14 @@ var (
 	_ Fileable = (*MediaGroupConfig)(nil)
 	_ Fileable = (*WebhookConfig)(nil)
 	_ Fileable = (*SetStickerSetThumbConfig)(nil)
+)
+
+// Ensure all RequestFileData types are correct.
+var (
+	_ RequestFileData = (*FilePath)(nil)
+	_ RequestFileData = (*FileBytes)(nil)
+	_ RequestFileData = (*FileReader)(nil)
+	_ RequestFileData = (*FileURL)(nil)
+	_ RequestFileData = (*FileID)(nil)
+	_ RequestFileData = (*fileAttach)(nil)
 )

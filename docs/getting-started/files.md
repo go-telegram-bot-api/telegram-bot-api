@@ -3,20 +3,22 @@
 Telegram supports specifying files in many different formats. In order to
 accommodate them all, there are multiple structs and type aliases required.
 
+All of these types implement the `RequestFileData` interface.
+
 | Type         | Description                                                               |
 | ------------ | ------------------------------------------------------------------------- |
-| `string`     | Used as a local path to a file                                            |
+| `FilePath`   | A local path to a file                                                    |
 | `FileID`     | Existing file ID on Telegram's servers                                    |
 | `FileURL`    | URL to file, must be served with expected MIME type                       |
 | `FileReader` | Use an `io.Reader` to provide a file. Lazily read to save memory.         |
 | `FileBytes`  | `[]byte` containing file data. Prefer to use `FileReader` to save memory. |
 
-## `string`
+## `FilePath`
 
 A path to a local file.
 
 ```go
-file := "tests/image.jpg"
+file := tgbotapi.FilePath("tests/image.jpg")
 ```
 
 ## `FileID`

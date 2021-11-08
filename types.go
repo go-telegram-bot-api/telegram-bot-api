@@ -107,6 +107,61 @@ type Update struct {
 	//
 	// optional
 	ChatMember *ChatMemberUpdated `json:"chat_member"`
+	// ChatJoinRequest is a request to join the chat has been sent. The bot must
+	// have the can_invite_users administrator right in the chat to receive
+	// these updates.
+	//
+	// optional
+	ChatJoinRequest *ChatJoinRequest `json:"chat_join_request"`
+}
+
+// SentFrom returns the user who sent an update. Can be nil, if Telegram did not provide information
+// about the user in the update object.
+func (u *Update) SentFrom() *User {
+	switch {
+	case u.Message != nil:
+		return u.Message.From
+	case u.EditedMessage != nil:
+		return u.EditedMessage.From
+	case u.InlineQuery != nil:
+		return u.InlineQuery.From
+	case u.ChosenInlineResult != nil:
+		return u.ChosenInlineResult.From
+	case u.CallbackQuery != nil:
+		return u.CallbackQuery.From
+	case u.ShippingQuery != nil:
+		return u.ShippingQuery.From
+	case u.PreCheckoutQuery != nil:
+		return u.PreCheckoutQuery.From
+	default:
+		return nil
+	}
+}
+
+// CallbackData returns the callback query data, if it exists.
+func (u *Update) CallbackData() string {
+	if u.CallbackQuery != nil {
+		return u.CallbackQuery.Data
+	}
+	return ""
+}
+
+// FromChat returns the chat where an update occured.
+func (u *Update) FromChat() *Chat {
+	switch {
+	case u.Message != nil:
+		return u.Message.Chat
+	case u.EditedMessage != nil:
+		return u.EditedMessage.Chat
+	case u.ChannelPost != nil:
+		return u.ChannelPost.Chat
+	case u.EditedChannelPost != nil:
+		return u.EditedChannelPost.Chat
+	case u.CallbackQuery != nil:
+		return u.CallbackQuery.Message.Chat
+	default:
+		return nil
+	}
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -1157,6 +1212,11 @@ type ReplyKeyboardMarkup struct {
 	//
 	// optional
 	OneTimeKeyboard bool `json:"one_time_keyboard,omitempty"`
+	// InputFieldPlaceholder is the placeholder to be shown in the input field when
+	// the keyboard is active; 1-64 characters.
+	//
+	// optional
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
 	// Selective use this parameter if you want to show the keyboard to specific users only.
 	// Targets:
 	//  1) users that are @mentioned in the text of the Message object;
@@ -1374,6 +1434,11 @@ type ForceReply struct {
 	// ForceReply shows reply interface to the user,
 	// as if they manually selected the bot's message and tapped 'Reply'.
 	ForceReply bool `json:"force_reply"`
+	// InputFieldPlaceholder is the placeholder to be shown in the input field when
+	// the reply is active; 1-64 characters.
+	//
+	// optional
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
 	// Selective use this parameter if you want to force reply from specific users only.
 	// Targets:
 	//  1) users that are @mentioned in the text of the Message object;
@@ -1410,10 +1475,19 @@ type ChatInviteLink struct {
 	InviteLink string `json:"invite_link"`
 	// Creator of the link.
 	Creator User `json:"creator"`
+	// CreatesJoinRequest is true if users joining the chat via the link need to
+	// be approved by chat administrators.
+	//
+	// optional
+	CreatesJoinRequest bool `json:"creates_join_request"`
 	// IsPrimary is true, if the link is primary.
 	IsPrimary bool `json:"is_primary"`
 	// IsRevoked is true, if the link is revoked.
 	IsRevoked bool `json:"is_revoked"`
+	// Name is the name of the invite link.
+	//
+	// optional
+	Name string `json:"name"`
 	// ExpireDate is the point in time (Unix timestamp) when the link will
 	// expire or has been expired.
 	//
@@ -1424,6 +1498,11 @@ type ChatInviteLink struct {
 	//
 	// optional
 	MemberLimit int `json:"member_limit"`
+	// PendingJoinRequestCount is the number of pending join requests created
+	// using this link.
+	//
+	// optional
+	PendingJoinRequestCount int `json:"pending_join_request_count"`
 }
 
 // ChatMember contains information about one member of a chat.
@@ -1577,6 +1656,24 @@ type ChatMemberUpdated struct {
 	InviteLink *ChatInviteLink `json:"invite_link"`
 }
 
+// ChatJoinRequest represents a join request sent to a chat.
+type ChatJoinRequest struct {
+	// Chat to which the request was sent.
+	Chat Chat `json:"chat"`
+	// User that sent the join request.
+	From User `json:"user"`
+	// Date the request was sent in Unix time.
+	Date int `json:"date"`
+	// Bio of the user.
+	//
+	// optional
+	Bio string `json:"bio"`
+	// InviteLink is the link that was used by the user to send the join request.
+	//
+	// optional
+	InviteLink *ChatInviteLink `json:"invite_link"`
+}
+
 // ChatPermissions describes actions that a non-administrator user is
 // allowed to take in a chat. All fields are optional.
 type ChatPermissions struct {
@@ -1642,6 +1739,16 @@ type BotCommand struct {
 	Description string `json:"description"`
 }
 
+// BotCommandScope represents the scope to which bot commands are applied.
+//
+// It contains the fields for all types of scopes, different types only support
+// specific (or no) fields.
+type BotCommandScope struct {
+	Type   string `json:"type"`
+	ChatID int64  `json:"chat_id,omitempty"`
+	UserID int64  `json:"user_id,omitempty"`
+}
+
 // ResponseParameters are various errors that can be returned in APIResponse.
 type ResponseParameters struct {
 	// The group has been migrated to a supergroup with the specified identifier.
@@ -1664,7 +1771,7 @@ type BaseInputMedia struct {
 	// pass an HTTP URL for Telegram to get a file from the Internet,
 	// or pass “attach://<file_attach_name>” to upload a new one
 	// using multipart/form-data under <file_attach_name> name.
-	Media interface{} `json:"media"`
+	Media RequestFileData `json:"media"`
 	// thumb intentionally missing as it is not currently compatible
 
 	// Caption of the video to be sent, 0-1024 characters after entities parsing.
@@ -1696,7 +1803,7 @@ type InputMediaVideo struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1722,7 +1829,7 @@ type InputMediaAnimation struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1744,7 +1851,7 @@ type InputMediaAudio struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// Duration of the audio in seconds
 	//
 	// optional
@@ -1766,7 +1873,7 @@ type InputMediaDocument struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// DisableContentTypeDetection disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data. Always true, if
 	// the document is sent as part of an album
