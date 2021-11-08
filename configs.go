@@ -29,6 +29,7 @@ const (
 	// Deprecated: use ChatUploadVoice instead.
 	ChatUploadAudio     = "upload_audio"
 	ChatUploadDocument  = "upload_document"
+	ChatChooseSticker   = "choose_sticker"
 	ChatFindLocation    = "find_location"
 	ChatRecordVideoNote = "record_video_note"
 	ChatUploadVideoNote = "upload_video_note"
@@ -1395,8 +1396,10 @@ func (config ChatInviteLinkConfig) params() (Params, error) {
 // RevokeChatInviteLinkConfig.
 type CreateChatInviteLinkConfig struct {
 	ChatConfig
-	ExpireDate  int
-	MemberLimit int
+	Name               string
+	ExpireDate         int
+	MemberLimit        int
+	CreatesJoinRequest bool
 }
 
 func (CreateChatInviteLinkConfig) method() string {
@@ -1406,9 +1409,11 @@ func (CreateChatInviteLinkConfig) method() string {
 func (config CreateChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
+	params.AddNonEmpty("name", config.Name)
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("expire_date", config.ExpireDate)
 	params.AddNonZero("member_limit", config.MemberLimit)
+	params.AddBool("creates_join_request", config.CreatesJoinRequest)
 
 	return params, nil
 }
@@ -1418,9 +1423,11 @@ func (config CreateChatInviteLinkConfig) params() (Params, error) {
 // must have the appropriate admin rights.
 type EditChatInviteLinkConfig struct {
 	ChatConfig
-	InviteLink  string
-	ExpireDate  int
-	MemberLimit int
+	InviteLink         string
+	Name               string
+	ExpireDate         int
+	MemberLimit        int
+	CreatesJoinRequest bool
 }
 
 func (EditChatInviteLinkConfig) method() string {
@@ -1431,9 +1438,11 @@ func (config EditChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonEmpty("name", config.Name)
 	params["invite_link"] = config.InviteLink
 	params.AddNonZero("expire_date", config.ExpireDate)
 	params.AddNonZero("member_limit", config.MemberLimit)
+	params.AddBool("creates_join_request", config.CreatesJoinRequest)
 
 	return params, nil
 }
@@ -1456,6 +1465,44 @@ func (config RevokeChatInviteLinkConfig) params() (Params, error) {
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params["invite_link"] = config.InviteLink
+
+	return params, nil
+}
+
+// ApproveChatJoinRequestConfig allows you to approve a chat join request.
+type ApproveChatJoinRequestConfig struct {
+	ChatConfig
+	UserID int64
+}
+
+func (ApproveChatJoinRequestConfig) method() string {
+	return "approveChatJoinRequest"
+}
+
+func (config ApproveChatJoinRequestConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("user_id", int(config.UserID))
+
+	return params, nil
+}
+
+// DeclineChatJoinRequest allows you to decline a chat join request.
+type DeclineChatJoinRequest struct {
+	ChatConfig
+	UserID int64
+}
+
+func (DeclineChatJoinRequest) method() string {
+	return "declineChatJoinRequest"
+}
+
+func (config DeclineChatJoinRequest) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("user_id", int(config.UserID))
 
 	return params, nil
 }

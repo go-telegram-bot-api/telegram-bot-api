@@ -108,6 +108,12 @@ type Update struct {
 	//
 	// optional
 	ChatMember *ChatMemberUpdated `json:"chat_member"`
+	// ChatJoinRequest is a request to join the chat has been sent. The bot must
+	// have the can_invite_users administrator right in the chat to receive
+	// these updates.
+	//
+	// optional
+	ChatJoinRequest *ChatJoinRequest `json:"chat_join_request"`
 }
 
 // UpdatesChannel is the channel for getting updates.
@@ -1421,10 +1427,19 @@ type ChatInviteLink struct {
 	InviteLink string `json:"invite_link"`
 	// Creator of the link.
 	Creator User `json:"creator"`
+	// CreatesJoinRequest is true if users joining the chat via the link need to
+	// be approved by chat administrators.
+	//
+	// optional
+	CreatesJoinRequest bool `json:"creates_join_request"`
 	// IsPrimary is true, if the link is primary.
 	IsPrimary bool `json:"is_primary"`
 	// IsRevoked is true, if the link is revoked.
 	IsRevoked bool `json:"is_revoked"`
+	// Name is the name of the invite link.
+	//
+	// optional
+	Name string `json:"name"`
 	// ExpireDate is the point in time (Unix timestamp) when the link will
 	// expire or has been expired.
 	//
@@ -1435,6 +1450,11 @@ type ChatInviteLink struct {
 	//
 	// optional
 	MemberLimit int `json:"member_limit"`
+	// PendingJoinRequestCount is the number of pending join requests created
+	// using this link.
+	//
+	// optional
+	PendingJoinRequestCount int `json:"pending_join_request_count"`
 }
 
 // ChatMember contains information about one member of a chat.
@@ -1583,6 +1603,24 @@ type ChatMemberUpdated struct {
 	NewChatMember ChatMember `json:"new_chat_member"`
 	// InviteLink is the link which was used by the user to join the chat;
 	// for joining by invite link events only.
+	//
+	// optional
+	InviteLink *ChatInviteLink `json:"invite_link"`
+}
+
+// ChatJoinRequest represents a join request sent to a chat.
+type ChatJoinRequest struct {
+	// Chat to which the request was sent.
+	Chat Chat `json:"chat"`
+	// User that sent the join request.
+	From User `json:"user"`
+	// Date the request was sent in Unix time.
+	Date int `json:"date"`
+	// Bio of the user.
+	//
+	// optional
+	Bio string `json:"bio"`
+	// InviteLink is the link that was used by the user to send the join request.
 	//
 	// optional
 	InviteLink *ChatInviteLink `json:"invite_link"`
