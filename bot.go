@@ -5,7 +5,6 @@ package tgbotapi
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -562,8 +561,7 @@ func (bot *BotAPI) ListenForWebhookRespReqFormat(w http.ResponseWriter, r *http.
 // HandleUpdate parses and returns update received via webhook.
 func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
 	if r.Method != http.MethodPost {
-		err := errors.New("wrong HTTP method required POST")
-		return nil, err
+		return nil, ErrWrongMethod
 	}
 
 	var update Update
@@ -756,18 +754,19 @@ func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
 func EscapeText(parseMode string, text string) string {
 	var replacer *strings.Replacer
 
-	if parseMode == ModeHTML {
+	switch parseMode {
+	case ModeHTML:
 		replacer = strings.NewReplacer("<", "&lt;", ">", "&gt;", "&", "&amp;")
-	} else if parseMode == ModeMarkdown {
+	case ModeMarkdown:
 		replacer = strings.NewReplacer("_", "\\_", "*", "\\*", "`", "\\`", "[", "\\[")
-	} else if parseMode == ModeMarkdownV2 {
+	case ModeMarkdownV2:
 		replacer = strings.NewReplacer(
 			"_", "\\_", "*", "\\*", "[", "\\[", "]", "\\]", "(",
 			"\\(", ")", "\\)", "~", "\\~", "`", "\\`", ">", "\\>",
 			"#", "\\#", "+", "\\+", "-", "\\-", "=", "\\=", "|",
 			"\\|", "{", "\\{", "}", "\\}", ".", "\\.", "!", "\\!",
 		)
-	} else {
+	default:
 		return ""
 	}
 
