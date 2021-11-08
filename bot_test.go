@@ -127,7 +127,7 @@ func TestCopyMessage(t *testing.T) {
 func TestSendWithNewPhoto(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewPhoto(ChatID, "tests/image.jpg")
+	msg := NewPhoto(ChatID, FilePath("tests/image.jpg"))
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -169,7 +169,7 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 func TestSendWithNewPhotoReply(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewPhoto(ChatID, "tests/image.jpg")
+	msg := NewPhoto(ChatID, FilePath("tests/image.jpg"))
 	msg.ReplyToMessageID = ReplyToMessageID
 
 	_, err := bot.Send(msg)
@@ -182,7 +182,7 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 func TestSendNewPhotoToChannel(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewPhotoToChannel(Channel, "tests/image.jpg")
+	msg := NewPhotoToChannel(Channel, FilePath("tests/image.jpg"))
 	msg.Caption = "Test"
 	_, err := bot.Send(msg)
 
@@ -239,7 +239,7 @@ func TestSendWithExistingPhoto(t *testing.T) {
 func TestSendWithNewDocument(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewDocument(ChatID, "tests/image.jpg")
+	msg := NewDocument(ChatID, FilePath("tests/image.jpg"))
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -250,8 +250,8 @@ func TestSendWithNewDocument(t *testing.T) {
 func TestSendWithNewDocumentAndThumb(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewDocument(ChatID, "tests/voice.ogg")
-	msg.Thumb = "tests/image.jpg"
+	msg := NewDocument(ChatID, FilePath("tests/voice.ogg"))
+	msg.Thumb = FilePath("tests/image.jpg")
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -273,7 +273,7 @@ func TestSendWithExistingDocument(t *testing.T) {
 func TestSendWithNewAudio(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewAudio(ChatID, "tests/audio.mp3")
+	msg := NewAudio(ChatID, FilePath("tests/audio.mp3"))
 	msg.Title = "TEST"
 	msg.Duration = 10
 	msg.Performer = "TEST"
@@ -302,7 +302,7 @@ func TestSendWithExistingAudio(t *testing.T) {
 func TestSendWithNewVoice(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewVoice(ChatID, "tests/voice.ogg")
+	msg := NewVoice(ChatID, FilePath("tests/voice.ogg"))
 	msg.Duration = 10
 	_, err := bot.Send(msg)
 
@@ -356,7 +356,7 @@ func TestSendWithVenue(t *testing.T) {
 func TestSendWithNewVideo(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewVideo(ChatID, "tests/video.mp4")
+	msg := NewVideo(ChatID, FilePath("tests/video.mp4"))
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
@@ -384,7 +384,7 @@ func TestSendWithExistingVideo(t *testing.T) {
 func TestSendWithNewVideoNote(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewVideoNote(ChatID, 240, "tests/videonote.mp4")
+	msg := NewVideoNote(ChatID, 240, FilePath("tests/videonote.mp4"))
 	msg.Duration = 10
 
 	_, err := bot.Send(msg)
@@ -410,7 +410,7 @@ func TestSendWithExistingVideoNote(t *testing.T) {
 func TestSendWithNewSticker(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewSticker(ChatID, "tests/image.jpg")
+	msg := NewSticker(ChatID, FilePath("tests/image.jpg"))
 
 	_, err := bot.Send(msg)
 
@@ -434,7 +434,7 @@ func TestSendWithExistingSticker(t *testing.T) {
 func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 	bot, _ := getBot(t)
 
-	msg := NewSticker(ChatID, "tests/image.jpg")
+	msg := NewSticker(ChatID, FilePath("tests/image.jpg"))
 	msg.ReplyMarkup = ReplyKeyboardRemove{
 		RemoveKeyboard: true,
 		Selective:      false,
@@ -550,7 +550,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	bot.Request(DeleteWebhookConfig{})
 
-	wh, err := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, "tests/cert.pem")
+	wh, err := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, FilePath("tests/cert.pem"))
 
 	if err != nil {
 		t.Error(err)
@@ -609,8 +609,8 @@ func TestSendWithMediaGroupPhotoVideo(t *testing.T) {
 
 	cfg := NewMediaGroup(ChatID, []interface{}{
 		NewInputMediaPhoto(FileURL("https://github.com/go-telegram-bot-api/telegram-bot-api/raw/0a3a1c8716c4cd8d26a262af9f12dcbab7f3f28c/tests/image.jpg")),
-		NewInputMediaPhoto("tests/image.jpg"),
-		NewInputMediaVideo("tests/video.mp4"),
+		NewInputMediaPhoto(FilePath("tests/image.jpg")),
+		NewInputMediaVideo(FilePath("tests/video.mp4")),
 	})
 
 	messages, err := bot.SendMediaGroup(cfg)
@@ -632,7 +632,7 @@ func TestSendWithMediaGroupDocument(t *testing.T) {
 
 	cfg := NewMediaGroup(ChatID, []interface{}{
 		NewInputMediaDocument(FileURL("https://i.imgur.com/unQLJIb.jpg")),
-		NewInputMediaDocument("tests/image.jpg"),
+		NewInputMediaDocument(FilePath("tests/image.jpg")),
 	})
 
 	messages, err := bot.SendMediaGroup(cfg)
@@ -653,8 +653,8 @@ func TestSendWithMediaGroupAudio(t *testing.T) {
 	bot, _ := getBot(t)
 
 	cfg := NewMediaGroup(ChatID, []interface{}{
-		NewInputMediaAudio("tests/audio.mp3"),
-		NewInputMediaAudio("tests/audio.mp3"),
+		NewInputMediaAudio(FilePath("tests/audio.mp3")),
+		NewInputMediaAudio(FilePath("tests/audio.mp3")),
 	})
 
 	messages, err := bot.SendMediaGroup(cfg)
@@ -715,7 +715,7 @@ func ExampleNewWebhook() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	wh, err := NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem")
+	wh, err := NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, FilePath("cert.pem"))
 
 	if err != nil {
 		panic(err)
@@ -755,7 +755,7 @@ func ExampleWebhookHandler() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	wh, err := NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, "cert.pem")
+	wh, err := NewWebhookWithCert("https://www.google.com:8443/"+bot.Token, FilePath("cert.pem"))
 
 	if err != nil {
 		panic(err)
@@ -1019,7 +1019,7 @@ func TestCommands(t *testing.T) {
 // 			ChatID:    ChatID,
 // 			MessageID: m.MessageID,
 // 		},
-// 		Media: NewInputMediaVideo("tests/video.mp4"),
+// 		Media: NewInputMediaVideo(FilePath("tests/video.mp4")),
 // 	}
 
 // 	_, err = bot.Request(edit)
@@ -1030,17 +1030,17 @@ func TestCommands(t *testing.T) {
 
 func TestPrepareInputMediaForParams(t *testing.T) {
 	media := []interface{}{
-		NewInputMediaPhoto("tests/image.jpg"),
+		NewInputMediaPhoto(FilePath("tests/image.jpg")),
 		NewInputMediaVideo(FileID("test")),
 	}
 
 	prepared := prepareInputMediaForParams(media)
 
-	if media[0].(InputMediaPhoto).Media != "tests/image.jpg" {
+	if media[0].(InputMediaPhoto).Media != FilePath("tests/image.jpg") {
 		t.Error("Original media was changed")
 	}
 
-	if prepared[0].(InputMediaPhoto).Media != "attach://file-0" {
+	if prepared[0].(InputMediaPhoto).Media != fileAttach("attach://file-0") {
 		t.Error("New media was not replaced")
 	}
 

@@ -1,9 +1,11 @@
 package tgbotapi
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/url"
+	"os"
 	"strconv"
 )
 
@@ -98,9 +100,7 @@ const (
 
 // Library errors
 const (
-	// ErrBadFileType happens when you pass an unknown type
-	ErrBadFileType = "bad file type"
-	ErrBadURL      = "bad or empty url"
+	ErrBadURL = "bad or empty url"
 )
 
 // Chattable is any config type that can be sent.
@@ -109,19 +109,134 @@ type Chattable interface {
 	method() string
 }
 
-// RequestFile represents a file associated with a request. May involve
-// uploading a file, or passing an existing ID.
-type RequestFile struct {
-	// The multipart upload field name.
-	Name string
-	// The file to upload.
-	File interface{}
-}
-
 // Fileable is any config type that can be sent that includes a file.
 type Fileable interface {
 	Chattable
 	files() []RequestFile
+}
+
+// RequestFile represents a file associated with a field name.
+type RequestFile struct {
+	// The file field name.
+	Name string
+	// The file data to include.
+	Data RequestFileData
+}
+
+// RequestFileData represents the data to be used for a file.
+type RequestFileData interface {
+	// If the file needs to be uploaded.
+	NeedsUpload() bool
+
+	// Get the file name and an `io.Reader` for the file to be uploaded. This
+	// must only be called when the file needs to be uploaded.
+	UploadData() (string, io.Reader, error)
+	// Get the file data to send when a file does not need to be uploaded. This
+	// must only be called when the file does not need to be uploaded.
+	SendData() string
+}
+
+// FileBytes contains information about a set of bytes to upload
+// as a File.
+type FileBytes struct {
+	Name  string
+	Bytes []byte
+}
+
+func (fb FileBytes) NeedsUpload() bool {
+	return true
+}
+
+func (fb FileBytes) UploadData() (string, io.Reader, error) {
+	return fb.Name, bytes.NewReader(fb.Bytes), nil
+}
+
+func (fb FileBytes) SendData() string {
+	panic("FileBytes must be uploaded")
+}
+
+// FileReader contains information about a reader to upload as a File.
+type FileReader struct {
+	Name   string
+	Reader io.Reader
+}
+
+func (fr FileReader) NeedsUpload() bool {
+	return true
+}
+
+func (fr FileReader) UploadData() (string, io.Reader, error) {
+	return fr.Name, fr.Reader, nil
+}
+
+func (fr FileReader) SendData() string {
+	panic("FileReader must be uploaded")
+}
+
+// FilePath is a path to a local file.
+type FilePath string
+
+func (fp FilePath) NeedsUpload() bool {
+	return true
+}
+
+func (fp FilePath) UploadData() (string, io.Reader, error) {
+	fileHandle, err := os.Open(string(fp))
+	if err != nil {
+		return "", nil, err
+	}
+
+	name := fileHandle.Name()
+	return name, fileHandle, err
+}
+
+func (fp FilePath) SendData() string {
+	panic("FilePath must be uploaded")
+}
+
+// FileURL is a URL to use as a file for a request.
+type FileURL string
+
+func (fu FileURL) NeedsUpload() bool {
+	return false
+}
+
+func (fu FileURL) UploadData() (string, io.Reader, error) {
+	panic("FileURL cannot be uploaded")
+}
+
+func (fu FileURL) SendData() string {
+	return string(fu)
+}
+
+// FileID is an ID of a file already uploaded to Telegram.
+type FileID string
+
+func (fi FileID) NeedsUpload() bool {
+	return false
+}
+
+func (fi FileID) UploadData() (string, io.Reader, error) {
+	panic("FileID cannot be uploaded")
+}
+
+func (fi FileID) SendData() string {
+	return string(fi)
+}
+
+// fileAttach is a internal file type used for processed media groups.
+type fileAttach string
+
+func (fa fileAttach) NeedsUpload() bool {
+	return false
+}
+
+func (fa fileAttach) UploadData() (string, io.Reader, error) {
+	panic("fileAttach cannot be uploaded")
+}
+
+func (fa fileAttach) SendData() string {
+	return string(fa)
 }
 
 // LogOutConfig is a request to log out of the cloud Bot API server.
@@ -177,7 +292,7 @@ func (chat *BaseChat) params() (Params, error) {
 // BaseFile is a base type for all file config types.
 type BaseFile struct {
 	BaseChat
-	File interface{}
+	File RequestFileData
 }
 
 func (file BaseFile) params() (Params, error) {
@@ -292,7 +407,7 @@ func (config CopyMessageConfig) method() string {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
-	Thumb           interface{}
+	Thumb           RequestFileData
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -318,13 +433,13 @@ func (config PhotoConfig) method() string {
 func (config PhotoConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "photo",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -334,7 +449,7 @@ func (config PhotoConfig) files() []RequestFile {
 // AudioConfig contains information about a SendAudio request.
 type AudioConfig struct {
 	BaseFile
-	Thumb           interface{}
+	Thumb           RequestFileData
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -366,13 +481,13 @@ func (config AudioConfig) method() string {
 func (config AudioConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "audio",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -382,7 +497,7 @@ func (config AudioConfig) files() []RequestFile {
 // DocumentConfig contains information about a SendDocument request.
 type DocumentConfig struct {
 	BaseFile
-	Thumb                       interface{}
+	Thumb                       RequestFileData
 	Caption                     string
 	ParseMode                   string
 	CaptionEntities             []MessageEntity
@@ -406,13 +521,13 @@ func (config DocumentConfig) method() string {
 func (config DocumentConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "document",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -435,14 +550,14 @@ func (config StickerConfig) method() string {
 func (config StickerConfig) files() []RequestFile {
 	return []RequestFile{{
 		Name: "sticker",
-		File: config.File,
+		Data: config.File,
 	}}
 }
 
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
-	Thumb             interface{}
+	Thumb             RequestFileData
 	Duration          int
 	Caption           string
 	ParseMode         string
@@ -472,13 +587,13 @@ func (config VideoConfig) method() string {
 func (config VideoConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "video",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -489,7 +604,7 @@ func (config VideoConfig) files() []RequestFile {
 type AnimationConfig struct {
 	BaseFile
 	Duration        int
-	Thumb           interface{}
+	Thumb           RequestFileData
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -516,13 +631,13 @@ func (config AnimationConfig) method() string {
 func (config AnimationConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "animation",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -532,7 +647,7 @@ func (config AnimationConfig) files() []RequestFile {
 // VideoNoteConfig contains information about a SendVideoNote request.
 type VideoNoteConfig struct {
 	BaseFile
-	Thumb    interface{}
+	Thumb    RequestFileData
 	Duration int
 	Length   int
 }
@@ -553,13 +668,13 @@ func (config VideoNoteConfig) method() string {
 func (config VideoNoteConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "video_note",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -569,7 +684,7 @@ func (config VideoNoteConfig) files() []RequestFile {
 // VoiceConfig contains information about a SendVoice request.
 type VoiceConfig struct {
 	BaseFile
-	Thumb           interface{}
+	Thumb           RequestFileData
 	Caption         string
 	ParseMode       string
 	CaptionEntities []MessageEntity
@@ -597,13 +712,13 @@ func (config VoiceConfig) method() string {
 func (config VoiceConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "voice",
-		File: config.File,
+		Data: config.File,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -1046,7 +1161,7 @@ func (config UpdateConfig) params() (Params, error) {
 // WebhookConfig contains information about a SetWebhook request.
 type WebhookConfig struct {
 	URL                *url.URL
-	Certificate        interface{}
+	Certificate        RequestFileData
 	IPAddress          string
 	MaxConnections     int
 	AllowedUpdates     []string
@@ -1076,7 +1191,7 @@ func (config WebhookConfig) files() []RequestFile {
 	if config.Certificate != nil {
 		return []RequestFile{{
 			Name: "certificate",
-			File: config.Certificate,
+			Data: config.Certificate,
 		}}
 	}
 
@@ -1099,25 +1214,6 @@ func (config DeleteWebhookConfig) params() (Params, error) {
 
 	return params, nil
 }
-
-// FileBytes contains information about a set of bytes to upload
-// as a File.
-type FileBytes struct {
-	Name  string
-	Bytes []byte
-}
-
-// FileReader contains information about a reader to upload as a File.
-type FileReader struct {
-	Name   string
-	Reader io.Reader
-}
-
-// FileURL is a URL to use as a file for a request.
-type FileURL string
-
-// FileID is an ID of a file already uploaded to Telegram.
-type FileID string
 
 // InlineConfig contains information on making an InlineQuery response.
 type InlineConfig struct {
@@ -1753,7 +1849,7 @@ func (config SetChatPhotoConfig) method() string {
 func (config SetChatPhotoConfig) files() []RequestFile {
 	return []RequestFile{{
 		Name: "photo",
-		File: config.File,
+		Data: config.File,
 	}}
 }
 
@@ -1837,7 +1933,7 @@ func (config GetStickerSetConfig) params() (Params, error) {
 // UploadStickerConfig allows you to upload a sticker for use in a set later.
 type UploadStickerConfig struct {
 	UserID     int64
-	PNGSticker interface{}
+	PNGSticker RequestFileData
 }
 
 func (config UploadStickerConfig) method() string {
@@ -1855,7 +1951,7 @@ func (config UploadStickerConfig) params() (Params, error) {
 func (config UploadStickerConfig) files() []RequestFile {
 	return []RequestFile{{
 		Name: "png_sticker",
-		File: config.PNGSticker,
+		Data: config.PNGSticker,
 	}}
 }
 
@@ -1866,8 +1962,8 @@ type NewStickerSetConfig struct {
 	UserID        int64
 	Name          string
 	Title         string
-	PNGSticker    interface{}
-	TGSSticker    interface{}
+	PNGSticker    RequestFileData
+	TGSSticker    RequestFileData
 	Emojis        string
 	ContainsMasks bool
 	MaskPosition  *MaskPosition
@@ -1897,13 +1993,13 @@ func (config NewStickerSetConfig) files() []RequestFile {
 	if config.PNGSticker != nil {
 		return []RequestFile{{
 			Name: "png_sticker",
-			File: config.PNGSticker,
+			Data: config.PNGSticker,
 		}}
 	}
 
 	return []RequestFile{{
 		Name: "tgs_sticker",
-		File: config.TGSSticker,
+		Data: config.TGSSticker,
 	}}
 }
 
@@ -1911,8 +2007,8 @@ func (config NewStickerSetConfig) files() []RequestFile {
 type AddStickerConfig struct {
 	UserID       int64
 	Name         string
-	PNGSticker   interface{}
-	TGSSticker   interface{}
+	PNGSticker   RequestFileData
+	TGSSticker   RequestFileData
 	Emojis       string
 	MaskPosition *MaskPosition
 }
@@ -1937,13 +2033,13 @@ func (config AddStickerConfig) files() []RequestFile {
 	if config.PNGSticker != nil {
 		return []RequestFile{{
 			Name: "png_sticker",
-			File: config.PNGSticker,
+			Data: config.PNGSticker,
 		}}
 	}
 
 	return []RequestFile{{
 		Name: "tgs_sticker",
-		File: config.TGSSticker,
+		Data: config.TGSSticker,
 	}}
 
 }
@@ -1988,7 +2084,7 @@ func (config DeleteStickerConfig) params() (Params, error) {
 type SetStickerSetThumbConfig struct {
 	Name   string
 	UserID int64
-	Thumb  interface{}
+	Thumb  RequestFileData
 }
 
 func (config SetStickerSetThumbConfig) method() string {
@@ -2007,7 +2103,7 @@ func (config SetStickerSetThumbConfig) params() (Params, error) {
 func (config SetStickerSetThumbConfig) files() []RequestFile {
 	return []RequestFile{{
 		Name: "thumb",
-		File: config.Thumb,
+		Data: config.Thumb,
 	}}
 }
 
@@ -2181,45 +2277,38 @@ func (config DeleteMyCommandsConfig) params() (Params, error) {
 func prepareInputMediaParam(inputMedia interface{}, idx int) interface{} {
 	switch m := inputMedia.(type) {
 	case InputMediaPhoto:
-		switch m.Media.(type) {
-		case string, FileBytes, FileReader:
-			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		if m.Media.NeedsUpload() {
+			m.Media = fileAttach(fmt.Sprintf("attach://file-%d", idx))
 		}
 
 		return m
 	case InputMediaVideo:
-		switch m.Media.(type) {
-		case string, FileBytes, FileReader:
-			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		if m.Media.NeedsUpload() {
+			m.Media = fileAttach(fmt.Sprintf("attach://file-%d", idx))
 		}
 
-		switch m.Thumb.(type) {
-		case string, FileBytes, FileReader:
-			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		if m.Thumb != nil && m.Thumb.NeedsUpload() {
+			m.Thumb = fileAttach(fmt.Sprintf("attach://file-%d-thumb", idx))
 		}
 
 		return m
 	case InputMediaAudio:
-		switch m.Media.(type) {
-		case string, FileBytes, FileReader:
-			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		if m.Media.NeedsUpload() {
+			m.Media = fileAttach(fmt.Sprintf("attach://file-%d", idx))
 		}
 
-		switch m.Thumb.(type) {
-		case string, FileBytes, FileReader:
-			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		if m.Thumb != nil && m.Thumb.NeedsUpload() {
+			m.Thumb = fileAttach(fmt.Sprintf("attach://file-%d-thumb", idx))
 		}
 
 		return m
 	case InputMediaDocument:
-		switch m.Media.(type) {
-		case string, FileBytes, FileReader:
-			m.Media = fmt.Sprintf("attach://file-%d", idx)
+		if m.Media.NeedsUpload() {
+			m.Media = fileAttach(fmt.Sprintf("attach://file-%d", idx))
 		}
 
-		switch m.Thumb.(type) {
-		case string, FileBytes, FileReader:
-			m.Thumb = fmt.Sprintf("attach://file-%d-thumb", idx)
+		if m.Thumb != nil && m.Thumb.NeedsUpload() {
+			m.Thumb = fileAttach(fmt.Sprintf("attach://file-%d-thumb", idx))
 		}
 
 		return m
@@ -2241,59 +2330,52 @@ func prepareInputMediaFile(inputMedia interface{}, idx int) []RequestFile {
 
 	switch m := inputMedia.(type) {
 	case InputMediaPhoto:
-		switch f := m.Media.(type) {
-		case string, FileBytes, FileReader:
+		if m.Media.NeedsUpload() {
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d", idx),
-				File: f,
+				Data: m.Media,
 			})
 		}
 	case InputMediaVideo:
-		switch f := m.Media.(type) {
-		case string, FileBytes, FileReader:
+		if m.Media.NeedsUpload() {
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d", idx),
-				File: f,
+				Data: m.Media,
 			})
 		}
 
-		switch f := m.Thumb.(type) {
-		case string, FileBytes, FileReader:
+		if m.Thumb != nil && m.Thumb.NeedsUpload() {
 			files = append(files, RequestFile{
-				Name: fmt.Sprintf("file-%d-thumb", idx),
-				File: f,
+				Name: fmt.Sprintf("file-%d", idx),
+				Data: m.Thumb,
 			})
 		}
 	case InputMediaDocument:
-		switch f := m.Media.(type) {
-		case string, FileBytes, FileReader:
+		if m.Media.NeedsUpload() {
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d", idx),
-				File: f,
+				Data: m.Media,
 			})
 		}
 
-		switch f := m.Thumb.(type) {
-		case string, FileBytes, FileReader:
+		if m.Thumb != nil && m.Thumb.NeedsUpload() {
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d", idx),
-				File: f,
+				Data: m.Thumb,
 			})
 		}
 	case InputMediaAudio:
-		switch f := m.Media.(type) {
-		case string, FileBytes, FileReader:
+		if m.Media.NeedsUpload() {
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d", idx),
-				File: f,
+				Data: m.Media,
 			})
 		}
 
-		switch f := m.Thumb.(type) {
-		case string, FileBytes, FileReader:
+		if m.Thumb != nil && m.Thumb.NeedsUpload() {
 			files = append(files, RequestFile{
 				Name: fmt.Sprintf("file-%d", idx),
-				File: f,
+				Data: m.Thumb,
 			})
 		}
 	}

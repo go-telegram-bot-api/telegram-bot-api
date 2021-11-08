@@ -1723,7 +1723,7 @@ type BaseInputMedia struct {
 	// pass an HTTP URL for Telegram to get a file from the Internet,
 	// or pass “attach://<file_attach_name>” to upload a new one
 	// using multipart/form-data under <file_attach_name> name.
-	Media interface{} `json:"media"`
+	Media RequestFileData `json:"media"`
 	// thumb intentionally missing as it is not currently compatible
 
 	// Caption of the video to be sent, 0-1024 characters after entities parsing.
@@ -1755,7 +1755,7 @@ type InputMediaVideo struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1781,7 +1781,7 @@ type InputMediaAnimation struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1803,7 +1803,7 @@ type InputMediaAudio struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// Duration of the audio in seconds
 	//
 	// optional
@@ -1825,7 +1825,7 @@ type InputMediaDocument struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb interface{} `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumb,omitempty"`
 	// DisableContentTypeDetection disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data. Always true, if
 	// the document is sent as part of an album

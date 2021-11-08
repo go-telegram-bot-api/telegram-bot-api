@@ -19,7 +19,8 @@ type DeleteMessageConfig struct {
 }
 ```
 
-What type should `ChatID` be? Telegram allows specifying numeric chat IDs or channel usernames. Golang doesn't have union types, and interfaces are entirely
+What type should `ChatID` be? Telegram allows specifying numeric chat IDs or
+channel usernames. Golang doesn't have union types, and interfaces are entirely
 untyped. This library solves this by adding two fields, a `ChatID` and a
 `ChannelUsername`. We can now write the struct as follows.
 
@@ -103,8 +104,8 @@ have similar fields for their files.
      ChannelUsername string
      ChatID          int64
      MessageID       int
-+    Delete          interface{}
-+    Thumb           interface{}
++    Delete          RequestFileData
++    Thumb           RequestFileData
  }
 ```
 
@@ -115,13 +116,13 @@ and add the `thumb` file if we have one.
 func (config DeleteMessageConfig) files() []RequestFile {
 	files := []RequestFile{{
 		Name: "delete",
-		File: config.Delete,
+		Data: config.Delete,
 	}}
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
 			Name: "thumb",
-			File: config.Thumb,
+			Data: config.Thumb,
 		})
 	}
 
@@ -129,7 +130,8 @@ func (config DeleteMessageConfig) files() []RequestFile {
 }
 ```
 
-And now our files will upload! It will transparently handle uploads whether File is a string with a path to a file, `FileURL`, `FileBytes`, `FileReader`, or `FileID`.
+And now our files will upload! It will transparently handle uploads whether File
+is a `FilePath`, `FileURL`, `FileBytes`, `FileReader`, or `FileID`.
 
 ### Base Configs
 
