@@ -116,6 +116,55 @@ type Update struct {
 	ChatJoinRequest *ChatJoinRequest `json:"chat_join_request"`
 }
 
+// SentFrom returns the user who sent an update. Can be nil, if Telegram did not provide information
+// about the user in the update object.
+func (u *Update) SentFrom() *User {
+	switch {
+	case u.Message != nil:
+		return u.Message.From
+	case u.EditedMessage != nil:
+		return u.EditedMessage.From
+	case u.InlineQuery != nil:
+		return u.InlineQuery.From
+	case u.ChosenInlineResult != nil:
+		return u.ChosenInlineResult.From
+	case u.CallbackQuery != nil:
+		return u.CallbackQuery.From
+	case u.ShippingQuery != nil:
+		return u.ShippingQuery.From
+	case u.PreCheckoutQuery != nil:
+		return u.PreCheckoutQuery.From
+	default:
+		return nil
+	}
+}
+
+// CallbackData returns the callback query data, if it exists.
+func (u *Update) CallbackData() string {
+	if u.CallbackQuery != nil {
+		return u.CallbackQuery.Data
+	}
+	return ""
+}
+
+// FromChat returns the chat where an update occured.
+func (u *Update) FromChat() *Chat {
+	switch {
+	case u.Message != nil:
+		return u.Message.Chat
+	case u.EditedMessage != nil:
+		return u.EditedMessage.Chat
+	case u.ChannelPost != nil:
+		return u.ChannelPost.Chat
+	case u.EditedChannelPost != nil:
+		return u.EditedChannelPost.Chat
+	case u.CallbackQuery != nil:
+		return u.CallbackQuery.Message.Chat
+	default:
+		return nil
+	}
+}
+
 // UpdatesChannel is the channel for getting updates.
 type UpdatesChannel <-chan Update
 
