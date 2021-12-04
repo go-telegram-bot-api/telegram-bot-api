@@ -82,9 +82,7 @@ func TestSendWithMessageReply(t *testing.T) {
 
 	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
 	msg.ReplyToMessageID = ReplyToMessageID
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -93,9 +91,7 @@ func TestSendWithMessageForward(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewForward(ChatID, ChatID, ReplyToMessageID)
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -125,9 +121,7 @@ func TestSendWithNewPhoto(t *testing.T) {
 
 	msg := NewPhoto(ChatID, FilePath("tests/image.jpg"))
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -140,9 +134,7 @@ func TestSendWithNewPhotoWithFileBytes(t *testing.T) {
 
 	msg := NewPhoto(ChatID, b)
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -155,9 +147,7 @@ func TestSendWithNewPhotoWithFileReader(t *testing.T) {
 
 	msg := NewPhoto(ChatID, reader)
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -168,9 +158,7 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 	msg := NewPhoto(ChatID, FilePath("tests/image.jpg"))
 	msg.ReplyToMessageID = ReplyToMessageID
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -180,11 +168,8 @@ func TestSendNewPhotoToChannel(t *testing.T) {
 
 	msg := NewPhotoToChannel(Channel, FilePath("tests/image.jpg"))
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -196,11 +181,8 @@ func TestSendNewPhotoToChannelFileBytes(t *testing.T) {
 
 	msg := NewPhotoToChannel(Channel, b)
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
-		t.Fail()
 	}
 }
 
@@ -212,9 +194,7 @@ func TestSendNewPhotoToChannelFileReader(t *testing.T) {
 
 	msg := NewPhotoToChannel(Channel, reader)
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 		t.Fail()
 	}
@@ -225,9 +205,7 @@ func TestSendWithExistingPhoto(t *testing.T) {
 
 	msg := NewPhoto(ChatID, FileID(ExistingPhotoFileID))
 	msg.Caption = "Test"
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -236,9 +214,7 @@ func TestSendWithNewDocument(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewDocument(ChatID, FilePath("tests/image.jpg"))
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -248,9 +224,7 @@ func TestSendWithNewDocumentAndThumb(t *testing.T) {
 
 	msg := NewDocument(ChatID, FilePath("tests/voice.ogg"))
 	msg.Thumb = FilePath("tests/image.jpg")
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -296,9 +270,7 @@ func TestSendWithNewVoice(t *testing.T) {
 
 	msg := NewVoice(ChatID, FilePath("tests/voice.ogg"))
 	msg.Duration = 10
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -308,9 +280,7 @@ func TestSendWithExistingVoice(t *testing.T) {
 
 	msg := NewVoice(ChatID, FileID(ExistingVoiceFileID))
 	msg.Duration = 10
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -352,9 +322,7 @@ func TestSendWithNewVideo(t *testing.T) {
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -366,9 +334,7 @@ func TestSendWithExistingVideo(t *testing.T) {
 	msg.Duration = 10
 	msg.Caption = "TEST"
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -379,9 +345,7 @@ func TestSendWithNewVideoNote(t *testing.T) {
 	msg := NewVideoNote(ChatID, 240, FilePath("tests/videonote.mp4"))
 	msg.Duration = 10
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -392,9 +356,7 @@ func TestSendWithExistingVideoNote(t *testing.T) {
 	msg := NewVideoNote(ChatID, 240, FileID(ExistingVideoNoteFileID))
 	msg.Duration = 10
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -404,9 +366,7 @@ func TestSendWithNewSticker(t *testing.T) {
 
 	msg := NewSticker(ChatID, FilePath("tests/image.jpg"))
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -416,9 +376,7 @@ func TestSendWithExistingSticker(t *testing.T) {
 
 	msg := NewSticker(ChatID, FileID(ExistingStickerFileID))
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -431,9 +389,7 @@ func TestSendWithNewStickerAndKeyboardHide(t *testing.T) {
 		RemoveKeyboard: true,
 		Selective:      false,
 	}
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -447,9 +403,7 @@ func TestSendWithExistingStickerAndKeyboardHide(t *testing.T) {
 		Selective:      false,
 	}
 
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 	}
 }
@@ -458,9 +412,7 @@ func TestSendWithDice(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewDice(ChatID)
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 		t.Fail()
 	}
@@ -470,9 +422,7 @@ func TestSendWithDiceWithEmoji(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewDiceWithEmoji(ChatID, "🏀")
-	_, err := bot.Send(msg)
-
-	if err != nil {
+	if _, err := bot.Send(msg); err != nil {
 		t.Error(err)
 		t.Fail()
 	}
@@ -485,9 +435,7 @@ func TestGetFile(t *testing.T) {
 		FileID: ExistingPhotoFileID,
 	}
 
-	_, err := bot.GetFile(file)
-
-	if err != nil {
+	if _, err := bot.GetFile(file); err != nil {
 		t.Error(err)
 	}
 }
@@ -502,7 +450,7 @@ func TestSendChatConfig(t *testing.T) {
 	}
 }
 
-// TODO: figure out why test is failing
+// TODO: identify why this isn't working
 // func TestSendEditMessage(t *testing.T) {
 // 	bot, _ := getBot(t)
 
@@ -933,7 +881,7 @@ func TestPolls(t *testing.T) {
 func TestSendDice(t *testing.T) {
 	bot, _ := getBot(t)
 
-	dice := NewSendDice(ChatID)
+	dice := NewDice(ChatID)
 
 	msg, err := bot.Send(dice)
 	if err != nil {

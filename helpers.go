@@ -809,13 +809,6 @@ func NewStopPoll(chatID int64, messageID int) StopPollConfig {
 	}
 }
 
-// NewSendDice allows you to send a random dice roll.
-//
-// Deprecated: Use NewDice instead.
-func NewSendDice(chatID int64) DiceConfig {
-	return NewDice(chatID)
-}
-
 // NewDice allows you to send a random dice roll.
 func NewDice(chatID int64) DiceConfig {
 	return DiceConfig{
@@ -905,12 +898,12 @@ func NewSetMyCommands(commands ...BotCommand) SetMyCommandsConfig {
 	return SetMyCommandsConfig{Commands: commands}
 }
 
-// NewSetMyCommands allows you to set the registered commands for a given scope.
+// NewSetMyCommandsWithScope allows you to set the registered commands for a given scope.
 func NewSetMyCommandsWithScope(scope BotCommandScope, commands ...BotCommand) SetMyCommandsConfig {
 	return SetMyCommandsConfig{Commands: commands, Scope: &scope}
 }
 
-// NewSetMyCommands allows you to set the registered commands for a given scope
+// NewSetMyCommandsWithScopeAndLanguage allows you to set the registered commands for a given scope
 // and language code.
 func NewSetMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string, commands ...BotCommand) SetMyCommandsConfig {
 	return SetMyCommandsConfig{Commands: commands, Scope: &scope, LanguageCode: languageCode}
@@ -921,13 +914,13 @@ func NewDeleteMyCommands() DeleteMyCommandsConfig {
 	return DeleteMyCommandsConfig{}
 }
 
-// NewDeleteMyCommands allows you to delete the registered commands for a given
+// NewDeleteMyCommandsWithScope allows you to delete the registered commands for a given
 // scope.
 func NewDeleteMyCommandsWithScope(scope BotCommandScope) DeleteMyCommandsConfig {
 	return DeleteMyCommandsConfig{Scope: &scope}
 }
 
-// NewDeleteMyCommands allows you to delete the registered commands for a given
+// NewDeleteMyCommandsWithScopeAndLanguage allows you to delete the registered commands for a given
 // scope and language code.
 func NewDeleteMyCommandsWithScopeAndLanguage(scope BotCommandScope, languageCode string) DeleteMyCommandsConfig {
 	return DeleteMyCommandsConfig{Scope: &scope, LanguageCode: languageCode}

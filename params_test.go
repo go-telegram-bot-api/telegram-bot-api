@@ -73,10 +73,14 @@ func TestAddInterface(t *testing.T) {
 	}{
 		Name: "test",
 	}
-	params.AddInterface("value", data)
+	if err := params.AddInterface("value", data); err != nil {
+		t.Error(err)
+	}
 	assertLen(t, params, 1)
 	assertEq(t, params["value"], `{"name":"test"}`)
-	params.AddInterface("test", nil)
+	if err := params.AddInterface("test", nil); err != nil {
+		t.Error(err)
+	}
 	assertLen(t, params, 1)
 	assertEq(t, params["test"], "")
 }

@@ -37,8 +37,7 @@ func TestUserStringWithUserName(t *testing.T) {
 func TestMessageTime(t *testing.T) {
 	message := Message{Date: 0}
 
-	date := time.Unix(0, 0)
-	if message.Time() != date {
+	if message.Time() != time.Unix(0, 0) {
 		t.Fail()
 	}
 }
@@ -281,6 +280,7 @@ func TestFileLink(t *testing.T) {
 var (
 	_ Chattable = AnimationConfig{}
 	_ Chattable = AudioConfig{}
+	_ Chattable = BanChatMemberConfig{}
 	_ Chattable = CallbackConfig{}
 	_ Chattable = ChatActionConfig{}
 	_ Chattable = ChatAdministratorsConfig{}

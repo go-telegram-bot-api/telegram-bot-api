@@ -178,22 +178,22 @@ func (bot *BotAPI) MakeRequestWithContext(ctx context.Context, endpoint string, 
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
 // If debug disabled, just decode http.Response.Body stream to APIResponse struct
 // for efficient memory usage.
-func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
+func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) ([]byte, error) {
 	if !bot.Debug {
 		dec := json.NewDecoder(responseBody)
-		err = dec.Decode(resp)
-		return
+		err := dec.Decode(resp)
+		return nil, err
 	}
 
-	// if debug, read reponse body
+	// if debug, read response body
 	data, err := ioutil.ReadAll(responseBody)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	err = json.Unmarshal(data, resp)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	return data, nil
@@ -446,7 +446,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 //
 // Offset, Limit, Timeout, and AllowedUpdates are optional.
 // To avoid stale items, set Offset to one higher than the previous item.
-// Set Timeout to a large number to reduce requests so you can get updates
+// Set Timeout to a large number to reduce requests, so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
 	return bot.GetUpdatesWithContext(context.Background(), config)
