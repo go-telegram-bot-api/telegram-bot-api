@@ -1,8 +1,6 @@
 # Change Log
 
-## v5
-
-**Work In Progress**
+## v5.4.0
 
 - Remove all methods that return `(APIResponse, error)`.
   - Use the `Request` method instead.
