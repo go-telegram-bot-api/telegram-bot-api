@@ -1294,18 +1294,18 @@ func (config UnbanChatMemberConfig) params() (Params, error) {
 	return params, nil
 }
 
-// KickChatMemberConfig contains extra fields to kick user
-type KickChatMemberConfig struct {
+// BanChatMemberConfig contains extra fields to kick user.
+type BanChatMemberConfig struct {
 	ChatMemberConfig
 	UntilDate      int64
 	RevokeMessages bool
 }
 
-func (config KickChatMemberConfig) method() string {
-	return "kickChatMember"
+func (config BanChatMemberConfig) method() string {
+	return "banChatMember"
 }
 
-func (config KickChatMemberConfig) params() (Params, error) {
+func (config BanChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
@@ -1315,6 +1315,11 @@ func (config KickChatMemberConfig) params() (Params, error) {
 
 	return params, nil
 }
+
+// KickChatMemberConfig contains extra fields to ban user.
+//
+// This was renamed to BanChatMember in later versions of the Telegram Bot API.
+type KickChatMemberConfig = BanChatMemberConfig
 
 // RestrictChatMemberConfig contains fields to restrict members of chat
 type RestrictChatMemberConfig struct {

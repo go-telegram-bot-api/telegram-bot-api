@@ -281,6 +281,7 @@ func TestFileLink(t *testing.T) {
 var (
 	_ Chattable = AnimationConfig{}
 	_ Chattable = AudioConfig{}
+	_ Chattable = BanChatMemberConfig{}
 	_ Chattable = CallbackConfig{}
 	_ Chattable = ChatActionConfig{}
 	_ Chattable = ChatAdministratorsConfig{}
