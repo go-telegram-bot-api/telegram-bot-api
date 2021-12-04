@@ -809,13 +809,6 @@ func NewStopPoll(chatID int64, messageID int) StopPollConfig {
 	}
 }
 
-// NewSendDice allows you to send a random dice roll.
-//
-// Deprecated: Use NewDice instead.
-func NewSendDice(chatID int64) DiceConfig {
-	return NewDice(chatID)
-}
-
 // NewDice allows you to send a random dice roll.
 func NewDice(chatID int64) DiceConfig {
 	return DiceConfig{

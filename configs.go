@@ -20,16 +20,12 @@ const (
 
 // Constant values for ChatActions
 const (
-	ChatTyping      = "typing"
-	ChatUploadPhoto = "upload_photo"
-	ChatRecordVideo = "record_video"
-	ChatUploadVideo = "upload_video"
-	ChatRecordVoice = "record_voice"
-	ChatUploadVoice = "upload_voice"
-	// Deprecated: use ChatRecordVoice instead.
-	ChatRecordAudio = "record_audio"
-	// Deprecated: use ChatUploadVoice instead.
-	ChatUploadAudio     = "upload_audio"
+	ChatTyping          = "typing"
+	ChatUploadPhoto     = "upload_photo"
+	ChatRecordVideo     = "record_video"
+	ChatUploadVideo     = "upload_video"
+	ChatRecordVoice     = "record_voice"
+	ChatUploadVoice     = "upload_voice"
 	ChatUploadDocument  = "upload_document"
 	ChatChooseSticker   = "choose_sticker"
 	ChatFindLocation    = "find_location"

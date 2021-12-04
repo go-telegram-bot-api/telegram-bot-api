@@ -143,22 +143,22 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
 // If debug disabled, just decode http.Response.Body stream to APIResponse struct
 // for efficient memory usage
-func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
+func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) ([]byte, error) {
 	if !bot.Debug {
 		dec := json.NewDecoder(responseBody)
-		err = dec.Decode(resp)
-		return
+		err := dec.Decode(resp)
+		return nil, err
 	}
 
 	// if debug, read response body
 	data, err := ioutil.ReadAll(responseBody)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	err = json.Unmarshal(data, resp)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	return data, nil
