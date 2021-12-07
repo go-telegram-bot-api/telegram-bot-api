@@ -1789,7 +1789,7 @@ type BaseInputMedia struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 }
 
 // InputMediaPhoto is a photo to send as part of a media group.

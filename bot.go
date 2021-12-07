@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"unicode/utf16"
 )
 
 // HTTPClient is the type needed for the bot to perform HTTP requests.
@@ -103,7 +104,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 
 	req, err := http.NewRequest("POST", method, strings.NewReader(values.Encode()))
 	if err != nil {
-		return &APIResponse{}, err
+		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -255,6 +256,7 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 		}
 
 		return &apiResp, &Error{
+			Code:               apiResp.ErrorCode,
 			Message:            apiResp.Description,
 			ResponseParameters: parameters,
 		}
@@ -293,11 +295,37 @@ func (bot *BotAPI) GetMe() (User, error) {
 	return user, err
 }
 
+// entityMentionsUser checks if an entity mentions a given username.
+func entityMentionsUser(entity MessageEntity, text, username string) bool {
+	if !entity.IsMention() {
+		return false
+	}
+
+	// Entities use UTF-16 encoding offsets. See GitHub for more info:
+	// https://github.com/go-telegram-bot-api/telegram-bot-api/issues/231
+	encoded := utf16.Encode([]rune(text))
+	entityText := utf16.Decode(encoded[entity.Offset : entity.Offset+entity.Length])
+
+	return strings.EqualFold(string(entityText), "@"+username)
+}
+
 // IsMessageToMe returns true if message directed to this bot.
 //
 // It requires the Message.
 func (bot *BotAPI) IsMessageToMe(message Message) bool {
-	return strings.Contains(message.Text, "@"+bot.Self.UserName)
+	for _, entity := range message.Entities {
+		if entityMentionsUser(entity, message.Text, bot.Self.UserName) {
+			return true
+		}
+	}
+
+	for _, entity := range message.CaptionEntities {
+		if entityMentionsUser(entity, message.Caption, bot.Self.UserName) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func hasFilesNeedingUpload(files []RequestFile) bool {

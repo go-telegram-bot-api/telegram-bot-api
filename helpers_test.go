@@ -179,21 +179,21 @@ func TestNewInlineKeyboardButtonLoginURL(t *testing.T) {
 }
 
 func TestNewEditMessageText(t *testing.T) {
-	edit := NewEditMessageText(ChatID, ReplyToMessageID, "new text")
+	edit := NewEditMessageText(123, 456, "new text")
 
 	if edit.Text != "new text" ||
-		edit.BaseEdit.ChatID != ChatID ||
-		edit.BaseEdit.MessageID != ReplyToMessageID {
+		edit.BaseEdit.ChatID != 123 ||
+		edit.BaseEdit.MessageID != 456 {
 		t.Fail()
 	}
 }
 
 func TestNewEditMessageCaption(t *testing.T) {
-	edit := NewEditMessageCaption(ChatID, ReplyToMessageID, "new caption")
+	edit := NewEditMessageCaption(123, 456, "new caption")
 
 	if edit.Caption != "new caption" ||
-		edit.BaseEdit.ChatID != ChatID ||
-		edit.BaseEdit.MessageID != ReplyToMessageID {
+		edit.BaseEdit.ChatID != 123 ||
+		edit.BaseEdit.MessageID != 456 {
 		t.Fail()
 	}
 }
@@ -207,11 +207,11 @@ func TestNewEditMessageReplyMarkup(t *testing.T) {
 		},
 	}
 
-	edit := NewEditMessageReplyMarkup(ChatID, ReplyToMessageID, markup)
+	edit := NewEditMessageReplyMarkup(123, 456, markup)
 
 	if edit.ReplyMarkup.InlineKeyboard[0][0].Text != "test" ||
-		edit.BaseEdit.ChatID != ChatID ||
-		edit.BaseEdit.MessageID != ReplyToMessageID {
+		edit.BaseEdit.ChatID != 123 ||
+		edit.BaseEdit.MessageID != 456 {
 		t.Fail()
 	}
 
