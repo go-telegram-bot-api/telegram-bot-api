@@ -264,6 +264,12 @@ type Chat struct {
 	//
 	// optional
 	Bio string `json:"bio,omitempty"`
+	// HasPrivateForwards is true if privacy settings of the other party in the
+	// private chat allows to use tg://user?id=<user_id> links only in chats
+	// with the user. Returned only in getChat.
+	//
+	// optional
+	HasPrivateForwards bool `json:"has_private_forwards,omitempty"`
 	// Description for groups, supergroups and channel chats
 	//
 	// optional
@@ -289,6 +295,16 @@ type Chat struct {
 	//
 	// optional
 	SlowModeDelay int `json:"slow_mode_delay,omitempty"`
+	// MessageAutoDeleteTime is the time after which all messages sent to the
+	// chat will be automatically deleted; in seconds. Returned only in getChat.
+	//
+	// optional
+	MessageAutoDeleteTime int `json:"message_auto_delete_time,omitempty"`
+	// HasProtectedContent is true if messages from the chat can't be forwarded
+	// to other chats. Returned only in getChat.
+	//
+	// optional
+	HasProtectedContent bool `json:"has_protected_content,omitempty"`
 	// StickerSetName is for supergroups, name of group sticker set.Returned
 	// only in getChat.
 	//
@@ -384,6 +400,11 @@ type Message struct {
 	//
 	// optional
 	ForwardDate int `json:"forward_date,omitempty"`
+	// IsAutomaticForward is true if the message is a channel post that was
+	// automatically forwarded to the connected discussion group.
+	//
+	// optional
+	IsAutomaticForward bool `json:"is_automatic_forward,omitempty"`
 	// ReplyToMessage for replies, the original message.
 	// Note that the Message object in this field will not contain further ReplyToMessage fields
 	// even if it itself is a reply;
@@ -398,6 +419,10 @@ type Message struct {
 	//
 	// optional
 	EditDate int `json:"edit_date,omitempty"`
+	// HasProtectedContent is true if the message can't be forwarded.
+	//
+	// optional
+	HasProtectedContent bool `json:"has_protected_content,omitempty"`
 	// MediaGroupID is the unique identifier of a media message group this message belongs to;
 	//
 	// optional
