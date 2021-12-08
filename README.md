@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/go-telegram-bot-api/telegram-bot-api/v5.svg)](https://pkg.go.dev/github.com/go-telegram-bot-api/telegram-bot-api/v5)
 [![Test](https://github.com/go-telegram-bot-api/telegram-bot-api/actions/workflows/test.yml/badge.svg)](https://github.com/go-telegram-bot-api/telegram-bot-api/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/go-telegram-bot-api/telegram-bot-api/branch/master/graph/badge.svg?token=jLF5GZgDv2)](https://codecov.io/gh/go-telegram-bot-api/telegram-bot-api)
 
 All methods are fairly self-explanatory, and reading the [godoc](https://pkg.go.dev/github.com/go-telegram-bot-api/telegram-bot-api/v5) page should
 explain everything. If something isn't clear, open an issue or submit
