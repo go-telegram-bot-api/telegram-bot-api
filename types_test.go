@@ -282,6 +282,7 @@ var (
 	_ Chattable = AnimationConfig{}
 	_ Chattable = AudioConfig{}
 	_ Chattable = BanChatMemberConfig{}
+	_ Chattable = BanChatSenderChatConfig{}
 	_ Chattable = CallbackConfig{}
 	_ Chattable = ChatActionConfig{}
 	_ Chattable = ChatAdministratorsConfig{}
@@ -332,6 +333,7 @@ var (
 	_ Chattable = StopMessageLiveLocationConfig{}
 	_ Chattable = StopPollConfig{}
 	_ Chattable = UnbanChatMemberConfig{}
+	_ Chattable = UnbanChatSenderChatConfig{}
 	_ Chattable = UnpinChatMessageConfig{}
 	_ Chattable = UpdateConfig{}
 	_ Chattable = UserProfilePhotosConfig{}

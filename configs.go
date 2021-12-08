@@ -1406,6 +1406,54 @@ func (config SetChatAdministratorCustomTitle) params() (Params, error) {
 	return params, nil
 }
 
+// BanChatSenderChatConfig bans a channel chat in a supergroup or a channel. The
+// owner of the chat will not be able to send messages and join live streams on
+// behalf of the chat, unless it is unbanned first. The bot must be an
+// administrator in the supergroup or channel for this to work and must have the
+// appropriate administrator rights.
+type BanChatSenderChatConfig struct {
+	ChatID          int64
+	ChannelUsername string
+	SenderChatID    int64
+	UntilDate       int
+}
+
+func (config BanChatSenderChatConfig) method() string {
+	return "banChatSenderChat"
+}
+
+func (config BanChatSenderChatConfig) params() (Params, error) {
+	params := make(Params)
+
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddNonZero64("sender_chat_id", config.SenderChatID)
+	params.AddNonZero("until_date", config.UntilDate)
+
+	return params, nil
+}
+
+// UnbanChatSenderChatConfig unbans a previously banned channel chat in a
+// supergroup or channel. The bot must be an administrator for this to work and
+// must have the appropriate administrator rights.
+type UnbanChatSenderChatConfig struct {
+	ChatID          int64
+	ChannelUsername string
+	SenderChatID    int64
+}
+
+func (config UnbanChatSenderChatConfig) method() string {
+	return "unbanChatSenderChat"
+}
+
+func (config UnbanChatSenderChatConfig) params() (Params, error) {
+	params := make(Params)
+
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	params.AddNonZero64("sender_chat_id", config.SenderChatID)
+
+	return params, nil
+}
+
 // ChatConfig contains information about getting information on a chat.
 type ChatConfig struct {
 	ChatID             int64
