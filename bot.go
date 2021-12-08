@@ -484,13 +484,12 @@ func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
 		}
 
 		ch <- *update
-		close(ch)
 	})
 
 	return ch
 }
 
-// ListenForWebhookRespReqFormat registers a http handler for a webhook.
+// ListenForWebhookRespReqFormat registers a http handler for a single incoming webhook.
 func (bot *BotAPI) ListenForWebhookRespReqFormat(w http.ResponseWriter, r *http.Request) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
