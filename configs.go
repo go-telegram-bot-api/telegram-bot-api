@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -97,6 +98,10 @@ const (
 // Library errors
 const (
 	ErrBadURL = "bad or empty url"
+)
+
+var (
+	ErrEmptyMediaGroup = errors.New("empty media group")
 )
 
 // Chattable is any config type that can be sent.

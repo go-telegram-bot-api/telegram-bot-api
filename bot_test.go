@@ -92,7 +92,7 @@ func assertBotRequests(t *testing.T, token string, botID int64, requests []BotRe
 		case expected:
 			if nextRequest.Files == nil {
 				assert.NoError(t, r.ParseForm())
-				assert.Equal(t, len(r.Form), len(nextRequest.RequestData), "request must have same number of values")
+				assert.Equal(t, len(nextRequest.RequestData), len(r.Form), "request must have same number of values")
 
 				for expectedValueKey, expectedValue := range nextRequest.RequestData {
 					t.Logf("Checking if %s contains %v", expectedValueKey, expectedValue)
@@ -103,12 +103,12 @@ func assertBotRequests(t *testing.T, token string, botID int64, requests []BotRe
 					t.Logf("Form contains %+v", foundValue)
 
 					assert.Len(t, foundValue, 1, "each key should have exactly one value")
-					assert.Equal(t, foundValue[0], expectedValue[0])
+					assert.Equal(t, expectedValue[0], foundValue[0])
 				}
 			} else if nextRequest.Files != nil {
 				assert.NoError(t, r.ParseMultipartForm(1024*1024*50), "request must be valid multipart form")
-				assert.Equal(t, len(r.MultipartForm.Value), len(nextRequest.RequestData), "request must have correct number of values")
-				assert.Equal(t, len(r.MultipartForm.File), len(nextRequest.Files), "request must have correct number of files")
+				assert.Equal(t, len(nextRequest.RequestData), len(r.MultipartForm.Value), "request must have correct number of values")
+				assert.Equal(t, len(nextRequest.Files), len(r.MultipartForm.File), "request must have correct number of files")
 
 				for expectedValueKey, expectedValue := range nextRequest.RequestData {
 					t.Logf("Checking if %s contains %v", expectedValueKey, expectedValue)
@@ -117,7 +117,7 @@ func assertBotRequests(t *testing.T, token string, botID int64, requests []BotRe
 
 					foundValue := r.MultipartForm.Value[expectedValueKey]
 					assert.Len(t, foundValue, 1, "each key should have exactly one value")
-					assert.Equal(t, foundValue[0], expectedValue[0])
+					assert.Equal(t, expectedValue[0], foundValue[0])
 				}
 
 				for _, expectedFile := range nextRequest.Files {
@@ -159,7 +159,7 @@ func TestNewBotAPI(t *testing.T) {
 	ts, bot := assertBotRequests(t, APIToken, BotID, []BotRequest{getMeRequest})
 	defer ts.Close()
 
-	assert.Equal(t, bot.Self.ID, BotID, "Bot ID should be expected ID")
+	assert.Equal(t, BotID, bot.Self.ID, "Bot ID should be expected ID")
 }
 
 func TestMakeRequest(t *testing.T) {
@@ -180,7 +180,14 @@ func TestMakeRequest(t *testing.T) {
 		ResponseData: `{"ok": false, "description": "msg", "error_code": 12343}`,
 	}
 
-	ts, bot := assertBotRequests(t, APIToken, BotID, []BotRequest{getMeRequest, goodReq, badReq})
+	badReqWithParams := BotRequest{
+		Endpoint:    "testEndpoint",
+		RequestData: values,
+
+		ResponseData: `{"ok": false, "description": "msg", "error_code": 12343, "parameters": {"retry_after": 52, "migrate_to_chat_id": 245}}`,
+	}
+
+	ts, bot := assertBotRequests(t, APIToken, BotID, []BotRequest{getMeRequest, goodReq, badReq, badReqWithParams})
 	defer ts.Close()
 
 	params := make(Params)
@@ -188,18 +195,34 @@ func TestMakeRequest(t *testing.T) {
 
 	resp, err := bot.MakeRequest("testEndpoint", params)
 	assert.NoError(t, err, "bot should be able to make request without errors")
-	assert.Equal(t, resp, &APIResponse{
+	assert.Equal(t, &APIResponse{
 		Ok:     true,
 		Result: []byte("true"),
-	})
+	}, resp)
 
 	resp, err = bot.MakeRequest("testEndpoint", params)
 	assert.Error(t, err)
-	assert.Equal(t, err, &Error{
+	assert.Equal(t, &Error{
 		Code:    12343,
 		Message: "msg",
-	})
+	}, err)
 	assert.NotNil(t, resp)
+
+	resp, err = bot.MakeRequest("testEndpoint", params)
+	assert.Error(t, err)
+	assert.Equal(t, &Error{
+		Code:    12343,
+		Message: "msg",
+		ResponseParameters: ResponseParameters{
+			MigrateToChatID: 245,
+			RetryAfter:      52,
+		},
+	}, err)
+	assert.NotNil(t, resp)
+	assert.Equal(t, &ResponseParameters{
+		MigrateToChatID: 245,
+		RetryAfter:      52,
+	}, resp.Parameters)
 }
 
 func TestUploadFilesBasic(t *testing.T) {
@@ -241,17 +264,17 @@ func TestUploadFilesBasic(t *testing.T) {
 
 	resp, err := bot.UploadFiles("testEndpoint", params, files)
 	assert.NoError(t, err, "bot should be able to make request without errors")
-	assert.Equal(t, resp, &APIResponse{
+	assert.Equal(t, &APIResponse{
 		Ok:     true,
 		Result: []byte("true"),
-	})
+	}, resp)
 
 	resp, err = bot.UploadFiles("testEndpoint", params, files)
 	assert.Error(t, err)
-	assert.Equal(t, err, &Error{
+	assert.Equal(t, &Error{
 		Code:    12343,
 		Message: "msg",
-	})
+	}, err)
 	assert.NotNil(t, resp)
 }
 
@@ -280,45 +303,38 @@ func TestUploadFilesAllTypes(t *testing.T) {
 	params := make(Params)
 	params["param_name"] = "param_value"
 
-	files := []RequestFile{
-		{
-			Name: "file-bytes",
-			Data: FileBytes{
-				Name:  "file-bytes-name",
-				Bytes: []byte("byte-data"),
-			},
+	files := []RequestFile{{
+		Name: "file-bytes",
+		Data: FileBytes{
+			Name:  "file-bytes-name",
+			Bytes: []byte("byte-data"),
 		},
-		{
-			Name: "file-reader",
-			Data: FileReader{
-				Name:   "file-reader-name",
-				Reader: bytes.NewReader([]byte("reader-data")),
-			},
+	}, {
+		Name: "file-reader",
+		Data: FileReader{
+			Name:   "file-reader-name",
+			Reader: bytes.NewReader([]byte("reader-data")),
 		},
-		{
-			Name: "file-path",
-			Data: FilePath("tests/file-path"),
-		},
-		{
-			Name: "file-url",
-			Data: FileURL("url"),
-		},
-		{
-			Name: "file-id",
-			Data: FileID("id"),
-		},
-		{
-			Name: "file-attach",
-			Data: fileAttach("attach"),
-		},
-	}
+	}, {
+		Name: "file-path",
+		Data: FilePath("tests/file-path"),
+	}, {
+		Name: "file-url",
+		Data: FileURL("url"),
+	}, {
+		Name: "file-id",
+		Data: FileID("id"),
+	}, {
+		Name: "file-attach",
+		Data: fileAttach("attach"),
+	}}
 
 	resp, err := bot.UploadFiles("uploadFiles", params, files)
 	assert.NoError(t, err, "bot should be able to make request without errors")
-	assert.Equal(t, resp, &APIResponse{
+	assert.Equal(t, &APIResponse{
 		Ok:     true,
 		Result: []byte("true"),
-	})
+	}, resp)
 }
 
 func TestGetMe(t *testing.T) {
@@ -351,66 +367,58 @@ func TestIsMessageToMe(t *testing.T) {
 		CaptionEntities []MessageEntity
 
 		IsMention bool
-	}{
-		{
-			Text:      "asdf",
-			Entities:  []MessageEntity{},
-			IsMention: false,
-		},
-		{
-			Text: "@test_bot",
-			Entities: []MessageEntity{{
-				Type:   "mention",
-				Offset: 0,
-				Length: 9,
-			}},
-			IsMention: true,
-		},
-		{
-			Text: "prefix @test_bot suffix",
-			Entities: []MessageEntity{{
-				Type:   "mention",
-				Offset: 7,
-				Length: 9,
-			}},
-			IsMention: true,
-		},
-		{
-			Text: "prefix @test_bot suffix",
-			Entities: []MessageEntity{{
-				Type:   "link",
-				Offset: 7,
-				Length: 9,
-			}},
-			IsMention: false,
-		},
-		{
-			Text: "prefix @test_bot suffix",
-			Entities: []MessageEntity{{
-				Type:   "link",
-				Offset: 0,
-				Length: 6,
-			}, {
-				Type:   "mention",
-				Offset: 7,
-				Length: 9,
-			}},
-			IsMention: true,
-		},
-		{
-			Text:      "prefix @test_bot suffix",
-			IsMention: false,
-		},
-		{
-			Caption: "prefix @test_bot suffix",
-			CaptionEntities: []MessageEntity{{
-				Type:   "mention",
-				Offset: 7,
-				Length: 9,
-			}},
-			IsMention: true,
-		},
-	}
+	}{{
+		Text:      "asdf",
+		Entities:  []MessageEntity{},
+		IsMention: false,
+	}, {
+		Text: "@test_bot",
+		Entities: []MessageEntity{{
+			Type:   "mention",
+			Offset: 0,
+			Length: 9,
+		}},
+		IsMention: true,
+	}, {
+		Text: "prefix @test_bot suffix",
+		Entities: []MessageEntity{{
+			Type:   "mention",
+			Offset: 7,
+			Length: 9,
+		}},
+		IsMention: true,
+	}, {
+		Text: "prefix @test_bot suffix",
+		Entities: []MessageEntity{{
+			Type:   "link",
+			Offset: 7,
+			Length: 9,
+		}},
+		IsMention: false,
+	}, {
+		Text: "prefix @test_bot suffix",
+		Entities: []MessageEntity{{
+			Type:   "link",
+			Offset: 0,
+			Length: 6,
+		}, {
+			Type:   "mention",
+			Offset: 7,
+			Length: 9,
+		}},
+		IsMention: true,
+	}, {
+		Text:      "prefix @test_bot suffix",
+		IsMention: false,
+	}, {
+		Caption: "prefix @test_bot suffix",
+		CaptionEntities: []MessageEntity{{
+			Type:   "mention",
+			Offset: 7,
+			Length: 9,
+		}},
+		IsMention: true,
+	}}
 
 	bot := BotAPI{
 		Self: User{
@@ -521,4 +529,64 @@ func TestSend(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, Message{MessageID: 123}, msg)
+}
+
+func TestSendMediaGroup(t *testing.T) {
+	values := url.Values{}
+	values.Set("chat_id", "125")
+	values.Set("media", `[{"type":"photo","media":"attach://file-0"},{"type":"photo","media":"file-id"}]`)
+
+	req1 := BotRequest{
+		Endpoint:    "sendMediaGroup",
+		RequestData: values,
+		Files: []BotRequestFile{{
+			Name: "file-0",
+			Data: []byte("path-data\n"),
+		}},
+		ResponseData: `{"ok": true, "result": [{"message_id": 123643}, {"message_id": 53452}]}`,
+	}
+
+	ts, bot := assertBotRequests(t, APIToken, BotID, []BotRequest{getMeRequest, req1})
+	defer ts.Close()
+
+	group, err := bot.SendMediaGroup(MediaGroupConfig{})
+	assert.ErrorIs(t, err, ErrEmptyMediaGroup)
+	assert.Nil(t, group)
+
+	group, err = bot.SendMediaGroup(MediaGroupConfig{
+		ChatID: 125,
+		Media: []interface{}{
+			NewInputMediaPhoto(FilePath("tests/file-path")),
+			NewInputMediaPhoto(FileID("file-id")),
+		},
+	})
+	assert.NoError(t, err)
+	assert.Len(t, group, 2)
+}
+
+func TestGetUserProfilePhotos(t *testing.T) {
+	values := url.Values{}
+	values.Set("user_id", "5426")
+
+	req1 := BotRequest{
+		Endpoint:     "getUserProfilePhotos",
+		RequestData:  values,
+		ResponseData: `{"ok": true, "result": {"total_count": 24, "photos": [[{"file_id": "abc123-file"}]]}}`,
+	}
+
+	ts, bot := assertBotRequests(t, APIToken, BotID, []BotRequest{getMeRequest, req1})
+	defer ts.Close()
+
+	profilePhotos, err := bot.GetUserProfilePhotos(UserProfilePhotosConfig{
+		UserID: 5426,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, UserProfilePhotos{
+		TotalCount: 24,
+		Photos: [][]PhotoSize{
+			{{
+				FileID: "abc123-file",
+			}},
+		},
+	}, profilePhotos)
 }

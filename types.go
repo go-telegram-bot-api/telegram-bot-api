@@ -158,7 +158,7 @@ func (u *Update) FromChat() *Chat {
 		return u.ChannelPost.Chat
 	case u.EditedChannelPost != nil:
 		return u.EditedChannelPost.Chat
-	case u.CallbackQuery != nil:
+	case u.CallbackQuery != nil && u.CallbackQuery.Message != nil:
 		return u.CallbackQuery.Message.Chat
 	default:
 		return nil
@@ -223,6 +223,7 @@ func (u *User) String() string {
 	if u == nil {
 		return ""
 	}
+
 	if u.UserName != "" {
 		return u.UserName
 	}
@@ -1161,8 +1162,8 @@ type VoiceChatScheduled struct {
 }
 
 // Time converts the scheduled start date into a Time.
-func (m *VoiceChatScheduled) Time() time.Time {
-	return time.Unix(int64(m.StartDate), 0)
+func (v *VoiceChatScheduled) Time() time.Time {
+	return time.Unix(int64(v.StartDate), 0)
 }
 
 // VoiceChatStarted represents a service message about a voice chat started in

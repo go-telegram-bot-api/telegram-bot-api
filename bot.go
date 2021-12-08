@@ -158,11 +158,8 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 	}
 
 	err = json.Unmarshal(data, resp)
-	if err != nil {
-		return nil, err
-	}
 
-	return data, nil
+	return data, err
 }
 
 // UploadFiles makes a request to the API with files.
@@ -380,6 +377,10 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 
 // SendMediaGroup sends a media group and returns the resulting messages.
 func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
+	if config.Media == nil || len(config.Media) == 0 {
+		return nil, ErrEmptyMediaGroup
+	}
+
 	resp, err := bot.Request(config)
 	if err != nil {
 		return nil, err
