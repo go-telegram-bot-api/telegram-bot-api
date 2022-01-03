@@ -266,6 +266,7 @@ func (CloseConfig) params() (Params, error) {
 type BaseChat struct {
 	ChatID                   int64 // required
 	ChannelUsername          string
+	ProtectContent           bool
 	ReplyToMessageID         int
 	ReplyMarkup              interface{}
 	DisableNotification      bool
@@ -279,6 +280,7 @@ func (chat *BaseChat) params() (Params, error) {
 	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
 	params.AddBool("disable_notification", chat.DisableNotification)
 	params.AddBool("allow_sending_without_reply", chat.AllowSendingWithoutReply)
+	params.AddBool("protect_content", chat.ProtectContent)
 
 	err := params.AddInterface("reply_markup", chat.ReplyMarkup)
 

@@ -712,6 +712,7 @@ type MessageEntity struct {
 	//  “italic” (italic text),
 	//  “underline” (underlined text),
 	//  “strikethrough” (strikethrough text),
+	//  "spoiler" (spoiler message),
 	//  “code” (monowidth string),
 	//  “pre” (monowidth block),
 	//  “text_link” (for clickable text URLs),
