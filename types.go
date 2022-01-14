@@ -2809,6 +2809,12 @@ type InlineQueryResultVideo struct {
 	//
 	// optional
 	Caption string `json:"caption,omitempty"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode,omitempty"`
 	// Width video width
 	//
 	// optional
