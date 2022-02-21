@@ -539,8 +539,14 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 	}
 
 	if t, ok := c.(Fileable); ok {
-		if hasFilesNeedingUpload(t.files()) {
+		files := t.files()
+
+		if hasFilesNeedingUpload(files) {
 			return errors.New("unable to use http response to upload files")
+		}
+
+		for _, file := range files {
+			params[file.Name] = file.Data.SendData()
 		}
 	}
 
