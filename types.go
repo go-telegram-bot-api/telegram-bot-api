@@ -733,6 +733,8 @@ type MessageEntity struct {
 	//
 	// optional
 	Language string `json:"language,omitempty"`
+	// Internal field, used by HtmlToEntities to keep track of HTML tag, so can check if start and end tags match.
+	Tag string `json:"-"`
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
