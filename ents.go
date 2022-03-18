@@ -100,8 +100,8 @@ func getAttr(t *html.Tokenizer, findKey string) string {
 	return ""
 }
 
-// Gets the Telegram message for the current token.
-// Figures out the entity type equivalent of the token's HTML tag (e.g "b" -> "bold").
+// Creates a message entity for the current token.
+// Figures out the entity type equivalent to the token's HTML tag (e.g "b" -> "bold").
 // Sets the type to empty string if no mapping found.
 //
 // https://core.telegram.org/api/entities
@@ -109,15 +109,15 @@ func getAttr(t *html.Tokenizer, findKey string) string {
 //
 //   Entity Type    Tags
 //   -----------    ----
-//   bold           b, strong
-//   code	        code
-//   italic         i, em
-//   pre		    pre
-//   spoiler        span with class="tg-spoiler", tg-spoiler
-//   strikethrough  del, s, strike
-//   text_link      a
-//   text_mention   a with href="tg://user?id={user}"
-//   underline      ins, u
+//   bold           <b>, <strong>
+//   code           <code>
+//   italic         <i>, <em>
+//   pre            <pre language="{language}">
+//   spoiler        <span class="tg-spoiler">, <tg-spoiler>
+//   strikethrough  <del>, <s>, <strike>
+//   text_link      <a href="https://...">
+//   text_mention   <a href="tg://user?id={user}">
+//   underline      <ins>, <u>
 //
 func getEntity(t *html.Tokenizer) (me MessageEntity) {
 	name, hasAttr := t.TagName()
