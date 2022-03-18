@@ -8,6 +8,7 @@
   - [Command Handling](./examples/command-handling.md)
   - [Keyboard](./examples/keyboard.md)
   - [Inline Keyboard](./examples/inline-keyboard.md)
+  - [Message Entities](./examples/message-entities.md)
 - [Change Log](./changelog.md)
 
 # Contributing
