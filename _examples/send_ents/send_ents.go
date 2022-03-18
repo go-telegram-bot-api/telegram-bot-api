@@ -20,7 +20,7 @@ var (
 //
 func main() {
 	// Parse command line arguments.
-	flag.Int64Var(&chatID, "id", 0, "Telegram channel chat ID (e.g. @channel, -1001234567890).")
+	flag.Int64Var(&chatID, "id", 0, "Telegram channel chat ID (e.g. -1001234567890).")
 	flag.StringVar(&botToken, "tok", "", "Telegram bot token.")
 	flag.Parse()
 	if chatID == 0 || botToken == "" {
