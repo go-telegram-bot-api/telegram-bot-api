@@ -15,6 +15,7 @@ import (
 // NOTE: The offset and length fields in the message entities are the number of UTF-16 code units (uint16) and not the number of characters.
 // For example the 😂 emoji is one 4 byte UTF-16 character made up of 2 16-bit code units (0xd83d and 0xde02).
 // Its code unit length is 2.
+// https://core.telegram.org/api/entities
 // https://core.telegram.org/bots/api#html-style
 // https://core.telegram.org/bots/api#messageentity
 // https://pkg.go.dev/golang.org/x/net/html
