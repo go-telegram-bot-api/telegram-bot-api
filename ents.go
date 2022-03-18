@@ -104,6 +104,7 @@ func getAttr(t *html.Tokenizer, findKey string) string {
 // Sets the type to empty string if no mapping found.
 //
 // https://core.telegram.org/api/entities
+// https://core.telegram.org/bots/api#formatting-options
 //
 //   Entity Type    Tags
 //   -----------    ----
