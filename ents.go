@@ -134,51 +134,39 @@ func getEntity(t *html.Tokenizer) (me MessageEntity) {
 				me.URL = href
 			}
 		}
-		return
 	case "b":
 		me.Type = "bold"
-		return
 	case "code":
 		me.Type = "code"
-		return
 	case "del":
 		me.Type = "strikethrough"
-		return
 	case "em":
 		me.Type = "italic"
-		return
 	case "i":
 		me.Type = "italic"
-		return
 	case "ins":
 		me.Type = "underline"
-		return
 	case "pre":
 		me.Type = "pre"
-		me.Language = getAttr(t, "language")
-		return
+		if hasAttr {
+			me.Language = getAttr(t, "language")
+		}
 	case "s":
 		me.Type = "strikethrough"
-		return
 	case "span":
 		if hasAttr {
 			if getAttr(t, "class") == "tg-spoiler" {
 				me.Type = "spoiler"
 			}
 		}
-		return
 	case "strike":
 		me.Type = "strikethrough"
-		return
 	case "strong":
 		me.Type = "bold"
-		return
 	case "tg-spoiler":
 		me.Type = "spoiler"
-		return
 	case "u":
 		me.Type = "underline"
-		return
 	}
 	return
 }
