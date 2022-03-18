@@ -110,8 +110,9 @@ func getAttr(t *html.Tokenizer, findKey string) string {
 //   Entity Type    Tags
 //   -----------    ----
 //   bold           b, strong
+//   code	        code
 //   italic         i, em
-//   monowidth      code, pre
+//   pre		    pre
 //   spoiler        span with class="tg-spoiler", tg-spoiler
 //   strikethrough  del, s, strike
 //   text_link      a
@@ -138,9 +139,12 @@ func getEntity(t *html.Tokenizer) (me MessageEntity) {
 		me.Type = "bold"
 		return
 	case "code":
-		me.Type = "monowidth"
+		me.Type = "code"
 		if hasAttr {
-			me.Language = getAttr(t, "class")
+			class := getAttr(t, "class")
+			if strings.HasPrefix(class, "language-") {
+				me.Language = class[len("language-"):]
+			}
 		}
 		return
 	case "del":
@@ -156,7 +160,7 @@ func getEntity(t *html.Tokenizer) (me MessageEntity) {
 		me.Type = "underline"
 		return
 	case "pre":
-		me.Type = "monowidth"
+		me.Type = "pre"
 		return
 	case "s":
 		me.Type = "strikethrough"
