@@ -111,7 +111,7 @@ func getAttr(t *html.Tokenizer, findKey string) string {
 //   -----------    ----
 //   bold           <b>, <strong>
 //   code           <code>
-//   italic         <i>, <em>
+//   italic         <em>, <i>
 //   pre            <pre language="{language}">
 //   spoiler        <span class="tg-spoiler">, <tg-spoiler>
 //   strikethrough  <del>, <s>, <strike>
