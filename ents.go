@@ -43,7 +43,6 @@ loop:
 		case html.StartTagToken:
 			// push on stack
 			me := getEntity(t)
-			// TBD: if code, unset language if previous tag isn't <pre> with same offset.
 			if me.Type == "" {
 				// ignore tags we don't know about
 				continue
@@ -79,7 +78,6 @@ loop:
 				// skip tags that have no content
 				continue
 			}
-			// TBD: don't add <pre> tag if previous tag was <code> with the same offset and length.
 			entities = append(entities, last)
 		}
 	}
@@ -105,7 +103,7 @@ func getAttr(t *html.Tokenizer, findKey string) string {
 // Figures out the entity type equivalent of the token's HTML tag (e.g "b" -> "bold").
 // Sets the type to empty string if no mapping found.
 //
-// https://core.telegram.org/bots/api#formatting-options
+// https://core.telegram.org/api/entities
 //
 //   Entity Type    Tags
 //   -----------    ----
@@ -140,12 +138,6 @@ func getEntity(t *html.Tokenizer) (me MessageEntity) {
 		return
 	case "code":
 		me.Type = "code"
-		if hasAttr {
-			class := getAttr(t, "class")
-			if strings.HasPrefix(class, "language-") {
-				me.Language = class[len("language-"):]
-			}
-		}
 		return
 	case "del":
 		me.Type = "strikethrough"
@@ -161,6 +153,7 @@ func getEntity(t *html.Tokenizer) (me MessageEntity) {
 		return
 	case "pre":
 		me.Type = "pre"
+		me.Language = getAttr(t, "language")
 		return
 	case "s":
 		me.Type = "strikethrough"
