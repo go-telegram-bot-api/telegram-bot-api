@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Converts a HTML string to a markup-free string and an array of Telegram message entities.
+// Converts an HTML string to a markup free string and an array of Telegram message entities.
 // Set strict to true if you want the function to error out on bad HTML or false to ignore.
 // NOTE: The offset and length fields in the message entities are the number of UTF-16 code units (uint16) and not the number of characters.
 // For example the 😂 emoji is one 4 byte UTF-16 character made up of 2 16-bit code units (0xd83d and 0xde02).

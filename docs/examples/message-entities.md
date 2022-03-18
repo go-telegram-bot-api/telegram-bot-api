@@ -1,6 +1,6 @@
 # Message Entities
 
-This is an example of using HtmlToEntities() to convert a HTML string into a markup free string and an array of message entities.
+This is an example of using HtmlToEntities() to convert an HTML string into a markup free string and an array of message entities.
 
 ```go
 package main
