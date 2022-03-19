@@ -602,6 +602,17 @@ func NewEditMessageReplyMarkup(chatID int64, messageID int, replyMarkup InlineKe
 	}
 }
 
+// NewEditMessageMedia allows you to edit message media.
+func NewEditMessageMedia(chatID int64, messageID int, media interface{}) EditMessageMediaConfig {
+	return EditMessageMediaConfig{
+		BaseEdit: BaseEdit{
+			ChatID:    chatID,
+			MessageID: messageID,
+		},
+		Media: media,
+	}
+}
+
 // NewRemoveKeyboard hides the keyboard, with the option for being selective
 // or hiding for everyone.
 func NewRemoveKeyboard(selective bool) ReplyKeyboardRemove {
