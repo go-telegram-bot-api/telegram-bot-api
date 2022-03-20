@@ -2,31 +2,12 @@ package tgbotapi
 
 import (
 	"encoding/json"
-	"net/url"
 	"reflect"
 	"strconv"
 )
 
 // Params represents a set of parameters that gets passed to a request.
 type Params map[string]string
-
-func newParams(values url.Values) Params {
-	params := Params{}
-	for k, v := range values {
-		if len(v) > 0 {
-			params[k] = v[0]
-		}
-	}
-	return params
-}
-
-func (p Params) toValues() url.Values {
-	values := url.Values{}
-	for k, v := range p {
-		values[k] = []string{v}
-	}
-	return values
-}
 
 // AddNonEmpty adds a value if it not an empty string.
 func (p Params) AddNonEmpty(key, value string) {
@@ -63,7 +44,7 @@ func (p Params) AddNonZeroFloat(key string, value float64) {
 	}
 }
 
-// AddInterface adds an interface if it is not nill and can be JSON marshalled.
+// AddInterface adds an interface if it is not nil and can be JSON marshalled.
 func (p Params) AddInterface(key string, value interface{}) error {
 	if value == nil || (reflect.ValueOf(value).Kind() == reflect.Ptr && reflect.ValueOf(value).IsNil()) {
 		return nil
