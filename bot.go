@@ -28,7 +28,7 @@ type BotAPI struct {
 
 	Self            User       `json:"-"`
 	Client          HTTPClient `json:"-"`
-	shutdownChannel chan interface{}
+	shutdownChannel chan struct{}
 
 	apiEndpoint string
 }
@@ -57,7 +57,7 @@ func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI,
 		Token:           token,
 		Client:          client,
 		Buffer:          100,
-		shutdownChannel: make(chan interface{}),
+		shutdownChannel: make(chan struct{}),
 
 		apiEndpoint: apiEndpoint,
 	}
