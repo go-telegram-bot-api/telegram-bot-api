@@ -1242,6 +1242,29 @@ func (config InlineConfig) params() (Params, error) {
 	return params, err
 }
 
+// AnswerWebAppQueryConfig is used to set the result of an interaction with a
+// Web App and send a corresponding message on behalf of the user to the chat
+// from which the query originated.
+type AnswerWebAppQueryConfig struct {
+	// WebAppQueryID is the unique identifier for the query to be answered.
+	WebAppQueryID string `json:"web_app_query_id"`
+	// Result is an InlineQueryResult object describing the message to be sent.
+	Result interface{} `json:"result"`
+}
+
+func (config AnswerWebAppQueryConfig) method() string {
+	return "answerWebAppQuery"
+}
+
+func (config AnswerWebAppQueryConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["web_app_query_id"] = config.WebAppQueryID
+	err := params.AddInterface("result", config.Result)
+
+	return params, err
+}
+
 // CallbackConfig contains information on making a CallbackQuery response.
 type CallbackConfig struct {
 	CallbackQueryID string `json:"callback_query_id"`
@@ -1355,7 +1378,7 @@ type PromoteChatMemberConfig struct {
 	CanPostMessages     bool
 	CanEditMessages     bool
 	CanDeleteMessages   bool
-	CanManageVoiceChats bool
+	CanManageVideoChats bool
 	CanInviteUsers      bool
 	CanRestrictMembers  bool
 	CanPinMessages      bool
@@ -1378,7 +1401,7 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params.AddBool("can_post_messages", config.CanPostMessages)
 	params.AddBool("can_edit_messages", config.CanEditMessages)
 	params.AddBool("can_delete_messages", config.CanDeleteMessages)
-	params.AddBool("can_manage_voice_chats", config.CanManageVoiceChats)
+	params.AddBool("can_manage_video_chats", config.CanManageVideoChats)
 	params.AddBool("can_invite_users", config.CanInviteUsers)
 	params.AddBool("can_restrict_members", config.CanRestrictMembers)
 	params.AddBool("can_pin_messages", config.CanPinMessages)
@@ -2313,6 +2336,81 @@ func (config DeleteMyCommandsConfig) params() (Params, error) {
 	params.AddNonEmpty("language_code", config.LanguageCode)
 
 	return params, err
+}
+
+// SetChatMenuButtonConfig changes the bot's menu button in a private chat,
+// or the default menu button.
+type SetChatMenuButtonConfig struct {
+	ChatID          int64
+	ChannelUsername string
+
+	MenuButton *MenuButton
+}
+
+func (config SetChatMenuButtonConfig) method() string {
+	return "setChatMenuButton"
+}
+
+func (config SetChatMenuButtonConfig) params() (Params, error) {
+	params := make(Params)
+
+	if err := params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername); err != nil {
+		return params, err
+	}
+	err := params.AddInterface("menu_button", config.MenuButton)
+
+	return params, err
+}
+
+type GetChatMenuButtonConfig struct {
+	ChatID          int64
+	ChannelUsername string
+}
+
+func (config GetChatMenuButtonConfig) method() string {
+	return "getChatMenuButton"
+}
+
+func (config GetChatMenuButtonConfig) params() (Params, error) {
+	params := make(Params)
+
+	err := params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+
+	return params, err
+}
+
+type SetMyDefaultAdministratorRightsConfig struct {
+	Rights      ChatAdministratorRights
+	ForChannels bool
+}
+
+func (config SetMyDefaultAdministratorRightsConfig) method() string {
+	return "setMyDefaultAdministratorRights"
+}
+
+func (config SetMyDefaultAdministratorRightsConfig) params() (Params, error) {
+	params := make(Params)
+
+	err := params.AddInterface("rights", config.Rights)
+	params.AddBool("for_channels", config.ForChannels)
+
+	return params, err
+}
+
+type GetMyDefaultAdministratorRightsConfig struct {
+	ForChannels bool
+}
+
+func (config GetMyDefaultAdministratorRightsConfig) method() string {
+	return "getMyDefaultAdministratorRights"
+}
+
+func (config GetMyDefaultAdministratorRightsConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddBool("for_channels", config.ForChannels)
+
+	return params, nil
 }
 
 // prepareInputMediaParam evaluates a single InputMedia and determines if it

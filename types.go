@@ -599,23 +599,27 @@ type Message struct {
 	//
 	// optional
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered"`
-	// VoiceChatScheduled is a service message: voice chat scheduled.
+	// VideoChatScheduled is a service message: video chat scheduled.
 	//
 	// optional
-	VoiceChatScheduled *VoiceChatScheduled `json:"voice_chat_scheduled"`
-	// VoiceChatStarted is a service message: voice chat started.
+	VideoChatScheduled *VideoChatScheduled `json:"video_chat_scheduled"`
+	// VideoChatStarted is a service message: video chat started.
 	//
 	// optional
-	VoiceChatStarted *VoiceChatStarted `json:"voice_chat_started"`
-	// VoiceChatEnded is a service message: voice chat ended.
+	VideoChatStarted *VideoChatStarted `json:"video_chat_started"`
+	// VideoChatEnded is a service message: video chat ended.
 	//
 	// optional
-	VoiceChatEnded *VoiceChatEnded `json:"voice_chat_ended"`
-	// VoiceChatParticipantsInvited is a service message: new participants
-	// invited to a voice chat.
+	VideoChatEnded *VideoChatEnded `json:"video_chat_ended"`
+	// VideoChatParticipantsInvited is a service message: new participants
+	// invited to a video chat.
 	//
 	// optional
-	VoiceChatParticipantsInvited *VoiceChatParticipantsInvited `json:"voice_chat_participants_invited"`
+	VideoChatParticipantsInvited *VideoChatParticipantsInvited `json:"video_chat_participants_invited"`
+	// WebAppData is a service message: data sent by a Web App.
+	//
+	// optional
+	WebAppData *WebAppData `json:"web_app_data"`
 	// ReplyMarkup is the Inline keyboard attached to the message.
 	// login_url buttons are represented as ordinary url buttons.
 	//
@@ -1135,6 +1139,15 @@ type Venue struct {
 	GooglePlaceType string `json:"google_place_type,omitempty"`
 }
 
+// WebAppData Contains data sent from a Web App to the bot.
+type WebAppData struct {
+	// Data is the data. Be aware that a bad client can send arbitrary data in this field.
+	Data string `json:"data"`
+	// ButtonText is the text of the web_app keyboard button, from which the Web App
+	// was opened. Be aware that a bad client can send arbitrary data in this field.
+	ButtonText string `json:"button_text"`
+}
+
 // ProximityAlertTriggered represents a service message sent when a user in the
 // chat triggers a proximity alert sent by another user.
 type ProximityAlertTriggered struct {
@@ -1153,33 +1166,33 @@ type MessageAutoDeleteTimerChanged struct {
 	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
 }
 
-// VoiceChatScheduled represents a service message about a voice chat scheduled
+// VideoChatScheduled represents a service message about a voice chat scheduled
 // in the chat.
-type VoiceChatScheduled struct {
+type VideoChatScheduled struct {
 	// Point in time (Unix timestamp) when the voice chat is supposed to be
 	// started by a chat administrator
 	StartDate int `json:"start_date"`
 }
 
 // Time converts the scheduled start date into a Time.
-func (m *VoiceChatScheduled) Time() time.Time {
+func (m *VideoChatScheduled) Time() time.Time {
 	return time.Unix(int64(m.StartDate), 0)
 }
 
-// VoiceChatStarted represents a service message about a voice chat started in
+// VideoChatStarted represents a service message about a voice chat started in
 // the chat.
-type VoiceChatStarted struct{}
+type VideoChatStarted struct{}
 
-// VoiceChatEnded represents a service message about a voice chat ended in the
+// VideoChatEnded represents a service message about a voice chat ended in the
 // chat.
-type VoiceChatEnded struct {
+type VideoChatEnded struct {
 	// Voice chat duration; in seconds.
 	Duration int `json:"duration"`
 }
 
-// VoiceChatParticipantsInvited represents a service message about new members
+// VideoChatParticipantsInvited represents a service message about new members
 // invited to a voice chat.
-type VoiceChatParticipantsInvited struct {
+type VideoChatParticipantsInvited struct {
 	// New members that were invited to the voice chat.
 	//
 	// optional
@@ -1218,6 +1231,13 @@ type File struct {
 // It requires the Bot token to create the link.
 func (f *File) Link(token string) string {
 	return fmt.Sprintf(FileEndpoint, token, f.FilePath)
+}
+
+// WebAppInfo contains information about a Web App.
+type WebAppInfo struct {
+	// URL is the HTTPS URL of a Web App to be opened with additional data as
+	// specified in Initializing Web Apps.
+	URL string `json:"url"`
 }
 
 // ReplyKeyboardMarkup represents a custom keyboard with reply options.
@@ -1277,11 +1297,17 @@ type KeyboardButton struct {
 	//
 	// optional
 	RequestLocation bool `json:"request_location,omitempty"`
-	// RequestPoll if True, the user will be asked to create a poll and send it
+	// RequestPoll if specified, the user will be asked to create a poll and send it
 	// to the bot when the button is pressed. Available in private chats only
 	//
 	// optional
 	RequestPoll *KeyboardButtonPollType `json:"request_poll,omitempty"`
+	// WebApp if specified, the described Web App will be launched when the button
+	// is pressed. The Web App will be able to send a “web_app_data” service
+	// message. Available in private chats only.
+	//
+	// optional
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
 }
 
 // KeyboardButtonPollType represents type of poll, which is allowed to
@@ -1348,6 +1374,12 @@ type InlineKeyboardButton struct {
 	//
 	// optional
 	CallbackData *string `json:"callback_data,omitempty"`
+	// WebApp is the Description of the Web App that will be launched when the user presses the button.
+	// The Web App will be able to send an arbitrary message on behalf of the user using the method
+	// answerWebAppQuery. Available only in private chats between a user and the bot.
+	//
+	// optional
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
 	// SwitchInlineQuery if set, pressing the button will prompt the user to select one of their chats,
 	// open that chat and insert the bot's username and the specified inline query in the input field.
 	// Can be empty, in which case just the bot's username will be inserted.
@@ -1532,6 +1564,20 @@ type ChatInviteLink struct {
 	PendingJoinRequestCount int `json:"pending_join_request_count"`
 }
 
+type ChatAdministratorRights struct {
+	IsAnonymous         bool `json:"is_anonymous"`
+	CanManageChat       bool `json:"can_manage_chat"`
+	CanDeleteMessages   bool `json:"can_delete_messages"`
+	CanManageVideoChats bool `json:"can_manage_video_chats"`
+	CanRestrictMembers  bool `json:"can_restrict_members"`
+	CanPromoteMembers   bool `json:"can_promote_members"`
+	CanChangeInfo       bool `json:"can_change_info"`
+	CanInviteUsers      bool `json:"can_invite_users"`
+	CanPostMessages     bool `json:"can_post_messages"`
+	CanEditMessages     bool `json:"can_edit_messages"`
+	CanPinMessages      bool `json:"can_pin_messages"`
+}
+
 // ChatMember contains information about one member of a chat.
 type ChatMember struct {
 	// User information about the user
@@ -1590,11 +1636,11 @@ type ChatMember struct {
 	//
 	// optional
 	CanDeleteMessages bool `json:"can_delete_messages,omitempty"`
-	// CanManageVoiceChats administrators only.
-	// True, if the administrator can manage voice chats.
+	// CanManageVideoChats administrators only.
+	// True, if the administrator can manage video chats.
 	//
 	// optional
-	CanManageVoiceChats bool `json:"can_manage_voice_chats"`
+	CanManageVideoChats bool `json:"can_manage_video_chats"`
 	// CanRestrictMembers administrators only.
 	// True, if the administrator can restrict, ban or unban chat members.
 	//
@@ -1774,6 +1820,20 @@ type BotCommandScope struct {
 	Type   string `json:"type"`
 	ChatID int64  `json:"chat_id,omitempty"`
 	UserID int64  `json:"user_id,omitempty"`
+}
+
+// MenuButton describes the bot's menu button in a private chat.
+type MenuButton struct {
+	// Type is the type of menu button, must be one of:
+	// - `commands`
+	// - `web_app`
+	// - `default`
+	Type string `json:"type"`
+	// Text is the text on the button, for `web_app` type.
+	Text string `json:"text,omitempty"`
+	// WebApp is the description of the Web App that will be launched when the
+	// user presses the button for the `web_app` type.
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
 }
 
 // ResponseParameters are various errors that can be returned in APIResponse.
@@ -2044,6 +2104,9 @@ type WebhookInfo struct {
 	//
 	// optional
 	LastErrorMessage string `json:"last_error_message,omitempty"`
+	// LastSynchronizationErrorDate is the unix time of the most recent error that
+	// happened when trying to synchronize available updates with Telegram datacenters.
+	LastSynchronizationErrorDate int `json:"last_synchronization_error_date,omitempty"`
 	// MaxConnections maximum allowed number of simultaneous
 	// HTTPS connections to the webhook for update delivery.
 	//
@@ -2895,6 +2958,16 @@ type ChosenInlineResult struct {
 	InlineMessageID string `json:"inline_message_id,omitempty"`
 	// Query the query that was used to obtain the result
 	Query string `json:"query"`
+}
+
+// SentWebAppMessage contains information about an inline message sent by a Web App
+// on behalf of a user.
+type SentWebAppMessage struct {
+	// Identifier of the sent inline message. Available only if there is an inline
+	// keyboard attached to the message.
+	//
+	// optional
+	InlineMessageID string `json:"inline_message_id"`
 }
 
 // InputTextMessageContent contains text for displaying
