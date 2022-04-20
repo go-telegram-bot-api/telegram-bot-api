@@ -2,6 +2,7 @@ package tgbotapi
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -9,7 +10,7 @@ import (
 	"strconv"
 )
 
-// Telegram constants
+// Telegram constants.
 const (
 	// APIEndpoint is the endpoint for all API methods,
 	// with formatting for Sprintf.
@@ -18,7 +19,7 @@ const (
 	FileEndpoint = "https://api.telegram.org/file/bot%s/%s"
 )
 
-// Constant values for ChatActions
+// Constant values for ChatActions.
 const (
 	ChatTyping          = "typing"
 	ChatUploadPhoto     = "upload_photo"
@@ -33,34 +34,34 @@ const (
 	ChatUploadVideoNote = "upload_video_note"
 )
 
-// API errors
+// API errors.
 const (
-	// ErrAPIForbidden happens when a token is bad
+	// ErrAPIForbidden happens when a token is invalid.
 	ErrAPIForbidden = "forbidden"
 )
 
-// Constant values for ParseMode in MessageConfig
+// Constant values for ParseMode in MessageConfig.
 const (
 	ModeMarkdown   = "Markdown"
 	ModeMarkdownV2 = "MarkdownV2"
 	ModeHTML       = "HTML"
 )
 
-// Constant values for update types
+// Constant values for update types.
 const (
 	// UpdateTypeMessage is new incoming message of any kind — text, photo, sticker, etc.
 	UpdateTypeMessage = "message"
 
-	// UpdateTypeEditedMessage is new version of a message that is known to the bot and was edited
+	// UpdateTypeEditedMessage is new version of a message that is known to the bot and was edited.
 	UpdateTypeEditedMessage = "edited_message"
 
 	// UpdateTypeChannelPost is new incoming channel post of any kind — text, photo, sticker, etc.
 	UpdateTypeChannelPost = "channel_post"
 
-	// UpdateTypeEditedChannelPost is new version of a channel post that is known to the bot and was edited
+	// UpdateTypeEditedChannelPost is new version of a channel post that is known to the bot and was edited.
 	UpdateTypeEditedChannelPost = "edited_channel_post"
 
-	// UpdateTypeInlineQuery is new incoming inline query
+	// UpdateTypeInlineQuery is new incoming inline query.
 	UpdateTypeInlineQuery = "inline_query"
 
 	// UpdateTypeChosenInlineResult i the result of an inline query that was chosen by a user and sent to their
@@ -68,17 +69,17 @@ const (
 	// details on how to enable these updates for your bot.
 	UpdateTypeChosenInlineResult = "chosen_inline_result"
 
-	// UpdateTypeCallbackQuery is new incoming callback query
+	// UpdateTypeCallbackQuery is new incoming callback query.
 	UpdateTypeCallbackQuery = "callback_query"
 
-	// UpdateTypeShippingQuery is new incoming shipping query. Only for invoices with flexible price
+	// UpdateTypeShippingQuery is new incoming shipping query. Only for invoices with flexible price.
 	UpdateTypeShippingQuery = "shipping_query"
 
-	// UpdateTypePreCheckoutQuery is new incoming pre-checkout query. Contains full information about checkout
+	// UpdateTypePreCheckoutQuery is new incoming pre-checkout query. Contains full information about checkout.
 	UpdateTypePreCheckoutQuery = "pre_checkout_query"
 
 	// UpdateTypePoll is new poll state. Bots receive only updates about stopped polls and polls
-	// which are sent by the bot
+	// which are sent by the bot.
 	UpdateTypePoll = "poll"
 
 	// UpdateTypePollAnswer is when user changed their answer in a non-anonymous poll. Bots receive new votes
@@ -94,9 +95,16 @@ const (
 	UpdateTypeChatMember = "chat_member"
 )
 
-// Library errors
-const (
-	ErrBadURL = "bad or empty url"
+// Library errors.
+var (
+	// ErrBadFileType happens when you pass an unknown type.
+	ErrBadFileType = errors.New("bad file type")
+	// ErrBadURL happens when a provided URL is empty or invalid.
+	ErrBadURL = errors.New("bad or empty url")
+	// ErrWrongMethod happens when a the webhook handler is not called with a POST request.
+	ErrWrongMethod = errors.New("wrong http method")
+	// ErrDisallowedUploads happens when attempting to upload files in a HTTP response.
+	ErrDisallowedUploads = errors.New("unable to use http response to upload files")
 )
 
 // Chattable is any config type that can be sent.
@@ -276,7 +284,7 @@ type BaseChat struct {
 func (chat *BaseChat) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
 	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
 	params.AddBool("disable_notification", chat.DisableNotification)
 	params.AddBool("allow_sending_without_reply", chat.AllowSendingWithoutReply)
@@ -312,7 +320,7 @@ func (edit BaseEdit) params() (Params, error) {
 	if edit.InlineMessageID != "" {
 		params["inline_message_id"] = edit.InlineMessageID
 	} else {
-		params.AddFirstValid("chat_id", edit.ChatID, edit.ChannelUsername)
+		_ = params.AddFirstValid("chat_id", edit.ChatID, edit.ChannelUsername)
 		params.AddNonZero("message_id", edit.MessageID)
 	}
 
@@ -389,7 +397,7 @@ func (config CopyMessageConfig) params() (Params, error) {
 		return params, err
 	}
 
-	params.AddFirstValid("from_chat_id", config.FromChatID, config.FromChannelUsername)
+	_ = params.AddFirstValid("from_chat_id", config.FromChatID, config.FromChannelUsername)
 	params.AddNonZero("message_id", config.MessageID)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
@@ -932,7 +940,7 @@ func (config SetGameScoreConfig) params() (Params, error) {
 	if config.InlineMessageID != "" {
 		params["inline_message_id"] = config.InlineMessageID
 	} else {
-		params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+		_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 		params.AddNonZero("message_id", config.MessageID)
 	}
 
@@ -960,7 +968,7 @@ func (config GetGameHighScoresConfig) params() (Params, error) {
 	if config.InlineMessageID != "" {
 		params["inline_message_id"] = config.InlineMessageID
 	} else {
-		params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+		_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 		params.AddNonZero("message_id", config.MessageID)
 	}
 
@@ -1151,9 +1159,9 @@ func (config UpdateConfig) params() (Params, error) {
 	params.AddNonZero("offset", config.Offset)
 	params.AddNonZero("limit", config.Limit)
 	params.AddNonZero("timeout", config.Timeout)
-	params.AddInterface("allowed_updates", config.AllowedUpdates)
+	err := params.AddInterface("allowed_updates", config.AllowedUpdates)
 
-	return params, nil
+	return params, err
 }
 
 // WebhookConfig contains information about a SetWebhook request.
@@ -1312,7 +1320,7 @@ func (config UnbanChatMemberConfig) method() string {
 func (config UnbanChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero64("user_id", config.UserID)
 	params.AddBool("only_if_banned", config.OnlyIfBanned)
 
@@ -1333,7 +1341,7 @@ func (config BanChatMemberConfig) method() string {
 func (config BanChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero64("user_id", config.UserID)
 	params.AddNonZero64("until_date", config.UntilDate)
 	params.AddBool("revoke_messages", config.RevokeMessages)
@@ -1346,7 +1354,7 @@ func (config BanChatMemberConfig) params() (Params, error) {
 // This was renamed to BanChatMember in later versions of the Telegram Bot API.
 type KickChatMemberConfig = BanChatMemberConfig
 
-// RestrictChatMemberConfig contains fields to restrict members of chat
+// RestrictChatMemberConfig contains fields to restrict members of chat.
 type RestrictChatMemberConfig struct {
 	ChatMemberConfig
 	UntilDate   int64
@@ -1360,7 +1368,7 @@ func (config RestrictChatMemberConfig) method() string {
 func (config RestrictChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero64("user_id", config.UserID)
 
 	err := params.AddInterface("permissions", config.Permissions)
@@ -1369,7 +1377,7 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 	return params, err
 }
 
-// PromoteChatMemberConfig contains fields to promote members of chat
+// PromoteChatMemberConfig contains fields to promote members of chat.
 type PromoteChatMemberConfig struct {
 	ChatMemberConfig
 	IsAnonymous         bool
@@ -1392,7 +1400,7 @@ func (config PromoteChatMemberConfig) method() string {
 func (config PromoteChatMemberConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero64("user_id", config.UserID)
 
 	params.AddBool("is_anonymous", config.IsAnonymous)
@@ -1424,7 +1432,7 @@ func (SetChatAdministratorCustomTitle) method() string {
 func (config SetChatAdministratorCustomTitle) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero64("user_id", config.UserID)
 	params.AddNonEmpty("custom_title", config.CustomTitle)
 
@@ -1488,7 +1496,7 @@ type ChatConfig struct {
 func (config ChatConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	return params, nil
 }
@@ -1535,7 +1543,7 @@ func (SetChatPermissionsConfig) method() string {
 func (config SetChatPermissionsConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	err := params.AddInterface("permissions", config.Permissions)
 
 	return params, err
@@ -1555,7 +1563,7 @@ func (ChatInviteLinkConfig) method() string {
 func (config ChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	return params, nil
 }
@@ -1580,7 +1588,7 @@ func (config CreateChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddNonEmpty("name", config.Name)
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("expire_date", config.ExpireDate)
 	params.AddNonZero("member_limit", config.MemberLimit)
 	params.AddBool("creates_join_request", config.CreatesJoinRequest)
@@ -1607,7 +1615,7 @@ func (EditChatInviteLinkConfig) method() string {
 func (config EditChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonEmpty("name", config.Name)
 	params["invite_link"] = config.InviteLink
 	params.AddNonZero("expire_date", config.ExpireDate)
@@ -1633,7 +1641,7 @@ func (RevokeChatInviteLinkConfig) method() string {
 func (config RevokeChatInviteLinkConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params["invite_link"] = config.InviteLink
 
 	return params, nil
@@ -1652,7 +1660,7 @@ func (ApproveChatJoinRequestConfig) method() string {
 func (config ApproveChatJoinRequestConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("user_id", int(config.UserID))
 
 	return params, nil
@@ -1671,7 +1679,7 @@ func (DeclineChatJoinRequest) method() string {
 func (config DeclineChatJoinRequest) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("user_id", int(config.UserID))
 
 	return params, nil
@@ -1690,7 +1698,7 @@ func (config LeaveChatConfig) method() string {
 func (config LeaveChatConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
 	return params, nil
 }
@@ -1705,7 +1713,7 @@ type ChatConfigWithUser struct {
 func (config ChatConfigWithUser) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero64("user_id", config.UserID)
 
 	return params, nil
@@ -1842,7 +1850,7 @@ func (config DeleteMessageConfig) method() string {
 func (config DeleteMessageConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddNonZero("message_id", config.MessageID)
 
 	return params, nil
@@ -1863,7 +1871,7 @@ func (config PinChatMessageConfig) method() string {
 func (config PinChatMessageConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddNonZero("message_id", config.MessageID)
 	params.AddBool("disable_notification", config.DisableNotification)
 
@@ -1886,7 +1894,7 @@ func (config UnpinChatMessageConfig) method() string {
 func (config UnpinChatMessageConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddNonZero("message_id", config.MessageID)
 
 	return params, nil
@@ -1906,7 +1914,7 @@ func (config UnpinAllChatMessagesConfig) method() string {
 func (config UnpinAllChatMessagesConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
 	return params, nil
 }
@@ -1940,7 +1948,7 @@ func (config DeleteChatPhotoConfig) method() string {
 func (config DeleteChatPhotoConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 
 	return params, nil
 }
@@ -1960,7 +1968,7 @@ func (config SetChatTitleConfig) method() string {
 func (config SetChatTitleConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params["title"] = config.Title
 
 	return params, nil
@@ -1981,7 +1989,7 @@ func (config SetChatDescriptionConfig) method() string {
 func (config SetChatDescriptionConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params["description"] = config.Description
 
 	return params, nil
@@ -2115,7 +2123,6 @@ func (config AddStickerConfig) files() []RequestFile {
 		Name: "tgs_sticker",
 		Data: config.TGSSticker,
 	}}
-
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
@@ -2196,7 +2203,7 @@ func (config SetChatStickerSetConfig) method() string {
 func (config SetChatStickerSetConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params["sticker_set_name"] = config.StickerSetName
 
 	return params, nil
@@ -2215,7 +2222,7 @@ func (config DeleteChatStickerSetConfig) method() string {
 func (config DeleteChatStickerSetConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 
 	return params, nil
 }
@@ -2239,7 +2246,7 @@ func (config MediaGroupConfig) method() string {
 func (config MediaGroupConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
+	_ = params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 

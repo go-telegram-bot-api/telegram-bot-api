@@ -214,7 +214,6 @@ func TestNewEditMessageReplyMarkup(t *testing.T) {
 		edit.BaseEdit.MessageID != ReplyToMessageID {
 		t.Fail()
 	}
-
 }
 
 func TestNewDice(t *testing.T) {

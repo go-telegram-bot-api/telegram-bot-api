@@ -1,0 +1,29 @@
+linters:
+  enable:
+    - bodyclose
+    - dupl
+    - errorlint
+    - exhaustive
+    - forcetypeassert
+    - gochecknoglobals
+    - gochecknoinits
+    - gocritic
+    - godot
+    - goerr113
+    - goprintffuncname
+    - ifshort
+    - nakedret
+    - nilerr
+    - noctx
+    - prealloc
+    - revive
+    - tagliatelle
+    - unconvert
+    - wastedassign
+    - whitespace
+
+linters-settings:
+  tagliatelle:
+    case:
+      rules:
+        json: snake
