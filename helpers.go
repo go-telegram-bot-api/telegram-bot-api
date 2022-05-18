@@ -618,6 +618,15 @@ func NewKeyboardButton(text string) KeyboardButton {
 	}
 }
 
+// NewKeyboardButtonWebApp creates a keyboard button with text
+// which goes to a WebApp.
+func NewKeyboardButtonWebApp(text string, webapp WebAppInfo) KeyboardButton {
+	return KeyboardButton{
+		Text:   text,
+		WebApp: &webapp,
+	}
+}
+
 // NewKeyboardButtonContact creates a keyboard button that requests
 // user contact information upon click.
 func NewKeyboardButtonContact(text string) KeyboardButton {
@@ -670,6 +679,15 @@ func NewInlineKeyboardButtonData(text, data string) InlineKeyboardButton {
 	return InlineKeyboardButton{
 		Text:         text,
 		CallbackData: &data,
+	}
+}
+
+// NewInlineKeyboardButtonWebApp creates an inline keyboard button with text
+// which goes to a WebApp.
+func NewInlineKeyboardButtonWebApp(text string, webapp WebAppInfo) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text:   text,
+		WebApp: &webapp,
 	}
 }
 
