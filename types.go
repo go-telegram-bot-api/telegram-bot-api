@@ -449,6 +449,11 @@ type Message struct {
 	//
 	// optional
 	Animation *Animation `json:"animation,omitempty"`
+	// PremiumAnimation message is an animation, information about the animation.
+	// For backward compatibility, when this field is set, the document field will also be set;
+	//
+	// optional
+	PremiumAnimation *Animation `json:"premium_animation,omitempty"`
 	// Audio message is an audio file, information about the file;
 	//
 	// optional
