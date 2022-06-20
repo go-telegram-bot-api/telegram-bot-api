@@ -134,6 +134,10 @@ func (u *Update) SentFrom() *User {
 		return u.ShippingQuery.From
 	case u.PreCheckoutQuery != nil:
 		return u.PreCheckoutQuery.From
+	case u.ChatMember != nil:
+		return &u.ChatMember.From
+	case u.MyChatMember != nil:
+		return &u.MyChatMember.From
 	default:
 		return nil
 	}
