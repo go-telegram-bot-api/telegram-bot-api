@@ -504,7 +504,7 @@ func TestGetFile(t *testing.T) {
 func TestSendChatConfig(t *testing.T) {
 	bot, _ := getBot(t)
 
-	_, err := bot.Request(NewChatAction(ChatID, ChatTyping))
+	err := bot.Request(NewChatAction(ChatID, ChatTyping), nil)
 
 	if err != nil {
 		t.Error(err)
@@ -548,14 +548,14 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(DeleteWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{}, nil)
 
 	wh, err := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, FilePath("tests/cert.pem"))
 
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = bot.Request(wh)
+	err = bot.Request(wh, nil)
 
 	if err != nil {
 		t.Error(err)
@@ -567,7 +567,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 	}
 
-	bot.Request(DeleteWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{}, nil)
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -575,7 +575,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(DeleteWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{}, nil)
 
 	wh, err := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 
@@ -583,7 +583,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = bot.Request(wh)
+	err = bot.Request(wh, nil)
 
 	if err != nil {
 		t.Error(err)
@@ -601,7 +601,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}
 
-	bot.Request(DeleteWebhookConfig{})
+	bot.Request(DeleteWebhookConfig{}, nil)
 }
 
 func TestSendWithMediaGroupPhotoVideo(t *testing.T) {
@@ -721,7 +721,7 @@ func ExampleNewWebhook() {
 		panic(err)
 	}
 
-	_, err = bot.Request(wh)
+	err = bot.Request(wh, nil)
 
 	if err != nil {
 		panic(err)
@@ -761,7 +761,7 @@ func ExampleWebhookHandler() {
 		panic(err)
 	}
 
-	_, err = bot.Request(wh)
+	err = bot.Request(wh, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -813,7 +813,7 @@ func ExampleInlineConfig() {
 			Results:       []interface{}{article},
 		}
 
-		if _, err := bot.Request(inlineConf); err != nil {
+		if err := bot.Request(inlineConf, nil); err != nil {
 			log.Println(err)
 		}
 	}
@@ -830,7 +830,7 @@ func TestDeleteMessage(t *testing.T) {
 		ChatID:    message.Chat.ID,
 		MessageID: message.MessageID,
 	}
-	_, err := bot.Request(deleteMessageConfig)
+	err := bot.Request(deleteMessageConfig, nil)
 
 	if err != nil {
 		t.Error(err)
@@ -849,7 +849,7 @@ func TestPinChatMessage(t *testing.T) {
 		MessageID:           message.MessageID,
 		DisableNotification: false,
 	}
-	_, err := bot.Request(pinChatMessageConfig)
+	err := bot.Request(pinChatMessageConfig, nil)
 
 	if err != nil {
 		t.Error(err)
@@ -870,7 +870,7 @@ func TestUnpinChatMessage(t *testing.T) {
 		DisableNotification: false,
 	}
 
-	if _, err := bot.Request(pinChatMessageConfig); err != nil {
+	if err := bot.Request(pinChatMessageConfig, nil); err != nil {
 		t.Error(err)
 	}
 
@@ -879,7 +879,7 @@ func TestUnpinChatMessage(t *testing.T) {
 		MessageID: message.MessageID,
 	}
 
-	if _, err := bot.Request(unpinChatMessageConfig); err != nil {
+	if err := bot.Request(unpinChatMessageConfig, nil); err != nil {
 		t.Error(err)
 	}
 }
@@ -897,7 +897,7 @@ func TestUnpinAllChatMessages(t *testing.T) {
 		DisableNotification: true,
 	}
 
-	if _, err := bot.Request(pinChatMessageConfig); err != nil {
+	if err := bot.Request(pinChatMessageConfig, nil); err != nil {
 		t.Error(err)
 	}
 
@@ -905,7 +905,7 @@ func TestUnpinAllChatMessages(t *testing.T) {
 		ChatID: message.Chat.ID,
 	}
 
-	if _, err := bot.Request(unpinAllChatMessagesConfig); err != nil {
+	if err := bot.Request(unpinAllChatMessagesConfig, nil); err != nil {
 		t.Error(err)
 	}
 }
@@ -961,7 +961,7 @@ func TestCommands(t *testing.T) {
 		Description: "a test command",
 	})
 
-	if _, err := bot.Request(setCommands); err != nil {
+	if err := bot.Request(setCommands, nil); err != nil {
 		t.Error("Unable to set commands")
 	}
 
@@ -983,7 +983,7 @@ func TestCommands(t *testing.T) {
 		Description: "a private command",
 	})
 
-	if _, err := bot.Request(setCommands); err != nil {
+	if err := bot.Request(setCommands, nil); err != nil {
 		t.Error("Unable to set commands")
 	}
 
