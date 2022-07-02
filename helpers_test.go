@@ -248,18 +248,6 @@ func TestValidateWebAppData(t *testing.T) {
 		}
 	})
 
-	t.Run("error bad init data", func(t *testing.T) {
-		token := "5473903189:AAFnHnISQMP5UQQ5MEaoEWvxeiwNgz2CN2U"
-		initData := "asdfasdfasdfasdfasdf"
-		result, err := ValidateWebAppData(token, initData)
-		if err == nil {
-			t.Fail()
-		}
-		if result {
-			t.Fail()
-		}
-	})
-
 	t.Run("error", func(t *testing.T) {
 		token := "5473903189:AAFnHnISQMP5UQQ5MEaoEWvxeiwNgz2CN2U"
 		initData := "asdfasdfasdfasdfasdf"
