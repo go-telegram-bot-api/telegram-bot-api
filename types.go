@@ -101,19 +101,19 @@ type Update struct {
 	// unblocked by the user.
 	//
 	// optional
-	MyChatMember *ChatMemberUpdated `json:"my_chat_member"`
+	MyChatMember *ChatMemberUpdated `json:"my_chat_member,omitempty"`
 	// ChatMember is a chat member's status was updated in a chat. The bot must
 	// be an administrator in the chat and must explicitly specify "chat_member"
 	// in the list of allowed_updates to receive these updates.
 	//
 	// optional
-	ChatMember *ChatMemberUpdated `json:"chat_member"`
+	ChatMember *ChatMemberUpdated `json:"chat_member,omitempty"`
 	// ChatJoinRequest is a request to join the chat has been sent. The bot must
 	// have the can_invite_users administrator right in the chat to receive
 	// these updates.
 	//
 	// optional
-	ChatJoinRequest *ChatJoinRequest `json:"chat_join_request"`
+	ChatJoinRequest *ChatJoinRequest `json:"chat_join_request,omitempty"`
 }
 
 // SentFrom returns the user who sent an update. Can be nil, if Telegram did not provide information
@@ -325,7 +325,7 @@ type Chat struct {
 	// connected. Returned only in getChat.
 	//
 	// optional
-	Location *ChatLocation `json:"location"`
+	Location *ChatLocation `json:"location,omitempty"`
 }
 
 // IsPrivate returns if the Chat is a private conversation.
@@ -553,7 +553,7 @@ type Message struct {
 	// settings changed in the chat.
 	//
 	// optional
-	MessageAutoDeleteTimerChanged *MessageAutoDeleteTimerChanged `json:"message_auto_delete_timer_changed"`
+	MessageAutoDeleteTimerChanged *MessageAutoDeleteTimerChanged `json:"message_auto_delete_timer_changed,omitempty"`
 	// MigrateToChatID is the group has been migrated to a supergroup with the specified identifier.
 	// This number may be greater than 32 bits and some programming languages
 	// may have difficulty/silent defects in interpreting it.
@@ -598,28 +598,28 @@ type Message struct {
 	// triggered another user's proximity alert while sharing Live Location
 	//
 	// optional
-	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered"`
+	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered,omitempty"`
 	// VideoChatScheduled is a service message: video chat scheduled.
 	//
 	// optional
-	VideoChatScheduled *VideoChatScheduled `json:"video_chat_scheduled"`
+	VideoChatScheduled *VideoChatScheduled `json:"video_chat_scheduled,omitempty"`
 	// VideoChatStarted is a service message: video chat started.
 	//
 	// optional
-	VideoChatStarted *VideoChatStarted `json:"video_chat_started"`
+	VideoChatStarted *VideoChatStarted `json:"video_chat_started,omitempty"`
 	// VideoChatEnded is a service message: video chat ended.
 	//
 	// optional
-	VideoChatEnded *VideoChatEnded `json:"video_chat_ended"`
+	VideoChatEnded *VideoChatEnded `json:"video_chat_ended,omitempty"`
 	// VideoChatParticipantsInvited is a service message: new participants
 	// invited to a video chat.
 	//
 	// optional
-	VideoChatParticipantsInvited *VideoChatParticipantsInvited `json:"video_chat_participants_invited"`
+	VideoChatParticipantsInvited *VideoChatParticipantsInvited `json:"video_chat_participants_invited,omitempty"`
 	// WebAppData is a service message: data sent by a Web App.
 	//
 	// optional
-	WebAppData *WebAppData `json:"web_app_data"`
+	WebAppData *WebAppData `json:"web_app_data,omitempty"`
 	// ReplyMarkup is the Inline keyboard attached to the message.
 	// login_url buttons are represented as ordinary url buttons.
 	//
@@ -1196,7 +1196,7 @@ type VideoChatParticipantsInvited struct {
 	// New members that were invited to the voice chat.
 	//
 	// optional
-	Users []User `json:"users"`
+	Users []User `json:"users,omitempty"`
 }
 
 // UserProfilePhotos contains a set of user profile photos.
@@ -1538,7 +1538,7 @@ type ChatInviteLink struct {
 	// be approved by chat administrators.
 	//
 	// optional
-	CreatesJoinRequest bool `json:"creates_join_request"`
+	CreatesJoinRequest bool `json:"creates_join_request,omitempty"`
 	// IsPrimary is true, if the link is primary.
 	IsPrimary bool `json:"is_primary"`
 	// IsRevoked is true, if the link is revoked.
@@ -1546,22 +1546,22 @@ type ChatInviteLink struct {
 	// Name is the name of the invite link.
 	//
 	// optional
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	// ExpireDate is the point in time (Unix timestamp) when the link will
 	// expire or has been expired.
 	//
 	// optional
-	ExpireDate int `json:"expire_date"`
+	ExpireDate int `json:"expire_date,omitempty"`
 	// MemberLimit is the maximum number of users that can be members of the
 	// chat simultaneously after joining the chat via this invite link; 1-99999.
 	//
 	// optional
-	MemberLimit int `json:"member_limit"`
+	MemberLimit int `json:"member_limit,omitempty"`
 	// PendingJoinRequestCount is the number of pending join requests created
 	// using this link.
 	//
 	// optional
-	PendingJoinRequestCount int `json:"pending_join_request_count"`
+	PendingJoinRequestCount int `json:"pending_join_request_count,omitempty"`
 }
 
 type ChatAdministratorRights struct {
@@ -1599,7 +1599,7 @@ type ChatMember struct {
 	// in the chat is hidden
 	//
 	// optional
-	IsAnonymous bool `json:"is_anonymous"`
+	IsAnonymous bool `json:"is_anonymous,omitempty"`
 	// UntilDate restricted and kicked only.
 	// Date when restrictions will be lifted for this user;
 	// unix time.
@@ -1618,7 +1618,7 @@ type ChatMember struct {
 	// any other administrator privilege.
 	//
 	// optional
-	CanManageChat bool `json:"can_manage_chat"`
+	CanManageChat bool `json:"can_manage_chat,omitempty"`
 	// CanPostMessages administrators only.
 	// True, if the administrator can post in the channel;
 	// channels only.
@@ -1640,7 +1640,7 @@ type ChatMember struct {
 	// True, if the administrator can manage video chats.
 	//
 	// optional
-	CanManageVideoChats bool `json:"can_manage_video_chats"`
+	CanManageVideoChats bool `json:"can_manage_video_chats,omitempty"`
 	// CanRestrictMembers administrators only.
 	// True, if the administrator can restrict, ban or unban chat members.
 	//
@@ -1726,7 +1726,7 @@ type ChatMemberUpdated struct {
 	// for joining by invite link events only.
 	//
 	// optional
-	InviteLink *ChatInviteLink `json:"invite_link"`
+	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
 }
 
 // ChatJoinRequest represents a join request sent to a chat.
@@ -1740,11 +1740,11 @@ type ChatJoinRequest struct {
 	// Bio of the user.
 	//
 	// optional
-	Bio string `json:"bio"`
+	Bio string `json:"bio,omitempty"`
 	// InviteLink is the link that was used by the user to send the join request.
 	//
 	// optional
-	InviteLink *ChatInviteLink `json:"invite_link"`
+	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
 }
 
 // ChatPermissions describes actions that a non-administrator user is
@@ -1875,7 +1875,7 @@ type BaseInputMedia struct {
 	// which can be specified instead of parse_mode
 	//
 	// optional
-	CaptionEntities []MessageEntity `json:"caption_entities"`
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 }
 
 // InputMediaPhoto is a photo to send as part of a media group.
@@ -2141,7 +2141,7 @@ type InlineQuery struct {
 	// unless the request was sent from a secret chat
 	//
 	// optional
-	ChatType string `json:"chat_type"`
+	ChatType string `json:"chat_type,omitempty"`
 	// Location sender location, only for bots that request user location.
 	//
 	// optional
@@ -2654,23 +2654,23 @@ type InlineQueryResultLocation struct {
 	// measured in meters; 0-1500
 	//
 	// optional
-	HorizontalAccuracy float64 `json:"horizontal_accuracy"`
+	HorizontalAccuracy float64 `json:"horizontal_accuracy,omitempty"`
 	// LivePeriod is the period in seconds for which the location can be
 	// updated, should be between 60 and 86400.
 	//
 	// optional
-	LivePeriod int `json:"live_period"`
+	LivePeriod int `json:"live_period,omitempty"`
 	// Heading is for live locations, a direction in which the user is moving,
 	// in degrees. Must be between 1 and 360 if specified.
 	//
 	// optional
-	Heading int `json:"heading"`
+	Heading int `json:"heading,omitempty"`
 	// ProximityAlertRadius is for live locations, a maximum distance for
 	// proximity alerts about approaching another chat member, in meters. Must
 	// be between 1 and 100000 if specified.
 	//
 	// optional
-	ProximityAlertRadius int `json:"proximity_alert_radius"`
+	ProximityAlertRadius int `json:"proximity_alert_radius,omitempty"`
 	// ReplyMarkup inline keyboard attached to the message
 	//
 	// optional
@@ -2704,15 +2704,15 @@ type InlineQueryResultMPEG4GIF struct {
 	// Width video width
 	//
 	// optional
-	Width int `json:"mpeg4_width"`
+	Width int `json:"mpeg4_width,omitempty"`
 	// Height vVideo height
 	//
 	// optional
-	Height int `json:"mpeg4_height"`
+	Height int `json:"mpeg4_height,omitempty"`
 	// Duration video duration
 	//
 	// optional
-	Duration int `json:"mpeg4_duration"`
+	Duration int `json:"mpeg4_duration,omitempty"`
 	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
 	ThumbURL string `json:"thumb_url"`
 	// Title for the result
@@ -2967,7 +2967,7 @@ type SentWebAppMessage struct {
 	// keyboard attached to the message.
 	//
 	// optional
-	InlineMessageID string `json:"inline_message_id"`
+	InlineMessageID string `json:"inline_message_id,omitempty"`
 }
 
 // InputTextMessageContent contains text for displaying
@@ -3003,7 +3003,7 @@ type InputLocationMessageContent struct {
 	// measured in meters; 0-1500
 	//
 	// optional
-	HorizontalAccuracy float64 `json:"horizontal_accuracy"`
+	HorizontalAccuracy float64 `json:"horizontal_accuracy,omitempty"`
 	// LivePeriod is the period in seconds for which the location can be
 	// updated, should be between 60 and 86400
 	//
@@ -3013,13 +3013,13 @@ type InputLocationMessageContent struct {
 	// in degrees. Must be between 1 and 360 if specified.
 	//
 	// optional
-	Heading int `json:"heading"`
+	Heading int `json:"heading,omitempty"`
 	// ProximityAlertRadius is for live locations, a maximum distance for
 	// proximity alerts about approaching another chat member, in meters. Must
 	// be between 1 and 100000 if specified.
 	//
 	// optional
-	ProximityAlertRadius int `json:"proximity_alert_radius"`
+	ProximityAlertRadius int `json:"proximity_alert_radius,omitempty"`
 }
 
 // InputVenueMessageContent contains a venue for displaying
@@ -3044,11 +3044,11 @@ type InputVenueMessageContent struct {
 	// GooglePlaceID is the Google Places identifier of the venue
 	//
 	// optional
-	GooglePlaceID string `json:"google_place_id"`
+	GooglePlaceID string `json:"google_place_id,omitempty"`
 	// GooglePlaceType is the Google Places type of the venue
 	//
 	// optional
-	GooglePlaceType string `json:"google_place_type"`
+	GooglePlaceType string `json:"google_place_type,omitempty"`
 }
 
 // InputContactMessageContent contains a contact for displaying
