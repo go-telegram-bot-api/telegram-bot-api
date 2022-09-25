@@ -1986,6 +1986,10 @@ type Sticker struct {
 	//
 	// optional
 	IsAnimated bool `json:"is_animated,omitempty"`
+	// IsVideo true, if the sticker is a video sticker
+	//
+	// optional
+	IsVideo bool `json:"is_video,omitempty"`
 	// Thumbnail sticker thumbnail in the .WEBP or .JPG format
 	//
 	// optional
@@ -1998,11 +2002,19 @@ type Sticker struct {
 	//
 	// optional
 	SetName string `json:"set_name,omitempty"`
+	// PremiumAnimation for premium regular stickers, premium animation for the sticker
+	//
+	// optional
+	PremiumAnimation *File `json:"premium_animation,omitempty"`
 	// MaskPosition is for mask stickers, the position where the mask should be
 	// placed
 	//
 	// optional
 	MaskPosition *MaskPosition `json:"mask_position,omitempty"`
+	// CustomEmojiID for custom emoji stickers, unique identifier of the custom emoji
+	//
+	// optional
+	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
 	// FileSize
 	//
 	// optional
@@ -2015,8 +2027,12 @@ type StickerSet struct {
 	Name string `json:"name"`
 	// Title sticker set title
 	Title string `json:"title"`
+	// StickerType of stickers in the set, currently one of “regular”, “mask”, “custom_emoji”
+	StickerType string `json:"sticker_type"`
 	// IsAnimated true, if the sticker set contains animated stickers
 	IsAnimated bool `json:"is_animated"`
+	// IsVideo true, if the sticker set contains video stickers
+	IsVideo bool `json:"is_video"`
 	// ContainsMasks true, if the sticker set contains masks
 	ContainsMasks bool `json:"contains_masks"`
 	// Stickers list of all set stickers
