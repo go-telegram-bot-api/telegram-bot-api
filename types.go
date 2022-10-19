@@ -290,7 +290,7 @@ type Chat struct {
 	// optional
 	Permissions *ChatPermissions `json:"permissions,omitempty"`
 	// SlowModeDelay is for supergroups, the minimum allowed delay between
-	// consecutive messages sent by each unpriviledged user. Returned only in
+	// consecutive messages sent by each unprivileged user. Returned only in
 	// getChat.
 	//
 	// optional
