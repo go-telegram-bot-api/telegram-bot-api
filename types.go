@@ -754,6 +754,12 @@ func (e MessageEntity) IsMention() bool {
 	return e.Type == "mention"
 }
 
+// IsTextMention returns true if the type of the message entity is "text_mention"
+// (At this time, the user field exists, and occurs when tagging a member without a username)
+func (e MessageEntity) IsTextMention() bool {
+	return e.Type == "text_mention"
+}
+
 // IsHashtag returns true if the type of the message entity is "hashtag".
 func (e MessageEntity) IsHashtag() bool {
 	return e.Type == "hashtag"
