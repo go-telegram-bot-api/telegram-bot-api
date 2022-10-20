@@ -183,6 +183,10 @@ type User struct {
 	//
 	// optional
 	IsBot bool `json:"is_bot,omitempty"`
+	// IsPremium true, if user has Telegram Premium
+	//
+	// optional
+	IsPremium bool `json:"is_premium,omitempty"`
 	// FirstName user's or bot's first name
 	FirstName string `json:"first_name"`
 	// LastName user's or bot's last name
@@ -445,6 +449,11 @@ type Message struct {
 	//
 	// optional
 	Animation *Animation `json:"animation,omitempty"`
+	// PremiumAnimation message is an animation, information about the animation.
+	// For backward compatibility, when this field is set, the document field will also be set;
+	//
+	// optional
+	PremiumAnimation *Animation `json:"premium_animation,omitempty"`
 	// Audio message is an audio file, information about the file;
 	//
 	// optional
