@@ -28,6 +28,7 @@ Let's start by constructing a new [BotAPI][bot-api-docs].
 package main
 
 import (
+	"log"
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -36,7 +37,7 @@ import (
 func main() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_APITOKEN"))
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	bot.Debug = true
@@ -98,7 +99,7 @@ things. We can add this code in right after the line enabling debug mode.
 			// Note that panics are a bad way to handle errors. Telegram can
 			// have service outages or network errors, you should retry sending
 			// messages or more gracefully handle failures.
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 ```

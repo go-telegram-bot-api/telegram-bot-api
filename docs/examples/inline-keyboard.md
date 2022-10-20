@@ -30,7 +30,7 @@ var numericKeyboard = tgbotapi.NewInlineKeyboardMarkup(
 func main() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_APITOKEN"))
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	bot.Debug = true
@@ -59,20 +59,20 @@ func main() {
 
 			// Send the message.
 			if _, err = bot.Send(msg); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 		} else if update.CallbackQuery != nil {
 			// Respond to the callback query, telling Telegram to show the user
 			// a message with the data received.
 			callback := tgbotapi.NewCallback(update.CallbackQuery.ID, update.CallbackQuery.Data)
 			if _, err := bot.Request(callback); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 
 			// And finally, send a message containing the data received.
 			msg := tgbotapi.NewMessage(update.CallbackQuery.Message.Chat.ID, update.CallbackQuery.Data)
 			if _, err := bot.Send(msg); err != nil {
-				panic(err)
+				log.Fatal(err)
 			}
 		}
 	}

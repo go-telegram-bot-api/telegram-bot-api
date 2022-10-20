@@ -29,7 +29,7 @@ var numericKeyboard = tgbotapi.NewReplyKeyboard(
 func main() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_APITOKEN"))
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	bot.Debug = true
@@ -56,7 +56,7 @@ func main() {
 		}
 
 		if _, err := bot.Send(msg); err != nil {
-			log.Panic(err)
+			log.Fatal(err)
 		}
 	}
 }
