@@ -103,7 +103,7 @@ things. We can add this code in right after the line enabling debug mode.
 	}
 ```
 
-Congradulations! You've made your very own bot!
+Congratulations! You've made your very own bot!
 
 Now that you've got some of the basics down, we can start talking about how the
 library is structured and more advanced features.

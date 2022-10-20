@@ -1807,7 +1807,7 @@ func (config ShippingConfig) params() (Params, error) {
 	return params, err
 }
 
-// PreCheckoutConfig conatins information for answerPreCheckoutQuery request.
+// PreCheckoutConfig contains information for answerPreCheckoutQuery request.
 type PreCheckoutConfig struct {
 	PreCheckoutQueryID string // required
 	OK                 bool   // required

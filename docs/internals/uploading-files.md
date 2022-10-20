@@ -74,8 +74,8 @@ mediaGroup := NewMediaGroup(ChatID, []interface{}{
 })
 ```
 
-A `MediaGroupConfig` stores all of the media in an array of interfaces. We now
-have all of the data we need to upload, but how do we figure out field names for
+A `MediaGroupConfig` stores all the media in an array of interfaces. We now
+have all the data we need to upload, but how do we figure out field names for
 uploads? We didn't specify `attach://unique-file` anywhere.
 
 When the library goes to upload the files, it looks at the `params` and `files`

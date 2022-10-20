@@ -43,7 +43,7 @@ pull request!
 
 - By default, bots only get updates directly addressed to them. If you need to
   get all messages, you must disable privacy mode with Botfather. Bots already
-  added to groups will need to be removed and readded for the changes to take
+  added to groups will need to be removed and re-added for the changes to take
   effect. You can read more on the [Telegram Bot API docs][api-docs].
 
 [api-docs]: https://core.telegram.org/bots/faq#what-messages-will-my-bot-get
