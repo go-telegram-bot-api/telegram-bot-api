@@ -493,6 +493,8 @@ func (bot *BotAPI) ListenForWebhookRespReqFormat(w http.ResponseWriter, r *http.
 	ch := make(chan Update, bot.Buffer)
 
 	func(w http.ResponseWriter, r *http.Request) {
+		defer close(ch)
+
 		update, err := bot.HandleUpdate(r)
 		if err != nil {
 			errMsg, _ := json.Marshal(map[string]string{"error": err.Error()})
@@ -503,7 +505,6 @@ func (bot *BotAPI) ListenForWebhookRespReqFormat(w http.ResponseWriter, r *http.
 		}
 
 		ch <- *update
-		close(ch)
 	}(w, r)
 
 	return ch
