@@ -21,9 +21,11 @@ type HTTPClient interface {
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
-	Token  string `json:"token"`
-	Debug  bool   `json:"debug"`
-	Buffer int    `json:"buffer"`
+	Token       string `json:"token"`
+	Debug       bool   `json:"debug"`
+	Buffer      int    `json:"buffer"`
+	locker      Locker
+	eventWorker EventWorker
 
 	Self            User       `json:"-"`
 	Client          HTTPClient `json:"-"`
@@ -32,11 +34,19 @@ type BotAPI struct {
 	apiEndpoint string
 }
 
+// NewBotAPIMultiInstance creates new BotAPI instance
+// and allows you to work with multiple instances.
+//
+// It requires a token, provided by @BotFather on Telegram, API endpoint, Locker interface and EventWorker interface.
+func NewBotAPIMultiInstance(token string, locker Locker, worker EventWorker) (*BotAPI, error) {
+	return newBotAPIWithClient(token, APIEndpoint, locker, worker, &http.Client{})
+}
+
 // NewBotAPI creates a new BotAPI instance.
 //
 // It requires a token, provided by @BotFather on Telegram.
 func NewBotAPI(token string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, APIEndpoint, &http.Client{})
+	return newBotAPIWithClient(token, APIEndpoint, &fakeLocker{}, &fakeEventWorker{}, &http.Client{})
 }
 
 // NewBotAPIWithAPIEndpoint creates a new BotAPI instance
@@ -44,7 +54,7 @@ func NewBotAPI(token string) (*BotAPI, error) {
 //
 // It requires a token, provided by @BotFather on Telegram and API endpoint.
 func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
-	return NewBotAPIWithClient(token, apiEndpoint, &http.Client{})
+	return newBotAPIWithClient(token, apiEndpoint, &fakeLocker{}, &fakeEventWorker{}, &http.Client{})
 }
 
 // NewBotAPIWithClient creates a new BotAPI instance
@@ -52,11 +62,23 @@ func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
 //
 // It requires a token, provided by @BotFather on Telegram and API endpoint.
 func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI, error) {
+	return newBotAPIWithClient(token, apiEndpoint, &fakeLocker{}, &fakeEventWorker{}, client)
+}
+
+func newBotAPIWithClient(
+	token,
+	apiEndpoint string,
+	locker Locker,
+	eventWorker EventWorker,
+	client HTTPClient,
+) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:           token,
 		Client:          client,
 		Buffer:          100,
 		shutdownChannel: make(chan interface{}),
+		locker:          locker,
+		eventWorker:     eventWorker,
 
 		apiEndpoint: apiEndpoint,
 	}
@@ -439,8 +461,28 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 			default:
 			}
 
-			updates, err := bot.GetUpdates(config)
+			for {
+				if bot.locker.Lock() {
+					break
+				} else {
+					<-time.After(time.Second)
+				}
+			}
+			lastEventID, err := bot.eventWorker.GetLastEventID()
 			if err != nil {
+				bot.locker.Unlock()
+				log.Println(err)
+				log.Println("Failed to get last event id, retrying in 3 seconds...")
+				time.Sleep(time.Second * 3)
+
+				continue
+			}
+
+			config.Offset = lastEventID + 1
+			updates, err := bot.GetUpdates(config)
+
+			if err != nil {
+				bot.locker.Unlock()
 				log.Println(err)
 				log.Println("Failed to get updates, retrying in 3 seconds...")
 				time.Sleep(time.Second * 3)
@@ -448,12 +490,29 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 				continue
 			}
 
+			newMaxEventID := lastEventID
 			for _, update := range updates {
-				if update.UpdateID >= config.Offset {
-					config.Offset = update.UpdateID + 1
-					ch <- update
+				if update.UpdateID > newMaxEventID {
+					newMaxEventID = update.UpdateID
 				}
 			}
+
+			if newMaxEventID > lastEventID {
+				if err := bot.eventWorker.UpdateEventID(newMaxEventID); err != nil {
+					bot.locker.Unlock()
+					log.Println(err)
+					log.Println("Failed to update event id, retrying in 3 seconds...")
+					time.Sleep(time.Second * 3)
+
+					continue
+				}
+			}
+
+			for _, update := range updates {
+				ch <- update
+			}
+
+			bot.locker.Unlock()
 		}
 	}()
 
