@@ -217,6 +217,16 @@ func TestNewEditMessageReplyMarkup(t *testing.T) {
 
 }
 
+func TestNewEditMessageMedia(t *testing.T) {
+	edit := NewEditMessageMedia(ChatID, ReplyToMessageID, "new media")
+
+	if value, ok := edit.Media.(string); !ok || value != "new media" ||
+		edit.BaseEdit.ChatID != ChatID ||
+		edit.BaseEdit.MessageID != ReplyToMessageID {
+		t.Fail()
+	}
+}
+
 func TestNewDice(t *testing.T) {
 	dice := NewDice(42)
 
