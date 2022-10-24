@@ -2588,6 +2588,12 @@ type InlineQueryResultDocument struct {
 	//
 	// optional
 	Caption string `json:"caption,omitempty"`
+	// ParseMode for parsing entities in the document caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode,omitempty"`
 	// URL a valid url for the file
 	URL string `json:"document_url"`
 	// MimeType of the content of the file, either “application/pdf” or “application/zip”
@@ -2904,6 +2910,12 @@ type InlineQueryResultVideo struct {
 	//
 	// optional
 	Caption string `json:"caption,omitempty"`
+	// ParseMode mode for parsing entities in the video caption.
+	// See formatting options for more details
+	// (https://core.telegram.org/bots/api#formatting-options).
+	//
+	// optional
+	ParseMode string `json:"parse_mode,omitempty"`
 	// Width video width
 	//
 	// optional
