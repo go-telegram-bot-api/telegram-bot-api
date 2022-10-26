@@ -85,7 +85,7 @@ func main() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	wh, _ := tgbotapi.NewWebhookWithCert("https://www.example.com:8443/"+bot.Token, "cert.pem")
+	wh, _ := tgbotapi.NewWebhookWithCert("https://example.com:8443/"+bot.Token, tgbotapi.FilePath("YOURPUBLIC.pem"))
 
 	_, err = bot.Request(wh)
 	if err != nil {
@@ -102,7 +102,7 @@ func main() {
 	}
 
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+	go http.ListenAndServeTLS("0.0.0.0:8443", "YOURPUBLIC.pem", "YOURPRIVATE.key", nil)
 
 	for update := range updates {
 		log.Printf("%+v\n", update)
@@ -115,7 +115,9 @@ HTTPS / TLS. The above example tells Telegram that this is your
 certificate and that it should be trusted, even though it is not
 properly signed.
 
-    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3560 -subj "//O=Org\CN=Test" -nodes
+    openssl req -newkey rsa:2048 -sha256 -nodes -keyout YOURPRIVATE.key -x509 -days 365 -out YOURPUBLIC.pem -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=example.com"
+
+Note: example.com must be replaced with public IP of your server or your own domain.
 
 Now that [Let's Encrypt](https://letsencrypt.org) is available,
 you may wish to generate your free TLS certificate there.
