@@ -2566,3 +2566,20 @@ func prepareInputMediaForFiles(inputMedia []interface{}) []RequestFile {
 
 	return files
 }
+
+type chattable struct {
+	p Params
+	m string
+}
+
+func newChattable(p Params, m string) *chattable {
+	return &chattable{p: p, m: m}
+}
+
+func (c chattable) params() (Params, error) {
+	return c.p, nil
+}
+
+func (c chattable) method() string {
+	return c.m
+}
