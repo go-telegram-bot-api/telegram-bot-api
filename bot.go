@@ -3,6 +3,7 @@
 package tgbotapi
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -25,11 +27,13 @@ type BotAPI struct {
 	Debug  bool   `json:"debug"`
 	Buffer int    `json:"buffer"`
 
-	Self            User       `json:"-"`
-	Client          HTTPClient `json:"-"`
-	shutdownChannel chan interface{}
+	Self   User       `json:"-"`
+	Client HTTPClient `json:"-"`
 
 	apiEndpoint string
+
+	stoppers []context.CancelFunc
+	mu       sync.RWMutex
 }
 
 // NewBotAPI creates a new BotAPI instance.
@@ -53,10 +57,9 @@ func NewBotAPIWithAPIEndpoint(token, apiEndpoint string) (*BotAPI, error) {
 // It requires a token, provided by @BotFather on Telegram and API endpoint.
 func NewBotAPIWithClient(token, apiEndpoint string, client HTTPClient) (*BotAPI, error) {
 	bot := &BotAPI{
-		Token:           token,
-		Client:          client,
-		Buffer:          100,
-		shutdownChannel: make(chan interface{}),
+		Token:  token,
+		Client: client,
+		Buffer: 100,
 
 		apiEndpoint: apiEndpoint,
 	}
@@ -90,8 +93,8 @@ func buildParams(in Params) url.Values {
 	return out
 }
 
-// MakeRequest makes a request to a specific endpoint with our token.
-func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
+// MakeRequestWithCtx makes a request to a specific endpoint with our token with context.
+func (bot *BotAPI) MakeRequestWithCtx(ctx context.Context, endpoint string, params Params) (*APIResponse, error) {
 	if bot.Debug {
 		log.Printf("Endpoint: %s, params: %v\n", endpoint, params)
 	}
@@ -100,7 +103,7 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 
 	values := buildParams(params)
 
-	req, err := http.NewRequest("POST", method, strings.NewReader(values.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", method, strings.NewReader(values.Encode()))
 	if err != nil {
 		return &APIResponse{}, err
 	}
@@ -139,6 +142,11 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 	return &apiResp, nil
 }
 
+// MakeRequest makes a request to a specific endpoint with our token.
+func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, error) {
+	return bot.MakeRequestWithCtx(context.Background(), endpoint, params)
+}
+
 // decodeAPIResponse decode response and return slice of bytes if debug enabled.
 // If debug disabled, just decode http.Response.Body stream to APIResponse struct
 // for efficient memory usage
@@ -163,8 +171,7 @@ func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) 
 	return data, nil
 }
 
-// UploadFiles makes a request to the API with files.
-func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
+func (bot *BotAPI) UploadFilesWithCtx(ctx context.Context, endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
 	r, w := io.Pipe()
 	m := multipart.NewWriter(w)
 
@@ -223,7 +230,7 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 
 	method := fmt.Sprintf(bot.apiEndpoint, bot.Token, endpoint)
 
-	req, err := http.NewRequest("POST", method, r)
+	req, err := http.NewRequestWithContext(ctx, "POST", method, r)
 	if err != nil {
 		return nil, err
 	}
@@ -262,6 +269,11 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 	return &apiResp, nil
 }
 
+// UploadFiles makes a request to the API with files.
+func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFile) (*APIResponse, error) {
+	return bot.UploadFilesWithCtx(context.Background(), endpoint, params, files)
+}
+
 // GetFileDirectURL returns direct URL to file
 //
 // It requires the FileID.
@@ -275,13 +287,8 @@ func (bot *BotAPI) GetFileDirectURL(fileID string) (string, error) {
 	return file.Link(bot.Token), nil
 }
 
-// GetMe fetches the currently authenticated bot.
-//
-// This method is called upon creation to validate the token,
-// and so you may get this data from BotAPI.Self without the need for
-// another request.
-func (bot *BotAPI) GetMe() (User, error) {
-	resp, err := bot.MakeRequest("getMe", nil)
+func (bot *BotAPI) GetMeWithCtx(ctx context.Context) (User, error) {
+	resp, err := bot.MakeRequestWithCtx(ctx, "getMe", nil)
 	if err != nil {
 		return User{}, err
 	}
@@ -290,6 +297,15 @@ func (bot *BotAPI) GetMe() (User, error) {
 	err = json.Unmarshal(resp.Result, &user)
 
 	return user, err
+}
+
+// GetMe fetches the currently authenticated bot.
+//
+// This method is called upon creation to validate the token,
+// and so you may get this data from BotAPI.Self without the need for
+// another request.
+func (bot *BotAPI) GetMe() (User, error) {
+	return bot.GetMeWithCtx(context.Background())
 }
 
 // IsMessageToMe returns true if message directed to this bot.
@@ -309,8 +325,7 @@ func hasFilesNeedingUpload(files []RequestFile) bool {
 	return false
 }
 
-// Request sends a Chattable to Telegram, and returns the APIResponse.
-func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
+func (bot *BotAPI) RequestWithCtx(ctx context.Context, c Chattable) (*APIResponse, error) {
 	params, err := c.params()
 	if err != nil {
 		return nil, err
@@ -322,7 +337,7 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 		// If we have files that need to be uploaded, we should delegate the
 		// request to UploadFile.
 		if hasFilesNeedingUpload(files) {
-			return bot.UploadFiles(t.method(), params, files)
+			return bot.UploadFilesWithCtx(ctx, t.method(), params, files)
 		}
 
 		// However, if there are no files to be uploaded, there's likely things
@@ -332,65 +347,66 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 		}
 	}
 
-	return bot.MakeRequest(c.method(), params)
+	return bot.MakeRequestWithCtx(ctx, c.method(), params)
+}
+
+// Request sends a Chattable to Telegram, and returns the APIResponse.
+func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
+	return bot.RequestWithCtx(context.Background(), c)
+}
+
+func (bot *BotAPI) requestUnmarshal(ctx context.Context, c Chattable, recv interface{}) error {
+	resp, err := bot.RequestWithCtx(ctx, c)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(resp.Result, &recv)
+}
+
+func (bot *BotAPI) SendWithCtx(ctx context.Context, c Chattable) (res Message, err error) {
+	err = bot.requestUnmarshal(ctx, c, &res)
+	return
 }
 
 // Send will send a Chattable item to Telegram and provides the
 // returned Message.
 func (bot *BotAPI) Send(c Chattable) (Message, error) {
-	resp, err := bot.Request(c)
-	if err != nil {
-		return Message{}, err
-	}
+	return bot.SendWithCtx(context.Background(), c)
+}
 
-	var message Message
-	err = json.Unmarshal(resp.Result, &message)
-
-	return message, err
+func (bot *BotAPI) SendMediaGroupWithCtx(ctx context.Context, c MediaGroupConfig) (res []Message, err error) {
+	err = bot.requestUnmarshal(ctx, c, &res)
+	return
 }
 
 // SendMediaGroup sends a media group and returns the resulting messages.
-func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return nil, err
-	}
-
-	var messages []Message
-	err = json.Unmarshal(resp.Result, &messages)
-
-	return messages, err
+func (bot *BotAPI) SendMediaGroup(cfg MediaGroupConfig) ([]Message, error) {
+	return bot.SendMediaGroupWithCtx(context.Background(), cfg)
 }
 
-// GetUserProfilePhotos gets a user's profile photos.
+// GetUserProfilePhotosWithCtx gets a user's profile photos.
 //
 // It requires UserID.
 // Offset and Limit are optional.
-func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return UserProfilePhotos{}, err
-	}
+func (bot *BotAPI) GetUserProfilePhotosWithCtx(ctx context.Context, cfg UserProfilePhotosConfig) (res UserProfilePhotos, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
+}
 
-	var profilePhotos UserProfilePhotos
-	err = json.Unmarshal(resp.Result, &profilePhotos)
+func (bot *BotAPI) GetUserProfilePhotos(cfg UserProfilePhotosConfig) (UserProfilePhotos, error) {
+	return bot.GetUserProfilePhotosWithCtx(context.Background(), cfg)
+}
 
-	return profilePhotos, err
+func (bot *BotAPI) GetFileWithCtx(ctx context.Context, cfg FileConfig) (res File, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetFile returns a File which can download a file from Telegram.
 //
 // Requires FileID.
-func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return File{}, err
-	}
-
-	var file File
-	err = json.Unmarshal(resp.Result, &file)
-
-	return file, err
+func (bot *BotAPI) GetFile(cfg FileConfig) (File, error) {
+	return bot.GetFileWithCtx(context.Background(), cfg)
 }
 
 // GetUpdates fetches updates.
@@ -401,45 +417,39 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // Set Timeout to a large number to reduce requests, so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return []Update{}, err
-	}
+	return bot.GetUpdatesWithCtx(context.Background(), config)
+}
 
-	var updates []Update
-	err = json.Unmarshal(resp.Result, &updates)
+func (bot *BotAPI) GetUpdatesWithCtx(ctx context.Context, cfg UpdateConfig) (res []Update, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
+}
 
-	return updates, err
+func (bot *BotAPI) GetWebhookInfoWithCtx(ctx context.Context) (res WebhookInfo, err error) {
+	err = bot.requestUnmarshal(ctx, newChattable(nil, "getWebhookInfo"), &res)
+	return
 }
 
 // GetWebhookInfo allows you to fetch information about a webhook and if
 // one currently is set, along with pending update count and error messages.
 func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
-	resp, err := bot.MakeRequest("getWebhookInfo", nil)
-	if err != nil {
-		return WebhookInfo{}, err
-	}
-
-	var info WebhookInfo
-	err = json.Unmarshal(resp.Result, &info)
-
-	return info, err
+	return bot.GetWebhookInfoWithCtx(context.Background())
 }
 
-// GetUpdatesChan starts and returns a channel for getting updates.
-func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
+func (bot *BotAPI) GetUpdatesChanWithCtx(ctx context.Context, config UpdateConfig) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
 
 	go func() {
+		defer close(ch)
+
 		for {
 			select {
-			case <-bot.shutdownChannel:
-				close(ch)
+			case <-ctx.Done():
 				return
 			default:
 			}
 
-			updates, err := bot.GetUpdates(config)
+			updates, err := bot.GetUpdatesWithCtx(ctx, config)
 			if err != nil {
 				log.Println(err)
 				log.Println("Failed to get updates, retrying in 3 seconds...")
@@ -460,12 +470,24 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 	return ch
 }
 
+// GetUpdatesChan starts and returns a channel for getting updates.
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
+	ctx, cancel := context.WithCancel(context.Background())
+	bot.mu.Lock()
+	bot.stoppers = append(bot.stoppers, cancel)
+	bot.mu.Unlock()
+
+	return bot.GetUpdatesChanWithCtx(ctx, config)
+}
+
 // StopReceivingUpdates stops the go routine which receives updates
 func (bot *BotAPI) StopReceivingUpdates() {
-	if bot.Debug {
-		log.Println("Stopping the update receiver routine...")
+	bot.mu.Lock()
+	defer bot.mu.Unlock()
+
+	for _, stopper := range bot.stoppers {
+		stopper()
 	}
-	close(bot.shutdownChannel)
 }
 
 // ListenForWebhook registers a http handler for a webhook.
@@ -552,111 +574,91 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 	return err
 }
 
+func (bot *BotAPI) GetChatWithCtx(ctx context.Context, cfg ChatInfoConfig) (res Chat, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
+}
+
 // GetChat gets information about a chat.
-func (bot *BotAPI) GetChat(config ChatInfoConfig) (Chat, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return Chat{}, err
-	}
+func (bot *BotAPI) GetChat(cfg ChatInfoConfig) (Chat, error) {
+	return bot.GetChatWithCtx(context.Background(), cfg)
+}
 
-	var chat Chat
-	err = json.Unmarshal(resp.Result, &chat)
-
-	return chat, err
+func (bot *BotAPI) GetChatAdministratorsWithCtx(ctx context.Context, cfg ChatAdministratorsConfig) (res []ChatMember, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetChatAdministrators gets a list of administrators in the chat.
 //
 // If none have been appointed, only the creator will be returned.
 // Bots are not shown, even if they are an administrator.
-func (bot *BotAPI) GetChatAdministrators(config ChatAdministratorsConfig) ([]ChatMember, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return []ChatMember{}, err
-	}
+func (bot *BotAPI) GetChatAdministrators(cfg ChatAdministratorsConfig) ([]ChatMember, error) {
+	return bot.GetChatAdministratorsWithCtx(context.Background(), cfg)
+}
 
-	var members []ChatMember
-	err = json.Unmarshal(resp.Result, &members)
-
-	return members, err
+func (bot *BotAPI) GetChatMembersCountWithCtx(ctx context.Context, cfg ChatMemberCountConfig) (res int, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetChatMembersCount gets the number of users in a chat.
-func (bot *BotAPI) GetChatMembersCount(config ChatMemberCountConfig) (int, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return -1, err
-	}
+func (bot *BotAPI) GetChatMembersCount(cfg ChatMemberCountConfig) (int, error) {
+	return bot.GetChatMembersCountWithCtx(context.Background(), cfg)
+}
 
-	var count int
-	err = json.Unmarshal(resp.Result, &count)
-
-	return count, err
+func (bot *BotAPI) GetChatMemberWithCtx(ctx context.Context, cfg GetChatMemberConfig) (res ChatMember, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetChatMember gets a specific chat member.
-func (bot *BotAPI) GetChatMember(config GetChatMemberConfig) (ChatMember, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return ChatMember{}, err
-	}
+func (bot *BotAPI) GetChatMember(cfg GetChatMemberConfig) (ChatMember, error) {
+	return bot.GetChatMemberWithCtx(context.Background(), cfg)
+}
 
-	var member ChatMember
-	err = json.Unmarshal(resp.Result, &member)
-
-	return member, err
+func (bot *BotAPI) GetGameHighScoresWithContext(ctx context.Context, cfg GetGameHighScoresConfig) (res []GameHighScore, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetGameHighScores allows you to get the high scores for a game.
-func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHighScore, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return []GameHighScore{}, err
-	}
+func (bot *BotAPI) GetGameHighScores(cfg GetGameHighScoresConfig) ([]GameHighScore, error) {
+	return bot.GetGameHighScoresWithContext(context.Background(), cfg)
+}
 
-	var highScores []GameHighScore
-	err = json.Unmarshal(resp.Result, &highScores)
-
-	return highScores, err
+func (bot *BotAPI) GetInviteLinkWithCtx(ctx context.Context, cfg ChatInviteLinkConfig) (res string, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetInviteLink get InviteLink for a chat
-func (bot *BotAPI) GetInviteLink(config ChatInviteLinkConfig) (string, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return "", err
-	}
+func (bot *BotAPI) GetInviteLink(cfg ChatInviteLinkConfig) (string, error) {
+	return bot.GetInviteLinkWithCtx(context.Background(), cfg)
+}
 
-	var inviteLink string
-	err = json.Unmarshal(resp.Result, &inviteLink)
-
-	return inviteLink, err
+func (bot *BotAPI) GetStickerSetWithCtx(ctx context.Context, cfg GetStickerSetConfig) (res StickerSet, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetStickerSet returns a StickerSet.
-func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return StickerSet{}, err
-	}
+func (bot *BotAPI) GetStickerSet(cfg GetStickerSetConfig) (StickerSet, error) {
+	return bot.GetStickerSetWithCtx(context.Background(), cfg)
+}
 
-	var stickers StickerSet
-	err = json.Unmarshal(resp.Result, &stickers)
-
-	return stickers, err
+func (bot *BotAPI) StopPollWithCtx(ctx context.Context, cfg StopPollConfig) (res Poll, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // StopPoll stops a poll and returns the result.
-func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return Poll{}, err
-	}
+func (bot *BotAPI) StopPoll(cfg StopPollConfig) (Poll, error) {
+	return bot.StopPollWithCtx(context.Background(), cfg)
+}
 
-	var poll Poll
-	err = json.Unmarshal(resp.Result, &poll)
-
-	return poll, err
+func (bot *BotAPI) GetMyCommandsWithCtx(ctx context.Context) ([]BotCommand, error) {
+	return bot.GetMyCommandsWithConfigWithCtx(ctx, GetMyCommandsConfig{})
 }
 
 // GetMyCommands gets the currently registered commands.
@@ -664,59 +666,47 @@ func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
 	return bot.GetMyCommandsWithConfig(GetMyCommandsConfig{})
 }
 
+func (bot *BotAPI) GetMyCommandsWithConfigWithCtx(ctx context.Context, cfg GetMyCommandsConfig) (res []BotCommand, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
+}
+
 // GetMyCommandsWithConfig gets the currently registered commands with a config.
-func (bot *BotAPI) GetMyCommandsWithConfig(config GetMyCommandsConfig) ([]BotCommand, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return nil, err
-	}
+func (bot *BotAPI) GetMyCommandsWithConfig(cfg GetMyCommandsConfig) ([]BotCommand, error) {
+	return bot.GetMyCommandsWithConfigWithCtx(context.Background(), cfg)
+}
 
-	var commands []BotCommand
-	err = json.Unmarshal(resp.Result, &commands)
-
-	return commands, err
+func (bot *BotAPI) CopyMessageWithCtx(ctx context.Context, cfg CopyMessageConfig) (res MessageID, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // CopyMessage copy messages of any kind. The method is analogous to the method
 // forwardMessage, but the copied message doesn't have a link to the original
 // message. Returns the MessageID of the sent message on success.
-func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
-	resp, err := bot.Request(config)
-	if err != nil {
-		return MessageID{}, err
-	}
+func (bot *BotAPI) CopyMessage(cfg CopyMessageConfig) (MessageID, error) {
+	return bot.CopyMessageWithCtx(context.Background(), cfg)
+}
 
-	var messageID MessageID
-	err = json.Unmarshal(resp.Result, &messageID)
-
-	return messageID, err
+func (bot *BotAPI) AnswerWebAppQueryWithCtx(ctx context.Context, cfg AnswerWebAppQueryConfig) (res SentWebAppMessage, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // AnswerWebAppQuery sets the result of an interaction with a Web App and send a
 // corresponding message on behalf of the user to the chat from which the query originated.
-func (bot *BotAPI) AnswerWebAppQuery(config AnswerWebAppQueryConfig) (SentWebAppMessage, error) {
-	var sentWebAppMessage SentWebAppMessage
+func (bot *BotAPI) AnswerWebAppQuery(cfg AnswerWebAppQueryConfig) (SentWebAppMessage, error) {
+	return bot.AnswerWebAppQueryWithCtx(context.Background(), cfg)
+}
 
-	resp, err := bot.Request(config)
-	if err != nil {
-		return sentWebAppMessage, err
-	}
-
-	err = json.Unmarshal(resp.Result, &sentWebAppMessage)
-	return sentWebAppMessage, err
+func (bot *BotAPI) GetMyDefaultAdministratorRightsWithCtx(ctx context.Context, cfg GetMyDefaultAdministratorRightsConfig) (res ChatAdministratorRights, err error) {
+	err = bot.requestUnmarshal(ctx, cfg, &res)
+	return
 }
 
 // GetMyDefaultAdministratorRights gets the current default administrator rights of the bot.
-func (bot *BotAPI) GetMyDefaultAdministratorRights(config GetMyDefaultAdministratorRightsConfig) (ChatAdministratorRights, error) {
-	var rights ChatAdministratorRights
-
-	resp, err := bot.Request(config)
-	if err != nil {
-		return rights, err
-	}
-
-	err = json.Unmarshal(resp.Result, &rights)
-	return rights, err
+func (bot *BotAPI) GetMyDefaultAdministratorRights(cfg GetMyDefaultAdministratorRightsConfig) (ChatAdministratorRights, error) {
+	return bot.GetMyDefaultAdministratorRightsWithCtx(context.Background(), cfg)
 }
 
 // EscapeText takes an input text and escape Telegram markup symbols.
