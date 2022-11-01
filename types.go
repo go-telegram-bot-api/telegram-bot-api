@@ -1579,6 +1579,7 @@ type ChatInviteLink struct {
 	PendingJoinRequestCount int `json:"pending_join_request_count,omitempty"`
 }
 
+// ChatAdministratorRights represents the rights of an administrator in a chat.
 type ChatAdministratorRights struct {
 	IsAnonymous         bool `json:"is_anonymous"`
 	CanManageChat       bool `json:"can_manage_chat"`
