@@ -261,8 +261,22 @@ type Chat struct {
 	//
 	// optional
 	LastName string `json:"last_name,omitempty"`
+	// IsForum is true if the supergroup chat is a forum (has topics enabled)
+	//
+	// optional
+	IsForum bool `json:"is_forum,omitempty"`
 	// Photo is a chat photo
 	Photo *ChatPhoto `json:"photo"`
+	// If non-empty, the list of all active chat usernames;
+	// for private chats, supergroups and channels. Returned only in getChat.
+	//
+	// optional
+	ActiveUsernames []string `json:"active_usernames,omitempty"`
+	// Custom emoji identifier of emoji status of the other party 
+	// in a private chat. Returned only in getChat.
+	//
+	// optional
+	EmojiStatusCustomEmojiID string `json:"emoji_status_custom_emoji_id,omitempty"`
 	// Bio is the bio of the other party in a private chat. Returned only in
 	// getChat
 	//
@@ -361,6 +375,11 @@ func (c Chat) ChatConfig() ChatConfig {
 type Message struct {
 	// MessageID is a unique message identifier inside this chat
 	MessageID int `json:"message_id"`
+	// Unique identifier of a message thread to which the message belongs;
+	// for supergroups only
+	//
+	// optional
+	MessageThreadID int `json:"message_thread_id,omitempty"`
 	// From is a sender, empty for messages sent to channels;
 	//
 	// optional
@@ -404,6 +423,10 @@ type Message struct {
 	//
 	// optional
 	ForwardDate int `json:"forward_date,omitempty"`
+	// IsTopicMessage true if the message is sent to a forum topic
+	//
+	// optional
+	IsTopicMessage bool `json:"is_topic_message,omitempty"`
 	// IsAutomaticForward is true if the message is a channel post that was
 	// automatically forwarded to the connected discussion group.
 	//
@@ -608,6 +631,18 @@ type Message struct {
 	//
 	// optional
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered,omitempty"`
+	// ForumTopicCreated is a service message: forum topic created
+	//
+	// optional
+	ForumTopicCreated *ForumTopicCreated `json:"forum_topic_created,omitempty"`
+	// ForumTopicClosed is a service message: forum topic closed
+	//
+	// optional
+	ForumTopicClosed *ForumTopicClosed `json:"forum_topic_closed,omitempty"`
+	// ForumTopicReopened is a service message: forum topic reopened
+	//
+	// optional
+	ForumTopicReopened *ForumTopicReopened `json:"forum_topic_reopened,omitempty"`
 	// VideoChatScheduled is a service message: video chat scheduled.
 	//
 	// optional
@@ -1181,6 +1216,30 @@ type MessageAutoDeleteTimerChanged struct {
 	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
 }
 
+// ForumTopicCreated represents a service message about a new forum topic
+// created in the chat.
+type ForumTopicCreated struct {
+	// Name is the name of topic
+	Name string `json:"name"`
+	// IconColor is the color of the topic icon in RGB format
+	IconColor int `json:"icon_color"`
+	// IconCustomEmojiID is the unique identifier of the custom emoji
+	// shown as the topic icon
+	//
+	// optional
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+}
+
+// ForumTopicClosed represents a service message about a forum topic
+// closed in the chat. Currently holds no information.
+type ForumTopicClosed struct {
+}
+
+// ForumTopicReopened represents a service message about a forum topic
+// reopened in the chat. Currently holds no information.
+type ForumTopicReopened struct {
+}
+
 // VideoChatScheduled represents a service message about a voice chat scheduled
 // in the chat.
 type VideoChatScheduled struct {
@@ -1591,6 +1650,7 @@ type ChatAdministratorRights struct {
 	CanPostMessages     bool `json:"can_post_messages"`
 	CanEditMessages     bool `json:"can_edit_messages"`
 	CanPinMessages      bool `json:"can_pin_messages"`
+	CanManageTopics     bool `json:"can_manage_topics"`
 }
 
 // ChatMember contains information about one member of a chat.
@@ -1682,7 +1742,13 @@ type ChatMember struct {
 	// True, if the user is allowed to pin messages; groups and supergroups only
 	//
 	// optional
-	CanPinMessages bool `json:"can_pin_messages,omitempty"`
+	CanPinMessages  bool `json:"can_pin_messages,omitempty"`
+	// CanManageTopics administrators and restricted only.
+	// True, if the user is allowed to create, rename, 
+	// close, and reopen forum topics; supergroups only
+	//
+	// optional
+	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 	// IsMember is true, if the user is a member of the chat at the moment of
 	// the request
 	IsMember bool `json:"is_member"`
@@ -1806,6 +1872,11 @@ type ChatPermissions struct {
 	//
 	// optional
 	CanPinMessages bool `json:"can_pin_messages,omitempty"`
+	// CanManageTopics is true, if the user is allowed to create forum topics.
+	// If omitted defaults to the value of can_pin_messages
+	//
+	// optional
+	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 }
 
 // ChatLocation represents a location to which a chat is connected.
@@ -1816,6 +1887,21 @@ type ChatLocation struct {
 	// Address is the location address; 1-64 characters, as defined by the chat
 	// owner
 	Address string `json:"address"`
+}
+
+// ForumTopic represents a forum topic.
+type ForumTopic struct {
+	// MessageThreadID is the unique identifier of the forum topic
+	MessageThreadID int `json:"message_thread_id"`
+	// Name is the name of the topic
+	Name string `json:"name"`
+	// IconColor is the color of the topic icon in RGB format
+	IconColor int `json:"icon_color"`
+	// IconCustomEmojiID is the unique identifier of the custom emoji
+	// shown as the topic icon
+	//
+	// optional
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
 }
 
 // BotCommand represents a bot command.
