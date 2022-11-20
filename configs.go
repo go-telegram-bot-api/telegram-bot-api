@@ -265,6 +265,7 @@ func (CloseConfig) params() (Params, error) {
 // BaseChat is base type for all chat config types.
 type BaseChat struct {
 	ChatID                   int64 // required
+	MessageThreadID          int
 	ChannelUsername          string
 	ProtectContent           bool
 	ReplyToMessageID         int
@@ -277,6 +278,7 @@ func (chat *BaseChat) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	params.AddNonZero("message_thread_id", chat.MessageThreadID)
 	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
 	params.AddBool("disable_notification", chat.DisableNotification)
 	params.AddBool("allow_sending_without_reply", chat.AllowSendingWithoutReply)
@@ -1164,6 +1166,7 @@ type WebhookConfig struct {
 	MaxConnections     int
 	AllowedUpdates     []string
 	DropPendingUpdates bool
+	SecretToken        string
 }
 
 func (config WebhookConfig) method() string {
@@ -1181,6 +1184,7 @@ func (config WebhookConfig) params() (Params, error) {
 	params.AddNonZero("max_connections", config.MaxConnections)
 	err := params.AddInterface("allowed_updates", config.AllowedUpdates)
 	params.AddBool("drop_pending_updates", config.DropPendingUpdates)
+	params.AddNonEmpty("secret_token", config.SecretToken)
 
 	return params, err
 }
@@ -1383,6 +1387,7 @@ type PromoteChatMemberConfig struct {
 	CanRestrictMembers  bool
 	CanPinMessages      bool
 	CanPromoteMembers   bool
+	CanManageTopics     bool
 }
 
 func (config PromoteChatMemberConfig) method() string {
@@ -1406,6 +1411,7 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params.AddBool("can_restrict_members", config.CanRestrictMembers)
 	params.AddBool("can_pin_messages", config.CanPinMessages)
 	params.AddBool("can_promote_members", config.CanPromoteMembers)
+	params.AddBool("can_manage_topics", config.CanManageTopics)
 
 	return params, nil
 }
@@ -1784,6 +1790,64 @@ func (config InvoiceConfig) method() string {
 	return "sendInvoice"
 }
 
+// InvoiceLinkConfig contains information for createInvoiceLink method
+type InvoiceLinkConfig struct {
+	Title                     string         //Required
+	Description               string         //Required
+	Payload                   string         //Required
+	ProviderToken             string         //Required
+	Currency                  string         //Required
+	Prices                    []LabeledPrice //Required
+	MaxTipAmount              int
+	SuggestedTipAmounts       []int
+	ProviderData              string
+	PhotoURL                  string
+	PhotoSize                 int
+	PhotoWidth                int
+	PhotoHeight               int
+	NeedName                  bool
+	NeedPhoneNumber           bool
+	NeedEmail                 bool
+	NeedShippingAddress       bool
+	SendPhoneNumberToProvider bool
+	SendEmailToProvider       bool
+	IsFlexible                bool
+}
+
+func (config InvoiceLinkConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["title"] = config.Title
+	params["description"] = config.Description
+	params["payload"] = config.Payload
+	params["provider_token"] = config.ProviderToken
+	params["currency"] = config.Currency
+	if err := params.AddInterface("prices", config.Prices); err != nil {
+		return params, err
+	}
+
+	params.AddNonZero("max_tip_amount", config.MaxTipAmount)
+	err := params.AddInterface("suggested_tip_amounts", config.SuggestedTipAmounts)
+	params.AddNonEmpty("provider_data", config.ProviderData)
+	params.AddNonEmpty("photo_url", config.PhotoURL)
+	params.AddNonZero("photo_size", config.PhotoSize)
+	params.AddNonZero("photo_width", config.PhotoWidth)
+	params.AddNonZero("photo_height", config.PhotoHeight)
+	params.AddBool("need_name", config.NeedName)
+	params.AddBool("need_phone_number", config.NeedPhoneNumber)
+	params.AddBool("need_email", config.NeedEmail)
+	params.AddBool("need_shipping_address", config.NeedShippingAddress)
+	params.AddBool("send_phone_number_to_provider", config.SendPhoneNumberToProvider)
+	params.AddBool("send_email_to_provider", config.SendEmailToProvider)
+	params.AddBool("is_flexible", config.IsFlexible)
+
+	return params, err
+}
+
+func (config InvoiceLinkConfig) method() string {
+	return "createInvoiceLink"
+}
+
 // ShippingConfig contains information for answerShippingQuery request.
 type ShippingConfig struct {
 	ShippingQueryID string // required
@@ -2004,6 +2068,24 @@ func (config GetStickerSetConfig) params() (Params, error) {
 	return params, nil
 }
 
+// GetCustomEmojiStickersConfig get information about
+// custom emoji stickers by their identifiers.
+type GetCustomEmojiStickersConfig struct {
+	CustomEmojiIDs []string
+}
+
+func (config GetCustomEmojiStickersConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddInterface("custom_emoji_ids", config.CustomEmojiIDs)
+
+	return params, nil
+}
+
+func (config GetCustomEmojiStickersConfig) method() string {
+	return "getCustomEmojiStickers"
+}
+
 // UploadStickerConfig allows you to upload a sticker for use in a set later.
 type UploadStickerConfig struct {
 	UserID     int64
@@ -2038,8 +2120,9 @@ type NewStickerSetConfig struct {
 	Title         string
 	PNGSticker    RequestFileData
 	TGSSticker    RequestFileData
+	StickerType   string
 	Emojis        string
-	ContainsMasks bool
+	ContainsMasks bool // deprecated
 	MaskPosition  *MaskPosition
 }
 
@@ -2053,11 +2136,10 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params.AddNonZero64("user_id", config.UserID)
 	params["name"] = config.Name
 	params["title"] = config.Title
-
 	params["emojis"] = config.Emojis
 
 	params.AddBool("contains_masks", config.ContainsMasks)
-
+	params.AddNonEmpty("sticker_type", string(config.StickerType))
 	err := params.AddInterface("mask_position", config.MaskPosition)
 
 	return params, err
@@ -2220,16 +2302,158 @@ func (config DeleteChatStickerSetConfig) params() (Params, error) {
 	return params, nil
 }
 
+// GetForumTopicIconStickersConfig allows you to get custom emoji stickers,
+// which can be used as a forum topic icon by any user.
+type GetForumTopicIconStickersConfig struct{}
+
+func (config GetForumTopicIconStickersConfig) method() string {
+	return "getForumTopicIconStickers"
+}
+
+func (config GetForumTopicIconStickersConfig) params() (Params, error) {
+	return nil, nil
+}
+
+// CreateForumTopicConfig allows you to create a topic
+// in a forum supergroup chat.
+type CreateForumTopicConfig struct {
+	ChatID             int64
+	Name               string
+	IconColor          int
+	IconCustomEmojiID  string
+	SuperGroupUsername string
+}
+
+func (config CreateForumTopicConfig) method() string {
+	return "createForumTopic"
+}
+
+func (config CreateForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonEmpty("name", config.Name)
+	params.AddNonZero("icon_color", config.IconColor)
+	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
+
+	return params, nil
+}
+
+// EditForumTopicConfig allows you to edit
+// name and icon of a topic in a forum supergroup chat.
+type EditForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	Name               string
+	IconCustomEmojiID  string
+	SuperGroupUsername string
+}
+
+func (config EditForumTopicConfig) method() string {
+	return "editForumTopic"
+}
+
+func (config EditForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+	params.AddNonEmpty("icon_color", config.Name)
+	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
+
+	return params, nil
+}
+
+// CloseForumTopicConfig allows you to close
+// an open topic in a forum supergroup chat.
+type CloseForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config CloseForumTopicConfig) method() string {
+	return "closeForumTopic"
+}
+
+func (config CloseForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
+// ReopenForumTopicConfig allows you to reopen
+// an closed topic in a forum supergroup chat.
+type ReopenForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config ReopenForumTopicConfig) method() string {
+	return "reopenForumTopic"
+}
+
+func (config ReopenForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
+// DeleteForumTopicConfig allows you to delete a forum topic
+// along with all its messages in a forum supergroup chat.
+type DeleteForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config DeleteForumTopicConfig) method() string {
+	return "deleteForumTopic"
+}
+
+func (config DeleteForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
+// UnpinAllForumTopicMessagesConfig allows you to clear the list
+// of pinned messages in a forum topic.
+type UnpinAllForumTopicMessagesConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config UnpinAllForumTopicMessagesConfig) method() string {
+	return "unpinAllForumTopicMessages"
+}
+
+func (config UnpinAllForumTopicMessagesConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
 // MediaGroupConfig allows you to send a group of media.
 //
 // Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
 type MediaGroupConfig struct {
-	ChatID          int64
-	ChannelUsername string
-
+	BaseChat
 	Media               []interface{}
-	DisableNotification bool
-	ReplyToMessageID    int
 }
 
 func (config MediaGroupConfig) method() string {
@@ -2237,13 +2461,16 @@ func (config MediaGroupConfig) method() string {
 }
 
 func (config MediaGroupConfig) params() (Params, error) {
-	params := make(Params)
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return nil, err
+	}
 
 	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
-	err := params.AddInterface("media", prepareInputMediaForParams(config.Media))
+	err = params.AddInterface("media", prepareInputMediaForParams(config.Media))
 
 	return params, err
 }
