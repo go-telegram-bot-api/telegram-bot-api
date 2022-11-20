@@ -265,6 +265,7 @@ func (CloseConfig) params() (Params, error) {
 // BaseChat is base type for all chat config types.
 type BaseChat struct {
 	ChatID                   int64 // required
+	MessageThreadID          int
 	ChannelUsername          string
 	ProtectContent           bool
 	ReplyToMessageID         int
@@ -277,6 +278,7 @@ func (chat *BaseChat) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", chat.ChatID, chat.ChannelUsername)
+	params.AddNonZero("message_thread_id", chat.MessageThreadID)
 	params.AddNonZero("reply_to_message_id", chat.ReplyToMessageID)
 	params.AddBool("disable_notification", chat.DisableNotification)
 	params.AddBool("allow_sending_without_reply", chat.AllowSendingWithoutReply)
@@ -1385,6 +1387,7 @@ type PromoteChatMemberConfig struct {
 	CanRestrictMembers  bool
 	CanPinMessages      bool
 	CanPromoteMembers   bool
+	CanManageTopics     bool
 }
 
 func (config PromoteChatMemberConfig) method() string {
@@ -1408,6 +1411,7 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params.AddBool("can_restrict_members", config.CanRestrictMembers)
 	params.AddBool("can_pin_messages", config.CanPinMessages)
 	params.AddBool("can_promote_members", config.CanPromoteMembers)
+	params.AddBool("can_manage_topics", config.CanManageTopics)
 
 	return params, nil
 }
@@ -2298,16 +2302,158 @@ func (config DeleteChatStickerSetConfig) params() (Params, error) {
 	return params, nil
 }
 
+// GetForumTopicIconStickersConfig allows you to get custom emoji stickers,
+// which can be used as a forum topic icon by any user.
+type GetForumTopicIconStickersConfig struct{}
+
+func (config GetForumTopicIconStickersConfig) method() string {
+	return "getForumTopicIconStickers"
+}
+
+func (config GetForumTopicIconStickersConfig) params() (Params, error) {
+	return nil, nil
+}
+
+// CreateForumTopicConfig allows you to create a topic
+// in a forum supergroup chat.
+type CreateForumTopicConfig struct {
+	ChatID             int64
+	Name               string
+	IconColor          int
+	IconCustomEmojiID  string
+	SuperGroupUsername string
+}
+
+func (config CreateForumTopicConfig) method() string {
+	return "createForumTopic"
+}
+
+func (config CreateForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonEmpty("name", config.Name)
+	params.AddNonZero("icon_color", config.IconColor)
+	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
+
+	return params, nil
+}
+
+// EditForumTopicConfig allows you to edit
+// name and icon of a topic in a forum supergroup chat.
+type EditForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	Name               string
+	IconCustomEmojiID  string
+	SuperGroupUsername string
+}
+
+func (config EditForumTopicConfig) method() string {
+	return "editForumTopic"
+}
+
+func (config EditForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+	params.AddNonEmpty("icon_color", config.Name)
+	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
+
+	return params, nil
+}
+
+// CloseForumTopicConfig allows you to close
+// an open topic in a forum supergroup chat.
+type CloseForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config CloseForumTopicConfig) method() string {
+	return "closeForumTopic"
+}
+
+func (config CloseForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
+// ReopenForumTopicConfig allows you to reopen
+// an closed topic in a forum supergroup chat.
+type ReopenForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config ReopenForumTopicConfig) method() string {
+	return "reopenForumTopic"
+}
+
+func (config ReopenForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
+// DeleteForumTopicConfig allows you to delete a forum topic
+// along with all its messages in a forum supergroup chat.
+type DeleteForumTopicConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config DeleteForumTopicConfig) method() string {
+	return "deleteForumTopic"
+}
+
+func (config DeleteForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
+// UnpinAllForumTopicMessagesConfig allows you to clear the list
+// of pinned messages in a forum topic.
+type UnpinAllForumTopicMessagesConfig struct {
+	ChatID             int64
+	MessageThreadID    int
+	SuperGroupUsername string
+}
+
+func (config UnpinAllForumTopicMessagesConfig) method() string {
+	return "unpinAllForumTopicMessages"
+}
+
+func (config UnpinAllForumTopicMessagesConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	return params, nil
+}
+
 // MediaGroupConfig allows you to send a group of media.
 //
 // Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
 type MediaGroupConfig struct {
-	ChatID          int64
-	ChannelUsername string
-
+	BaseChat
 	Media               []interface{}
-	DisableNotification bool
-	ReplyToMessageID    int
 }
 
 func (config MediaGroupConfig) method() string {
@@ -2315,13 +2461,16 @@ func (config MediaGroupConfig) method() string {
 }
 
 func (config MediaGroupConfig) params() (Params, error) {
-	params := make(Params)
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return nil, err
+	}
 
 	params.AddFirstValid("chat_id", config.ChatID, config.ChannelUsername)
 	params.AddBool("disable_notification", config.DisableNotification)
 	params.AddNonZero("reply_to_message_id", config.ReplyToMessageID)
 
-	err := params.AddInterface("media", prepareInputMediaForParams(config.Media))
+	err = params.AddInterface("media", prepareInputMediaForParams(config.Media))
 
 	return params, err
 }
