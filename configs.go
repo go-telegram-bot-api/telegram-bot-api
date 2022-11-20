@@ -2064,6 +2064,24 @@ func (config GetStickerSetConfig) params() (Params, error) {
 	return params, nil
 }
 
+// GetCustomEmojiStickersConfig get information about
+// custom emoji stickers by their identifiers.
+type GetCustomEmojiStickersConfig struct {
+	CustomEmojiIDs []string
+}
+
+func (config GetCustomEmojiStickersConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddInterface("custom_emoji_ids", config.CustomEmojiIDs)
+
+	return params, nil
+}
+
+func (config GetCustomEmojiStickersConfig) method() string {
+	return "getCustomEmojiStickers"
+}
+
 // UploadStickerConfig allows you to upload a sticker for use in a set later.
 type UploadStickerConfig struct {
 	UserID     int64
@@ -2098,8 +2116,9 @@ type NewStickerSetConfig struct {
 	Title         string
 	PNGSticker    RequestFileData
 	TGSSticker    RequestFileData
+	StickerType   string
 	Emojis        string
-	ContainsMasks bool
+	ContainsMasks bool // deprecated
 	MaskPosition  *MaskPosition
 }
 
@@ -2113,11 +2132,10 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params.AddNonZero64("user_id", config.UserID)
 	params["name"] = config.Name
 	params["title"] = config.Title
-
 	params["emojis"] = config.Emojis
 
 	params.AddBool("contains_masks", config.ContainsMasks)
-
+	params.AddNonEmpty("sticker_type", string(config.StickerType))
 	err := params.AddInterface("mask_position", config.MaskPosition)
 
 	return params, err
