@@ -187,6 +187,10 @@ type User struct {
 	//
 	// optional
 	IsPremium bool `json:"is_premium,omitempty"`
+	// AddedToAttachmentMenu true, if this user added the bot to the attachment menu
+	//
+	// optional
+	AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`
 	// FirstName user's or bot's first name
 	FirstName string `json:"first_name"`
 	// LastName user's or bot's last name
@@ -274,6 +278,18 @@ type Chat struct {
 	//
 	// optional
 	HasPrivateForwards bool `json:"has_private_forwards,omitempty"`
+	// JoinToSendMessages is true, if users need to join the supergroup
+	// before they can send messages.
+	// Returned only in getChat
+	//
+	// optional
+	JoinToSendMessages bool `json:"join_to_send_messages,omitempty"`
+	// JoinByRequest is true, if all users directly joining the supergroup
+	// need to be approved by supergroup administrators.
+	// Returned only in getChat.
+	//
+	// optional
+	JoinByRequest bool `json:"join_by_request,omitempty"`
 	// Description for groups, supergroups and channel chats
 	//
 	// optional
@@ -863,7 +879,7 @@ type Animation struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Audio represents an audio file to be treated as music by the Telegram clients.
@@ -896,7 +912,7 @@ type Audio struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 	// Thumbnail is the album cover to which the music file belongs
 	//
 	// optional
@@ -927,7 +943,7 @@ type Document struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Video represents a video file.
@@ -960,7 +976,7 @@ type Video struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // VideoNote object represents a video message.
@@ -1002,7 +1018,7 @@ type Voice struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Contact represents a phone contact.
@@ -1234,7 +1250,7 @@ type File struct {
 	// FileSize file size, if known
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 	// FilePath file path
 	//
 	// optional
