@@ -20,7 +20,8 @@ you want to ask questions or discuss development.
 ## Example
 
 First, ensure the library is installed and up to date by running
-`go get -u github.com/go-telegram-bot-api/telegram-bot-api/v5`.
+`go mod init bot`
+`go mod tidy`
 
 This is a very simple bot that just displays any gotten updates,
 then replies it to that chat.
