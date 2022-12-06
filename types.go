@@ -1384,6 +1384,11 @@ type InlineKeyboardButton struct {
 	// used as a replacement for the Telegram Login Widget
 	//
 	// optional
+	// WebApp
+	WebApp *WebApp `json:"web_app,omitempty"`
+	// CallbackData data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
+	//
+	// optional
 	LoginURL *LoginURL `json:"login_url,omitempty"`
 	// CallbackData data to be sent in a callback query to the bot when button is pressed, 1-64 bytes.
 	//
@@ -1426,6 +1431,10 @@ type InlineKeyboardButton struct {
 	//
 	// optional
 	Pay bool `json:"pay,omitempty"`
+}
+
+type WebApp struct{
+	Url string `json:"url,omitempty"`
 }
 
 // LoginURL represents a parameter of the inline keyboard button used to
