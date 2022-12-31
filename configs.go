@@ -323,6 +323,21 @@ func (edit BaseEdit) params() (Params, error) {
 	return params, err
 }
 
+// BaseSpoiler is base type of structures with spoilers.
+type BaseSpoiler struct {
+	HasSpoiler bool
+}
+
+func (spoiler BaseSpoiler) params() (Params, error) {
+	params := make(Params)
+
+	if spoiler.HasSpoiler {
+		params.AddBool("has_spoiler", true)
+	}
+
+	return params, nil
+}
+
 // MessageConfig contains information about a SendMessage request.
 type MessageConfig struct {
 	BaseChat
@@ -407,6 +422,7 @@ func (config CopyMessageConfig) method() string {
 // PhotoConfig contains information about a SendPhoto request.
 type PhotoConfig struct {
 	BaseFile
+	BaseSpoiler
 	Thumb           RequestFileData
 	Caption         string
 	ParseMode       string
@@ -422,6 +438,15 @@ func (config PhotoConfig) params() (Params, error) {
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 	err = params.AddInterface("caption_entities", config.CaptionEntities)
+	if err != nil {
+		return params, err
+	}
+
+	p1, err := config.BaseSpoiler.params()
+	if err != nil {
+		return params, err
+	}
+	params.Merge(p1)
 
 	return params, err
 }
@@ -557,6 +582,7 @@ func (config StickerConfig) files() []RequestFile {
 // VideoConfig contains information about a SendVideo request.
 type VideoConfig struct {
 	BaseFile
+	BaseSpoiler
 	Thumb             RequestFileData
 	Duration          int
 	Caption           string
@@ -576,6 +602,15 @@ func (config VideoConfig) params() (Params, error) {
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 	params.AddBool("supports_streaming", config.SupportsStreaming)
 	err = params.AddInterface("caption_entities", config.CaptionEntities)
+	if err != nil {
+		return params, err
+	}
+
+	p1, err := config.BaseSpoiler.params()
+	if err != nil {
+		return params, err
+	}
+	params.Merge(p1)
 
 	return params, err
 }
@@ -603,6 +638,7 @@ func (config VideoConfig) files() []RequestFile {
 // AnimationConfig contains information about a SendAnimation request.
 type AnimationConfig struct {
 	BaseFile
+	BaseSpoiler
 	Duration        int
 	Thumb           RequestFileData
 	Caption         string
@@ -620,6 +656,15 @@ func (config AnimationConfig) params() (Params, error) {
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 	err = params.AddInterface("caption_entities", config.CaptionEntities)
+	if err != nil {
+		return params, err
+	}
+
+	p1, err := config.BaseSpoiler.params()
+	if err != nil {
+		return params, err
+	}
+	params.Merge(p1)
 
 	return params, err
 }
@@ -976,6 +1021,7 @@ func (config GetGameHighScoresConfig) method() string {
 // ChatActionConfig contains information about a SendChatAction request.
 type ChatActionConfig struct {
 	BaseChat
+	MessageThreadID int
 	Action string // required
 }
 
@@ -983,6 +1029,7 @@ func (config ChatActionConfig) params() (Params, error) {
 	params, err := config.BaseChat.params()
 
 	params["action"] = config.Action
+	params.AddNonZero("message_thread_id", config.MessageThreadID)
 
 	return params, err
 }
@@ -2314,14 +2361,27 @@ func (config GetForumTopicIconStickersConfig) params() (Params, error) {
 	return nil, nil
 }
 
+// BaseForum is a base type for all forum config types.
+type BaseForum struct {
+	ChatID             int64
+	SuperGroupUsername string
+}
+
+func (config BaseForum) params() (Params, error) {
+	params := make(Params)
+
+	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+
+	return params, nil
+}
+
 // CreateForumTopicConfig allows you to create a topic
 // in a forum supergroup chat.
 type CreateForumTopicConfig struct {
-	ChatID             int64
-	Name               string
-	IconColor          int
-	IconCustomEmojiID  string
-	SuperGroupUsername string
+	BaseForum
+	Name              string
+	IconColor         int
+	IconCustomEmojiID string
 }
 
 func (config CreateForumTopicConfig) method() string {
@@ -2331,10 +2391,12 @@ func (config CreateForumTopicConfig) method() string {
 func (config CreateForumTopicConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonEmpty("name", config.Name)
 	params.AddNonZero("icon_color", config.IconColor)
 	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
+
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
 
 	return params, nil
 }
@@ -2342,11 +2404,10 @@ func (config CreateForumTopicConfig) params() (Params, error) {
 // EditForumTopicConfig allows you to edit
 // name and icon of a topic in a forum supergroup chat.
 type EditForumTopicConfig struct {
-	ChatID             int64
-	MessageThreadID    int
-	Name               string
-	IconCustomEmojiID  string
-	SuperGroupUsername string
+	BaseForum
+	MessageThreadID   int
+	Name              string
+	IconCustomEmojiID string
 }
 
 func (config EditForumTopicConfig) method() string {
@@ -2356,10 +2417,12 @@ func (config EditForumTopicConfig) method() string {
 func (config EditForumTopicConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("message_thread_id", config.MessageThreadID)
-	params.AddNonEmpty("icon_color", config.Name)
+	params.AddNonEmpty("name", config.Name)
 	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
+
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
 
 	return params, nil
 }
@@ -2367,9 +2430,8 @@ func (config EditForumTopicConfig) params() (Params, error) {
 // CloseForumTopicConfig allows you to close
 // an open topic in a forum supergroup chat.
 type CloseForumTopicConfig struct {
-	ChatID             int64
-	MessageThreadID    int
-	SuperGroupUsername string
+	BaseForum
+	MessageThreadID int
 }
 
 func (config CloseForumTopicConfig) method() string {
@@ -2379,8 +2441,10 @@ func (config CloseForumTopicConfig) method() string {
 func (config CloseForumTopicConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
 
 	return params, nil
 }
@@ -2388,9 +2452,8 @@ func (config CloseForumTopicConfig) params() (Params, error) {
 // ReopenForumTopicConfig allows you to reopen
 // an closed topic in a forum supergroup chat.
 type ReopenForumTopicConfig struct {
-	ChatID             int64
-	MessageThreadID    int
-	SuperGroupUsername string
+	BaseForum
+	MessageThreadID int
 }
 
 func (config ReopenForumTopicConfig) method() string {
@@ -2403,15 +2466,17 @@ func (config ReopenForumTopicConfig) params() (Params, error) {
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("message_thread_id", config.MessageThreadID)
 
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
+
 	return params, nil
 }
 
 // DeleteForumTopicConfig allows you to delete a forum topic
 // along with all its messages in a forum supergroup chat.
 type DeleteForumTopicConfig struct {
-	ChatID             int64
-	MessageThreadID    int
-	SuperGroupUsername string
+	BaseForum
+	MessageThreadID int
 }
 
 func (config DeleteForumTopicConfig) method() string {
@@ -2421,8 +2486,10 @@ func (config DeleteForumTopicConfig) method() string {
 func (config DeleteForumTopicConfig) params() (Params, error) {
 	params := make(Params)
 
-	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("message_thread_id", config.MessageThreadID)
+
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
 
 	return params, nil
 }
@@ -2430,9 +2497,8 @@ func (config DeleteForumTopicConfig) params() (Params, error) {
 // UnpinAllForumTopicMessagesConfig allows you to clear the list
 // of pinned messages in a forum topic.
 type UnpinAllForumTopicMessagesConfig struct {
-	ChatID             int64
-	MessageThreadID    int
-	SuperGroupUsername string
+	BaseForum
+	MessageThreadID int
 }
 
 func (config UnpinAllForumTopicMessagesConfig) method() string {
@@ -2445,7 +2511,76 @@ func (config UnpinAllForumTopicMessagesConfig) params() (Params, error) {
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("message_thread_id", config.MessageThreadID)
 
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
+
 	return params, nil
+}
+
+// UnpinAllForumTopicMessagesConfig allows you to edit the name of
+// the 'General' topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work
+// and must have can_manage_topics administrator rights. Returns True on success.
+type EditGeneralForumTopicConfig struct {
+	BaseForum
+	Name string
+}
+
+func (config EditGeneralForumTopicConfig) method() string {
+	return "editGeneralForumTopic"
+}
+
+func (config EditGeneralForumTopicConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("name", config.Name)
+
+	p1, _ := config.BaseForum.params()
+	params.Merge(p1)
+
+	return params, nil
+}
+
+// CloseGeneralForumTopicConfig allows you to to close an open 'General' topic
+// in a forum supergroup chat. The bot must be an administrator in the chat
+// for this to work and must have the can_manage_topics administrator rights.
+// Returns True on success.
+type CloseGeneralForumTopicConfig struct{ BaseForum }
+
+func (config CloseGeneralForumTopicConfig) method() string {
+	return "closeGeneralForumTopic"
+}
+
+// CloseGeneralForumTopicConfig allows you to reopen a closed 'General' topic
+// in a forum supergroup chat. The bot must be an administrator in the chat
+// for this to work and must have the can_manage_topics administrator rights.
+// The topic will be automatically unhidden if it was hidden.
+// Returns True on success.
+type ReopenGeneralForumTopicConfig struct{ BaseForum }
+
+func (config ReopenGeneralForumTopicConfig) method() string {
+	return "reopenGeneralForumTopic"
+}
+
+// HideGeneralForumTopicConfig allows you to hide the 'General' topic
+// in a forum supergroup chat. The bot must be an administrator in the chat
+// for this to work and must have the can_manage_topics administrator rights.
+// The topic will be automatically closed if it was open.
+// Returns True on success.
+type HideGeneralForumTopicConfig struct{ BaseForum }
+
+func (config HideGeneralForumTopicConfig) method() string {
+	return "hideGeneralForumTopic"
+}
+
+// UnhideGeneralForumTopicConfig allows you to unhide the 'General' topic
+// in a forum supergroup chat. The bot must be an administrator in the chat
+// for this to work and must have the can_manage_topics administrator rights.
+// Returns True on success.
+type UnhideGeneralForumTopicConfig struct{ BaseForum }
+
+func (config UnhideGeneralForumTopicConfig) method() string {
+	return "unhideGeneralForumTopic"
 }
 
 // MediaGroupConfig allows you to send a group of media.
@@ -2453,7 +2588,7 @@ func (config UnpinAllForumTopicMessagesConfig) params() (Params, error) {
 // Media consist of InputMedia items (InputMediaPhoto, InputMediaVideo).
 type MediaGroupConfig struct {
 	BaseChat
-	Media               []interface{}
+	Media []interface{}
 }
 
 func (config MediaGroupConfig) method() string {
