@@ -1,0 +1,40 @@
+package main
+
+import (
+	"log"
+	"os"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
+
+func main() {
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_APITOKEN"))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	bot.Debug = true
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	u := tgbotapi.NewUpdate(0)
+	u.Timeout = 60
+
+	updates := bot.GetUpdatesChan(u)
+
+	// Loop through each update.
+	for update := range updates {
+		// Check if we've gotten a message update.
+		if update.Message != nil {
+      // Check if we've gotten photo in message update
+      if update.Message.Photo != nil {
+        // get unique fileID 
+        fileID := update.Message.Photo[0].FileID
+        // get message for send, get file by fileID to chat_id
+        msg := tg.NewPhoto(update.Message.Chat.ID, tg.FileID(fileID))
+        // send message
+        bot.Send(msg)
+      }
+		}
+	}
+}
