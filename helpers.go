@@ -178,7 +178,9 @@ func NewVoice(chatID int64, file RequestFileData) VoiceConfig {
 // two to ten InputMediaPhoto or InputMediaVideo.
 func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 	return MediaGroupConfig{
-		ChatID: chatID,
+		BaseChat: BaseChat{
+			ChatID: chatID,
+		},
 		Media:  files,
 	}
 }
