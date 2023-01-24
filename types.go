@@ -1696,13 +1696,13 @@ type ChatMember struct {
 	// optional
 	CanSendMediaMessages bool `json:"can_send_media_messages,omitempty"`
 	// CanSendPolls restricted only.
-	// True, if the user is allowed to send polls
+	// True, if the user is allowed to send audios, documents,
+	// photos, videos, video notes and voice notes.
 	//
 	// optional
 	CanSendPolls bool `json:"can_send_polls,omitempty"`
 	// CanSendOtherMessages restricted only.
-	// True, if the user is allowed to send audios, documents,
-	// photos, videos, video notes and voice notes.
+	// True, if the user is allowed to send polls	
 	//
 	// optional
 	CanSendOtherMessages bool `json:"can_send_other_messages,omitempty"`
