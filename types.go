@@ -276,7 +276,7 @@ type Chat struct {
 	//
 	// optional
 	ActiveUsernames []string `json:"active_usernames,omitempty"`
-	// Custom emoji identifier of emoji status of the other party 
+	// Custom emoji identifier of emoji status of the other party
 	// in a private chat. Returned only in getChat.
 	//
 	// optional
@@ -292,8 +292,8 @@ type Chat struct {
 	//
 	// optional
 	HasPrivateForwards bool `json:"has_private_forwards,omitempty"`
-	// HasRestrictedVoiceAndVideoMessages if the privacy settings of the other party 
-	// restrict sending voice and video note messages 
+	// HasRestrictedVoiceAndVideoMessages if the privacy settings of the other party
+	// restrict sending voice and video note messages
 	// in the private chat. Returned only in getChat.
 	//
 	// optional
@@ -340,6 +340,17 @@ type Chat struct {
 	//
 	// optional
 	MessageAutoDeleteTime int `json:"message_auto_delete_time,omitempty"`
+	// HasAggressiveAntiSpamEnabled is true if aggressive anti-spam checks are enabled 
+	// in the supergroup. The field is only available to chat administrators. 
+	// Returned only in getChat.
+	//
+	// optional
+	HasAggressiveAntiSpamEnabled bool `json:"has_aggressive_anti_spam_enabled,omitempty"`
+	// HasHiddenMembers is true if non-administrators can only get
+	// the list of bots and administrators in the chat.
+	//
+	// optional
+	HasHiddenMembers bool `json:"has_hidden_members,omitempty"`
 	// HasProtectedContent is true if messages from the chat can't be forwarded
 	// to other chats. Returned only in getChat.
 	//
@@ -535,6 +546,10 @@ type Message struct {
 	//
 	// optional
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// HasSpoiler True, if the message media is covered by a spoiler animation
+	//
+	// optional
+	HasMediaSpoiler bool `json:"has_media_spoiler,omitempty"`
 	// Contact message is a shared contact, information about the contact;
 	//
 	// optional
@@ -644,6 +659,11 @@ type Message struct {
 	//
 	// optional
 	ConnectedWebsite string `json:"connected_website,omitempty"`
+	// WriteAccessAllowed is a service message: the user allowed the bot
+	// added to the attachment menu to write messages
+	//
+	// optional
+	WriteAccessAllowed *WriteAccessAllowed `json:"write_access_allowed,omitempty"`
 	// PassportData is a Telegram Passport data;
 	//
 	// optional
@@ -657,6 +677,10 @@ type Message struct {
 	//
 	// optional
 	ForumTopicCreated *ForumTopicCreated `json:"forum_topic_created,omitempty"`
+	// ForumTopicClosed is a service message: forum topic edited
+	//
+	// optional
+	ForumTopicEdited *ForumTopicEdited `json:"forum_topic_edited,omitempty"`
 	// ForumTopicClosed is a service message: forum topic closed
 	//
 	// optional
@@ -665,6 +689,14 @@ type Message struct {
 	//
 	// optional
 	ForumTopicReopened *ForumTopicReopened `json:"forum_topic_reopened,omitempty"`
+	// GeneralForumTopicHidden is a service message: the 'General' forum topic hidden
+	//
+	// optional
+	GeneralForumTopicHidden *GeneralForumTopicHidden `json:"general_forum_topic_hidden,omitempty"`
+	// GeneralForumTopicUnhidden is a service message: the 'General' forum topic unhidden
+	//
+	// optional
+	GeneralForumTopicUnhidden *GeneralForumTopicUnhidden `json:"general_forum_topic_unhidden,omitempty"`
 	// VideoChatScheduled is a service message: video chat scheduled.
 	//
 	// optional
@@ -1262,9 +1294,39 @@ type ForumTopicCreated struct {
 type ForumTopicClosed struct {
 }
 
+// ForumTopicEdited object represents a service message about an edited forum topic.
+type ForumTopicEdited struct {
+	// Name is the new name of the topic, if it was edited
+	//
+	// optional
+	Name string `json:"name,omitempty"`
+	// IconCustomEmojiID is the new identifier of the custom emoji
+	// shown as the topic icon, if it was edited;
+	// an empty string if the icon was removed
+	//
+	// optional
+	IconCustomEmojiID *string `json:"icon_custom_emoji_id,omitempty"`
+}
+
 // ForumTopicReopened represents a service message about a forum topic
 // reopened in the chat. Currently holds no information.
 type ForumTopicReopened struct {
+}
+
+// GeneralForumTopicHidden represents a service message about General forum topic
+// hidden in the chat. Currently holds no information.
+type GeneralForumTopicHidden struct {
+}
+
+// GeneralForumTopicUnhidden represents a service message about General forum topic
+// unhidden in the chat. Currently holds no information.
+type GeneralForumTopicUnhidden struct {
+}
+
+// WriteAccessAllowed represents a service message about a user
+// allowing a bot added to the attachment menu to write messages.
+// Currently holds no information.
+type WriteAccessAllowed struct {
 }
 
 // VideoChatScheduled represents a service message about a voice chat scheduled
@@ -1345,6 +1407,13 @@ type WebAppInfo struct {
 type ReplyKeyboardMarkup struct {
 	// Keyboard is an array of button rows, each represented by an Array of KeyboardButton objects
 	Keyboard [][]KeyboardButton `json:"keyboard"`
+	// IsPersistent requests clients to always show the keyboard
+	// when the regular keyboard is hidden.
+	// Defaults to false, in which case the custom keyboard can be hidden
+	// and opened with a keyboard icon.
+	//
+	// optional
+	IsPersistent bool `json:"is_persistent"`
 	// ResizeKeyboard requests clients to resize the keyboard vertically for optimal fit
 	// (e.g., make the keyboard smaller if there are just two rows of buttons).
 	// Defaults to false, in which case the custom keyboard
@@ -1769,9 +1838,9 @@ type ChatMember struct {
 	// True, if the user is allowed to pin messages; groups and supergroups only
 	//
 	// optional
-	CanPinMessages  bool `json:"can_pin_messages,omitempty"`
+	CanPinMessages bool `json:"can_pin_messages,omitempty"`
 	// CanManageTopics administrators and restricted only.
-	// True, if the user is allowed to create, rename, 
+	// True, if the user is allowed to create, rename,
 	// close, and reopen forum topics; supergroups only
 	//
 	// optional
@@ -2004,6 +2073,10 @@ type BaseInputMedia struct {
 	//
 	// optional
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// HasSpoiler pass True, if the photo needs to be covered with a spoiler animation
+	//
+	// optional
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
 }
 
 // InputMediaPhoto is a photo to send as part of a media group.
@@ -2035,6 +2108,10 @@ type InputMediaVideo struct {
 	//
 	// optional
 	SupportsStreaming bool `json:"supports_streaming,omitempty"`
+	// HasSpoiler pass True, if the video needs to be covered with a spoiler animation
+	//
+	// optional
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
 }
 
 // InputMediaAnimation is an animation to send as part of a media group.
@@ -2057,6 +2134,10 @@ type InputMediaAnimation struct {
 	//
 	// optional
 	Duration int `json:"duration,omitempty"`
+	// HasSpoiler pass True, if the photo needs to be covered with a spoiler animation
+	//
+	// optional
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
 }
 
 // InputMediaAudio is an audio to send as part of a media group.
