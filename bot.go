@@ -311,18 +311,18 @@ func hasFilesNeedingUpload(files []RequestFile) bool {
 
 // Request sends a Chattable to Telegram, and returns the APIResponse.
 func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
-	params, err := c.params()
+	params, err := c.Params()
 	if err != nil {
 		return nil, err
 	}
 
 	if t, ok := c.(Fileable); ok {
-		files := t.files()
+		files := t.Files()
 
 		// If we have files that need to be uploaded, we should delegate the
 		// request to UploadFile.
 		if hasFilesNeedingUpload(files) {
-			return bot.UploadFiles(t.method(), params, files)
+			return bot.UploadFiles(t.Method(), params, files)
 		}
 
 		// However, if there are no files to be uploaded, there's likely things
@@ -332,7 +332,7 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 		}
 	}
 
-	return bot.MakeRequest(c.method(), params)
+	return bot.MakeRequest(c.Method(), params)
 }
 
 // Send will send a Chattable item to Telegram and provides the
@@ -533,19 +533,19 @@ func (bot *BotAPI) HandleUpdate(r *http.Request) (*Update, error) {
 // See https://core.telegram.org/bots/api#making-requests-when-getting-updates
 // for details.
 func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
-	params, err := c.params()
+	params, err := c.Params()
 	if err != nil {
 		return err
 	}
 
 	if t, ok := c.(Fileable); ok {
-		if hasFilesNeedingUpload(t.files()) {
+		if hasFilesNeedingUpload(t.Files()) {
 			return errors.New("unable to use http response to upload files")
 		}
 	}
 
 	values := buildParams(params)
-	values.Set("method", c.method())
+	values.Set("method", c.Method())
 
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	_, err = w.Write([]byte(values.Encode()))
