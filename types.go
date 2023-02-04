@@ -340,8 +340,8 @@ type Chat struct {
 	//
 	// optional
 	MessageAutoDeleteTime int `json:"message_auto_delete_time,omitempty"`
-	// HasAggressiveAntiSpamEnabled is true if aggressive anti-spam checks are enabled 
-	// in the supergroup. The field is only available to chat administrators. 
+	// HasAggressiveAntiSpamEnabled is true if aggressive anti-spam checks are enabled
+	// in the supergroup. The field is only available to chat administrators.
 	// Returned only in getChat.
 	//
 	// optional
@@ -654,6 +654,14 @@ type Message struct {
 	//
 	// optional
 	SuccessfulPayment *SuccessfulPayment `json:"successful_payment,omitempty"`
+	// UserShared is a service message: a user was shared with the bot
+	//
+	// optional
+	UserShared *UserShared `json:"user_shared,omitempty"`
+	// ChatShared is a service message: a chat was shared with the bot
+	//
+	// optional
+	ChatShared *ChatShared `json:"chat_shared,omitempty"`
 	// ConnectedWebsite is the domain name of the website on which the user has
 	// logged in;
 	//
@@ -1323,6 +1331,24 @@ type GeneralForumTopicHidden struct {
 type GeneralForumTopicUnhidden struct {
 }
 
+// UserShared object contains information about the user whose identifier
+// was shared with the bot using a KeyboardButtonRequestUser button.
+type UserShared struct {
+	// RequestID is an indentifier of the request.
+	RequestID int `json:"request_id"`
+	// UserID in an identifier of the shared user.
+	UserID int64
+}
+
+// ChatShared contains information about the chat whose identifier
+// was shared with the bot using a KeyboardButtonRequestChat button.
+type ChatShared struct {
+	// RequestID is an indentifier of the request.
+	RequestID int `json:"request_id"`
+	// ChatID is an identifier of the shared chat.
+	ChatID int64
+}
+
 // WriteAccessAllowed represents a service message about a user
 // allowing a bot added to the attachment menu to write messages.
 // Currently holds no information.
@@ -1455,6 +1481,20 @@ type KeyboardButton struct {
 	// Text of the button. If none of the optional fields are used,
 	// it will be sent as a message when the button is pressed.
 	Text string `json:"text"`
+	// RequestUser if specified, pressing the button will open
+	// a list of suitable users. Tapping on any user will send
+	// their identifier to the bot in a "user_shared" service message.
+	// Available in private chats only.
+	//
+	// optional
+	RequestUser *KeyboardButtonRequestUser `json:"request_user,omitempty"`
+	// RequestChat if specified, pressing the button will open
+	// a list of suitable chats. Tapping on a chat will send
+	// its identifier to the bot in a "chat_shared" service message.
+	// Available in private chats only.
+	//
+	// optional
+	RequestChat *KeyboardButtonRequestChat `json:"request_chat,omitempty"`
 	// RequestContact if True, the user's phone number will be sent
 	// as a contact when the button is pressed.
 	// Available in private chats only.
@@ -1478,6 +1518,72 @@ type KeyboardButton struct {
 	//
 	// optional
 	WebApp *WebAppInfo `json:"web_app,omitempty"`
+}
+
+// KeyboardButtonRequestUser defines the criteria used to request
+// a suitable user. The identifier of the selected user will be shared
+// with the bot when the corresponding button is pressed.
+type KeyboardButtonRequestUser struct {
+	// RequestID is a signed 32-bit identifier of the request.
+	RequestID int `json:"request_id"`
+	// UserIsBot pass True to request a bot,
+	// pass False to request a regular user.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	UserIsBot bool `json:"user_is_bot,omitempty"`
+	// UserIsPremium pass True to request a premium user,
+	// pass False to request a non-premium user.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	UserIsPremium bool `json:"user_is_premium,omitempty"`
+}
+
+// KeyboardButtonRequestChat defines the criteria used to request
+// a suitable chat. The identifier of the selected chat will be shared
+// with the bot when the corresponding button is pressed.
+type KeyboardButtonRequestChat struct {
+	// RequestID is a signed 32-bit identifier of the request.
+	RequestID int `json:"request_id"`
+	// ChatIsChannel pass True to request a channel chat,
+	// pass False to request a group or a supergroup chat.
+	ChatIsChannel bool `json:"chat_is_channel"`
+	// ChatIsForum pass True to request a forum supergroup,
+	// pass False to request a non-forum chat.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	ChatIsForum bool `json:"chat_is_forum,omitempty"`
+	// ChatHasUsername pass True to request a supergroup or a channel with a username,
+	// pass False to request a chat without a username.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	ChatHasUsername bool `json:"chat_has_username,omitempty"`
+	// ChatIsCreated pass True to request a chat owned by the user.
+	// Otherwise, no additional restrictions are applied.
+	//
+	// optional
+	ChatIsCreated bool `json:"chat_is_created,omitempty"`
+	// UserAdministratorRights is a JSON-serialized object listing
+	// the required administrator rights of the user in the chat.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	UserAdministratorRights *ChatAdministratorRights `json:"user_administrator_rights,omitempty"`
+	// BotAdministratorRights is a JSON-serialized object listing
+	// the required administrator rights of the bot in the chat.
+	// The rights must be a subset of user_administrator_rights.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	BotAdministratorRights *ChatAdministratorRights `json:"bot_administrator_rights,omitempty"`
+	// BotIsMember pass True to request a chat with the bot as a member.
+	// Otherwise, no additional restrictions are applied.
+	//
+	// optional
+	BotIsMember bool `json:"bot_is_member,omitempty"`
 }
 
 // KeyboardButtonPollType represents type of poll, which is allowed to
@@ -1852,11 +1958,36 @@ type ChatMember struct {
 	//
 	// optional
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
-	// CanSendMediaMessages restricted only.
-	// True, if the user is allowed to send text messages, contacts, locations and venues
+	// CanSendAudios restricted only.
+	// True, if the user is allowed to send audios
 	//
 	// optional
-	CanSendMediaMessages bool `json:"can_send_media_messages,omitempty"`
+	CanSendAudios bool
+	// CanSendDocuments restricted only.
+	// True, if the user is allowed to send documents
+	//
+	// optional
+	CanSendDocuments bool
+	// CanSendPhotos is restricted only.
+	// True, if the user is allowed to send photos
+	//
+	// optional
+	CanSendPhotos bool
+	// CanSendVideos restricted only.
+	// True, if the user is allowed to send videos
+	//
+	// optional
+	CanSendVideos bool
+	// CanSendVideoNotes restricted only.
+	// True, if the user is allowed to send video notes
+	//
+	// optional
+	CanSendVideoNotes bool
+	// CanSendVoiceNotes restricted only.
+	// True, if the user is allowed to send voice notes
+	//
+	// optional
+	CanSendVoiceNotes bool
 	// CanSendPolls restricted only.
 	// True, if the user is allowed to send polls
 	//
@@ -1887,6 +2018,27 @@ func (chat ChatMember) HasLeft() bool { return chat.Status == "left" }
 // WasKicked returns if the ChatMember was kicked from the chat.
 func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
 
+// SetCanSendMediaMessages is a method to replace field "can_send_media_messages".
+// It sets CanSendAudio, CanSendDocuments, CanSendPhotos, CanSendVideos,
+// CanSendVideoNotes, CanSendVoiceNotes to passed value.
+func (chat *ChatMember) SetCanSendMediaMessages(b bool) {
+	chat.CanSendAudios = b
+	chat.CanSendDocuments = b
+	chat.CanSendPhotos = b
+	chat.CanSendVideos = b
+	chat.CanSendVideoNotes = b
+	chat.CanSendVoiceNotes = b
+}
+
+// CanSendMediaMessages method to replace field "can_send_media_messages".
+// It returns true if CanSendAudio and CanSendDocuments and CanSendPhotos and CanSendVideos and
+// CanSendVideoNotes and CanSendVoiceNotes are true.
+func (chat *ChatMember) CanSendMediaMessages() bool {
+	return chat.CanSendAudios && chat.CanSendDocuments &&
+		chat.CanSendPhotos && chat.CanSendVideos &&
+		chat.CanSendVideoNotes && chat.CanSendVoiceNotes
+}
+
 // ChatMemberUpdated represents changes in the status of a chat member.
 type ChatMemberUpdated struct {
 	// Chat the user belongs to.
@@ -1912,6 +2064,8 @@ type ChatJoinRequest struct {
 	Chat Chat `json:"chat"`
 	// User that sent the join request.
 	From User `json:"from"`
+	// UserChatID identifier of a private chat with the user who sent the join request.
+	UserChatID int64 `json:"user_chat_id"`
 	// Date the request was sent in Unix time.
 	Date int `json:"date"`
 	// Bio of the user.
@@ -1932,12 +2086,30 @@ type ChatPermissions struct {
 	//
 	// optional
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
-	// CanSendMediaMessages is true, if the user is allowed to send audios,
-	// documents, photos, videos, video notes and voice notes, implies
-	// can_send_messages
+	// CanSendAudios is true, if the user is allowed to send audios
 	//
 	// optional
-	CanSendMediaMessages bool `json:"can_send_media_messages,omitempty"`
+	CanSendAudios bool
+	// CanSendDocuments is true, if the user is allowed to send documents
+	//
+	// optional
+	CanSendDocuments bool
+	// CanSendPhotos is true, if the user is allowed to send photos
+	//
+	// optional
+	CanSendPhotos bool
+	// CanSendVideos is true, if the user is allowed to send videos
+	//
+	// optional
+	CanSendVideos bool
+	// CanSendVideoNotes is true, if the user is allowed to send video notes
+	//
+	// optional
+	CanSendVideoNotes bool
+	// CanSendVoiceNotes is true, if the user is allowed to send voice notes
+	//
+	// optional
+	CanSendVoiceNotes bool
 	// CanSendPolls is true, if the user is allowed to send polls, implies
 	// can_send_messages
 	//
@@ -1973,6 +2145,27 @@ type ChatPermissions struct {
 	//
 	// optional
 	CanManageTopics bool `json:"can_manage_topics,omitempty"`
+}
+
+// SetCanSendMediaMessages is a method to replace field "can_send_media_messages".
+// It sets CanSendAudio, CanSendDocuments, CanSendPhotos, CanSendVideos,
+// CanSendVideoNotes, CanSendVoiceNotes to passed value.
+func (c *ChatPermissions) SetCanSendMediaMessages(b bool) {
+	c.CanSendAudios = b
+	c.CanSendDocuments = b
+	c.CanSendPhotos = b
+	c.CanSendVideos = b
+	c.CanSendVideoNotes = b
+	c.CanSendVoiceNotes = b
+}
+
+// CanSendMediaMessages method to replace field "can_send_media_messages".
+// It returns true if CanSendAudio and CanSendDocuments and CanSendPhotos and CanSendVideos and
+// CanSendVideoNotes and CanSendVoiceNotes are true.
+func (c *ChatPermissions) CanSendMediaMessages() bool {
+	return c.CanSendAudios && c.CanSendDocuments &&
+		c.CanSendPhotos && c.CanSendVideos &&
+		c.CanSendVideoNotes && c.CanSendVoiceNotes
 }
 
 // ChatLocation represents a location to which a chat is connected.

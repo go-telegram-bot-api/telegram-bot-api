@@ -1022,7 +1022,7 @@ func (config GetGameHighScoresConfig) method() string {
 type ChatActionConfig struct {
 	BaseChat
 	MessageThreadID int
-	Action string // required
+	Action          string // required
 }
 
 func (config ChatActionConfig) params() (Params, error) {
@@ -1400,8 +1400,9 @@ type KickChatMemberConfig = BanChatMemberConfig
 // RestrictChatMemberConfig contains fields to restrict members of chat
 type RestrictChatMemberConfig struct {
 	ChatMemberConfig
-	UntilDate   int64
-	Permissions *ChatPermissions
+	UntilDate                     int64
+	UseIndependentChatPermissions bool
+	Permissions                   *ChatPermissions
 }
 
 func (config RestrictChatMemberConfig) method() string {
@@ -1413,6 +1414,7 @@ func (config RestrictChatMemberConfig) params() (Params, error) {
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername, config.ChannelUsername)
 	params.AddNonZero64("user_id", config.UserID)
+	params.AddBool("use_independent_chat_permissions", config.UseIndependentChatPermissions)
 
 	err := params.AddInterface("permissions", config.Permissions)
 	params.AddNonZero64("until_date", config.UntilDate)
@@ -1578,7 +1580,8 @@ func (ChatAdministratorsConfig) method() string {
 // restrict members.
 type SetChatPermissionsConfig struct {
 	ChatConfig
-	Permissions *ChatPermissions
+	UseIndependentChatPermissions bool
+	Permissions                   *ChatPermissions
 }
 
 func (SetChatPermissionsConfig) method() string {
@@ -1589,6 +1592,7 @@ func (config SetChatPermissionsConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
+	params.AddBool("use_independent_chat_permissions", config.UseIndependentChatPermissions)
 	err := params.AddInterface("permissions", config.Permissions)
 
 	return params, err
