@@ -1337,7 +1337,7 @@ type UserShared struct {
 	// RequestID is an indentifier of the request.
 	RequestID int `json:"request_id"`
 	// UserID in an identifier of the shared user.
-	UserID int64
+	UserID int64 `json:"user_id"`
 }
 
 // ChatShared contains information about the chat whose identifier
@@ -1346,7 +1346,7 @@ type ChatShared struct {
 	// RequestID is an indentifier of the request.
 	RequestID int `json:"request_id"`
 	// ChatID is an identifier of the shared chat.
-	ChatID int64
+	ChatID int64 `json:"chat_id"`
 }
 
 // WriteAccessAllowed represents a service message about a user
