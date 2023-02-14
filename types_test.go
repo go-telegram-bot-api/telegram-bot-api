@@ -347,6 +347,18 @@ var (
 	_ Chattable = VideoNoteConfig{}
 	_ Chattable = VoiceConfig{}
 	_ Chattable = WebhookConfig{}
+	_ Chattable = CreateForumTopicConfig{}
+	_ Chattable = EditForumTopicConfig{}
+	_ Chattable = CloseForumTopicConfig{}
+	_ Chattable = ReopenForumTopicConfig{}
+	_ Chattable = DeleteForumTopicConfig{}
+	_ Chattable = UnpinAllForumTopicMessagesConfig{}
+	_ Chattable = GetForumTopicIconStickersConfig{}
+	_ Chattable = EditGeneralForumTopicConfig{}
+	_ Chattable = CloseGeneralForumTopicConfig{}
+	_ Chattable = ReopenGeneralForumTopicConfig{}
+	_ Chattable = HideGeneralForumTopicConfig{}
+	_ Chattable = UnhideGeneralForumTopicConfig{}
 )
 
 // Ensure all Fileable types are correct.
