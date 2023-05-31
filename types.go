@@ -134,6 +134,8 @@ func (u *Update) SentFrom() *User {
 		return u.ShippingQuery.From
 	case u.PreCheckoutQuery != nil:
 		return u.PreCheckoutQuery.From
+	case u.MyChatMember != nil:
+		return &u.MyChatMember.From
 	default:
 		return nil
 	}
@@ -160,6 +162,8 @@ func (u *Update) FromChat() *Chat {
 		return u.EditedChannelPost.Chat
 	case u.CallbackQuery != nil:
 		return u.CallbackQuery.Message.Chat
+	case u.MyChatMember != nil:
+		return &u.MyChatMember.Chat
 	default:
 		return nil
 	}
