@@ -51,13 +51,12 @@ type Update struct {
 	//
 	// optional
 	EditedMessage *Message `json:"edited_message,omitempty"`
-	// ChannelPost new version of a message that is known to the bot and was
-	// edited
+	// ChannelPost new incoming channel post of any kind - text, photo, sticker, etc.
 	//
 	// optional
 	ChannelPost *Message `json:"channel_post,omitempty"`
-	// EditedChannelPost new incoming channel post of any kind — text, photo,
-	// sticker, etc.
+	// EditedChannelPost new version of a channel post that is known to the bot
+	// and was edited
 	//
 	// optional
 	EditedChannelPost *Message `json:"edited_channel_post,omitempty"`
