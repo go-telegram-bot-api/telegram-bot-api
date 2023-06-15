@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -426,6 +427,13 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 	return info, err
 }
 
+func RedactLoggingURL(err error) (redactedError error) {
+	matcher := regexp.MustCompile(`bot\d{10}:[a-zA-Z0-9_.-]{35}`)
+
+	redacted := matcher.ReplaceAllString(err.Error(), "bot**********")
+	return errors.New(redacted)
+}
+
 // GetUpdatesChan starts and returns a channel for getting updates.
 func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 	ch := make(chan Update, bot.Buffer)
@@ -441,7 +449,7 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
-				log.Println(err)
+				log.Println(RedactLoggingURL(err))
 				log.Println("Failed to get updates, retrying in 3 seconds...")
 				time.Sleep(time.Second * 3)
 
