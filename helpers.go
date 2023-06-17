@@ -6,9 +6,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"image"
+	"image/jpeg"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
+
+	"github.com/nfnt/resize"
 )
 
 // NewMessage creates a new Message.
@@ -84,6 +89,41 @@ func NewPhoto(chatID int64, file RequestFileData) PhotoConfig {
 			File:     file,
 		},
 	}
+}
+
+// ResizePhoto resizes the photo to valid dimensions of telegram
+func ResizePhoto(fp FilePath) FilePath {
+	fileHandle, err := os.Open(string(fp))
+	defer fileHandle.Close()
+	if err != nil {
+		panic("Can't read photo")
+	}
+	im, _, err := image.Decode(fileHandle)
+	w, h := im.Bounds().Dx(), im.Bounds().Dy()
+	dimSum := w + h
+	maxDim := 10000
+	if dimSum > maxDim {
+		if err != nil {
+			panic("Can't read photo")
+		}
+		newW, newH := uint(w*maxDim/dimSum), uint(h*maxDim/dimSum)
+		newImage := resize.Resize(newW, newH, im, resize.Lanczos3)
+
+		// TODO : make a name based on initial file name
+		outname := "resized_temp.jpg"
+
+		out, err := os.Create(outname)
+		defer out.Close()
+		if err != nil {
+			panic("Can't write photo")
+		}
+		err = jpeg.Encode(out, newImage, nil)
+
+		return FilePath(outname)
+	} else {
+		return fp
+	}
+
 }
 
 // NewPhotoToChannel creates a new photo uploader to send a photo to a channel.
