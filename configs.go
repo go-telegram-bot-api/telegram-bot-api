@@ -2179,6 +2179,7 @@ type NewStickerSetConfig struct {
 	Name            string
 	Title           string
 	Stickers        []InputSticker
+	StickerFormat   string
 	StickerType     string
 	NeedsRepainting bool //optional; Pass True if stickers in the sticker set must be repainted to the color of text when used in messages, the accent color if used as emoji status, white on chat photos, or another appropriate color based on context; for custom emoji sticker sets only
 }
@@ -2193,6 +2194,7 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params.AddNonZero64("user_id", config.UserID)
 	params["name"] = config.Name
 	params["title"] = config.Title
+	params["sticker_format"] = config.StickerFormat
 
 	params.AddBool("needs_repainting", config.NeedsRepainting)
 	params.AddNonEmpty("sticker_type", string(config.StickerType))
