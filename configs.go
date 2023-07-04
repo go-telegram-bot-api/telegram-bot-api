@@ -2165,15 +2165,10 @@ func (config UploadStickerConfig) params() (Params, error) {
 }
 
 func (config UploadStickerConfig) files() []RequestFile {
-	return []RequestFile{{
-		Name: "png_sticker",
-		Data: config.PNGSticker,
-	}}
+	return []RequestFile{config.Sticker}
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
-//
-// You must set either PNGSticker or TGSSticker.
 type NewStickerSetConfig struct {
 	UserID          int64
 	Name            string
@@ -2204,17 +2199,11 @@ func (config NewStickerSetConfig) params() (Params, error) {
 }
 
 func (config NewStickerSetConfig) files() []RequestFile {
-	if config.PNGSticker != nil {
-		return []RequestFile{{
-			Name: "png_sticker",
-			Data: config.PNGSticker,
-		}}
+	requestFiles := []RequestFile{}
+	for _, v := range config.Stickers {
+		requestFiles = append(requestFiles, v.Sticker)
 	}
-
-	return []RequestFile{{
-		Name: "tgs_sticker",
-		Data: config.TGSSticker,
-	}}
+	return requestFiles
 }
 
 // AddStickerConfig allows you to add a sticker to a set.
@@ -2238,18 +2227,7 @@ func (config AddStickerConfig) params() (Params, error) {
 }
 
 func (config AddStickerConfig) files() []RequestFile {
-	if config.PNGSticker != nil {
-		return []RequestFile{{
-			Name: "png_sticker",
-			Data: config.PNGSticker,
-		}}
-	}
-
-	return []RequestFile{{
-		Name: "tgs_sticker",
-		Data: config.TGSSticker,
-	}}
-
+	return []RequestFile{config.Sticker.Sticker}
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
