@@ -953,7 +953,7 @@ type Animation struct {
 	// Thumbnail animation thumbnail as defined by sender
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileName original animation filename as defined by sender
 	//
 	// optional
@@ -1002,7 +1002,7 @@ type Audio struct {
 	// Thumbnail is the album cover to which the music file belongs
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 }
 
 // Document represents a general file.
@@ -1017,7 +1017,7 @@ type Document struct {
 	// Thumbnail document thumbnail as defined by sender
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileName original filename as defined by sender
 	//
 	// optional
@@ -1050,7 +1050,7 @@ type Video struct {
 	// Thumbnail video thumbnail
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileName is the original filename as defined by sender
 	//
 	// optional
@@ -1080,7 +1080,7 @@ type VideoNote struct {
 	// Thumbnail video thumbnail
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileSize file size
 	//
 	// optional
@@ -2212,6 +2212,16 @@ type BotCommandScope struct {
 	UserID int64  `json:"user_id,omitempty"`
 }
 
+// BotDescription represents the bot's description.
+type BotDescription struct {
+	Description string `json:"description"`
+}
+
+// BotShortDescription represents the bot's short description
+type BotShortDescription struct {
+	ShortDescription string `json:"short_description"`
+}
+
 // MenuButton describes the bot's menu button in a private chat.
 type MenuButton struct {
 	// Type is the type of menu button, must be one of:
@@ -2284,7 +2294,7 @@ type InputMediaVideo struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -2314,7 +2324,7 @@ type InputMediaAnimation struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -2340,7 +2350,7 @@ type InputMediaAudio struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// Duration of the audio in seconds
 	//
 	// optional
@@ -2362,7 +2372,7 @@ type InputMediaDocument struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// DisableContentTypeDetection disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data. Always true, if
 	// the document is sent as part of an album
@@ -2406,7 +2416,7 @@ type Sticker struct {
 	// Thumbnail sticker thumbnail in the .WEBP or .JPG format
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// Emoji associated with the sticker
 	//
 	// optional
@@ -2428,6 +2438,10 @@ type Sticker struct {
 	//
 	// optional
 	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
+	// NeedsRepainting True, if the sticker must be repainted to a text color in messages, the color of the Telegram Premium badge in emoji status, white color on chat photos, or another appropriate color in other places
+	//
+	//optional
+	NeedsRepainting bool `json:"needs_reainting,omitempty"`
 	// FileSize
 	//
 	// optional
@@ -2468,7 +2482,7 @@ type StickerSet struct {
 	// Stickers list of all set stickers
 	Stickers []Sticker `json:"stickers"`
 	// Thumb is the sticker set thumbnail in the .WEBP or .TGS format
-	Thumbnail *PhotoSize `json:"thumb"`
+	Thumbnail *PhotoSize `json:"thumbnail"`
 }
 
 // IsRegular returns if the StickerSet is regular
@@ -2502,6 +2516,22 @@ type MaskPosition struct {
 	YShift float64 `json:"y_shift"`
 	// Mask scaling coefficient. For example, 2.0 means double size.
 	Scale float64 `json:"scale"`
+}
+
+// InputSticker describes a sticker to be added to a sticker set.
+type InputSticker struct {
+	// The added sticker. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, upload a new one using multipart/form-data, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name. Animated and video stickers can't be uploaded via HTTP URL.
+	Sticker RequestFile `json:"sticker"`
+	// List of 1-20 emoji associated with the sticker
+	EmojiList []string `json:"emoji_list"`
+	// Position where the mask should be placed on faces. For “mask” stickers only.
+	//
+	// optional
+	MaskPosition *MaskPosition `json:"mask_position"`
+	// List of 0-20 search keywords for the sticker with total length of up to 64 characters. For “regular” and “custom_emoji” stickers only.
+	//
+	// optional
+	Keywords []string `json:"keywords"`
 }
 
 // Game represents a game. Use BotFather to create and edit games, their short
@@ -2923,15 +2953,15 @@ type InlineQueryResultArticle struct {
 	// ThumbURL url of the thumbnail for the result
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultAudio is an inline query response audio.
@@ -2987,9 +3017,9 @@ type InlineQueryResultContact struct {
 	VCard               string                `json:"vcard"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	ThumbURL            string                `json:"thumbnail_url"`
+	ThumbWidth          int                   `json:"thumbnail_width"`
+	ThumbHeight         int                   `json:"thumbnail_height"`
 }
 
 // InlineQueryResultGame is an inline query response game.
@@ -3037,15 +3067,15 @@ type InlineQueryResultDocument struct {
 	// ThumbURL url of the thumbnail (jpeg only) for the file
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultGIF is an inline query response GIF.
@@ -3057,7 +3087,9 @@ type InlineQueryResultGIF struct {
 	// URL a valid URL for the GIF file. File size must not exceed 1MB.
 	URL string `json:"gif_url"`
 	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
-	ThumbURL string `json:"thumb_url"`
+	ThumbURL string `json:"thumbnail_url"`
+	// MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
+	ThumbMimeType string `json:"thumbnail_mime_type,omitempty"`
 	// Width of the GIF
 	//
 	// optional
@@ -3143,15 +3175,15 @@ type InlineQueryResultLocation struct {
 	// ThumbURL url of the thumbnail for the result
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
@@ -3175,7 +3207,9 @@ type InlineQueryResultMPEG4GIF struct {
 	// optional
 	Duration int `json:"mpeg4_duration,omitempty"`
 	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
-	ThumbURL string `json:"thumb_url"`
+	ThumbURL string `json:"thumbnail_url"`
+	// MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
+	ThumbMimeType string `json:"thumbnail_mime_type,omitempty"`
 	// Title for the result
 	//
 	// optional
@@ -3227,7 +3261,7 @@ type InlineQueryResultPhoto struct {
 	// ThumbURL url of the thumbnail for the photo.
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// Title for the result
 	//
 	// optional
@@ -3303,15 +3337,15 @@ type InlineQueryResultVenue struct {
 	// ThumbURL url of the thumbnail for the result
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultVideo is an inline query response video.
@@ -3327,7 +3361,7 @@ type InlineQueryResultVideo struct {
 	//
 	// ThumbURL url of the thumbnail (jpeg only) for the video
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// Title for the result
 	Title string `json:"title"`
 	// Caption of the video to be sent, 0-1024 characters after entities parsing

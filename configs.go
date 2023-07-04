@@ -463,7 +463,7 @@ func (config PhotoConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -511,7 +511,7 @@ func (config AudioConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -551,7 +551,7 @@ func (config DocumentConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -561,11 +561,18 @@ func (config DocumentConfig) files() []RequestFile {
 
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
+	//Emoji associated with the sticker; only for just uploaded stickers
+	Emoji string
 	BaseFile
 }
 
 func (config StickerConfig) params() (Params, error) {
-	return config.BaseChat.params()
+	params, err := config.BaseChat.params()
+	if err != nil {
+		return params, err
+	}
+	params.AddNonEmpty("emoji", config.Emoji)
+	return params, err
 }
 
 func (config StickerConfig) method() string {
@@ -627,7 +634,7 @@ func (config VideoConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -681,7 +688,7 @@ func (config AnimationConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -718,7 +725,7 @@ func (config VideoNoteConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -762,7 +769,7 @@ func (config VoiceConfig) files() []RequestFile {
 
 	if config.Thumb != nil {
 		files = append(files, RequestFile{
-			Name: "thumb",
+			Name: "thumbnail",
 			Data: config.Thumb,
 		})
 	}
@@ -2139,8 +2146,9 @@ func (config GetCustomEmojiStickersConfig) method() string {
 
 // UploadStickerConfig allows you to upload a sticker for use in a set later.
 type UploadStickerConfig struct {
-	UserID     int64
-	PNGSticker RequestFileData
+	UserID        int64
+	Sticker       RequestFile
+	StickerFormat string
 }
 
 func (config UploadStickerConfig) method() string {
@@ -2151,30 +2159,24 @@ func (config UploadStickerConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddNonZero64("user_id", config.UserID)
+	params["sticker_format"] = config.StickerFormat
 
 	return params, nil
 }
 
 func (config UploadStickerConfig) files() []RequestFile {
-	return []RequestFile{{
-		Name: "png_sticker",
-		Data: config.PNGSticker,
-	}}
+	return []RequestFile{config.Sticker}
 }
 
 // NewStickerSetConfig allows creating a new sticker set.
-//
-// You must set either PNGSticker or TGSSticker.
 type NewStickerSetConfig struct {
-	UserID        int64
-	Name          string
-	Title         string
-	PNGSticker    RequestFileData
-	TGSSticker    RequestFileData
-	StickerType   string
-	Emojis        string
-	ContainsMasks bool // deprecated
-	MaskPosition  *MaskPosition
+	UserID          int64
+	Name            string
+	Title           string
+	Stickers        []InputSticker
+	StickerFormat   string
+	StickerType     string
+	NeedsRepainting bool //optional; Pass True if stickers in the sticker set must be repainted to the color of text when used in messages, the accent color if used as emoji status, white on chat photos, or another appropriate color based on context; for custom emoji sticker sets only
 }
 
 func (config NewStickerSetConfig) method() string {
@@ -2187,37 +2189,28 @@ func (config NewStickerSetConfig) params() (Params, error) {
 	params.AddNonZero64("user_id", config.UserID)
 	params["name"] = config.Name
 	params["title"] = config.Title
-	params["emojis"] = config.Emojis
+	params["sticker_format"] = config.StickerFormat
 
-	params.AddBool("contains_masks", config.ContainsMasks)
+	params.AddBool("needs_repainting", config.NeedsRepainting)
 	params.AddNonEmpty("sticker_type", string(config.StickerType))
-	err := params.AddInterface("mask_position", config.MaskPosition)
+	err := params.AddInterface("stickers", config.Stickers)
 
 	return params, err
 }
 
 func (config NewStickerSetConfig) files() []RequestFile {
-	if config.PNGSticker != nil {
-		return []RequestFile{{
-			Name: "png_sticker",
-			Data: config.PNGSticker,
-		}}
+	requestFiles := []RequestFile{}
+	for _, v := range config.Stickers {
+		requestFiles = append(requestFiles, v.Sticker)
 	}
-
-	return []RequestFile{{
-		Name: "tgs_sticker",
-		Data: config.TGSSticker,
-	}}
+	return requestFiles
 }
 
 // AddStickerConfig allows you to add a sticker to a set.
 type AddStickerConfig struct {
-	UserID       int64
-	Name         string
-	PNGSticker   RequestFileData
-	TGSSticker   RequestFileData
-	Emojis       string
-	MaskPosition *MaskPosition
+	UserID  int64
+	Name    string
+	Sticker InputSticker
 }
 
 func (config AddStickerConfig) method() string {
@@ -2229,26 +2222,12 @@ func (config AddStickerConfig) params() (Params, error) {
 
 	params.AddNonZero64("user_id", config.UserID)
 	params["name"] = config.Name
-	params["emojis"] = config.Emojis
-
-	err := params.AddInterface("mask_position", config.MaskPosition)
-
+	err := params.AddInterface("sticker", config.Sticker)
 	return params, err
 }
 
 func (config AddStickerConfig) files() []RequestFile {
-	if config.PNGSticker != nil {
-		return []RequestFile{{
-			Name: "png_sticker",
-			Data: config.PNGSticker,
-		}}
-	}
-
-	return []RequestFile{{
-		Name: "tgs_sticker",
-		Data: config.TGSSticker,
-	}}
-
+	return []RequestFile{config.Sticker.Sticker}
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
@@ -2270,6 +2249,61 @@ func (config SetStickerPositionConfig) params() (Params, error) {
 	return params, nil
 }
 
+// SetCustomEmojiStickerSetThumbnalConfig allows you to set the thumbnail of a custom emoji sticker set
+type SetCustomEmojiStickerSetThumbnalConfig struct {
+	Name          string
+	CustomEmojiID string
+}
+
+func (config SetCustomEmojiStickerSetThumbnalConfig) method() string {
+	return "setCustomEmojiStickerSetThumbnail"
+}
+
+func (config SetCustomEmojiStickerSetThumbnalConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["name"] = config.Name
+	params.AddNonEmpty("position", config.CustomEmojiID)
+
+	return params, nil
+}
+
+// SetStickerSetTitle allows you to set the title of a created sticker set
+type SetStickerSetTitleConfig struct {
+	Name  string
+	Title string
+}
+
+func (config SetStickerSetTitleConfig) method() string {
+	return "setStickerSetTitle"
+}
+
+func (config SetStickerSetTitleConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["name"] = config.Name
+	params["title"] = config.Title
+
+	return params, nil
+}
+
+// DeleteStickerSetConfig allows you to delete a sticker set that was created by the bot.
+type DeleteStickerSetConfig struct {
+	Name string
+}
+
+func (config DeleteStickerSetConfig) method() string {
+	return "deleteStickerSet"
+}
+
+func (config DeleteStickerSetConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["name"] = config.Name
+
+	return params, nil
+}
+
 // DeleteStickerConfig allows you to delete a sticker from a set.
 type DeleteStickerConfig struct {
 	Sticker string
@@ -2287,6 +2321,63 @@ func (config DeleteStickerConfig) params() (Params, error) {
 	return params, nil
 }
 
+// SetStickerEmojiListConfig allows you to change the list of emoji assigned to a regular or custom emoji sticker. The sticker must belong to a sticker set created by the bot
+type SetStickerEmojiListConfig struct {
+	Sticker   string
+	EmojiList []string
+}
+
+func (config SetStickerEmojiListConfig) method() string {
+	return "setStickerEmojiList"
+}
+
+func (config SetStickerEmojiListConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["sticker"] = config.Sticker
+	err := params.AddInterface("emoji_list", config.EmojiList)
+
+	return params, err
+}
+
+// SetStickerKeywordsConfig allows you to change search keywords assigned to a regular or custom emoji sticker. The sticker must belong to a sticker set created by the bot.
+type SetStickerKeywordsConfig struct {
+	Sticker  string
+	Keywords []string
+}
+
+func (config SetStickerKeywordsConfig) method() string {
+	return "setStickerKeywords"
+}
+
+func (config SetStickerKeywordsConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["sticker"] = config.Sticker
+	err := params.AddInterface("keywords", config.Keywords)
+
+	return params, err
+}
+
+// SetStickerMaskPositionConfig allows you to  change the mask position of a mask sticker. The sticker must belong to a sticker set that was created by the bot
+type SetStickerMaskPositionConfig struct {
+	Sticker      string
+	MaskPosition *MaskPosition
+}
+
+func (config SetStickerMaskPositionConfig) method() string {
+	return "setStickerMaskPosition"
+}
+
+func (config SetStickerMaskPositionConfig) params() (Params, error) {
+	params := make(Params)
+
+	params["sticker"] = config.Sticker
+	err := params.AddInterface("keywords", config.MaskPosition)
+
+	return params, err
+}
+
 // SetStickerSetThumbConfig allows you to set the thumbnail for a sticker set.
 type SetStickerSetThumbConfig struct {
 	Name   string
@@ -2295,7 +2386,7 @@ type SetStickerSetThumbConfig struct {
 }
 
 func (config SetStickerSetThumbConfig) method() string {
-	return "setStickerSetThumb"
+	return "setStickerSetThumbnail"
 }
 
 func (config SetStickerSetThumbConfig) params() (Params, error) {
@@ -2309,7 +2400,7 @@ func (config SetStickerSetThumbConfig) params() (Params, error) {
 
 func (config SetStickerSetThumbConfig) files() []RequestFile {
 	return []RequestFile{{
-		Name: "thumb",
+		Name: "thumbnail",
 		Data: config.Thumb,
 	}}
 }
@@ -2702,6 +2793,86 @@ func (config DeleteMyCommandsConfig) params() (Params, error) {
 	params.AddNonEmpty("language_code", config.LanguageCode)
 
 	return params, err
+}
+
+// GetMyDescriptionConfig get the current bot description for the given user language
+type GetMyDescriptionConfig struct {
+	LanguageCode string
+}
+
+func (config GetMyDescriptionConfig) method() string {
+	return "getMyDescription"
+}
+
+func (config GetMyDescriptionConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, nil
+}
+
+// SetMyDescroptionConfig sets the bot's description, which is shown in the chat with the bot if the chat is empty
+type SetMyDescriptionConfig struct {
+	// Pass an empty string to remove the dedicated description for the given language.
+	Description string
+	//If empty, the description will be applied to all users for whose language there is no dedicated description.
+	LanguageCode string
+}
+
+func (config SetMyDescriptionConfig) method() string {
+	return "setMyDescription"
+}
+
+func (config SetMyDescriptionConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("description", config.Description)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, nil
+}
+
+// GetMyShortDescriptionConfig get the current bot short description for the given user language
+type GetMyShortDescriptionConfig struct {
+	LanguageCode string
+}
+
+func (config GetMyShortDescriptionConfig) method() string {
+	return "getMyShortDescription"
+}
+
+func (config GetMyShortDescriptionConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, nil
+}
+
+// SetMyDescroptionConfig sets the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot.
+type SetMyShortDescriptionConfig struct {
+	// New short description for the bot; 0-120 characters.
+	//
+	//Pass an empty string to remove the dedicated short description for the given language.
+	ShortDescription string
+	//A two-letter ISO 639-1 language code.
+	//
+	//If empty, the short description will be applied to all users for whose language there is no dedicated short description.
+	LanguageCode string
+}
+
+func (config SetMyShortDescriptionConfig) method() string {
+	return "setMyDescription"
+}
+
+func (config SetMyShortDescriptionConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("short_description", config.ShortDescription)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, nil
 }
 
 // SetChatMenuButtonConfig changes the bot's menu button in a private chat,

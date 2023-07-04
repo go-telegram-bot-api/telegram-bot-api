@@ -130,6 +130,29 @@ func NewSticker(chatID int64, file RequestFileData) StickerConfig {
 	}
 }
 
+// NewCustomEmojiStickerSetThumbnal creates a new setCustomEmojiStickerSetThumbnal request
+func NewCustomEmojiStickerSetThumbnal(name, customEmojiID string) SetCustomEmojiStickerSetThumbnalConfig {
+	return SetCustomEmojiStickerSetThumbnalConfig{
+		Name:          name,
+		CustomEmojiID: customEmojiID,
+	}
+}
+
+// NewStickerSetTitle creates a new setStickerSetTitle request
+func NewStickerSetTitle(name, title string) SetStickerSetTitleConfig {
+	return SetStickerSetTitleConfig{
+		Name:  name,
+		Title: title,
+	}
+}
+
+// NewDeleteStickerSet creates a new deleteStickerSet request
+func NewDeleteStickerSet(name, title string) DeleteStickerSetConfig {
+	return DeleteStickerSetConfig{
+		Name: name,
+	}
+}
+
 // NewVideo creates a new sendVideo request.
 func NewVideo(chatID int64, file RequestFileData) VideoConfig {
 	return VideoConfig{
@@ -181,7 +204,7 @@ func NewMediaGroup(chatID int64, files []interface{}) MediaGroupConfig {
 		BaseChat: BaseChat{
 			ChatID: chatID,
 		},
-		Media:  files,
+		Media: files,
 	}
 }
 
@@ -905,6 +928,36 @@ func NewBotCommandScopeChatMember(chatID, userID int64) BotCommandScope {
 		Type:   "chat_member",
 		ChatID: chatID,
 		UserID: userID,
+	}
+}
+
+// NewSetMyDescription allows you to change the bot's description, which is shown in the chat with the bot if the chat is empty.
+func NewSetMyDescription(description, languageCode string) SetMyDescriptionConfig {
+	return SetMyDescriptionConfig{
+		Description:  description,
+		LanguageCode: languageCode,
+	}
+}
+
+// NewGetMyDescription returns the current bot description for the given user language
+func NewGetMyDescription(languageCode string) GetMyDescriptionConfig {
+	return GetMyDescriptionConfig{
+		LanguageCode: languageCode,
+	}
+}
+
+// NewSetMyShortDescription allows you change the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot.
+func NewSetMyShortDescription(shortDescription, languageCode string) SetMyShortDescriptionConfig {
+	return SetMyShortDescriptionConfig{
+		ShortDescription: shortDescription,
+		LanguageCode:     languageCode,
+	}
+}
+
+// NewGetMyShortDescription returns the current bot short description for the given user language.
+func NewGetMyShortDescription(languageCode string) GetMyShortDescriptionConfig {
+	return GetMyShortDescriptionConfig{
+		LanguageCode: languageCode,
 	}
 }
 
