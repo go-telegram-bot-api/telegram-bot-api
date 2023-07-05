@@ -1271,15 +1271,29 @@ func (config DeleteWebhookConfig) params() (Params, error) {
 	return params, nil
 }
 
+// InlineQueryResultsButton represents a button to be shown above inline query results. You must use exactly one of the optional fields.
+type InlineQueryResultsButton struct {
+	//Label text on the button
+	//
+	Text string `json:"text"`
+	//Description of the Web App that will be launched when the user presses the button. The Web App will be able to switch back to the inline mode using the method switchInlineQuery inside the Web App.
+	//
+	//Optional
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
+	// Deep-linking parameter for the /start message sent to the bot when a user presses the button. 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
+	//
+	//Optional
+	StartParam string `json:"start_parameter,omitempty"`
+}
+
 // InlineConfig contains information on making an InlineQuery response.
 type InlineConfig struct {
-	InlineQueryID     string        `json:"inline_query_id"`
-	Results           []interface{} `json:"results"`
-	CacheTime         int           `json:"cache_time"`
-	IsPersonal        bool          `json:"is_personal"`
-	NextOffset        string        `json:"next_offset"`
-	SwitchPMText      string        `json:"switch_pm_text"`
-	SwitchPMParameter string        `json:"switch_pm_parameter"`
+	InlineQueryID string                    `json:"inline_query_id"`
+	Results       []interface{}             `json:"results"`
+	CacheTime     int                       `json:"cache_time"`
+	IsPersonal    bool                      `json:"is_personal"`
+	NextOffset    string                    `json:"next_offset"`
+	Button        *InlineQueryResultsButton `json:"button,omitempty"`
 }
 
 func (config InlineConfig) method() string {
@@ -1293,9 +1307,11 @@ func (config InlineConfig) params() (Params, error) {
 	params.AddNonZero("cache_time", config.CacheTime)
 	params.AddBool("is_personal", config.IsPersonal)
 	params.AddNonEmpty("next_offset", config.NextOffset)
-	params.AddNonEmpty("switch_pm_text", config.SwitchPMText)
-	params.AddNonEmpty("switch_pm_parameter", config.SwitchPMParameter)
-	err := params.AddInterface("results", config.Results)
+	err := params.AddInterface("button", config.Button)
+	if err != nil {
+		return params, err
+	}
+	err = params.AddInterface("results", config.Results)
 
 	return params, err
 }
@@ -2793,6 +2809,41 @@ func (config DeleteMyCommandsConfig) params() (Params, error) {
 	params.AddNonEmpty("language_code", config.LanguageCode)
 
 	return params, err
+}
+
+// SetMyNameConfig change the bot's name
+type SetMyNameConfig struct {
+	Name         string
+	LanguageCode string
+}
+
+func (config SetMyNameConfig) method() string {
+	return "setMyName"
+}
+
+func (config SetMyNameConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("name", config.Name)
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, nil
+}
+
+type GetMyNameConfig struct {
+	LanguageCode string
+}
+
+func (config GetMyNameConfig) method() string {
+	return "getMyName"
+}
+
+func (config GetMyNameConfig) params() (Params, error) {
+	params := make(Params)
+
+	params.AddNonEmpty("language_code", config.LanguageCode)
+
+	return params, nil
 }
 
 // GetMyDescriptionConfig get the current bot description for the given user language

@@ -723,6 +723,15 @@ func NewInlineKeyboardButtonWebApp(text string, webapp WebAppInfo) InlineKeyboar
 	}
 }
 
+// NewInlineKeyboardButtonSwitchInlineQueryChoosenChat creates an inline keyboard button with text
+// which goes to a SwitchInlineQueryChosenChat.
+func NewInlineKeyboardButtonSwitchInlineQueryChoosenChat(text string, switchInlineQueryChosenChat SwitchInlineQueryChosenChat) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text:                        text,
+		SwitchInlineQueryChosenChat: &switchInlineQueryChosenChat,
+	}
+}
+
 // NewInlineKeyboardButtonLoginURL creates an inline keyboard button with text
 // which goes to a LoginURL.
 func NewInlineKeyboardButtonLoginURL(text string, loginURL LoginURL) InlineKeyboardButton {
@@ -957,6 +966,21 @@ func NewSetMyShortDescription(shortDescription, languageCode string) SetMyShortD
 // NewGetMyShortDescription returns the current bot short description for the given user language.
 func NewGetMyShortDescription(languageCode string) GetMyShortDescriptionConfig {
 	return GetMyShortDescriptionConfig{
+		LanguageCode: languageCode,
+	}
+}
+
+// NewGetMyName get the current bot name for the given user language
+func NewGetMyName(languageCode string) GetMyNameConfig {
+	return GetMyNameConfig{
+		LanguageCode: languageCode,
+	}
+}
+
+// NewSetMyName change the bot's name
+func NewSetMyName(languageCode, name string) SetMyNameConfig {
+	return SetMyNameConfig{
+		Name:         name,
 		LanguageCode: languageCode,
 	}
 }

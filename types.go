@@ -1349,10 +1349,14 @@ type ChatShared struct {
 	ChatID int64 `json:"chat_id"`
 }
 
-// WriteAccessAllowed represents a service message about a user
-// allowing a bot added to the attachment menu to write messages.
-// Currently holds no information.
+// WriteAccessAllowed represents a service message about a user allowing a bot
+// to write messages after adding the bot to the attachment menu or launching
+// a Web App from a link.
 type WriteAccessAllowed struct {
+	//Name of the Web App which was launched from a link
+	//
+	// Optional
+	WebAppName string `json:"web_app_name"`
 }
 
 // VideoChatScheduled represents a service message about a voice chat scheduled
@@ -1677,6 +1681,12 @@ type InlineKeyboardButton struct {
 	//
 	// optional
 	SwitchInlineQueryCurrentChat *string `json:"switch_inline_query_current_chat,omitempty"`
+	//SwitchInlineQueryChosenChat If set, pressing the button will prompt the user to
+	//select one of their chats of the specified type, open that chat and insert the bot's
+	//username and the specified inline query in the input field
+	//
+	//optional
+	SwitchInlineQueryChosenChat *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
 	// CallbackGame description of the game that will be launched when the user presses the button.
 	//
 	// optional
@@ -2056,6 +2066,11 @@ type ChatMemberUpdated struct {
 	//
 	// optional
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
+	// ViaChatFolderInviteLink is True, if the user joined the chat 
+	// via a chat folder invite link
+	//
+	// optional
+	ViaChatFolderInviteLink bool `json:"via_chat_folder_invite_link,omitempty"`
 }
 
 // ChatJoinRequest represents a join request sent to a chat.
@@ -2572,6 +2587,32 @@ type GameHighScore struct {
 
 // CallbackGame is for starting a game in an inline keyboard button.
 type CallbackGame struct{}
+
+// SwitchInlineQueryChosenChat represents an inline button that switches the current
+// user to inline mode in a chosen chat, with an optional default inline query.
+type SwitchInlineQueryChosenChat struct {
+	// Query is default inline query to be inserted in the input field.
+	// If left empty, only the bot's username will be inserted
+	//
+	// optional
+	Query string `json:"query,omitempty"`
+	// AllowUserChats is True, if private chats with users can be chosen
+	//
+	// optional
+	AllowUserChats bool `json:"allow_user_chats,omitempty"`
+	// AllowBotChats is True, if private chats with bots can be chosen
+	//
+	// optional
+	AllowBotChats bool `json:"allow_bot_chats,omitempty"`
+	// AllowGroupChats is True, if group and supergroup chats can be chosen
+	//
+	// optional
+	AllowGroupChats bool `json:"allow_group_chats,omitempty"`
+	// AllowChannelChats is True, if channel chats can be chosen
+	//
+	// optional
+	AllowChannelChats bool `json:"allow_channel_chats,omitempty"`
+}
 
 // WebhookInfo is information about a currently set webhook.
 type WebhookInfo struct {
