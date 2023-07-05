@@ -1356,7 +1356,7 @@ type WriteAccessAllowed struct {
 	//Name of the Web App which was launched from a link
 	//
 	// Optional
-	WebAppName string `json:"web_app_name"`
+	WebAppName string `json:"web_app_name,omitempty"`
 }
 
 // VideoChatScheduled represents a service message about a voice chat scheduled

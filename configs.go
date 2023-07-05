@@ -1274,7 +1274,6 @@ func (config DeleteWebhookConfig) params() (Params, error) {
 // InlineQueryResultsButton represents a button to be shown above inline query results. You must use exactly one of the optional fields.
 type InlineQueryResultsButton struct {
 	//Label text on the button
-	//
 	Text string `json:"text"`
 	//Description of the Web App that will be launched when the user presses the button. The Web App will be able to switch back to the inline mode using the method switchInlineQuery inside the Web App.
 	//
