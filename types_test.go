@@ -369,6 +369,8 @@ var (
 	_ Chattable = SetMyDescriptionConfig{}
 	_ Chattable = GetMyShortDescriptionConfig{}
 	_ Chattable = SetMyShortDescriptionConfig{}
+	_ Chattable = GetMyNameConfig{}
+	_ Chattable = SetMyNameConfig{}
 )
 
 // Ensure all Fileable types are correct.

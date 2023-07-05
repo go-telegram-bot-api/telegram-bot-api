@@ -178,6 +178,25 @@ func TestNewInlineKeyboardButtonLoginURL(t *testing.T) {
 	}
 }
 
+func TestNewInlineKeyboardButtonSwitchInlineQueryChoosenChat(t *testing.T) {
+	result := NewInlineKeyboardButtonSwitchInlineQueryChoosenChat("text", SwitchInlineQueryChosenChat{
+		Query:             "query",
+		AllowUserChats:    false,
+		AllowBotChats:     false,
+		AllowGroupChats:   false,
+		AllowChannelChats: false,
+	})
+
+	if result.Text != "text" ||
+		result.SwitchInlineQueryChosenChat.Query != "query" ||
+		result.SwitchInlineQueryChosenChat.AllowUserChats != false ||
+		result.SwitchInlineQueryChosenChat.AllowBotChats != false ||
+		result.SwitchInlineQueryChosenChat.AllowGroupChats != false ||
+		result.SwitchInlineQueryChosenChat.AllowChannelChats != false {
+		t.Fail()
+	}
+}
+
 func TestNewEditMessageText(t *testing.T) {
 	edit := NewEditMessageText(ChatID, ReplyToMessageID, "new text")
 
