@@ -409,6 +409,10 @@ type Message struct {
 	//
 	// optional
 	IsAutomaticForward bool `json:"is_automatic_forward,omitempty"`
+	// MessageThreadID Unique identifier for the target message thread (topic) of the forum; for forum supergroups only.
+	//
+	// optional
+	MessageThreadID int `json:"message_thread_id,omitempty"`
 	// ReplyToMessage for replies, the original message.
 	// Note that the Message object in this field will not contain further ReplyToMessage fields
 	// even if it itself is a reply;
