@@ -359,7 +359,7 @@ var (
 	_ Chattable = ReopenGeneralForumTopicConfig{}
 	_ Chattable = HideGeneralForumTopicConfig{}
 	_ Chattable = UnhideGeneralForumTopicConfig{}
-	_ Chattable = SetCustomEmojiStickerSetThumbnalConfig{}
+	_ Chattable = SetCustomEmojiStickerSetThumbnailConfig{}
 	_ Chattable = SetStickerSetTitleConfig{}
 	_ Chattable = DeleteStickerSetConfig{}
 	_ Chattable = SetStickerEmojiListConfig{}

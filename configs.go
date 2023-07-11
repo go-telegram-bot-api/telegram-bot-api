@@ -2264,17 +2264,17 @@ func (config SetStickerPositionConfig) params() (Params, error) {
 	return params, nil
 }
 
-// SetCustomEmojiStickerSetThumbnalConfig allows you to set the thumbnail of a custom emoji sticker set
-type SetCustomEmojiStickerSetThumbnalConfig struct {
+// SetCustomEmojiStickerSetThumbnailConfig allows you to set the thumbnail of a custom emoji sticker set
+type SetCustomEmojiStickerSetThumbnailConfig struct {
 	Name          string
 	CustomEmojiID string
 }
 
-func (config SetCustomEmojiStickerSetThumbnalConfig) method() string {
+func (config SetCustomEmojiStickerSetThumbnailConfig) method() string {
 	return "setCustomEmojiStickerSetThumbnail"
 }
 
-func (config SetCustomEmojiStickerSetThumbnalConfig) params() (Params, error) {
+func (config SetCustomEmojiStickerSetThumbnailConfig) params() (Params, error) {
 	params := make(Params)
 
 	params["name"] = config.Name
