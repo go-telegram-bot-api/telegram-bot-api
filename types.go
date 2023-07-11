@@ -158,7 +158,7 @@ func (u *Update) FromChat() *Chat {
 		return u.ChannelPost.Chat
 	case u.EditedChannelPost != nil:
 		return u.EditedChannelPost.Chat
-	case u.CallbackQuery != nil:
+	case u.CallbackQuery != nil && u.CallbackQuery.Message != nil:
 		return u.CallbackQuery.Message.Chat
 	default:
 		return nil
