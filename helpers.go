@@ -131,8 +131,8 @@ func NewSticker(chatID int64, file RequestFileData) StickerConfig {
 }
 
 // NewCustomEmojiStickerSetThumbnal creates a new setCustomEmojiStickerSetThumbnal request
-func NewCustomEmojiStickerSetThumbnal(name, customEmojiID string) SetCustomEmojiStickerSetThumbnalConfig {
-	return SetCustomEmojiStickerSetThumbnalConfig{
+func NewCustomEmojiStickerSetThumbnal(name, customEmojiID string) SetCustomEmojiStickerSetThumbnailConfig {
+	return SetCustomEmojiStickerSetThumbnailConfig{
 		Name:          name,
 		CustomEmojiID: customEmojiID,
 	}
