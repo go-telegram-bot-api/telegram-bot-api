@@ -2280,7 +2280,7 @@ func (config EditForumTopicConfig) params() (Params, error) {
 
 	params.AddFirstValid("chat_id", config.ChatID, config.SuperGroupUsername)
 	params.AddNonZero("message_thread_id", config.MessageThreadID)
-	params.AddNonEmpty("icon_color", config.Name)
+	params.AddNonEmpty("name", config.Name)
 	params.AddNonEmpty("icon_custom_emoji_id", config.IconCustomEmojiID)
 
 	return params, nil
