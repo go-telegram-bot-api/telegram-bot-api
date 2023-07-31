@@ -2,3 +2,5 @@
 coverage.out
 tmp/
 book/
+.vscode/
+
