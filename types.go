@@ -158,7 +158,7 @@ func (u *Update) FromChat() *Chat {
 		return u.ChannelPost.Chat
 	case u.EditedChannelPost != nil:
 		return u.EditedChannelPost.Chat
-	case u.CallbackQuery != nil:
+	case u.CallbackQuery != nil && u.CallbackQuery.Message != nil:
 		return u.CallbackQuery.Message.Chat
 	default:
 		return nil
@@ -187,6 +187,10 @@ type User struct {
 	//
 	// optional
 	IsPremium bool `json:"is_premium,omitempty"`
+	// AddedToAttachmentMenu true, if this user added the bot to the attachment menu
+	//
+	// optional
+	AddedToAttachmentMenu bool `json:"added_to_attachment_menu,omitempty"`
 	// FirstName user's or bot's first name
 	FirstName string `json:"first_name"`
 	// LastName user's or bot's last name
@@ -261,8 +265,22 @@ type Chat struct {
 	//
 	// optional
 	LastName string `json:"last_name,omitempty"`
+	// IsForum is true if the supergroup chat is a forum (has topics enabled)
+	//
+	// optional
+	IsForum bool `json:"is_forum,omitempty"`
 	// Photo is a chat photo
 	Photo *ChatPhoto `json:"photo"`
+	// If non-empty, the list of all active chat usernames;
+	// for private chats, supergroups and channels. Returned only in getChat.
+	//
+	// optional
+	ActiveUsernames []string `json:"active_usernames,omitempty"`
+	// Custom emoji identifier of emoji status of the other party
+	// in a private chat. Returned only in getChat.
+	//
+	// optional
+	EmojiStatusCustomEmojiID string `json:"emoji_status_custom_emoji_id,omitempty"`
 	// Bio is the bio of the other party in a private chat. Returned only in
 	// getChat
 	//
@@ -274,6 +292,24 @@ type Chat struct {
 	//
 	// optional
 	HasPrivateForwards bool `json:"has_private_forwards,omitempty"`
+	// HasRestrictedVoiceAndVideoMessages if the privacy settings of the other party
+	// restrict sending voice and video note messages
+	// in the private chat. Returned only in getChat.
+	//
+	// optional
+	HasRestrictedVoiceAndVideoMessages bool `json:"has_restricted_voice_and_video_messages,omitempty"`
+	// JoinToSendMessages is true, if users need to join the supergroup
+	// before they can send messages.
+	// Returned only in getChat
+	//
+	// optional
+	JoinToSendMessages bool `json:"join_to_send_messages,omitempty"`
+	// JoinByRequest is true, if all users directly joining the supergroup
+	// need to be approved by supergroup administrators.
+	// Returned only in getChat.
+	//
+	// optional
+	JoinByRequest bool `json:"join_by_request,omitempty"`
 	// Description for groups, supergroups and channel chats
 	//
 	// optional
@@ -304,6 +340,17 @@ type Chat struct {
 	//
 	// optional
 	MessageAutoDeleteTime int `json:"message_auto_delete_time,omitempty"`
+	// HasAggressiveAntiSpamEnabled is true if aggressive anti-spam checks are enabled
+	// in the supergroup. The field is only available to chat administrators.
+	// Returned only in getChat.
+	//
+	// optional
+	HasAggressiveAntiSpamEnabled bool `json:"has_aggressive_anti_spam_enabled,omitempty"`
+	// HasHiddenMembers is true if non-administrators can only get
+	// the list of bots and administrators in the chat.
+	//
+	// optional
+	HasHiddenMembers bool `json:"has_hidden_members,omitempty"`
 	// HasProtectedContent is true if messages from the chat can't be forwarded
 	// to other chats. Returned only in getChat.
 	//
@@ -361,6 +408,11 @@ func (c Chat) ChatConfig() ChatConfig {
 type Message struct {
 	// MessageID is a unique message identifier inside this chat
 	MessageID int `json:"message_id"`
+	// Unique identifier of a message thread to which the message belongs;
+	// for supergroups only
+	//
+	// optional
+	MessageThreadID int `json:"message_thread_id,omitempty"`
 	// From is a sender, empty for messages sent to channels;
 	//
 	// optional
@@ -404,6 +456,10 @@ type Message struct {
 	//
 	// optional
 	ForwardDate int `json:"forward_date,omitempty"`
+	// IsTopicMessage true if the message is sent to a forum topic
+	//
+	// optional
+	IsTopicMessage bool `json:"is_topic_message,omitempty"`
 	// IsAutomaticForward is true if the message is a channel post that was
 	// automatically forwarded to the connected discussion group.
 	//
@@ -490,6 +546,10 @@ type Message struct {
 	//
 	// optional
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// HasSpoiler True, if the message media is covered by a spoiler animation
+	//
+	// optional
+	HasMediaSpoiler bool `json:"has_media_spoiler,omitempty"`
 	// Contact message is a shared contact, information about the contact;
 	//
 	// optional
@@ -594,11 +654,24 @@ type Message struct {
 	//
 	// optional
 	SuccessfulPayment *SuccessfulPayment `json:"successful_payment,omitempty"`
+	// UserShared is a service message: a user was shared with the bot
+	//
+	// optional
+	UserShared *UserShared `json:"user_shared,omitempty"`
+	// ChatShared is a service message: a chat was shared with the bot
+	//
+	// optional
+	ChatShared *ChatShared `json:"chat_shared,omitempty"`
 	// ConnectedWebsite is the domain name of the website on which the user has
 	// logged in;
 	//
 	// optional
 	ConnectedWebsite string `json:"connected_website,omitempty"`
+	// WriteAccessAllowed is a service message: the user allowed the bot
+	// added to the attachment menu to write messages
+	//
+	// optional
+	WriteAccessAllowed *WriteAccessAllowed `json:"write_access_allowed,omitempty"`
 	// PassportData is a Telegram Passport data;
 	//
 	// optional
@@ -608,6 +681,30 @@ type Message struct {
 	//
 	// optional
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered,omitempty"`
+	// ForumTopicCreated is a service message: forum topic created
+	//
+	// optional
+	ForumTopicCreated *ForumTopicCreated `json:"forum_topic_created,omitempty"`
+	// ForumTopicClosed is a service message: forum topic edited
+	//
+	// optional
+	ForumTopicEdited *ForumTopicEdited `json:"forum_topic_edited,omitempty"`
+	// ForumTopicClosed is a service message: forum topic closed
+	//
+	// optional
+	ForumTopicClosed *ForumTopicClosed `json:"forum_topic_closed,omitempty"`
+	// ForumTopicReopened is a service message: forum topic reopened
+	//
+	// optional
+	ForumTopicReopened *ForumTopicReopened `json:"forum_topic_reopened,omitempty"`
+	// GeneralForumTopicHidden is a service message: the 'General' forum topic hidden
+	//
+	// optional
+	GeneralForumTopicHidden *GeneralForumTopicHidden `json:"general_forum_topic_hidden,omitempty"`
+	// GeneralForumTopicUnhidden is a service message: the 'General' forum topic unhidden
+	//
+	// optional
+	GeneralForumTopicUnhidden *GeneralForumTopicUnhidden `json:"general_forum_topic_unhidden,omitempty"`
 	// VideoChatScheduled is a service message: video chat scheduled.
 	//
 	// optional
@@ -730,6 +827,7 @@ type MessageEntity struct {
 	//  “pre” (monowidth block),
 	//  “text_link” (for clickable text URLs),
 	//  “text_mention” (for users without usernames)
+	//  “text_mention” (for inline custom emoji stickers)
 	Type string `json:"type"`
 	// Offset in UTF-16 code units to the start of the entity
 	Offset int `json:"offset"`
@@ -747,6 +845,10 @@ type MessageEntity struct {
 	//
 	// optional
 	Language string `json:"language,omitempty"`
+	// CustomEmojiID for “custom_emoji” only, unique identifier of the custom emoji
+	//
+	// optional
+	CustomEmojiID string `json:"custom_emoji_id"`
 }
 
 // ParseURL attempts to parse a URL contained within a MessageEntity.
@@ -851,7 +953,7 @@ type Animation struct {
 	// Thumbnail animation thumbnail as defined by sender
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileName original animation filename as defined by sender
 	//
 	// optional
@@ -863,7 +965,7 @@ type Animation struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Audio represents an audio file to be treated as music by the Telegram clients.
@@ -896,11 +998,11 @@ type Audio struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 	// Thumbnail is the album cover to which the music file belongs
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 }
 
 // Document represents a general file.
@@ -915,7 +1017,7 @@ type Document struct {
 	// Thumbnail document thumbnail as defined by sender
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileName original filename as defined by sender
 	//
 	// optional
@@ -927,7 +1029,7 @@ type Document struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Video represents a video file.
@@ -948,7 +1050,7 @@ type Video struct {
 	// Thumbnail video thumbnail
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileName is the original filename as defined by sender
 	//
 	// optional
@@ -960,7 +1062,7 @@ type Video struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // VideoNote object represents a video message.
@@ -978,7 +1080,7 @@ type VideoNote struct {
 	// Thumbnail video thumbnail
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// FileSize file size
 	//
 	// optional
@@ -1002,7 +1104,7 @@ type Voice struct {
 	// FileSize file size
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Contact represents a phone contact.
@@ -1181,6 +1283,82 @@ type MessageAutoDeleteTimerChanged struct {
 	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
 }
 
+// ForumTopicCreated represents a service message about a new forum topic
+// created in the chat.
+type ForumTopicCreated struct {
+	// Name is the name of topic
+	Name string `json:"name"`
+	// IconColor is the color of the topic icon in RGB format
+	IconColor int `json:"icon_color"`
+	// IconCustomEmojiID is the unique identifier of the custom emoji
+	// shown as the topic icon
+	//
+	// optional
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+}
+
+// ForumTopicClosed represents a service message about a forum topic
+// closed in the chat. Currently holds no information.
+type ForumTopicClosed struct {
+}
+
+// ForumTopicEdited object represents a service message about an edited forum topic.
+type ForumTopicEdited struct {
+	// Name is the new name of the topic, if it was edited
+	//
+	// optional
+	Name string `json:"name,omitempty"`
+	// IconCustomEmojiID is the new identifier of the custom emoji
+	// shown as the topic icon, if it was edited;
+	// an empty string if the icon was removed
+	//
+	// optional
+	IconCustomEmojiID *string `json:"icon_custom_emoji_id,omitempty"`
+}
+
+// ForumTopicReopened represents a service message about a forum topic
+// reopened in the chat. Currently holds no information.
+type ForumTopicReopened struct {
+}
+
+// GeneralForumTopicHidden represents a service message about General forum topic
+// hidden in the chat. Currently holds no information.
+type GeneralForumTopicHidden struct {
+}
+
+// GeneralForumTopicUnhidden represents a service message about General forum topic
+// unhidden in the chat. Currently holds no information.
+type GeneralForumTopicUnhidden struct {
+}
+
+// UserShared object contains information about the user whose identifier
+// was shared with the bot using a KeyboardButtonRequestUser button.
+type UserShared struct {
+	// RequestID is an indentifier of the request.
+	RequestID int `json:"request_id"`
+	// UserID in an identifier of the shared user.
+	UserID int64 `json:"user_id"`
+}
+
+// ChatShared contains information about the chat whose identifier
+// was shared with the bot using a KeyboardButtonRequestChat button.
+type ChatShared struct {
+	// RequestID is an indentifier of the request.
+	RequestID int `json:"request_id"`
+	// ChatID is an identifier of the shared chat.
+	ChatID int64 `json:"chat_id"`
+}
+
+// WriteAccessAllowed represents a service message about a user allowing a bot
+// to write messages after adding the bot to the attachment menu or launching
+// a Web App from a link.
+type WriteAccessAllowed struct {
+	//Name of the Web App which was launched from a link
+	//
+	// Optional
+	WebAppName string `json:"web_app_name,omitempty"`
+}
+
 // VideoChatScheduled represents a service message about a voice chat scheduled
 // in the chat.
 type VideoChatScheduled struct {
@@ -1234,7 +1412,7 @@ type File struct {
 	// FileSize file size, if known
 	//
 	// optional
-	FileSize int `json:"file_size,omitempty"`
+	FileSize int64 `json:"file_size,omitempty"`
 	// FilePath file path
 	//
 	// optional
@@ -1259,6 +1437,13 @@ type WebAppInfo struct {
 type ReplyKeyboardMarkup struct {
 	// Keyboard is an array of button rows, each represented by an Array of KeyboardButton objects
 	Keyboard [][]KeyboardButton `json:"keyboard"`
+	// IsPersistent requests clients to always show the keyboard
+	// when the regular keyboard is hidden.
+	// Defaults to false, in which case the custom keyboard can be hidden
+	// and opened with a keyboard icon.
+	//
+	// optional
+	IsPersistent bool `json:"is_persistent"`
 	// ResizeKeyboard requests clients to resize the keyboard vertically for optimal fit
 	// (e.g., make the keyboard smaller if there are just two rows of buttons).
 	// Defaults to false, in which case the custom keyboard
@@ -1300,6 +1485,20 @@ type KeyboardButton struct {
 	// Text of the button. If none of the optional fields are used,
 	// it will be sent as a message when the button is pressed.
 	Text string `json:"text"`
+	// RequestUser if specified, pressing the button will open
+	// a list of suitable users. Tapping on any user will send
+	// their identifier to the bot in a "user_shared" service message.
+	// Available in private chats only.
+	//
+	// optional
+	RequestUser *KeyboardButtonRequestUser `json:"request_user,omitempty"`
+	// RequestChat if specified, pressing the button will open
+	// a list of suitable chats. Tapping on a chat will send
+	// its identifier to the bot in a "chat_shared" service message.
+	// Available in private chats only.
+	//
+	// optional
+	RequestChat *KeyboardButtonRequestChat `json:"request_chat,omitempty"`
 	// RequestContact if True, the user's phone number will be sent
 	// as a contact when the button is pressed.
 	// Available in private chats only.
@@ -1323,6 +1522,72 @@ type KeyboardButton struct {
 	//
 	// optional
 	WebApp *WebAppInfo `json:"web_app,omitempty"`
+}
+
+// KeyboardButtonRequestUser defines the criteria used to request
+// a suitable user. The identifier of the selected user will be shared
+// with the bot when the corresponding button is pressed.
+type KeyboardButtonRequestUser struct {
+	// RequestID is a signed 32-bit identifier of the request.
+	RequestID int `json:"request_id"`
+	// UserIsBot pass True to request a bot,
+	// pass False to request a regular user.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	UserIsBot bool `json:"user_is_bot,omitempty"`
+	// UserIsPremium pass True to request a premium user,
+	// pass False to request a non-premium user.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	UserIsPremium bool `json:"user_is_premium,omitempty"`
+}
+
+// KeyboardButtonRequestChat defines the criteria used to request
+// a suitable chat. The identifier of the selected chat will be shared
+// with the bot when the corresponding button is pressed.
+type KeyboardButtonRequestChat struct {
+	// RequestID is a signed 32-bit identifier of the request.
+	RequestID int `json:"request_id"`
+	// ChatIsChannel pass True to request a channel chat,
+	// pass False to request a group or a supergroup chat.
+	ChatIsChannel bool `json:"chat_is_channel"`
+	// ChatIsForum pass True to request a forum supergroup,
+	// pass False to request a non-forum chat.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	ChatIsForum bool `json:"chat_is_forum,omitempty"`
+	// ChatHasUsername pass True to request a supergroup or a channel with a username,
+	// pass False to request a chat without a username.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	ChatHasUsername bool `json:"chat_has_username,omitempty"`
+	// ChatIsCreated pass True to request a chat owned by the user.
+	// Otherwise, no additional restrictions are applied.
+	//
+	// optional
+	ChatIsCreated bool `json:"chat_is_created,omitempty"`
+	// UserAdministratorRights is a JSON-serialized object listing
+	// the required administrator rights of the user in the chat.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	UserAdministratorRights *ChatAdministratorRights `json:"user_administrator_rights,omitempty"`
+	// BotAdministratorRights is a JSON-serialized object listing
+	// the required administrator rights of the bot in the chat.
+	// The rights must be a subset of user_administrator_rights.
+	// If not specified, no additional restrictions are applied.
+	//
+	// optional
+	BotAdministratorRights *ChatAdministratorRights `json:"bot_administrator_rights,omitempty"`
+	// BotIsMember pass True to request a chat with the bot as a member.
+	// Otherwise, no additional restrictions are applied.
+	//
+	// optional
+	BotIsMember bool `json:"bot_is_member,omitempty"`
 }
 
 // KeyboardButtonPollType represents type of poll, which is allowed to
@@ -1416,6 +1681,12 @@ type InlineKeyboardButton struct {
 	//
 	// optional
 	SwitchInlineQueryCurrentChat *string `json:"switch_inline_query_current_chat,omitempty"`
+	//SwitchInlineQueryChosenChat If set, pressing the button will prompt the user to
+	//select one of their chats of the specified type, open that chat and insert the bot's
+	//username and the specified inline query in the input field
+	//
+	//optional
+	SwitchInlineQueryChosenChat *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
 	// CallbackGame description of the game that will be launched when the user presses the button.
 	//
 	// optional
@@ -1591,6 +1862,7 @@ type ChatAdministratorRights struct {
 	CanPostMessages     bool `json:"can_post_messages"`
 	CanEditMessages     bool `json:"can_edit_messages"`
 	CanPinMessages      bool `json:"can_pin_messages"`
+	CanManageTopics     bool `json:"can_manage_topics"`
 }
 
 // ChatMember contains information about one member of a chat.
@@ -1683,6 +1955,12 @@ type ChatMember struct {
 	//
 	// optional
 	CanPinMessages bool `json:"can_pin_messages,omitempty"`
+	// CanManageTopics administrators and restricted only.
+	// True, if the user is allowed to create, rename,
+	// close, and reopen forum topics; supergroups only
+	//
+	// optional
+	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 	// IsMember is true, if the user is a member of the chat at the moment of
 	// the request
 	IsMember bool `json:"is_member"`
@@ -1690,11 +1968,36 @@ type ChatMember struct {
 	//
 	// optional
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
-	// CanSendMediaMessages restricted only.
-	// True, if the user is allowed to send text messages, contacts, locations and venues
+	// CanSendAudios restricted only.
+	// True, if the user is allowed to send audios
 	//
 	// optional
-	CanSendMediaMessages bool `json:"can_send_media_messages,omitempty"`
+	CanSendAudios bool
+	// CanSendDocuments restricted only.
+	// True, if the user is allowed to send documents
+	//
+	// optional
+	CanSendDocuments bool
+	// CanSendPhotos is restricted only.
+	// True, if the user is allowed to send photos
+	//
+	// optional
+	CanSendPhotos bool
+	// CanSendVideos restricted only.
+	// True, if the user is allowed to send videos
+	//
+	// optional
+	CanSendVideos bool
+	// CanSendVideoNotes restricted only.
+	// True, if the user is allowed to send video notes
+	//
+	// optional
+	CanSendVideoNotes bool
+	// CanSendVoiceNotes restricted only.
+	// True, if the user is allowed to send voice notes
+	//
+	// optional
+	CanSendVoiceNotes bool
 	// CanSendPolls restricted only.
 	// True, if the user is allowed to send polls
 	//
@@ -1725,6 +2028,27 @@ func (chat ChatMember) HasLeft() bool { return chat.Status == "left" }
 // WasKicked returns if the ChatMember was kicked from the chat.
 func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
 
+// SetCanSendMediaMessages is a method to replace field "can_send_media_messages".
+// It sets CanSendAudio, CanSendDocuments, CanSendPhotos, CanSendVideos,
+// CanSendVideoNotes, CanSendVoiceNotes to passed value.
+func (chat *ChatMember) SetCanSendMediaMessages(b bool) {
+	chat.CanSendAudios = b
+	chat.CanSendDocuments = b
+	chat.CanSendPhotos = b
+	chat.CanSendVideos = b
+	chat.CanSendVideoNotes = b
+	chat.CanSendVoiceNotes = b
+}
+
+// CanSendMediaMessages method to replace field "can_send_media_messages".
+// It returns true if CanSendAudio and CanSendDocuments and CanSendPhotos and CanSendVideos and
+// CanSendVideoNotes and CanSendVoiceNotes are true.
+func (chat *ChatMember) CanSendMediaMessages() bool {
+	return chat.CanSendAudios && chat.CanSendDocuments &&
+		chat.CanSendPhotos && chat.CanSendVideos &&
+		chat.CanSendVideoNotes && chat.CanSendVoiceNotes
+}
+
 // ChatMemberUpdated represents changes in the status of a chat member.
 type ChatMemberUpdated struct {
 	// Chat the user belongs to.
@@ -1742,6 +2066,11 @@ type ChatMemberUpdated struct {
 	//
 	// optional
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
+	// ViaChatFolderInviteLink is True, if the user joined the chat 
+	// via a chat folder invite link
+	//
+	// optional
+	ViaChatFolderInviteLink bool `json:"via_chat_folder_invite_link,omitempty"`
 }
 
 // ChatJoinRequest represents a join request sent to a chat.
@@ -1750,6 +2079,8 @@ type ChatJoinRequest struct {
 	Chat Chat `json:"chat"`
 	// User that sent the join request.
 	From User `json:"from"`
+	// UserChatID identifier of a private chat with the user who sent the join request.
+	UserChatID int64 `json:"user_chat_id"`
 	// Date the request was sent in Unix time.
 	Date int `json:"date"`
 	// Bio of the user.
@@ -1770,12 +2101,30 @@ type ChatPermissions struct {
 	//
 	// optional
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
-	// CanSendMediaMessages is true, if the user is allowed to send audios,
-	// documents, photos, videos, video notes and voice notes, implies
-	// can_send_messages
+	// CanSendAudios is true, if the user is allowed to send audios
 	//
 	// optional
-	CanSendMediaMessages bool `json:"can_send_media_messages,omitempty"`
+	CanSendAudios bool
+	// CanSendDocuments is true, if the user is allowed to send documents
+	//
+	// optional
+	CanSendDocuments bool
+	// CanSendPhotos is true, if the user is allowed to send photos
+	//
+	// optional
+	CanSendPhotos bool
+	// CanSendVideos is true, if the user is allowed to send videos
+	//
+	// optional
+	CanSendVideos bool
+	// CanSendVideoNotes is true, if the user is allowed to send video notes
+	//
+	// optional
+	CanSendVideoNotes bool
+	// CanSendVoiceNotes is true, if the user is allowed to send voice notes
+	//
+	// optional
+	CanSendVoiceNotes bool
 	// CanSendPolls is true, if the user is allowed to send polls, implies
 	// can_send_messages
 	//
@@ -1806,6 +2155,32 @@ type ChatPermissions struct {
 	//
 	// optional
 	CanPinMessages bool `json:"can_pin_messages,omitempty"`
+	// CanManageTopics is true, if the user is allowed to create forum topics.
+	// If omitted defaults to the value of can_pin_messages
+	//
+	// optional
+	CanManageTopics bool `json:"can_manage_topics,omitempty"`
+}
+
+// SetCanSendMediaMessages is a method to replace field "can_send_media_messages".
+// It sets CanSendAudio, CanSendDocuments, CanSendPhotos, CanSendVideos,
+// CanSendVideoNotes, CanSendVoiceNotes to passed value.
+func (c *ChatPermissions) SetCanSendMediaMessages(b bool) {
+	c.CanSendAudios = b
+	c.CanSendDocuments = b
+	c.CanSendPhotos = b
+	c.CanSendVideos = b
+	c.CanSendVideoNotes = b
+	c.CanSendVoiceNotes = b
+}
+
+// CanSendMediaMessages method to replace field "can_send_media_messages".
+// It returns true if CanSendAudio and CanSendDocuments and CanSendPhotos and CanSendVideos and
+// CanSendVideoNotes and CanSendVoiceNotes are true.
+func (c *ChatPermissions) CanSendMediaMessages() bool {
+	return c.CanSendAudios && c.CanSendDocuments &&
+		c.CanSendPhotos && c.CanSendVideos &&
+		c.CanSendVideoNotes && c.CanSendVoiceNotes
 }
 
 // ChatLocation represents a location to which a chat is connected.
@@ -1816,6 +2191,21 @@ type ChatLocation struct {
 	// Address is the location address; 1-64 characters, as defined by the chat
 	// owner
 	Address string `json:"address"`
+}
+
+// ForumTopic represents a forum topic.
+type ForumTopic struct {
+	// MessageThreadID is the unique identifier of the forum topic
+	MessageThreadID int `json:"message_thread_id"`
+	// Name is the name of the topic
+	Name string `json:"name"`
+	// IconColor is the color of the topic icon in RGB format
+	IconColor int `json:"icon_color"`
+	// IconCustomEmojiID is the unique identifier of the custom emoji
+	// shown as the topic icon
+	//
+	// optional
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
 }
 
 // BotCommand represents a bot command.
@@ -1835,6 +2225,16 @@ type BotCommandScope struct {
 	Type   string `json:"type"`
 	ChatID int64  `json:"chat_id,omitempty"`
 	UserID int64  `json:"user_id,omitempty"`
+}
+
+// BotDescription represents the bot's description.
+type BotDescription struct {
+	Description string `json:"description"`
+}
+
+// BotShortDescription represents the bot's short description
+type BotShortDescription struct {
+	ShortDescription string `json:"short_description"`
 }
 
 // MenuButton describes the bot's menu button in a private chat.
@@ -1891,6 +2291,10 @@ type BaseInputMedia struct {
 	//
 	// optional
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// HasSpoiler pass True, if the photo needs to be covered with a spoiler animation
+	//
+	// optional
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
 }
 
 // InputMediaPhoto is a photo to send as part of a media group.
@@ -1905,7 +2309,7 @@ type InputMediaVideo struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1922,6 +2326,10 @@ type InputMediaVideo struct {
 	//
 	// optional
 	SupportsStreaming bool `json:"supports_streaming,omitempty"`
+	// HasSpoiler pass True, if the video needs to be covered with a spoiler animation
+	//
+	// optional
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
 }
 
 // InputMediaAnimation is an animation to send as part of a media group.
@@ -1931,7 +2339,7 @@ type InputMediaAnimation struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// Width video width
 	//
 	// optional
@@ -1944,6 +2352,10 @@ type InputMediaAnimation struct {
 	//
 	// optional
 	Duration int `json:"duration,omitempty"`
+	// HasSpoiler pass True, if the photo needs to be covered with a spoiler animation
+	//
+	// optional
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
 }
 
 // InputMediaAudio is an audio to send as part of a media group.
@@ -1953,7 +2365,7 @@ type InputMediaAudio struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// Duration of the audio in seconds
 	//
 	// optional
@@ -1975,7 +2387,7 @@ type InputMediaDocument struct {
 	// the file is supported server-side.
 	//
 	// optional
-	Thumb RequestFileData `json:"thumb,omitempty"`
+	Thumb RequestFileData `json:"thumbnail,omitempty"`
 	// DisableContentTypeDetection disables automatic server-side content type
 	// detection for files uploaded using multipart/form-data. Always true, if
 	// the document is sent as part of an album
@@ -1983,6 +2395,13 @@ type InputMediaDocument struct {
 	// optional
 	DisableContentTypeDetection bool `json:"disable_content_type_detection,omitempty"`
 }
+
+// Constant values for sticker types
+const (
+	StickerTypeRegular     = "regular"
+	StickerTypeMask        = "mask"
+	StickerTypeCustomEmoji = "custom_emoji"
+)
 
 // Sticker represents a sticker.
 type Sticker struct {
@@ -1993,6 +2412,10 @@ type Sticker struct {
 	// which is supposed to be the same over time and for different bots.
 	// Can't be used to download or reuse the file.
 	FileUniqueID string `json:"file_unique_id"`
+	// Type is a type of the sticker, currently one of “regular”,
+	// “mask”, “custom_emoji”. The type of the sticker is independent
+	// from its format, which is determined by the fields is_animated and is_video.
+	Type string `json:"type"`
 	// Width sticker width
 	Width int `json:"width"`
 	// Height sticker height
@@ -2008,7 +2431,7 @@ type Sticker struct {
 	// Thumbnail sticker thumbnail in the .WEBP or .JPG format
 	//
 	// optional
-	Thumbnail *PhotoSize `json:"thumb,omitempty"`
+	Thumbnail *PhotoSize `json:"thumbnail,omitempty"`
 	// Emoji associated with the sticker
 	//
 	// optional
@@ -2030,10 +2453,29 @@ type Sticker struct {
 	//
 	// optional
 	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
+	// NeedsRepainting True, if the sticker must be repainted to a text color in messages, the color of the Telegram Premium badge in emoji status, white color on chat photos, or another appropriate color in other places
+	//
+	//optional
+	NeedsRepainting bool `json:"needs_reainting,omitempty"`
 	// FileSize
 	//
 	// optional
 	FileSize int `json:"file_size,omitempty"`
+}
+
+// IsRegular returns if the Sticker is regular
+func (s Sticker) IsRegular() bool {
+	return s.Type == StickerTypeRegular
+}
+
+// IsMask returns if the Sticker is mask
+func (s Sticker) IsMask() bool {
+	return s.Type == StickerTypeMask
+}
+
+// IsCustomEmoji returns if the Sticker is custom emoji
+func (s Sticker) IsCustomEmoji() bool {
+	return s.Type == StickerTypeCustomEmoji
 }
 
 // StickerSet represents a sticker set.
@@ -2049,11 +2491,28 @@ type StickerSet struct {
 	// IsVideo true, if the sticker set contains video stickers
 	IsVideo bool `json:"is_video"`
 	// ContainsMasks true, if the sticker set contains masks
+	//
+	// deprecated. Use sticker_type instead
 	ContainsMasks bool `json:"contains_masks"`
 	// Stickers list of all set stickers
 	Stickers []Sticker `json:"stickers"`
 	// Thumb is the sticker set thumbnail in the .WEBP or .TGS format
-	Thumbnail *PhotoSize `json:"thumb"`
+	Thumbnail *PhotoSize `json:"thumbnail"`
+}
+
+// IsRegular returns if the StickerSet is regular
+func (s StickerSet) IsRegular() bool {
+	return s.StickerType == StickerTypeRegular
+}
+
+// IsMask returns if the StickerSet is mask
+func (s StickerSet) IsMask() bool {
+	return s.StickerType == StickerTypeMask
+}
+
+// IsCustomEmoji returns if the StickerSet is custom emoji
+func (s StickerSet) IsCustomEmoji() bool {
+	return s.StickerType == StickerTypeCustomEmoji
 }
 
 // MaskPosition describes the position on faces where a mask should be placed
@@ -2072,6 +2531,22 @@ type MaskPosition struct {
 	YShift float64 `json:"y_shift"`
 	// Mask scaling coefficient. For example, 2.0 means double size.
 	Scale float64 `json:"scale"`
+}
+
+// InputSticker describes a sticker to be added to a sticker set.
+type InputSticker struct {
+	// The added sticker. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, upload a new one using multipart/form-data, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name. Animated and video stickers can't be uploaded via HTTP URL.
+	Sticker RequestFile `json:"sticker"`
+	// List of 1-20 emoji associated with the sticker
+	EmojiList []string `json:"emoji_list"`
+	// Position where the mask should be placed on faces. For “mask” stickers only.
+	//
+	// optional
+	MaskPosition *MaskPosition `json:"mask_position"`
+	// List of 0-20 search keywords for the sticker with total length of up to 64 characters. For “regular” and “custom_emoji” stickers only.
+	//
+	// optional
+	Keywords []string `json:"keywords"`
 }
 
 // Game represents a game. Use BotFather to create and edit games, their short
@@ -2112,6 +2587,32 @@ type GameHighScore struct {
 
 // CallbackGame is for starting a game in an inline keyboard button.
 type CallbackGame struct{}
+
+// SwitchInlineQueryChosenChat represents an inline button that switches the current
+// user to inline mode in a chosen chat, with an optional default inline query.
+type SwitchInlineQueryChosenChat struct {
+	// Query is default inline query to be inserted in the input field.
+	// If left empty, only the bot's username will be inserted
+	//
+	// optional
+	Query string `json:"query,omitempty"`
+	// AllowUserChats is True, if private chats with users can be chosen
+	//
+	// optional
+	AllowUserChats bool `json:"allow_user_chats,omitempty"`
+	// AllowBotChats is True, if private chats with bots can be chosen
+	//
+	// optional
+	AllowBotChats bool `json:"allow_bot_chats,omitempty"`
+	// AllowGroupChats is True, if group and supergroup chats can be chosen
+	//
+	// optional
+	AllowGroupChats bool `json:"allow_group_chats,omitempty"`
+	// AllowChannelChats is True, if channel chats can be chosen
+	//
+	// optional
+	AllowChannelChats bool `json:"allow_channel_chats,omitempty"`
+}
 
 // WebhookInfo is information about a currently set webhook.
 type WebhookInfo struct {
@@ -2493,15 +2994,15 @@ type InlineQueryResultArticle struct {
 	// ThumbURL url of the thumbnail for the result
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultAudio is an inline query response audio.
@@ -2557,9 +3058,9 @@ type InlineQueryResultContact struct {
 	VCard               string                `json:"vcard"`
 	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 	InputMessageContent interface{}           `json:"input_message_content,omitempty"`
-	ThumbURL            string                `json:"thumb_url"`
-	ThumbWidth          int                   `json:"thumb_width"`
-	ThumbHeight         int                   `json:"thumb_height"`
+	ThumbURL            string                `json:"thumbnail_url"`
+	ThumbWidth          int                   `json:"thumbnail_width"`
+	ThumbHeight         int                   `json:"thumbnail_height"`
 }
 
 // InlineQueryResultGame is an inline query response game.
@@ -2607,15 +3108,15 @@ type InlineQueryResultDocument struct {
 	// ThumbURL url of the thumbnail (jpeg only) for the file
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultGIF is an inline query response GIF.
@@ -2627,7 +3128,9 @@ type InlineQueryResultGIF struct {
 	// URL a valid URL for the GIF file. File size must not exceed 1MB.
 	URL string `json:"gif_url"`
 	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
-	ThumbURL string `json:"thumb_url"`
+	ThumbURL string `json:"thumbnail_url"`
+	// MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
+	ThumbMimeType string `json:"thumbnail_mime_type,omitempty"`
 	// Width of the GIF
 	//
 	// optional
@@ -2713,15 +3216,15 @@ type InlineQueryResultLocation struct {
 	// ThumbURL url of the thumbnail for the result
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultMPEG4GIF is an inline query response MPEG4 GIF.
@@ -2745,7 +3248,9 @@ type InlineQueryResultMPEG4GIF struct {
 	// optional
 	Duration int `json:"mpeg4_duration,omitempty"`
 	// ThumbURL url of the static (JPEG or GIF) or animated (MPEG4) thumbnail for the result.
-	ThumbURL string `json:"thumb_url"`
+	ThumbURL string `json:"thumbnail_url"`
+	// MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”. Defaults to “image/jpeg”
+	ThumbMimeType string `json:"thumbnail_mime_type,omitempty"`
 	// Title for the result
 	//
 	// optional
@@ -2797,7 +3302,7 @@ type InlineQueryResultPhoto struct {
 	// ThumbURL url of the thumbnail for the photo.
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// Title for the result
 	//
 	// optional
@@ -2873,15 +3378,15 @@ type InlineQueryResultVenue struct {
 	// ThumbURL url of the thumbnail for the result
 	//
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// ThumbWidth thumbnail width
 	//
 	// optional
-	ThumbWidth int `json:"thumb_width,omitempty"`
+	ThumbWidth int `json:"thumbnail_width,omitempty"`
 	// ThumbHeight thumbnail height
 	//
 	// optional
-	ThumbHeight int `json:"thumb_height,omitempty"`
+	ThumbHeight int `json:"thumbnail_height,omitempty"`
 }
 
 // InlineQueryResultVideo is an inline query response video.
@@ -2897,7 +3402,7 @@ type InlineQueryResultVideo struct {
 	//
 	// ThumbURL url of the thumbnail (jpeg only) for the video
 	// optional
-	ThumbURL string `json:"thumb_url,omitempty"`
+	ThumbURL string `json:"thumbnail_url,omitempty"`
 	// Title for the result
 	Title string `json:"title"`
 	// Caption of the video to be sent, 0-1024 characters after entities parsing
