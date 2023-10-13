@@ -557,10 +557,13 @@ type VideoConfig struct {
 	BaseFile
 	Thumb             RequestFileData
 	Duration          int
+	Width             int
+	Height            int
 	Caption           string
 	ParseMode         string
 	CaptionEntities   []MessageEntity
 	SupportsStreaming bool
+
 }
 
 func (config VideoConfig) params() (Params, error) {
@@ -570,6 +573,8 @@ func (config VideoConfig) params() (Params, error) {
 	}
 
 	params.AddNonZero("duration", config.Duration)
+	params.AddNonZero("width", config.Width)
+	params.AddNonZero("height", config.Height)
 	params.AddNonEmpty("caption", config.Caption)
 	params.AddNonEmpty("parse_mode", config.ParseMode)
 	params.AddBool("supports_streaming", config.SupportsStreaming)
