@@ -2227,6 +2227,11 @@ type BotCommandScope struct {
 	UserID int64  `json:"user_id,omitempty"`
 }
 
+//BotName represents the bot's name.
+type BotName struct {
+	Name string `json:"name"`
+}
+
 // BotDescription represents the bot's description.
 type BotDescription struct {
 	Description string `json:"description"`
