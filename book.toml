@@ -6,4 +6,4 @@ src = "docs"
 title = "Go Telegram Bot API"
 
 [output.html]
-git-repository-url = "https://github.com/go-telegram-bot-api/telegram-bot-api"
+git-repository-url = "https://github.com/a-dov/telegram-bot-api"
