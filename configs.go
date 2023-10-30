@@ -92,6 +92,10 @@ const (
 	// UpdateTypeChatMember is when the bot must be an administrator in the chat and must explicitly specify
 	// this update in the list of allowed_updates to receive these updates.
 	UpdateTypeChatMember = "chat_member"
+
+	// UpdateTypeChatJoinRequest is request to join the chat has been sent. 
+	// The bot must have the can_invite_users administrator right in the chat to receive these updates.
+	UpdateTypeChatJoinRequest = "chat_join_request"
 )
 
 // Library errors
