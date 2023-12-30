@@ -281,6 +281,11 @@ type Chat struct {
 	//
 	// optional
 	EmojiStatusCustomEmojiID string `json:"emoji_status_custom_emoji_id,omitempty"`
+	// Expiration date of the emoji status of the chat or the other party 
+	// in a private chat, in Unix time, if any. Returned only in getChat.
+	//
+	// optional
+	EmojiStatusCustomEmojiDate int64 `json:"emoji_status_expiration_date,omitempty"`
 	// Bio is the bio of the other party in a private chat. Returned only in
 	// getChat
 	//
@@ -526,6 +531,10 @@ type Message struct {
 	//
 	// optional
 	Sticker *Sticker `json:"sticker,omitempty"`
+	// Story message is a forwarded story;
+	//
+	// optional
+	Story *Story `json:"story,omitempty"`
 	// Video message is a video, information about the video;
 	//
 	// optional
@@ -1032,6 +1041,9 @@ type Document struct {
 	FileSize int64 `json:"file_size,omitempty"`
 }
 
+// Story represents a message about a forwarded story in the chat.
+type Story struct{}
+
 // Video represents a video file.
 type Video struct {
 	// FileID identifier for this file, which can be used to download or reuse
@@ -1149,8 +1161,16 @@ type PollOption struct {
 type PollAnswer struct {
 	// PollID is the unique poll identifier
 	PollID string `json:"poll_id"`
-	// User who changed the answer to the poll
-	User User `json:"user"`
+	// Chat that changed the answer to the poll, if the voter is anonymous.
+	//
+	// Optional
+	VoterChat *Chat `json:"voter_chat,omitempty"`
+	// User who changed the answer to the poll, if the voter isn't anonymous
+	// For backward compatibility, the field user in such objects
+	// will contain the user 136817688 (@Channel_Bot).
+	//
+	// Optional
+	User *User `json:"user,omitempty"`
 	// OptionIDs is the 0-based identifiers of poll options chosen by the user.
 	// May be empty if user retracted vote.
 	OptionIDs []int `json:"option_ids"`
@@ -2066,7 +2086,7 @@ type ChatMemberUpdated struct {
 	//
 	// optional
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
-	// ViaChatFolderInviteLink is True, if the user joined the chat 
+	// ViaChatFolderInviteLink is True, if the user joined the chat
 	// via a chat folder invite link
 	//
 	// optional
@@ -2227,7 +2247,7 @@ type BotCommandScope struct {
 	UserID int64  `json:"user_id,omitempty"`
 }
 
-//BotName represents the bot's name.
+// BotName represents the bot's name.
 type BotName struct {
 	Name string `json:"name"`
 }
