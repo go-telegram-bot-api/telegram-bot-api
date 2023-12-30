@@ -1462,6 +1462,9 @@ type PromoteChatMemberConfig struct {
 	CanRestrictMembers  bool
 	CanPinMessages      bool
 	CanPromoteMembers   bool
+	CanPostStories      bool
+	CanEditStories      bool
+	CanDeleteStories    bool
 	CanManageTopics     bool
 }
 
@@ -1486,6 +1489,9 @@ func (config PromoteChatMemberConfig) params() (Params, error) {
 	params.AddBool("can_restrict_members", config.CanRestrictMembers)
 	params.AddBool("can_pin_messages", config.CanPinMessages)
 	params.AddBool("can_promote_members", config.CanPromoteMembers)
+	params.AddBool("can_post_stories", config.CanPostStories)
+	params.AddBool("can_edit_stories", config.CanEditStories)
+	params.AddBool("can_delete_stories", config.CanDeleteStories)
 	params.AddBool("can_manage_topics", config.CanManageTopics)
 
 	return params, nil

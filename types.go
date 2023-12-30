@@ -281,7 +281,7 @@ type Chat struct {
 	//
 	// optional
 	EmojiStatusCustomEmojiID string `json:"emoji_status_custom_emoji_id,omitempty"`
-	// Expiration date of the emoji status of the chat or the other party 
+	// Expiration date of the emoji status of the chat or the other party
 	// in a private chat, in Unix time, if any. Returned only in getChat.
 	//
 	// optional
@@ -1373,10 +1373,21 @@ type ChatShared struct {
 // to write messages after adding the bot to the attachment menu or launching
 // a Web App from a link.
 type WriteAccessAllowed struct {
-	//Name of the Web App which was launched from a link
+	// FromRequest is true, if the access was granted after
+	// the user accepted an explicit request from a Web App
+	// sent by the method requestWriteAccess.
+	//
+	// Optional
+	FromRequest bool `json:"from_request,omitempty"`
+	// Name of the Web App which was launched from a link
 	//
 	// Optional
 	WebAppName string `json:"web_app_name,omitempty"`
+	// FromAttachmentMenu is true, if the access was granted when
+	// the bot was added to the attachment or side menu
+	//
+	// Optional
+	FromAttachmentMenu bool `json:"from_attachment_menu,omitempty"`
 }
 
 // VideoChatScheduled represents a service message about a voice chat scheduled
@@ -1882,6 +1893,9 @@ type ChatAdministratorRights struct {
 	CanPostMessages     bool `json:"can_post_messages"`
 	CanEditMessages     bool `json:"can_edit_messages"`
 	CanPinMessages      bool `json:"can_pin_messages"`
+	CanPostStories      bool `json:"can_post_stories"`
+	CanEditStories      bool `json:"can_edit_stories"`
+	CanDeleteStories    bool `json:"can_delete_stories"`
 	CanManageTopics     bool `json:"can_manage_topics"`
 }
 
@@ -1975,6 +1989,21 @@ type ChatMember struct {
 	//
 	// optional
 	CanPinMessages bool `json:"can_pin_messages,omitempty"`
+	// CanPostStories administrators only.
+	// True, if the administrator can post stories in the channel; channels only
+	//
+	// optional
+	CanPostStories bool `json:"can_post_stories,omitempty"`
+	// CanEditStories administrators only.
+	// True, if the administrator can edit stories posted by other users; channels only
+	//
+	// optional
+	CanEditStories bool `json:"can_edit_stories,omitempty"`
+	// CanDeleteStories administrators only.
+	// True, if the administrator can delete stories posted by other users; channels only
+	//
+	// optional
+	CanDeleteStories bool `json:"can_delete_stories,omitempty"`
 	// CanManageTopics administrators and restricted only.
 	// True, if the user is allowed to create, rename,
 	// close, and reopen forum topics; supergroups only
