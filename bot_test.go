@@ -84,7 +84,7 @@ func TestSendWithMessageReply(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewMessage(ChatID, "A test message from the test library in telegram-bot-api")
-	msg.ReplyToMessageID = ReplyToMessageID
+	msg.ReplyParameters.MessageID = ReplyToMessageID
 	_, err := bot.Send(msg)
 
 	if err != nil {
@@ -169,7 +169,7 @@ func TestSendWithNewPhotoReply(t *testing.T) {
 	bot, _ := getBot(t)
 
 	msg := NewPhoto(ChatID, FilePath("tests/image.jpg"))
-	msg.ReplyToMessageID = ReplyToMessageID
+	msg.ReplyParameters.MessageID = ReplyToMessageID
 
 	_, err := bot.Send(msg)
 
@@ -699,7 +699,7 @@ func ExampleNewBotAPI() {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		msg := NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
+		msg.ReplyParameters.MessageID = update.Message.MessageID
 
 		bot.Send(msg)
 	}
@@ -827,8 +827,12 @@ func TestDeleteMessage(t *testing.T) {
 	message, _ := bot.Send(msg)
 
 	deleteMessageConfig := DeleteMessageConfig{
-		ChatID:    message.Chat.ID,
-		MessageID: message.MessageID,
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: message.Chat.ID,
+			},
+			MessageID: message.MessageID,
+		},
 	}
 	_, err := bot.Request(deleteMessageConfig)
 
@@ -845,8 +849,12 @@ func TestPinChatMessage(t *testing.T) {
 	message, _ := bot.Send(msg)
 
 	pinChatMessageConfig := PinChatMessageConfig{
-		ChatID:              message.Chat.ID,
-		MessageID:           message.MessageID,
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: ChatID,
+			},
+			MessageID: message.MessageID,
+		},
 		DisableNotification: false,
 	}
 	_, err := bot.Request(pinChatMessageConfig)
@@ -865,8 +873,12 @@ func TestUnpinChatMessage(t *testing.T) {
 
 	// We need pin message to unpin something
 	pinChatMessageConfig := PinChatMessageConfig{
-		ChatID:              message.Chat.ID,
-		MessageID:           message.MessageID,
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: message.Chat.ID,
+			},
+			MessageID: message.MessageID,
+		},
 		DisableNotification: false,
 	}
 
@@ -875,8 +887,12 @@ func TestUnpinChatMessage(t *testing.T) {
 	}
 
 	unpinChatMessageConfig := UnpinChatMessageConfig{
-		ChatID:    message.Chat.ID,
-		MessageID: message.MessageID,
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: message.Chat.ID,
+			},
+			MessageID: message.MessageID,
+		},
 	}
 
 	if _, err := bot.Request(unpinChatMessageConfig); err != nil {
@@ -892,8 +908,12 @@ func TestUnpinAllChatMessages(t *testing.T) {
 	message, _ := bot.Send(msg)
 
 	pinChatMessageConfig := PinChatMessageConfig{
-		ChatID:              message.Chat.ID,
-		MessageID:           message.MessageID,
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: message.Chat.ID,
+			},
+			MessageID: message.MessageID,
+		},
 		DisableNotification: true,
 	}
 
@@ -902,7 +922,7 @@ func TestUnpinAllChatMessages(t *testing.T) {
 	}
 
 	unpinAllChatMessagesConfig := UnpinAllChatMessagesConfig{
-		ChatID: message.Chat.ID,
+		ChatConfig: ChatConfig{ChatID: message.Chat.ID},
 	}
 
 	if _, err := bot.Request(unpinAllChatMessagesConfig); err != nil {

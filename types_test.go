@@ -341,6 +341,7 @@ var (
 	_ Chattable = UnbanChatSenderChatConfig{}
 	_ Chattable = UnpinChatMessageConfig{}
 	_ Chattable = UpdateConfig{}
+	_ Chattable = SetMessageReactionConfig{}
 	_ Chattable = UserProfilePhotosConfig{}
 	_ Chattable = VenueConfig{}
 	_ Chattable = VideoConfig{}
@@ -359,6 +360,7 @@ var (
 	_ Chattable = ReopenGeneralForumTopicConfig{}
 	_ Chattable = HideGeneralForumTopicConfig{}
 	_ Chattable = UnhideGeneralForumTopicConfig{}
+	_ Chattable = UnpinAllGeneralForumTopicMessagesConfig{}
 	_ Chattable = SetCustomEmojiStickerSetThumbnailConfig{}
 	_ Chattable = SetStickerSetTitleConfig{}
 	_ Chattable = DeleteStickerSetConfig{}
