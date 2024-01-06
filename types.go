@@ -741,6 +741,22 @@ type Message struct {
 	//
 	// optional
 	GeneralForumTopicUnhidden *GeneralForumTopicUnhidden `json:"general_forum_topic_unhidden,omitempty"`
+	// Service message: a scheduled giveaway was created
+	//
+	// optional
+	GiveawayCreated *GiveawayCreated `json:"giveaway_created,omitempty"`
+	// The message is a scheduled giveaway message
+	//
+	// optional
+	Giveaway *Giveaway `json:"giveaway,omitempty"`
+	// A giveaway with public winners was completed
+	//
+	// optional
+	GiveawayWinners *GiveawayWinners `json:"giveaway_winners,omitempty"`
+	// Service message: a giveaway without public winners was completed
+	//
+	// optional
+	GiveawayCompleted *GiveawayCompleted `json:"giveaway_completed,omitempty"`
 	// VideoChatScheduled is a service message: video chat scheduled.
 	//
 	// optional
@@ -1659,6 +1675,9 @@ type VideoChatParticipantsInvited struct {
 	Users []User `json:"users,omitempty"`
 }
 
+// This object represents a service message about the creation of a scheduled giveaway. Currently holds no information.
+type GiveawayCreated struct{}
+
 // Giveaway represents a message about a scheduled giveaway.
 type Giveaway struct {
 	// Chats is the list of chats which the user must join to participate in the giveaway
@@ -1736,6 +1755,20 @@ type GiveawayWinners struct {
 	//
 	// optional
 	PrizeDescription string `json:"prize_description,omitempty"`
+}
+
+// This object represents a service message about the completion of a giveaway without public winners.
+type GiveawayCompleted struct {
+	// Number of winners in the giveaway
+	WinnerCount int `json:"winner_count"`
+	// Number of undistributed prizes
+	//
+	// optional
+	UnclaimedprizeCounr int `json:"unclaimed_prize_count,omitempty"`
+	// Message with the giveaway that was completed, if it wasn't deleted
+	//
+	// optional
+	GiveawayMessage *Message `json:"giveaway_message,omitempty"`
 }
 
 // LinkPreviewOptions describes the options used for link preview generation.
