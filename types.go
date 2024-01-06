@@ -289,6 +289,28 @@ type Chat struct {
 	//
 	// optional
 	AvailableReactions []ReactionType `json:"available_reactions,omitempty"`
+	// Identifier of the accent color for the chat name and backgrounds of the chat photo,
+	// reply header, and link preview.
+	// See accent colors for more details. Returned only in getChat.
+	// Always returned in getChat.
+	//
+	// optional
+	AccentColorID int `json:"accent_color_id,omitempty"`
+	// Custom emoji identifier of emoji chosen by the chat for the reply header and link preview background.
+	// Returned only in getChat.
+	//
+	// optional
+	BackgroundCustomEmojiID string `json:"background_custom_emoji_id,omitempty"`
+	// Identifier of the accent color for the chat's profile background.
+	// See profile accent colors for more details. Returned only in getChat.
+	//
+	// optional
+	ProfileAccentColorID int `json:"profile_accent_color_id,omitempty"`
+	// Custom emoji identifier of the emoji chosen by the chat for its profile background.
+	// Returned only in getChat.
+	//
+	// optional
+	ProfileBackgroundCustomEmojiID string `json:"profile_background_custom_emoji_id,omitempty"`
 	// Custom emoji identifier of emoji status of the other party
 	// in a private chat. Returned only in getChat.
 	//
@@ -374,6 +396,11 @@ type Chat struct {
 	//
 	// optional
 	HasProtectedContent bool `json:"has_protected_content,omitempty"`
+	// True, if new chat members will have access to old messages; available only to chat administrators.
+	// Returned only in getChat.
+	//
+	// optional
+	HasVisibleHistory bool `json:"has_visible_history,omitempty"`
 	// StickerSetName is for supergroups, name of group sticker set.Returned
 	// only in getChat.
 	//
@@ -422,6 +449,26 @@ func (c Chat) ChatConfig() ChatConfig {
 	return ChatConfig{ChatID: c.ID}
 }
 
+// This object describes a message that can be inaccessible to the bot.
+// It can be one of
+//
+//	Message
+//	InaccessibleMessage
+type MaybeInaccessibleMessage struct {
+	Message
+	InaccessibleMessage
+}
+
+// InaccessibleMessage describes a message that was deleted or is otherwise inaccessible to the bot.
+type InaccessibleMessage struct {
+	// Chat the message belonged to
+	Chat Chat `json:"chat"`
+	// Unique message identifier inside the chat
+	MessageID int `json:"message_id"`
+	// Always 0. The field can be used to differentiate regular and inaccessible messages.
+	Date int `json:"date"`
+}
+
 // Message represents a message.
 type Message struct {
 	// MessageID is a unique message identifier inside this chat
@@ -446,34 +493,10 @@ type Message struct {
 	Date int `json:"date"`
 	// Chat is the conversation the message belongs to
 	Chat *Chat `json:"chat"`
-	// ForwardFrom for forwarded messages, sender of the original message;
+	//  Information about the original message for forwarded messages
 	//
 	// optional
-	ForwardFrom *User `json:"forward_from,omitempty"`
-	// ForwardFromChat for messages forwarded from channels,
-	// information about the original channel;
-	//
-	// optional
-	ForwardFromChat *Chat `json:"forward_from_chat,omitempty"`
-	// ForwardFromMessageID for messages forwarded from channels,
-	// identifier of the original message in the channel;
-	//
-	// optional
-	ForwardFromMessageID int `json:"forward_from_message_id,omitempty"`
-	// ForwardSignature for messages forwarded from channels, signature of the
-	// post author if present
-	//
-	// optional
-	ForwardSignature string `json:"forward_signature,omitempty"`
-	// ForwardSenderName is the sender's name for messages forwarded from users
-	// who disallow adding a link to their account in forwarded messages
-	//
-	// optional
-	ForwardSenderName string `json:"forward_sender_name,omitempty"`
-	// ForwardDate for forwarded messages, date the original message was sent in Unix time;
-	//
-	// optional
-	ForwardDate int `json:"forward_date,omitempty"`
+	ForwardOrigin *MessageOrigin `json:"forward_origin,omitempty"`
 	// IsTopicMessage true if the message is sent to a forum topic
 	//
 	// optional
@@ -675,9 +698,9 @@ type Message struct {
 	//
 	// optional
 	MigrateFromChatID int64 `json:"migrate_from_chat_id,omitempty"`
-	// PinnedMessage is a specified message was pinned.
-	// Note that the Message object in this field will not contain further ReplyToMessage
-	// fields even if it is itself a reply;
+	// Specified message was pinned.
+	// Note that the Message object in this field will not contain
+	// further reply_to_message fields even if it itself is a reply.
 	//
 	// optional
 	PinnedMessage *Message `json:"pinned_message,omitempty"`
@@ -2158,9 +2181,7 @@ type CallbackQuery struct {
 	ID string `json:"id"`
 	// From sender
 	From *User `json:"from"`
-	// Message with the callback button that originated the query.
-	// Note that message content and message date will not be available if the
-	// message is too old.
+	// Message sent by the bot with the callback button that originated the query
 	//
 	// optional
 	Message *Message `json:"message,omitempty"`
