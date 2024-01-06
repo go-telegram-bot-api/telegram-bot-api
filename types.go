@@ -1764,7 +1764,7 @@ type GiveawayCompleted struct {
 	// Number of undistributed prizes
 	//
 	// optional
-	UnclaimedprizeCounr int `json:"unclaimed_prize_count,omitempty"`
+	UnclaimedPrizeCount int `json:"unclaimed_prize_count,omitempty"`
 	// Message with the giveaway that was completed, if it wasn't deleted
 	//
 	// optional
