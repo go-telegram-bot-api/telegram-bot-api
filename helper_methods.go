@@ -855,6 +855,49 @@ func NewChatDescription(chatID int64, description string) SetChatDescriptionConf
 	}
 }
 
+func NewPinChatMessage(chatID int64, messageID int, disableNotification bool) PinChatMessageConfig {
+	return PinChatMessageConfig{
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: chatID,
+			},
+			MessageID: messageID,
+		},
+		DisableNotification: disableNotification,
+	}
+}
+
+func NewUnpinChatMessage(chatID int64, messageID int) UnpinChatMessageConfig {
+	return UnpinChatMessageConfig{
+		BaseChatMessage: BaseChatMessage{
+			ChatConfig: ChatConfig{
+				ChatID: chatID,
+			},
+			MessageID: messageID,
+		},
+	}
+}
+
+func NewGetChatMember(chatID, userID int64) GetChatMemberConfig {
+	return GetChatMemberConfig{
+		ChatConfigWithUser: ChatConfigWithUser{
+			ChatConfig: ChatConfig{
+				ChatID: chatID,
+			},
+			UserID: userID,
+		},
+	}
+}
+
+func NewChatMember(chatID, userID int64) ChatMemberConfig {
+	return ChatMemberConfig{
+		ChatConfig: ChatConfig{
+			ChatID: chatID,
+		},
+		UserID: userID,
+	}
+}
+
 // NewChatPhoto allows you to update the photo for a chat.
 func NewChatPhoto(chatID int64, photo RequestFileData) SetChatPhotoConfig {
 	return SetChatPhotoConfig{
