@@ -159,15 +159,15 @@ func (u *Update) CallbackData() string {
 func (u *Update) FromChat() *Chat {
 	switch {
 	case u.Message != nil:
-		return u.Message.Chat
+		return &u.Message.Chat
 	case u.EditedMessage != nil:
-		return u.EditedMessage.Chat
+		return &u.EditedMessage.Chat
 	case u.ChannelPost != nil:
-		return u.ChannelPost.Chat
+		return &u.ChannelPost.Chat
 	case u.EditedChannelPost != nil:
-		return u.EditedChannelPost.Chat
+		return &u.EditedChannelPost.Chat
 	case u.CallbackQuery != nil && u.CallbackQuery.Message != nil:
-		return u.CallbackQuery.Message.Chat
+		return &u.CallbackQuery.Message.Chat
 	default:
 		return nil
 	}
@@ -289,38 +289,39 @@ type Chat struct {
 	//
 	// optional
 	AvailableReactions []ReactionType `json:"available_reactions,omitempty"`
-	// Identifier of the accent color for the chat name and backgrounds of the chat photo,
-	// reply header, and link preview.
+	// AccentColorID is an identifier of the accent color for the chat name and backgrounds of
+	// the chat photo, reply header, and link preview.
 	// See accent colors for more details. Returned only in getChat.
 	// Always returned in getChat.
 	//
 	// optional
 	AccentColorID int `json:"accent_color_id,omitempty"`
-	// Custom emoji identifier of emoji chosen by the chat for the reply header and link preview background.
+	// BackgroundCustomEmojiID is a custom emoji identifier of emoji chosen by
+	// the chat for the reply header and link preview background.
 	// Returned only in getChat.
 	//
 	// optional
 	BackgroundCustomEmojiID string `json:"background_custom_emoji_id,omitempty"`
-	// Identifier of the accent color for the chat's profile background.
+	// ProfileAccentColorID is ani dentifier of the accent color for the chat's profile background.
 	// See profile accent colors for more details. Returned only in getChat.
 	//
 	// optional
 	ProfileAccentColorID int `json:"profile_accent_color_id,omitempty"`
-	// Custom emoji identifier of the emoji chosen by the chat for its profile background.
-	// Returned only in getChat.
+	// ProfileBackgroundCustomEmojiID is a custom emoji identifier of the emoji chosen by
+	// the chat for its profile background. Returned only in getChat.
 	//
 	// optional
 	ProfileBackgroundCustomEmojiID string `json:"profile_background_custom_emoji_id,omitempty"`
-	// Custom emoji identifier of emoji status of the other party
+	// EmojiStatusCustomEmojiID is a custom emoji identifier of emoji status of the other party
 	// in a private chat. Returned only in getChat.
 	//
 	// optional
 	EmojiStatusCustomEmojiID string `json:"emoji_status_custom_emoji_id,omitempty"`
-	// Expiration date of the emoji status of the chat or the other party
+	// EmojiStatusExpirationDate is a date of the emoji status of the chat or the other party
 	// in a private chat, in Unix time, if any. Returned only in getChat.
 	//
 	// optional
-	EmojiStatusCustomEmojiDate int64 `json:"emoji_status_expiration_date,omitempty"`
+	EmojiStatusExpirationDate int64 `json:"emoji_status_expiration_date,omitempty"`
 	// Bio is the bio of the other party in a private chat. Returned only in
 	// getChat
 	//
@@ -396,8 +397,8 @@ type Chat struct {
 	//
 	// optional
 	HasProtectedContent bool `json:"has_protected_content,omitempty"`
-	// True, if new chat members will have access to old messages; available only to chat administrators.
-	// Returned only in getChat.
+	// HasVisibleHistory is True, if new chat members will have access to old messages;
+	// available only to chat administrators. Returned only in getChat.
 	//
 	// optional
 	HasVisibleHistory bool `json:"has_visible_history,omitempty"`
@@ -449,23 +450,13 @@ func (c Chat) ChatConfig() ChatConfig {
 	return ChatConfig{ChatID: c.ID}
 }
 
-// This object describes a message that can be inaccessible to the bot.
-// It can be one of
-//
-//	Message
-//	InaccessibleMessage
-type MaybeInaccessibleMessage struct {
-	Message
-	InaccessibleMessage
-}
-
 // InaccessibleMessage describes a message that was deleted or is otherwise inaccessible to the bot.
 type InaccessibleMessage struct {
 	// Chat the message belonged to
 	Chat Chat `json:"chat"`
-	// Unique message identifier inside the chat
+	// MessageID is unique message identifier inside the chat
 	MessageID int `json:"message_id"`
-	// Always 0. The field can be used to differentiate regular and inaccessible messages.
+	// Date is always 0. The field can be used to differentiate regular and inaccessible messages.
 	Date int `json:"date"`
 }
 
@@ -492,8 +483,8 @@ type Message struct {
 	// Date of the message was sent in Unix time
 	Date int `json:"date"`
 	// Chat is the conversation the message belongs to
-	Chat *Chat `json:"chat"`
-	//  Information about the original message for forwarded messages
+	Chat Chat `json:"chat"`
+	// ForwardOrigin is information about the original message for forwarded messages
 	//
 	// optional
 	ForwardOrigin *MessageOrigin `json:"forward_origin,omitempty"`
@@ -764,19 +755,19 @@ type Message struct {
 	//
 	// optional
 	GeneralForumTopicUnhidden *GeneralForumTopicUnhidden `json:"general_forum_topic_unhidden,omitempty"`
-	// Service message: a scheduled giveaway was created
+	// GiveawayCreated is as service message: a scheduled giveaway was created
 	//
 	// optional
 	GiveawayCreated *GiveawayCreated `json:"giveaway_created,omitempty"`
-	// The message is a scheduled giveaway message
+	// Giveaway is a scheduled giveaway message
 	//
 	// optional
 	Giveaway *Giveaway `json:"giveaway,omitempty"`
-	// A giveaway with public winners was completed
+	// GiveawayWinners is a giveaway with public winners was completed
 	//
 	// optional
 	GiveawayWinners *GiveawayWinners `json:"giveaway_winners,omitempty"`
-	// Service message: a giveaway without public winners was completed
+	// GiveawayCompleted is a service message: a giveaway without public winners was completed
 	//
 	// optional
 	GiveawayCompleted *GiveawayCompleted `json:"giveaway_completed,omitempty"`
@@ -2203,6 +2194,21 @@ type CallbackQuery struct {
 	//
 	// optional
 	GameShortName string `json:"game_short_name,omitempty"`
+}
+
+// IsInaccessibleMessage method that shows whether message is inaccessible
+func (c CallbackQuery) IsInaccessibleMessage() bool {
+	return c.Message != nil && c.Message.Date == 0
+}
+
+func (c CallbackQuery) GetInaccessibleMessage() InaccessibleMessage {
+	if c.Message == nil {
+		return InaccessibleMessage{}
+	}
+	return InaccessibleMessage{
+		Chat:      c.Message.Chat,
+		MessageID: c.Message.MessageID,
+	}
 }
 
 // ForceReply when receiving a message with this object, Telegram clients will
