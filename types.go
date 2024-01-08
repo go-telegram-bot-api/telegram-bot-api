@@ -1958,13 +1958,13 @@ type KeyboardButtonRequestUsers struct {
 	// If not specified, no additional restrictions are applied.
 	//
 	// optional
-	UserIsBot bool `json:"user_is_bot,omitempty"`
+	UserIsBot *bool `json:"user_is_bot,omitempty"`
 	// UserIsPremium pass True to request a premium user,
 	// pass False to request a non-premium user.
 	// If not specified, no additional restrictions are applied.
 	//
 	// optional
-	UserIsPremium bool `json:"user_is_premium,omitempty"`
+	UserIsPremium *bool `json:"user_is_premium,omitempty"`
 	// MaxQuantity is the maximum number of users to be selected.
 	// 1-10. Defaults to 1
 	//
