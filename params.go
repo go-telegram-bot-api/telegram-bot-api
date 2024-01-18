@@ -95,3 +95,13 @@ func (p Params) AddFirstValid(key string, args ...interface{}) error {
 
 	return nil
 }
+
+func (p Params) Merge(otherParams Params) {
+	if otherParams == nil {
+		return
+	}
+
+	for key, value := range otherParams {
+		p[key] = value
+	}
+}

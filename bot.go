@@ -310,10 +310,14 @@ func hasFilesNeedingUpload(files []RequestFile) bool {
 }
 
 // Request sends a Chattable to Telegram, and returns the APIResponse.
-func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
+func (bot *BotAPI) Request(c Chattable, extraParams Params) (*APIResponse, error) {
 	params, err := c.params()
 	if err != nil {
 		return nil, err
+	}
+
+	if extraParams != nil {
+		params.Merge(extraParams)
 	}
 
 	if t, ok := c.(Fileable); ok {
@@ -337,8 +341,8 @@ func (bot *BotAPI) Request(c Chattable) (*APIResponse, error) {
 
 // Send will send a Chattable item to Telegram and provides the
 // returned Message.
-func (bot *BotAPI) Send(c Chattable) (Message, error) {
-	resp, err := bot.Request(c)
+func (bot *BotAPI) Send(c Chattable, extraParams Params) (Message, error) {
+	resp, err := bot.Request(c, extraParams)
 	if err != nil {
 		return Message{}, err
 	}
@@ -350,8 +354,8 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 }
 
 // SendMediaGroup sends a media group and returns the resulting messages.
-func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
-	resp, err := bot.Request(config)
+func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig, extraParams Params) ([]Message, error) {
+	resp, err := bot.Request(config, extraParams)
 	if err != nil {
 		return nil, err
 	}
@@ -367,7 +371,7 @@ func (bot *BotAPI) SendMediaGroup(config MediaGroupConfig) ([]Message, error) {
 // It requires UserID.
 // Offset and Limit are optional.
 func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserProfilePhotos, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return UserProfilePhotos{}, err
 	}
@@ -382,7 +386,7 @@ func (bot *BotAPI) GetUserProfilePhotos(config UserProfilePhotosConfig) (UserPro
 //
 // Requires FileID.
 func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return File{}, err
 	}
@@ -401,7 +405,7 @@ func (bot *BotAPI) GetFile(config FileConfig) (File, error) {
 // Set Timeout to a large number to reduce requests, so you can get updates
 // instantly instead of having to wait between requests.
 func (bot *BotAPI) GetUpdates(config UpdateConfig) ([]Update, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return []Update{}, err
 	}
@@ -554,7 +558,7 @@ func WriteToHTTPResponse(w http.ResponseWriter, c Chattable) error {
 
 // GetChat gets information about a chat.
 func (bot *BotAPI) GetChat(config ChatInfoConfig) (Chat, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return Chat{}, err
 	}
@@ -570,7 +574,7 @@ func (bot *BotAPI) GetChat(config ChatInfoConfig) (Chat, error) {
 // If none have been appointed, only the creator will be returned.
 // Bots are not shown, even if they are an administrator.
 func (bot *BotAPI) GetChatAdministrators(config ChatAdministratorsConfig) ([]ChatMember, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return []ChatMember{}, err
 	}
@@ -583,7 +587,7 @@ func (bot *BotAPI) GetChatAdministrators(config ChatAdministratorsConfig) ([]Cha
 
 // GetChatMembersCount gets the number of users in a chat.
 func (bot *BotAPI) GetChatMembersCount(config ChatMemberCountConfig) (int, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return -1, err
 	}
@@ -596,7 +600,7 @@ func (bot *BotAPI) GetChatMembersCount(config ChatMemberCountConfig) (int, error
 
 // GetChatMember gets a specific chat member.
 func (bot *BotAPI) GetChatMember(config GetChatMemberConfig) (ChatMember, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return ChatMember{}, err
 	}
@@ -609,7 +613,7 @@ func (bot *BotAPI) GetChatMember(config GetChatMemberConfig) (ChatMember, error)
 
 // GetGameHighScores allows you to get the high scores for a game.
 func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHighScore, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return []GameHighScore{}, err
 	}
@@ -622,7 +626,7 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 
 // GetInviteLink get InviteLink for a chat
 func (bot *BotAPI) GetInviteLink(config ChatInviteLinkConfig) (string, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return "", err
 	}
@@ -635,7 +639,7 @@ func (bot *BotAPI) GetInviteLink(config ChatInviteLinkConfig) (string, error) {
 
 // GetStickerSet returns a StickerSet.
 func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return StickerSet{}, err
 	}
@@ -648,7 +652,7 @@ func (bot *BotAPI) GetStickerSet(config GetStickerSetConfig) (StickerSet, error)
 
 // StopPoll stops a poll and returns the result.
 func (bot *BotAPI) StopPoll(config StopPollConfig) (Poll, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return Poll{}, err
 	}
@@ -666,7 +670,7 @@ func (bot *BotAPI) GetMyCommands() ([]BotCommand, error) {
 
 // GetMyCommandsWithConfig gets the currently registered commands with a config.
 func (bot *BotAPI) GetMyCommandsWithConfig(config GetMyCommandsConfig) ([]BotCommand, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -681,7 +685,7 @@ func (bot *BotAPI) GetMyCommandsWithConfig(config GetMyCommandsConfig) ([]BotCom
 // forwardMessage, but the copied message doesn't have a link to the original
 // message. Returns the MessageID of the sent message on success.
 func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return MessageID{}, err
 	}
@@ -697,7 +701,7 @@ func (bot *BotAPI) CopyMessage(config CopyMessageConfig) (MessageID, error) {
 func (bot *BotAPI) AnswerWebAppQuery(config AnswerWebAppQueryConfig) (SentWebAppMessage, error) {
 	var sentWebAppMessage SentWebAppMessage
 
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return sentWebAppMessage, err
 	}
@@ -710,7 +714,7 @@ func (bot *BotAPI) AnswerWebAppQuery(config AnswerWebAppQueryConfig) (SentWebApp
 func (bot *BotAPI) GetMyDefaultAdministratorRights(config GetMyDefaultAdministratorRightsConfig) (ChatAdministratorRights, error) {
 	var rights ChatAdministratorRights
 
-	resp, err := bot.Request(config)
+	resp, err := bot.Request(config, nil)
 	if err != nil {
 		return rights, err
 	}
