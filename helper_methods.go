@@ -40,6 +40,19 @@ func NewDeleteMessage(chatID int64, messageID int) DeleteMessageConfig {
 	}
 }
 
+// NewDeleteMessages creates a request to delete multiple messages. The messages have to be
+// in the same chat. Provide the message ids as an array of integers
+func NewDeleteMessages(chatID int64, messageIDs []int) DeleteMessagesConfig {
+	return DeleteMessagesConfig{
+		BaseChatMessages: BaseChatMessages{
+			ChatConfig: ChatConfig{
+				ChatID: chatID,
+			},
+			MessageIDs: messageIDs,
+		},
+	}
+}
+
 // NewMessageToChannel creates a new Message that is sent to a channel
 // by username.
 //
