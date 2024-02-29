@@ -818,24 +818,34 @@ func (e MessageEntity) IsTextLink() bool {
 	return e.Type == "text_link"
 }
 
+// MessageReaction represents reactions update.
 type MessageReaction struct {
 	// MessageID is a unique message identifier inside this chat
 	MessageID int `json:"message_id"`
 	// Chat is the conversation the message belongs to
 	Chat *Chat `json:"chat"`
-	// User that updated reaction;
-	//
-	// optional
-	User *User `json:"User,omitempty"`
+	// User that updated reaction
+	User *User `json:"User"`
 	// Date of the reacion was updated in Unix time
-	Date        int        `json:"date"`
+	Date int `json:"date"`
+	// Old slice of reactions
 	OldReaction []Reaction `json:"old_reaction"`
+	// New slice of reactions
 	NewReaction []Reaction `json:"new_reaction"`
 }
 
+// Reaction represents reaction entity.
 type Reaction struct {
-	Type  string `json:"type"`
-	Emoji string `json:"emoji"`
+	// Emoji type: emoji or custom_emoji
+	Type string `json:"type"`
+	// Emoji associated with the sticker
+	//
+	// optional
+	Emoji string `json:"emoji,omitempty"`
+	// CustomEmojiID for custom emoji stickers, unique identifier of the custom emoji
+	//
+	// optional
+	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
 }
 
 // PhotoSize represents one size of a photo or a file / sticker thumbnail.
