@@ -51,6 +51,10 @@ type Update struct {
 	//
 	// optional
 	EditedMessage *Message `json:"edited_message,omitempty"`
+	// MessageReaction is reactions to messages with emojies.
+	//
+	// optional
+	MessageReaction *MessageReaction `json:"message_reaction,omitempty"`
 	// ChannelPost new version of a message that is known to the bot and was
 	// edited
 	//
@@ -812,6 +816,26 @@ func (e MessageEntity) IsPre() bool {
 // IsTextLink returns true if the type of the message entity is "text_link" (clickable text URL).
 func (e MessageEntity) IsTextLink() bool {
 	return e.Type == "text_link"
+}
+
+type MessageReaction struct {
+	// MessageID is a unique message identifier inside this chat
+	MessageID int `json:"message_id"`
+	// Chat is the conversation the message belongs to
+	Chat *Chat `json:"chat"`
+	// User that updated reaction;
+	//
+	// optional
+	User *User `json:"User,omitempty"`
+	// Date of the reacion was updated in Unix time
+	Date        int        `json:"date"`
+	OldReaction []Reaction `json:"old_reaction"`
+	NewReaction []Reaction `json:"new_reaction"`
+}
+
+type Reaction struct {
+	Type  string `json:"type"`
+	Emoji string `json:"emoji"`
 }
 
 // PhotoSize represents one size of a photo or a file / sticker thumbnail.

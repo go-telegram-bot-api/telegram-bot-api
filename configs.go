@@ -54,6 +54,9 @@ const (
 	// UpdateTypeEditedMessage is new version of a message that is known to the bot and was edited
 	UpdateTypeEditedMessage = "edited_message"
 
+	// UpdateTypeMessage is new incoming updates of reactions.
+	UpdateTypeMessageReaction = "message_reaction"
+
 	// UpdateTypeChannelPost is new incoming channel post of any kind — text, photo, sticker, etc.
 	UpdateTypeChannelPost = "channel_post"
 
@@ -2115,7 +2118,6 @@ func (config AddStickerConfig) files() []RequestFile {
 		Name: "tgs_sticker",
 		Data: config.TGSSticker,
 	}}
-
 }
 
 // SetStickerPositionConfig allows you to change the position of a sticker in a set.
