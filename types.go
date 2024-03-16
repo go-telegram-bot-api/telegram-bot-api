@@ -634,6 +634,8 @@ type Message struct {
 	//
 	// optional
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+
+	BooleanResult *bool `json:"boolean_result,omitempty"`
 }
 
 // Time converts the message timestamp into a Time.

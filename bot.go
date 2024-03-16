@@ -345,6 +345,16 @@ func (bot *BotAPI) Send(c Chattable) (Message, error) {
 
 	var message Message
 	err = json.Unmarshal(resp.Result, &message)
+	if err == nil {
+		return message, nil
+	}
+
+	var booleanResult bool
+	err = json.Unmarshal(resp.Result, &booleanResult)
+	if err != nil {
+		return message, err
+	}
+	message.BooleanResult = &booleanResult
 
 	return message, err
 }
