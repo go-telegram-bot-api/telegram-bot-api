@@ -1426,6 +1426,20 @@ type InlineKeyboardButton struct {
 	//
 	// optional
 	Pay bool `json:"pay,omitempty"`
+	WebApp                       *WebAppInfo     `json:"web_app,omitempty"`
+}
+
+type WebAppInfo struct {
+	URL string `json:"url"`
+}
+
+func NewInlineKeyboardButtonWebApp(text, url string) InlineKeyboardButton {
+	return InlineKeyboardButton{
+		Text: text,
+		WebApp: &WebAppInfo{
+			URL: url,
+		},
+	}
 }
 
 // LoginURL represents a parameter of the inline keyboard button used to
