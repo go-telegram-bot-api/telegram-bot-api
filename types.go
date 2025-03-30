@@ -134,6 +134,12 @@ func (u *Update) SentFrom() *User {
 		return u.ShippingQuery.From
 	case u.PreCheckoutQuery != nil:
 		return u.PreCheckoutQuery.From
+	case u.MyChatMember != nil:
+		return u.MyChatMember.From
+	case u.ChatMember != nil:
+		return u.ChatMember.From
+	case u.ChatJoinRequest != nil:
+		return u.ChatJoinRequest.From
 	default:
 		return nil
 	}
@@ -160,6 +166,12 @@ func (u *Update) FromChat() *Chat {
 		return u.EditedChannelPost.Chat
 	case u.CallbackQuery != nil:
 		return u.CallbackQuery.Message.Chat
+	case u.MyChatMember != nil:
+		return u.MyChatMember.Chat
+	case u.ChatMember != nil:
+		return u.ChatMember.Chat
+	case u.ChatJoinRequest != nil:
+		return u.ChatJoinRequest.Chat
 	default:
 		return nil
 	}
@@ -1728,9 +1740,9 @@ func (chat ChatMember) WasKicked() bool { return chat.Status == "kicked" }
 // ChatMemberUpdated represents changes in the status of a chat member.
 type ChatMemberUpdated struct {
 	// Chat the user belongs to.
-	Chat Chat `json:"chat"`
+	Chat *Chat `json:"chat"`
 	// From is the performer of the action, which resulted in the change.
-	From User `json:"from"`
+	From *User `json:"from"`
 	// Date the change was done in Unix time.
 	Date int `json:"date"`
 	// Previous information about the chat member.
@@ -1747,9 +1759,9 @@ type ChatMemberUpdated struct {
 // ChatJoinRequest represents a join request sent to a chat.
 type ChatJoinRequest struct {
 	// Chat to which the request was sent.
-	Chat Chat `json:"chat"`
+	Chat *Chat `json:"chat"`
 	// User that sent the join request.
-	From User `json:"from"`
+	From *User `json:"from"`
 	// Date the request was sent in Unix time.
 	Date int `json:"date"`
 	// Bio of the user.
