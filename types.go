@@ -370,6 +370,8 @@ type Message struct {
 	// from anonymous group administrators. The linked channel for messages
 	// automatically forwarded to the discussion group
 	//
+	MessageThreadID int `json:"message_thread_id,omitempty"`
+
 	// optional
 	SenderChat *Chat `json:"sender_chat,omitempty"`
 	// Date of the message was sent in Unix time
