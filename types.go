@@ -371,6 +371,9 @@ type Message struct {
 	// automatically forwarded to the discussion group
 	//
 	// optional
+	MessageThreadID int `json:"message_thread_id,omitempty"`
+	//
+	// optional
 	SenderChat *Chat `json:"sender_chat,omitempty"`
 	// Date of the message was sent in Unix time
 	Date int `json:"date"`
