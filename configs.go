@@ -926,7 +926,7 @@ func (config SetGameScoreConfig) params() (Params, error) {
 	params := make(Params)
 
 	params.AddNonZero64("user_id", config.UserID)
-	params.AddNonZero("scrore", config.Score)
+	params.AddNonZero("score", config.Score)
 	params.AddBool("disable_edit_message", config.DisableEditMessage)
 
 	if config.InlineMessageID != "" {
