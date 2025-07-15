@@ -1366,6 +1366,11 @@ type InlineKeyboardMarkup struct {
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }
 
+// CopyText is a structure that represents copyable text for button
+type CopyText struct {
+	Text string `json:"text"`
+}
+
 // InlineKeyboardButton represents one button of an inline keyboard. You must
 // use exactly one of the optional fields.
 //
@@ -1426,6 +1431,10 @@ type InlineKeyboardButton struct {
 	//
 	// optional
 	Pay bool `json:"pay,omitempty"`
+	// CopyText a data that can be copied on button click
+	//
+	// optional
+	CopyText *CopyText `json:"copy_text,omitempty"`
 }
 
 // LoginURL represents a parameter of the inline keyboard button used to
