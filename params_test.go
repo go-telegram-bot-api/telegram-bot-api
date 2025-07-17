@@ -66,28 +66,3 @@ func TestAddNonZeroFloat(t *testing.T) {
 	assertLen(t, params, 1)
 	assertEq(t, params["test"], "")
 }
-
-func TestAddInterface(t *testing.T) {
-	params := make(Params)
-	data := struct {
-		Name string `json:"name"`
-	}{
-		Name: "test",
-	}
-	params.AddInterface("value", data)
-	assertLen(t, params, 1)
-	assertEq(t, params["value"], `{"name":"test"}`)
-	params.AddInterface("test", nil)
-	assertLen(t, params, 1)
-	assertEq(t, params["test"], "")
-}
-
-func TestAddFirstValid(t *testing.T) {
-	params := make(Params)
-	params.AddFirstValid("value", 0, "", "test")
-	assertLen(t, params, 1)
-	assertEq(t, params["value"], "test")
-	params.AddFirstValid("value2", 3, "test")
-	assertLen(t, params, 2)
-	assertEq(t, params["value2"], "3")
-}

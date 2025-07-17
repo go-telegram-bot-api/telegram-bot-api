@@ -110,7 +110,9 @@ func (bot *BotAPI) MakeRequest(endpoint string, params Params) (*APIResponse, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	var apiResp APIResponse
 	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
@@ -171,12 +173,16 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 	// This code modified from the very helpful @HirbodBehnam
 	// https://github.com/go-telegram-bot-api/telegram-bot-api/issues/354#issuecomment-663856473
 	go func() {
-		defer w.Close()
-		defer m.Close()
+		defer func(w *io.PipeWriter) {
+			_ = w.Close()
+		}(w)
+		defer func(m *multipart.Writer) {
+			_ = m.Close()
+		}(m)
 
 		for field, value := range params {
 			if err := m.WriteField(field, value); err != nil {
-				w.CloseWithError(err)
+				_ = w.CloseWithError(err)
 				return
 			}
 		}
@@ -234,7 +240,9 @@ func (bot *BotAPI) UploadFiles(endpoint string, params Params, files []RequestFi
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	var apiResp APIResponse
 	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
@@ -729,18 +737,19 @@ func (bot *BotAPI) GetMyDefaultAdministratorRights(config GetMyDefaultAdministra
 func EscapeText(parseMode string, text string) string {
 	var replacer *strings.Replacer
 
-	if parseMode == ModeHTML {
+	switch parseMode {
+	case ModeHTML:
 		replacer = strings.NewReplacer("<", "&lt;", ">", "&gt;", "&", "&amp;")
-	} else if parseMode == ModeMarkdown {
+	case ModeMarkdown:
 		replacer = strings.NewReplacer("_", "\\_", "*", "\\*", "`", "\\`", "[", "\\[")
-	} else if parseMode == ModeMarkdownV2 {
+	case ModeMarkdownV2:
 		replacer = strings.NewReplacer(
 			"_", "\\_", "*", "\\*", "[", "\\[", "]", "\\]", "(",
 			"\\(", ")", "\\)", "~", "\\~", "`", "\\`", ">", "\\>",
 			"#", "\\#", "+", "\\+", "-", "\\-", "=", "\\=", "|",
 			"\\|", "{", "\\{", "}", "\\}", ".", "\\.", "!", "\\!",
 		)
-	} else {
+	default:
 		return ""
 	}
 

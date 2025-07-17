@@ -39,7 +39,7 @@ func getBot(t *testing.T) (*BotAPI, error) {
 	bot.Debug = true
 
 	logger := testLogger{t}
-	SetLogger(logger)
+	_ = SetLogger(logger)
 
 	if err != nil {
 		t.Error(err)
@@ -548,7 +548,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(DeleteWebhookConfig{})
+	_, _ = bot.Request(DeleteWebhookConfig{})
 
 	wh, err := NewWebhookWithCert("https://example.com/tgbotapi-test/"+bot.Token, FilePath("tests/cert.pem"))
 
@@ -567,7 +567,7 @@ func TestSetWebhookWithCert(t *testing.T) {
 		t.Error(err)
 	}
 
-	bot.Request(DeleteWebhookConfig{})
+	_, _ = bot.Request(DeleteWebhookConfig{})
 }
 
 func TestSetWebhookWithoutCert(t *testing.T) {
@@ -575,7 +575,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	bot.Request(DeleteWebhookConfig{})
+	_, _ = bot.Request(DeleteWebhookConfig{})
 
 	wh, err := NewWebhook("https://example.com/tgbotapi-test/" + bot.Token)
 
@@ -601,7 +601,7 @@ func TestSetWebhookWithoutCert(t *testing.T) {
 		t.Errorf("failed to set webhook: %s", info.LastErrorMessage)
 	}
 
-	bot.Request(DeleteWebhookConfig{})
+	_, _ = bot.Request(DeleteWebhookConfig{})
 }
 
 func TestSendWithMediaGroupPhotoVideo(t *testing.T) {
@@ -701,7 +701,7 @@ func ExampleNewBotAPI() {
 		msg := NewMessage(update.Message.Chat.ID, update.Message.Text)
 		msg.ReplyToMessageID = update.Message.MessageID
 
-		bot.Send(msg)
+		_, _ = bot.Send(msg)
 	}
 }
 
@@ -738,14 +738,19 @@ func ExampleNewWebhook() {
 	}
 
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+	go func() {
+		err = http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
 }
 
-func ExampleWebhookHandler() {
+func Handler() {
 	bot, err := NewBotAPI("MyAwesomeBotToken")
 	if err != nil {
 		panic(err)
@@ -782,7 +787,12 @@ func ExampleWebhookHandler() {
 		}
 	})
 
-	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+	go func() {
+		err = http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }
 
 func ExampleInlineConfig() {
