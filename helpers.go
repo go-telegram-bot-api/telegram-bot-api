@@ -233,6 +233,19 @@ func NewInputMediaDocument(media RequestFileData) InputMediaDocument {
 	}
 }
 
+func NewEditMessageMedia(chatID int64, messageID int, caption string, parse_mode string, fileType string, fileID string) EditMessageMediaConfig {
+  return EditMessageMediaConfig{
+    ChatID:    chatID,
+    MessageID: messageID,
+    InputMedia: InputMedia{
+      Type:      fileType,
+      Media:     fileID,
+      Caption:   caption,
+      ParseMode: parse_mode,
+    },
+  }
+}
+
 // NewContact allows you to send a shared contact.
 func NewContact(chatID int64, phoneNumber, firstName string) ContactConfig {
 	return ContactConfig{

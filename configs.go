@@ -532,6 +532,93 @@ func (config DocumentConfig) files() []RequestFile {
 	return files
 }
 
+type InputMedia struct {
+  Media     string json:"media"
+  Type      string json:"type"
+  Caption   string json:"caption"
+  ParseMode string json:"parse_mode"
+}
+
+func (config InputMedia) params() (map[string]string, error) {
+  params, _ := config.params()
+  params["media"] = config.Media
+  params["type"] = config.Type
+  if config.Caption != "" {
+    params["caption"] = config.Caption
+    if config.ParseMode != "" {
+      params["parse_mode"] = config.ParseMode
+    }
+  }
+
+  return params, nil
+}
+
+// Values returns a url.Values representation of PhotoConfig.
+func (config InputMedia) values() ([]byte, error) {
+  // v := url.Values{}
+  // // if err != nil {
+  // //   return v, err
+  // // }
+
+  // v.Add(config.name(), config.Media)
+  // v.Add("type", config.Type)
+  // if config.Caption != "" {
+  //   v.Add("caption", config.Caption)
+  //   if config.ParseMode != "" {
+  //     v.Add("parse_mode", config.ParseMode)
+  //   }
+  // }
+  data, err := json.Marshal(config)
+  if err != nil {
+    return data, err
+  }
+
+  return data, nil
+}
+
+// name returns the field name for the Photo.
+func (config InputMedia) name() string {
+  return "media"
+}
+
+type EditMessageMediaConfig struct {
+  ChatID          int64
+  ChannelUsername string
+  MessageID       int
+  InlineMessageID string
+  ReplyMarkup     *InlineKeyboardMarkup
+
+  InputMedia
+}
+
+func (EditMessageMediaConfig) method() string {
+  return "editMessageMedia"
+}
+
+func (edit EditMessageMediaConfig) values() (url.Values, error) {
+  v := url.Values{}
+  data, err := edit.InputMedia.values()
+  v.Add("media", string(data))
+  if edit.InlineMessageID == "" {
+    if edit.ChannelUsername != "" {
+      v.Add("chat_id", edit.ChannelUsername)
+    } else {
+      v.Add("chat_id", strconv.FormatInt(edit.ChatID, 10))
+    }
+    v.Add("message_id", strconv.Itoa(edit.MessageID))
+  } else {
+    v.Add("inline_message_id", edit.InlineMessageID)
+  }
+  if edit.ReplyMarkup != nil {
+    data, err := json.Marshal(edit.ReplyMarkup)
+    if err != nil {
+      return v, err
+    }
+    v.Add("reply_markup", string(data))
+  }
+  return v, err
+}
+
 // StickerConfig contains information about a SendSticker request.
 type StickerConfig struct {
 	BaseFile
