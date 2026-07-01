@@ -114,6 +114,11 @@ type Update struct {
 	//
 	// optional
 	ChatJoinRequest *ChatJoinRequest `json:"chat_join_request,omitempty"`
+	// ManagedBot is the creation, token update, or owner update of a bot
+	// managed by the current bot (Bot API 9.6+, Managed Bots).
+	//
+	// optional
+	ManagedBot *ManagedBotUpdated `json:"managed_bot,omitempty"`
 }
 
 // SentFrom returns the user who sent an update. Can be nil, if Telegram did not provide information
@@ -217,6 +222,11 @@ type User struct {
 	//
 	// optional
 	SupportsInlineQueries bool `json:"supports_inline_queries,omitempty"`
+	// CanManageBots is true, if other bots can be created to be controlled
+	// by this bot (Bot API 9.6+, Managed Bots). Returned only in getMe.
+	//
+	// optional
+	CanManageBots bool `json:"can_manage_bots,omitempty"`
 }
 
 // String displays a simple text version of a user.
@@ -563,6 +573,11 @@ type Message struct {
 	//
 	// optional
 	MessageAutoDeleteTimerChanged *MessageAutoDeleteTimerChanged `json:"message_auto_delete_timer_changed,omitempty"`
+	// ManagedBotCreated is a service message: a bot was created to be
+	// managed by the current bot (Bot API 9.6+, Managed Bots).
+	//
+	// optional
+	ManagedBotCreated *ManagedBotCreated `json:"managed_bot_created,omitempty"`
 	// MigrateToChatID is the group has been migrated to a supergroup with the specified identifier.
 	// This number may be greater than 32 bits and some programming languages
 	// may have difficulty/silent defects in interpreting it.
@@ -1179,6 +1194,22 @@ type ProximityAlertTriggered struct {
 type MessageAutoDeleteTimerChanged struct {
 	// New auto-delete time for messages in the chat.
 	MessageAutoDeleteTime int `json:"message_auto_delete_time"`
+}
+
+// ManagedBotCreated contains information about a bot that was created to be
+// managed by the current bot (Bot API 9.6+, Managed Bots).
+type ManagedBotCreated struct {
+	// Bot is the newly created managed bot.
+	Bot User `json:"bot"`
+}
+
+// ManagedBotUpdated represents the creation, token update, or owner update of
+// a bot managed by the current bot (Bot API 9.6+, Managed Bots).
+type ManagedBotUpdated struct {
+	// User who owns the managed bot.
+	User User `json:"user"`
+	// Bot is the managed bot affected by this update.
+	Bot User `json:"bot"`
 }
 
 // VideoChatScheduled represents a service message about a voice chat scheduled
