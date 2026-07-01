@@ -441,7 +441,11 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) UpdatesChannel {
 
 			updates, err := bot.GetUpdates(config)
 			if err != nil {
-				log.Println(err)
+				// Transport-level errors (e.g. "unexpected EOF") come back as a
+				// *url.Error whose message embeds the full request URL — and the
+				// bot token is part of that URL, so logging err verbatim leaks
+				// it in cleartext. Redact before printing.
+				log.Println(strings.ReplaceAll(err.Error(), bot.Token, "[REDACTED]"))
 				log.Println("Failed to get updates, retrying in 3 seconds...")
 				time.Sleep(time.Second * 3)
 
